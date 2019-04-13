@@ -1,7 +1,8 @@
 DEAR Petition
 =============
 
-Behold My Awesome Project!
+A `Durham Expunction and Restoration (DEAR)<https://www.deardurham.org>`_
+project for creating petition forms.
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
@@ -12,6 +13,41 @@ Behold My Awesome Project!
 
 
 :License: MIT
+
+
+Local Development With Docker
+-----------------------------
+
+To run this on a Mac, use `Docker for Mac
+<https://docs.docker.com/docker-for-mac/install/>`_.
+
+Create a ``.env`` file with the following::
+
+  COMPOSE_FILE=local.yml
+
+Build the project containers::
+
+  docker-compose build
+
+Run the containers::
+
+  docker-compose up -d
+
+
+Initial Setup
+~~~~~~~~~~~~~
+
+Create a superuser::
+
+  docker-compose run --rm django python manage.py createsuperuser
+
+Migrate DB::
+
+  docker-compose run --rm django python manage.py migrate
+
+See detailed `cookiecutter-django Docker documentation`_.
+
+.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
 
 
 Settings
@@ -121,15 +157,3 @@ Heroku
 See detailed `cookiecutter-django Heroku documentation`_.
 
 .. _`cookiecutter-django Heroku documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-on-heroku.html
-
-
-
-Docker
-^^^^^^
-
-See detailed `cookiecutter-django Docker documentation`_.
-
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
-
-
-
