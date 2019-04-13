@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=dear_petition
+POSTGRES_USER=VmPOASIQfLOVUgehHTGrJDyWLbRGmzbX
+POSTGRES_PASSWORD=eli57XSof3ruhHypu7oSzPHQkKg1OUYNksJlPv1Hh3F4FJN2GCqTCCkviF9GIKWx
