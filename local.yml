@@ -41,6 +41,16 @@ services:
   redis:
     image: redis:5-alpine
 
+  jupyter:
+    <<: *django
+    image: dear_petition_local_jupyter
+    ports:
+      - "8001:8888"
+    depends_on:
+      - postgres
+      - redis
+    command: /start-jupyter
+
   # TODO: uncomment when ready to use
   # celeryworker:
   #   <<: *django

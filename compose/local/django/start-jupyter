@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+jupyter lab --NotebookApp.token='' --no-browser --allow-root --ip 0.0.0.0
