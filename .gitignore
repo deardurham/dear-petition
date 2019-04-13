@@ -269,6 +269,8 @@ tags
 ### Project template
 
 dear_petition/media/
+.ipynb_checkpoints
+notebooks/petition.pdf
 
 .pytest_cache/
 
