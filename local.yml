@@ -41,32 +41,33 @@ services:
   redis:
     image: redis:5-alpine
 
-  celeryworker:
-    <<: *django
-    image: dear_petition_local_celeryworker
-    depends_on:
-      - redis
-      - postgres
-      - mailhog
-    ports: []
-    command: /start-celeryworker
+  # TODO: uncomment when ready to use
+  # celeryworker:
+  #   <<: *django
+  #   image: dear_petition_local_celeryworker
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - mailhog
+  #   ports: []
+  #   command: /start-celeryworker
 
-  celerybeat:
-    <<: *django
-    image: dear_petition_local_celerybeat
-    depends_on:
-      - redis
-      - postgres
-      - mailhog
-    ports: []
-    command: /start-celerybeat
+  # celerybeat:
+  #   <<: *django
+  #   image: dear_petition_local_celerybeat
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - mailhog
+  #   ports: []
+  #   command: /start-celerybeat
 
-  flower:
-    <<: *django
-    image: dear_petition_local_flower
-    ports:
-      - "5555:5555"
-    command: /start-flower
+  # flower:
+  #   <<: *django
+  #   image: dear_petition_local_flower
+  #   ports:
+  #     - "5555:5555"
+  #   command: /start-flower
 
   node:
     build:
