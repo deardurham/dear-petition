@@ -15,7 +15,9 @@ RUN apk update \
   # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
   && apk add postgresql-client \
   # ZeroMQ
-  && apk add libzmq zeromq-dev
+  && apk add libzmq zeromq-dev \
+  # Git
+  && apk add git
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 

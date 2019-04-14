@@ -270,7 +270,7 @@ tags
 
 dear_petition/media/
 .ipynb_checkpoints
-notebooks/petition.pdf
+notebooks/ignore
 
 .pytest_cache/
 
