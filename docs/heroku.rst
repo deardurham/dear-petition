@@ -34,6 +34,7 @@ Environment variables::
     heroku config:set DJANGO_AWS_ACCESS_KEY_ID=""
     heroku config:set DJANGO_AWS_SECRET_ACCESS_KEY=""
     heroku config:set DJANGO_AWS_STORAGE_BUCKET_NAME="dear-petition-staging"
+    heroku config:set DJANGO_AWS_S3_REGION_NAME="us-east-1"
     heroku config:set SENTRY_DSN=""
     heroku config:set DJANGO_ALLOWED_HOSTS=dear-petition.herokuapp.com
     heroku config:set DJANGO_DEBUG=1
