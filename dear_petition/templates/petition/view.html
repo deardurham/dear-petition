@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static i18n crispy_forms_tags %}
+
+{% block title %}CIPRS Record: {{ record.data.Defendant.Name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>CIPRS Record: {{ record.data.Defendant.Name }}</h2>
+  {{ record.data }}
+</div>
+{% endblock content %}

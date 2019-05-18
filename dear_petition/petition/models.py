@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 class CIPRSRecord(models.Model):
 
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    report_pdf = models.FileField("Report PDF", upload_to='ciprs/')
+    report_pdf = models.FileField("Report PDF", upload_to='ciprs/', blank=True, null=True)
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
 
-    def parse_report(self):
+    def parse_report(self, report_pdf=None):
         """Save file locally, parse PDF, save to JSONField"""
         with tempfile.TemporaryDirectory(prefix='ciprs-') as tmp_folder:
             storage = FileSystemStorage(location=tmp_folder)
-            storage.save('report.pdf', self.report_pdf)
+            storage.save('report.pdf', report_pdf)
             saved_file_path = os.path.join(storage.location, 'report.pdf')
             reader = ciprs_reader.PDFToTextReader(saved_file_path)
             try:
