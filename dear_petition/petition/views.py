@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 
@@ -20,4 +22,8 @@ def upload_report(request):
 @login_required
 def view_record(request, pk):
     record = get_object_or_404(CIPRSRecord, pk=pk)
-    return render(request, 'petition/view.html', {'record': record})
+    context = {
+        'record': record,
+        'data_pretty': json.dumps(record.data, sort_keys=True, indent=4)
+    }
+    return render(request, 'petition/view.html', context)

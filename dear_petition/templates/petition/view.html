@@ -6,6 +6,6 @@
 {% block content %}
 <div class="container">
   <h2>CIPRS Record: {{ record.data.Defendant.Name }}</h2>
-  {{ record.data }}
+  <pre><code>{{ data_pretty }}</code><pre>
 </div>
 {% endblock content %}
