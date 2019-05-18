@@ -1,5 +1,9 @@
 build:
   docker:
     django: Dockerfile.prod
+release:
+  image: django
+  command:
+    - ./deployment-tasks.sh
 run:
   django: ./compose/production/django/start
