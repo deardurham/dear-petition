@@ -1,0 +1,5 @@
+build:
+  docker:
+    django: ./compose/production/django/Dockerfile
+run:
+  django: ./compose/production/django/start
