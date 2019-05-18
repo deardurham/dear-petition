@@ -1,9 +1,9 @@
 build:
   docker:
-    django: Dockerfile.prod
+    web: Dockerfile.prod
 release:
-  image: django
+  image: web
   command:
-    - ./deployment-tasks.sh
+    - ./compose/production/django/deployment-tasks.sh
 run:
-  django: ./compose/production/django/start
+  web: ./compose/production/django/start
