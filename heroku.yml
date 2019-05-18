@@ -4,6 +4,6 @@ build:
 release:
   image: web
   command:
-    - ./compose/production/django/deployment-tasks.sh
+    - /deployment-tasks
 run:
   web: ./compose/production/django/start
