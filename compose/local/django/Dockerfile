@@ -17,7 +17,9 @@ RUN apk update \
   # ZeroMQ
   && apk add libzmq zeromq-dev \
   # Git
-  && apk add git
+  && apk add git \
+  # pdftotext
+  && apk add poppler-utils
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 
