@@ -7,7 +7,7 @@ COPY . /app
 RUN npm run build
 
 # Python build stage
-FROM python:3.6-alpine
+FROM alpine:3.9.3
 
 ENV PYTHONUNBUFFERED 1
 
@@ -19,6 +19,10 @@ RUN apk update \
   && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
   # CFFI dependencies
   && apk add libffi-dev py-cffi
+  # Git
+  && apk add git \
+  # pdftotext
+  && apk add poppler-utils
 
 RUN addgroup -S django \
     && adduser -S -G django django
