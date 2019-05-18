@@ -6,4 +6,5 @@ set -o nounset
 
 
 python /app/manage.py collectstatic --noinput
+python /app/manage.py migrate --noinput
 /usr/bin/gunicorn config.wsgi --bind 0.0.0.0:$PORT --chdir=/app
