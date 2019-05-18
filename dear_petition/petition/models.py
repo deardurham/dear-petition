@@ -1,7 +1,9 @@
 import json
 import logging
-import tempfile
+import os
 import subprocess
+import tempfile
+import ciprs_reader
 
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
@@ -22,14 +24,13 @@ class CIPRSRecord(models.Model):
         """Save file locally, parse PDF, save to JSONField"""
         with tempfile.TemporaryDirectory(prefix='ciprs-') as tmp_folder:
             storage = FileSystemStorage(location=tmp_folder)
-            storage.save('record.pdf', record.report_pdf)
-            saved_file_path = os.path.join(storage.location, 'record.pdf')
+            storage.save('report.pdf', self.report_pdf)
+            saved_file_path = os.path.join(storage.location, 'report.pdf')
             reader = ciprs_reader.PDFToTextReader(saved_file_path)
             try:
                 reader.parse()
-                record.data = json.loads(reader.json())
+                data = json.loads(reader.json())
             except subprocess.CalledProcessError as e:
                 logger.exception(e)
-                record.data = {'error': str(e)}
-            finally:
-                record.save()
+                data = {'error': str(e)}
+            return data
