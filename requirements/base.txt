@@ -21,5 +21,4 @@ djangorestframework==3.9.2  # https://github.com/encode/django-rest-framework
 coreapi==2.3.3  # https://github.com/core-api/python-client
 
 pdfrw==0.4
-git+https://github.com/JoshData/pdf-redactor.git@e8945b3c7e73ba338873b0ee42ac5b9beeee3c5a#egg=pdf-redactor
-pdfminer.six==20181108
+git+https://github.com/codefordurham/ciprs-reader.git#egg=ciprs-reader
