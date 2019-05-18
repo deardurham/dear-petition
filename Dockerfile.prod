@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
   # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3 python3-dev musl-dev \
+  && apk add --virtual build-deps gcc python3 python3-dev musl-dev py3-pip bash \
   && apk add postgresql-dev \
   # Pillow dependencies
   && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
@@ -46,10 +46,10 @@ RUN sed -i 's/\r//' /start
 RUN chmod +x /start
 RUN chown django /start
 
-COPY ./compose/production/django/deployment-tasks /deployment-tasks
-RUN sed -i 's/\r//' /deployment-tasks
-RUN chmod +x /deployment-tasks
-RUN chown django /deployment-tasks
+COPY ./compose/production/django/deployment-tasks /deployment-tasks.sh
+RUN sed -i 's/\r//' /deployment-tasks.sh
+RUN chmod +x /deployment-tasks.sh
+RUN chown django /deployment-tasks.sh
 
 COPY ./compose/production/django/celery/worker/start /start-celeryworker
 RUN sed -i 's/\r//' /start-celeryworker
