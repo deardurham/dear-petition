@@ -17,6 +17,10 @@ Provisioning::
     # heroku stack:set container
     heroku stack:set heroku-18
 
+    heroku buildpacks:clear
+    heroku buildpacks:add heroku/nodejs
+    heroku buildpacks:add heroku/python
+
     heroku addons:create heroku-postgresql:hobby-dev
     heroku addons:create heroku-redis:hobby-dev
     heroku addons:create mailgun:starter
