@@ -20,6 +20,7 @@ Provisioning::
     heroku buildpacks:clear
     heroku buildpacks:add heroku/nodejs
     heroku buildpacks:add heroku/python
+    heroku buildpacks:add https://github.com/carwow/heroku-buildpack-pdftotext.git
 
     heroku addons:create heroku-postgresql:hobby-dev
     heroku addons:create heroku-redis:hobby-dev
