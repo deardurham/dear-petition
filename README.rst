@@ -14,6 +14,11 @@ project for creating petition forms.
 
 :License: MIT
 
+Setup
+=============
+
+Run the setup_project.py script from the base directory, providing as a command line argument the directory to the related ciprs-reader project. This will set up the project in your environment.
+
 
 Local Development With Docker
 -----------------------------

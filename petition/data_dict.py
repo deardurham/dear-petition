@@ -1,14 +1,14 @@
 def map_data(json):
 
     return {
-        "County": json['General']['County'],
+        "County": json.get('General',{}).get('County',''),
         # File No
-        "ConsJdgmntFileNum": json['General']['File No'],
+        "ConsJdgmntFileNum": json.get('General',{}).get('File No',''),
         # Checkboxes: In The General Court of Justice
         "District": 'Yes',  # Yes == checked
         "Superior": '',
         # Name and Address of Petitioner
-        "NamePetitioner": json['Defendant']['Name'],
+        "NamePetitioner": json.get('Defendant',{}).get('Name',''),
         "StreetAddr": '',
         "MailAddr": '',
         "City": "Durham",
@@ -18,27 +18,20 @@ def map_data(json):
         "DLNo": '',
         "DLState": '',
         # Race
-        "Race": json['Defendant']['Race'],
+        "Race": json.get('Defendant',{}).get('Race',''),
         # Sex
-        "Sex": json['Defendant']['Sex'],
+        "Sex": json.get('Defendant',{}).get('Sex',''),
         # Date of Birth
-        "DOB": json['Defendant']['Date of Birth/Estimated Age'],
+        "DOB": json.get('Defendant',{}).get('Date of Birth/Estimated Age',''),
         # Full Social Security Number
         "SNN": '',
         # Age At Time of Offense
         "Age": '',
         # Name and Address of Petitioners Attorney
-        "NameAtty": "Arnetta Herring",
-        "StAddrAtty": "510 Dillard Street, 6th Fl",
-        "MailAddrAtty": "Suite 6400",
-        "CityAtty": "Durham",
-        "StateAtty": "NC",
-        "ZipCodeAtty": "27701",
+        "NameAtty": "",
+        "StAddrAtty": "",
+        "MailAddrAtty": "",
+        "CityAtty": "",
+        "StateAtty": "",
+        "ZipCodeAtty": "",
         }
-
-def f():
-    return 'hello'
-
-if __name__=='main':
-    with open('test.txt','w') as fi:
-        fi.write(f())
