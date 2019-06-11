@@ -1,0 +1,9 @@
+build:
+  docker:
+    web: Dockerfile.prod
+# release:
+#   command:
+#     - /deployment-tasks.sh
+#   image: web
+run:
+  web: ./compose/production/django/start

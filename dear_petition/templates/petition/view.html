@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static i18n crispy_forms_tags %}
+
+{% block title %}CIPRS Record: {{ record.data.Defendant.Name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>CIPRS Record: {{ record.data.Defendant.Name }}</h2>
+  <br />
+  <form method="POST" action="{% url 'view-record' record.pk %}">
+    {% csrf_token %}
+    <button class="primaryAction btn btn-primary" type="submit">{% trans "Generate Petition Form" %}</button>
+  </form>
+  <br />
+  <h3>Extracted Data</h3>
+  <pre><code>{{ data_pretty }}</code><pre>
+</div>
+{% endblock content %}
