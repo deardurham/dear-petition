@@ -171,7 +171,7 @@ MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-APP_LOG_LEVEL = env.int("APP_LOG_LEVEL", "DEBUG")
+APP_LOG_LEVEL = env("APP_LOG_LEVEL", default="DEBUG")
 
 LOGGING = {
     "version": 1,
