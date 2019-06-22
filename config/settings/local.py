@@ -63,5 +63,47 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-eager-propagates
 CELERY_TASK_EAGER_PROPAGATES = True
+
+APP_LOG_LEVEL = env.int("APP_LOG_LEVEL", "DEBUG")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(name)s "
+            "%(process)d %(thread)d %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "propagate": True,
+        },
+        "django.template": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "dear_petition": {
+            "level": APP_LOG_LEVEL,
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "ciprs": {
+            "level": APP_LOG_LEVEL,
+            "handlers": ["console"],
+            "propagate": False,
+        },
+    },
+}
+
 # Your stuff...
 # ------------------------------------------------------------------------------

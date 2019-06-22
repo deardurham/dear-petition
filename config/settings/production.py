@@ -171,13 +171,14 @@ MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+APP_LOG_LEVEL = env.int("APP_LOG_LEVEL", "DEBUG")
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s "
+            "format": "%(levelname)s %(asctime)s %(name)s "
             "%(process)d %(thread)d %(message)s"
         }
     },
@@ -191,6 +192,16 @@ LOGGING = {
     "loggers": {
         "django.db.backends": {
             "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "dear_petition": {
+            "level": APP_LOG_LEVEL,
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "ciprs": {
+            "level": APP_LOG_LEVEL,
             "handlers": ["console"],
             "propagate": False,
         },
