@@ -255,3 +255,4 @@ SOCIALACCOUNT_ADAPTER = "dear_petition.users.adapters.SocialAccountAdapter"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)

@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import ciprs_reader
 
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -28,7 +29,7 @@ class CIPRSRecord(models.Model):
             saved_file_path = os.path.join(storage.location, 'report.pdf')
             reader = ciprs_reader.PDFToTextReader(saved_file_path)
             try:
-                reader.parse()
+                reader.parse(source=settings.CIPRS_READER_SOURCE)
                 data = json.loads(reader.json())
             except subprocess.CalledProcessError as e:
                 logger.exception(e)
