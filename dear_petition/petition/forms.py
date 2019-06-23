@@ -18,6 +18,8 @@ class UploadFileForm(forms.Form):
     def save(self):
         file_ = self.cleaned_data['file']
         record = CIPRSRecord()
+        if settings.CIPRS_SAVE_PDF:
+            record.report_pdf = file_
         record.data = record.parse_report(file_)
         if 'error' in record.data:
             raise forms.ValidationError(record.data['error'])
