@@ -35,3 +35,31 @@ class CIPRSRecord(models.Model):
                 logger.exception(e)
                 data = {'error': str(e)}
             return data
+
+    @property
+    def file_no(self):
+        return self.data['General'].get('File No', '')
+
+    @property
+    def county(self):
+        return self.data['General'].get('County', '')
+
+    @property
+    def dob(self):
+        return self.data['Defendant'].get('Date of Birth/Estimated Age', '')
+
+    @property
+    def case_status(self):
+        return self.data['Case Information'].get('Case Status', '')
+
+    @property
+    def offense_date(self):
+        return self.data['Case Information'].get('Offense Date', '')
+
+    @property
+    def disposed_on(self):
+        return self.data['Offense Record'].get('Disposed On', '')
+
+    @property
+    def disposition_method(self):
+        return self.data['Offense Record'].get('Disposition Method', '')

@@ -6,7 +6,7 @@
 {% block content %}
   <div class="row">
     <div class="col-sm">
-      <h2>CIPRS Record: {{ record.data.Defendant.Name }}</h2>
+      <h1 class='page-header'>{{ record.data.Defendant.Name|title }}</h1>
     <div>
   </div>
   <br />
@@ -20,10 +20,69 @@
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="petition" role="tabpanel" aria-labelledby="petition-tab">
-      <form method="POST" action="{% url 'view-record' record.pk %}">
-        {% csrf_token %}
-        <button class="primaryAction btn btn-primary" type="submit">{% trans "Generate Petition Form" %}</button>
-      </form>
+      <h3>Record Data</h3>
+      <table id="ciprs-data" class="table table-hover">
+        <tbody>
+          <tr>
+            <th scope="row">General</th>
+            <td>File No</td>
+            <td>{{ record.file_no }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>County</td>
+            <td>{{ record.county }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Defendant</th>
+            <td>Name</td>
+            <td>{{ record.data.Defendant.Name }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Sex</td>
+            <td>{{ record.data.Defendant.Sex }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Race</td>
+            <td>{{ record.data.Defendant.Race }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Date of Birth</td>
+            <td>{{ record.dob }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Case Information</th>
+            <td>Case Status</td>
+            <td>{{ record.case_status }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Offense Date</td>
+            <td>{{ record.offense_date }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Offense Record</th>
+            <td>Disposed On</td>
+            <td>{{ record.disposed_on }}</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td>Disposition Method</td>
+            <td>{{ record.disposition_method }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="col-sm">
+          <form method="POST" action="{% url 'view-record' record.pk %}">
+            {% csrf_token %}
+            <button class="primaryAction btn btn-primary" type="submit">{% trans "Generate Petition Form" %}</button>
+          </form>
+        </div>
+      </div>
     </div>
     <div class="tab-pane fade" id="source" role="tabpanel" aria-labelledby="source-tab">
       <pre><code>{{ source|linebreaks }}</code></pre>
