@@ -26,9 +26,6 @@
       </form>
     </div>
     <div class="tab-pane fade" id="source" role="tabpanel" aria-labelledby="source-tab">
-      {% if record.report_pdf %}
-        <a id='ciprs-pdf-download' href='{{ record.report_pdf.url }}'>View CIPRS PDF</a>
-      {% endif %}
       <pre><code>{{ source|linebreaks }}</code></pre>
     </div>
   </div>
