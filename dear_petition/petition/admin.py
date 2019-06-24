@@ -27,3 +27,11 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
             messages.success(request, "Parsed successfully")
         return redirect('admin:petition_ciprsrecord_changelist')
     action_parse_report_pdf.short_description = 'Parse PDF Report...'
+
+
+@admin.register(models.Contact)
+class ContactAdmin(admin.ModelAdmin):
+
+    list_display = ('pk', 'name', 'category', 'address1')
+    list_filter = ('category',)
+    ordering = ('category', 'name')

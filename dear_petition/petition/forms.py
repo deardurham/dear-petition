@@ -6,7 +6,7 @@ import tempfile
 from django import forms
 from django.conf import settings
 
-from dear_petition.petition.models import CIPRSRecord
+from dear_petition.petition.models import CIPRSRecord, Contact
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
 from dear_petition.petition.writer import Writer
@@ -31,9 +31,63 @@ class UploadFileForm(forms.Form):
 
 class GeneratePetitionForm(forms.Form):
 
+    attorney = forms.ModelChoiceField(
+        queryset=Contact.objects.filter(category='attorney'),
+        required=False,
+    )
+    agency1 = forms.ModelChoiceField(
+        queryset=Contact.objects.filter(category='agency'),
+        label="Agency #1",
+        required=False,
+    )
+    agency2 = forms.ModelChoiceField(
+        queryset=Contact.objects.filter(category='agency'),
+        label="Agency #2",
+        required=False,
+    )
+
     def __init__(self, *args, **kwargs):
         self.record = kwargs.pop('record')
         super().__init__(*args, **kwargs)
+
+    def clean_attorney(self):
+        data = self.cleaned_data['attorney']
+        if data:
+            self.record.data.update({
+                'NameAtty': data.name,
+                'StAddrAtty': data.address1,
+                'MailAddrAtty': data.address2,
+                'CityAtty': data.city,
+                'StateAtty': data.state,
+                'ZipCodeAtty': data.zipcode,
+            })
+        return data
+
+    def clean_agency1(self):
+        data = self.cleaned_data['agency1']
+        if data:
+            self.record.data.update({
+                'NameAgency1': data.name,
+                'AddrAgency1': data.address1,
+                'MailAgency1': data.address2,
+                'CityAgency1': data.city,
+                'StateAgency1': data.state,
+                'ZipAgency1': data.zipcode,
+            })
+        return data
+
+    def clean_agency2(self):
+        data = self.cleaned_data['agency2']
+        if data:
+            self.record.data.update({
+                'NameAgency2': data.name,
+                'AddrAgency2': data.address1,
+                'MailAgency2': data.address2,
+                'CityAgency2': data.city,
+                'StateAgency2': data.state,
+                'ZipAgency2': data.zipcode,
+            })
+        return data
 
     def save(self):
         output = io.BytesIO()

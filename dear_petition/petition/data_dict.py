@@ -28,10 +28,24 @@ def map_data(json):
         # Age At Time of Offense
         "Age": '',
         # Name and Address of Petitioners Attorney
-        "NameAtty": "",
-        "StAddrAtty": "",
-        "MailAddrAtty": "",
-        "CityAtty": "",
-        "StateAtty": "",
-        "ZipCodeAtty": "",
+        "NameAtty": json.get('NameAtty', ''),
+        "StAddrAtty": json.get('StAddrAtty', ''),
+        "MailAddrAtty": json.get('MailAddrAtty', ''),
+        "CityAtty": json.get('CityAtty', ''),
+        "StateAtty": json.get('StateAtty', ''),
+        "ZipCodeAtty": json.get('ZipCodeAtty', ''),
+        # Agency 1
+        "NameAgency1": json.get('NameAgency1', ''),
+        "AddrAgency1": json.get('AddrAgency1', ''),
+        "MailAgency1": json.get('MailAgency1', ''),
+        "CityAgency1": json.get('CityAgency1', ''),
+        "StateAgency1": json.get('StateAgency1', ''),
+        "ZipAgency1": json.get('ZipAgency1', ''),
+        # Agency 2
+        "NameAgency2": json.get('NameAgency2', ''),
+        "AddrAgency2": json.get('AddrAgency2', ''),
+        "MailAgency2": json.get('MailAgency2', ''),
+        "CityAgency2": json.get('CityAgency2', ''),
+        "StateAgency2": json.get('StateAgency2', ''),
+        "ZipAgency2": json.get('ZipAgency2', ''),
         }

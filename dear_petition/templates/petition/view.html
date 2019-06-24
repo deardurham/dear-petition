@@ -12,7 +12,10 @@
   <br />
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="petition-tab" data-toggle="tab" href="#petition" role="tab" aria-controls="home" aria-selected="true">Petition</a>
+      <a class="nav-link active" id="petition-tab" data-toggle="tab" href="#petition" role="tab" aria-controls="petition" aria-selected="true">Petition Form</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="ciprs-tab" data-toggle="tab" href="#ciprs" role="tab" aria-controls="ciprs" aria-selected="true">CIPRS</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="source-tab" data-toggle="tab" href="#source" role="tab" aria-controls="profile" aria-selected="false">Source</a>
@@ -20,67 +23,75 @@
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="petition" role="tabpanel" aria-labelledby="petition-tab">
-      <h3>Record Data</h3>
-      <table id="ciprs-data" class="table table-hover">
-        <tbody>
-          <tr>
-            <th scope="row">General</th>
-            <td>File No</td>
-            <td>{{ record.file_no }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>County</td>
-            <td>{{ record.county }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Defendant</th>
-            <td>Name</td>
-            <td>{{ record.data.Defendant.Name }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>Sex</td>
-            <td>{{ record.data.Defendant.Sex }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>Race</td>
-            <td>{{ record.data.Defendant.Race }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>Date of Birth</td>
-            <td>{{ record.dob }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Case Information</th>
-            <td>Case Status</td>
-            <td>{{ record.case_status }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>Offense Date</td>
-            <td>{{ record.offense_date }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Offense Record</th>
-            <td>Disposed On</td>
-            <td>{{ record.disposed_on }}</td>
-          </tr>
-          <tr>
-            <th scope="row"></th>
-            <td>Disposition Method</td>
-            <td>{{ record.disposition_method }}</td>
-          </tr>
-        </tbody>
-      </table>
       <div class="row">
-        <div class="col-sm">
+        <div class="col-7">
+          <h3>Petition Form</h3>
           <form method="POST" action="{% url 'view-record' record.pk %}">
             {% csrf_token %}
+            {{ form|crispy }}
             <button class="primaryAction btn btn-primary" type="submit">{% trans "Generate Petition Form" %}</button>
           </form>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="ciprs" role="tabpanel" aria-labelledby="ciprs-tab">
+      <div class="row">
+        <div class="col">
+          <h3>CIPRS Data</h3>
+          <table id="ciprs-data" class="table table-hover table-sm">
+            <tbody>
+              <tr>
+                <th scope="row">General</th>
+                <td>File No</td>
+                <td>{{ record.file_no }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>County</td>
+                <td>{{ record.county }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Defendant</th>
+                <td>Name</td>
+                <td>{{ record.data.Defendant.Name }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Sex</td>
+                <td>{{ record.data.Defendant.Sex }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Race</td>
+                <td>{{ record.data.Defendant.Race }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Date of Birth</td>
+                <td>{{ record.dob }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Case Information</th>
+                <td>Case Status</td>
+                <td>{{ record.case_status }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Offense Date</td>
+                <td>{{ record.offense_date }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Offense Record</th>
+                <td>Disposed On</td>
+                <td>{{ record.disposed_on }}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Disposition Method</td>
+                <td>{{ record.disposition_method }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

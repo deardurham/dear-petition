@@ -63,3 +63,22 @@ class CIPRSRecord(models.Model):
     @property
     def disposition_method(self):
         return self.data['Offense Record'].get('Disposition Method', '')
+
+
+class Contact(models.Model):
+
+    CONTACT_CATEGORIES = (
+        ('agency', 'Agency'),
+        ('attorney', 'Attorney'),
+    )
+
+    name = models.CharField(max_length=512)
+    category = models.CharField(max_length=16, choices=CONTACT_CATEGORIES, default='agency')
+    address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
+    city = models.CharField(max_length=64, blank=True)
+    state = models.CharField(max_length=64, blank=True)
+    zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
+
+    def __str__(self):
+        return self.name

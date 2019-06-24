@@ -29,13 +29,15 @@ def view_record(request, pk):
         if form.is_valid():
             output = form.save()
             return FileResponse(output, filename='petition.pdf', as_attachment=True)
+    else:
+        form = GeneratePetitionForm(record=record)
     if '_meta' in record.data and 'source' in record.data['_meta']:
         source = record.data['_meta']['source']
     else:
         source = ''
     context = {
+        'form': form,
         'record': record,
-        'data_pretty': json.dumps(record.data, sort_keys=True, indent=4),
         'source': source,
     }
     return render(request, 'petition/view.html', context)
