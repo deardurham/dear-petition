@@ -50,6 +50,20 @@
                 <td>County</td>
                 <td>{{ record.county }}</td>
               </tr>
+              {% if record.district_court %}
+              <tr>
+                <th scope="row"></th>
+                <td>District</td>
+                <td>{{ record.district_court }}</td>
+              </tr>
+              {% endif %}
+              {% if record.superior_court %}
+              <tr>
+                <th scope="row"></th>
+                <td>Superior</td>
+                <td>{{ record.superior_court }}</td>
+              </tr>
+              {% endif %}
               <tr>
                 <th scope="row">Defendant</th>
                 <td>Name</td>

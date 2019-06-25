@@ -64,6 +64,14 @@ class CIPRSRecord(models.Model):
     def disposition_method(self):
         return self.data['Offense Record'].get('Disposition Method', '')
 
+    @property
+    def district_court(self):
+        return self.data['General'].get('District', '')
+
+    @property
+    def superior_court(self):
+        return self.data['General'].get('Superior', '')
+
 
 class Contact(models.Model):
 

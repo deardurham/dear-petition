@@ -5,8 +5,8 @@ def map_data(json):
         # File No
         "ConsJdgmntFileNum": json.get('General',{}).get('File No',''),
         # Checkboxes: In The General Court of Justice
-        "District": 'Yes',  # Yes == checked
-        "Superior": '',
+        "District": json.get('General', {}).get('District',''),
+        "Superior": json.get('General', {}).get('Superior',''),
         # Name and Address of Petitioner
         "NamePetitioner": json.get('Defendant',{}).get('Name',''),
         "StreetAddr": '',
