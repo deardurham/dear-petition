@@ -23,7 +23,9 @@ Local Development
 -----------------
 Begin by cloning the repository:
 
-git@github.com:deardurham/dear-petition.git
+```
+git clone https://github.com/deardurham/dear-petition.git
+```
 
 ## Setting Up a Virtual Environment
 Developing inside a virtual environment is recommended.
@@ -47,7 +49,7 @@ Run the setup\_project.py script from the base directory, providing as a
 command line argument the directory to the related ciprs-reader project.
 This will set up the project in your environment.
 ```
-python3 setup-project.py
+python3 setup-project.py <path-to-ciprs-reader>
 ```
 
 ## Local Development With Docker
