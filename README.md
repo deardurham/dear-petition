@@ -19,13 +19,43 @@ Run the setup\_project.py script from the base directory, providing as a
 command line argument the directory to the related ciprs-reader project.
 This will set up the project in your environment.
 
-Local Development With Docker
------------------------------
+Local Development
+-----------------
+Begin by cloning the repository:
+
+git@github.com:deardurham/dear-petition.git
+
+## Setting Up a Virtual Environment
+Developing inside a virtual environment is recommended.
+
+On Mac run the following command to set up a virtual environment:
+```
+brew install pipenv
+pipenv shell
+pip install -r requirements/base.txt
+```
+
+On Linux run the following command to set up a virtual environment:
+```
+sudo yum install python-tools
+pip3 install pipenv
+pipenv shell
+pip install -r requirements/base.txt
+```
+
+Run the setup\_project.py script from the base directory, providing as a
+command line argument the directory to the related ciprs-reader project.
+This will set up the project in your environment.
+```
+python3 setup-project.py
+```
+
+## Local Development With Docker
 
 To run this on a Mac, use [Docker for
 Mac](https://docs.docker.com/docker-for-mac/install/).
 
-Create a `.env` file with the following:
+Add desired environment variables to the `.env` file before creating your virtual environment.  You can copy `.env.example` to get started. Create a `.env` file with the following:
 
     COMPOSE_FILE=local.yml
 
