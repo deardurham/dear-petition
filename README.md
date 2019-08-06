@@ -45,11 +45,25 @@ pipenv shell
 pip install -r requirements/base.txt
 ```
 
-Run the setup\_project.py script from the base directory, providing as a
+While inside of the pipenv run the setup\_project.py script from the base directory, providing as a
 command line argument the directory to the related ciprs-reader project.
 This will set up the project in your environment.
 ```
 python3 setup-project.py <path-to-ciprs-reader>
+```
+
+Additional Pipenv Notes:
+To exit the pip environment:
+```
+(dear-petition) bash-3.2$ exit
+exit
+bash-3.2$
+```
+
+To delete the pipenv environment:
+```
+bash-3.2$ pipenv --rm
+Removing virtualenv (/Users/user/.local/share/virtualenvs/dear-petition-fJpn7FEC)…
 ```
 
 ## Local Development With Docker
