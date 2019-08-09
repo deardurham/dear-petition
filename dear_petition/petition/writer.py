@@ -27,6 +27,6 @@ class Writer:
                 key = annotation[self.ANNOT_FIELD_KEY][1:-1]
                 if key in self.data:
                     annotation.update(
-                        pdfrw.PdfDict(V='{}'.format(self.data[key]))
+                        pdfrw.PdfDict(**self.data[key])
                     )
         pdfrw.PdfWriter().write(self.output_path, self.template)

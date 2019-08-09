@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import pdfrw
 import tempfile
 
 from django import forms
@@ -88,6 +89,14 @@ class GeneratePetitionForm(forms.Form):
                 'ZipAgency2': data.zipcode,
             })
         return data
+
+    def clean(self):
+        # make sure checkbox is checked on PDF
+        checked_box = pdfrw.PdfName('Yes')
+        if 'General' in self.record.data and 'District' in self.record.data['General']:
+            self.record.data['General']['District'] = checked_box
+        if 'General' in self.record.data and 'Superior' in self.record.data['General']:
+            self.record.data['General']['Superior'] = checked_box
 
     def save(self):
         output = io.BytesIO()

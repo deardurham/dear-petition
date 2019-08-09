@@ -1,6 +1,6 @@
 import ciprs.reader as reader
-import petition.writer as writer
-from petition.data_dict import map_data
+import writer
+from data_dict import map_data
 import json
 import argparse
 
