@@ -1,5 +1,4 @@
-DEAR Petition
-=============
+# DEAR Petition
 
 A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 project for creating petition forms.
@@ -8,26 +7,59 @@ project for creating petition forms.
 
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-License
 
-:   MIT
+## Local Development
 
-Setup
-=====
-
-Run the setup\_project.py script from the base directory, providing as a
-command line argument the directory to the related ciprs-reader project.
-This will set up the project in your environment.
-
-Local Development
------------------
 Begin by cloning the repository:
 
 ```
 git clone https://github.com/deardurham/dear-petition.git
 ```
 
-## Setting Up a Virtual Environment
+
+## Local Development with Docker
+
+To run this on a Mac, use [Docker for
+Mac](https://docs.docker.com/docker-for-mac/install/).
+
+Add desired environment variables to the `.env` file before creating your virtual environment.  You can copy `.env.example` to get started. Create a `.env` file with the following:
+
+    COMPOSE_FILE=local.yml
+
+Build the project containers:
+
+    docker-compose build
+
+Run the containers:
+
+    docker-compose up -d
+
+Visit http://localhost:8000 in your browser.
+
+
+### Initial Setup
+
+Create a superuser:
+
+    docker-compose run --rm django python manage.py createsuperuser
+
+Migrate DB:
+
+    docker-compose run --rm django python manage.py migrate
+
+See detailed [cookiecutter-django Docker
+documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
+
+
+## Setup (without Docker)
+
+Run the setup\_project.py script from the base directory, providing as a
+command line argument the directory to the related ciprs-reader project.
+This will set up the project in your environment.
+
+
+### Setting Up a Virtual Environment
+
 Developing inside a virtual environment is recommended.
 
 On Mac run the following command to set up a virtual environment:
@@ -66,35 +98,6 @@ bash-3.2$ pipenv --rm
 Removing virtualenv (/Users/user/.local/share/virtualenvs/dear-petition-fJpn7FEC)…
 ```
 
-## Local Development With Docker
-
-To run this on a Mac, use [Docker for
-Mac](https://docs.docker.com/docker-for-mac/install/).
-
-Add desired environment variables to the `.env` file before creating your virtual environment.  You can copy `.env.example` to get started. Create a `.env` file with the following:
-
-    COMPOSE_FILE=local.yml
-
-Build the project containers:
-
-    docker-compose build
-
-Run the containers:
-
-    docker-compose up -d
-
-### Initial Setup
-
-Create a superuser:
-
-    docker-compose run --rm django python manage.py createsuperuser
-
-Migrate DB:
-
-    docker-compose run --rm django python manage.py migrate
-
-See detailed [cookiecutter-django Docker
-documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
 
 Settings
 --------
