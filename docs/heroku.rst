@@ -23,6 +23,7 @@ Provisioning::
     heroku addons:create heroku-postgresql:hobby-dev --remote staging
     heroku addons:create heroku-redis:hobby-dev --remote staging
     heroku addons:create mailgun:starter --remote staging
+    heroku addons:create papertrail:choklad --remote staging
 
 Environment variables::
 
