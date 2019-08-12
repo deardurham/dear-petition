@@ -12,33 +12,33 @@ Git Remote::
 
 Provisioning::
 
-    heroku stack
-    # gave up on this one:
-    # heroku stack:set container
-    heroku stack:set heroku-18
+    heroku stack --remote staging
+    heroku stack:set heroku-18 --remote staging
 
-    heroku buildpacks:clear
-    heroku buildpacks:add heroku/nodejs
-    heroku buildpacks:add heroku/python
-    heroku buildpacks:add https://github.com/carwow/heroku-buildpack-pdftotext.git
+    heroku buildpacks:clear --remote staging
+    heroku buildpacks:add heroku/nodejs --remote staging
+    heroku buildpacks:add heroku/python --remote staging
+    heroku buildpacks:add https://github.com/carwow/heroku-buildpack-pdftotext.git --remote staging
 
-    heroku addons:create heroku-postgresql:hobby-dev
-    heroku addons:create heroku-redis:hobby-dev
-    heroku addons:create mailgun:starter
+    heroku addons:create heroku-postgresql:hobby-dev --remote staging
+    heroku addons:create heroku-redis:hobby-dev --remote staging
+    heroku addons:create mailgun:starter --remote staging
 
 Environment variables::
 
-    heroku config:set DJANGO_SETTINGS_MODULE=config.settings.production
-    heroku config:set DJANGO_SECRET_KEY="$(openssl rand -base64 64)"
-    heroku config:set DJANGO_ADMIN_URL="$(openssl rand -base64 4096 | tr -dc 'A-HJ-NP-Za-km-z2-9' | head -c 32)/"
-    heroku config:set DJANGO_AWS_ACCESS_KEY_ID=""
-    heroku config:set DJANGO_AWS_SECRET_ACCESS_KEY=""
-    heroku config:set DJANGO_AWS_STORAGE_BUCKET_NAME="dear-petition-staging"
-    heroku config:set DJANGO_AWS_S3_REGION_NAME="us-east-1"
-    heroku config:set SENTRY_DSN=""
-    heroku config:set DJANGO_ALLOWED_HOSTS=dear-petition.herokuapp.com
-    heroku config:set DJANGO_DEBUG=1
-    heroku config:set DJANGO_SECURE_SSL_REDIRECT=0
+    heroku config:set DJANGO_SETTINGS_MODULE=config.settings.production --remote staging
+    heroku config:set DJANGO_SECRET_KEY="$(openssl rand -base64 64)" --remote staging
+    heroku config:set DJANGO_ADMIN_URL="admin-$(openssl rand -base64 4096 | tr -dc 'A-HJ-NP-Za-km-z2-9' | head -c 8)/" --remote staging
+    heroku config:set DJANGO_AWS_ACCESS_KEY_ID="" --remote staging
+    heroku config:set DJANGO_AWS_SECRET_ACCESS_KEY="" --remote staging
+    heroku config:set DJANGO_AWS_STORAGE_BUCKET_NAME="dear-petition-staging" --remote staging
+    heroku config:set DJANGO_AWS_S3_REGION_NAME="us-east-1" --remote staging
+    heroku config:set SENTRY_DSN="" --remote staging
+    heroku config:set DJANGO_ALLOWED_HOSTS=dear-petition-staging.herokuapp.com --remote staging
+    heroku config:set DJANGO_DEBUG=1 --remote staging
+    heroku config:set DJANGO_SECURE_SSL_REDIRECT=0 --remote staging
+    heroku config:set CELERY_BROKER_URL="" --remote staging
+    heroku config:set CIPRS_READER_SOURCE="true" --remote staging
 
 Deployment::
 
@@ -52,3 +52,19 @@ Dev Ops::
     heroku run python manage.py createsuperuser
     heroku run python manage.py check --deploy
     heroku open
+
+Setup scheduled DB backups::
+
+    heroku pg:backups:schedule DATABASE_URL --at '02:00 America/New_York' --app dear-petition
+
+
+Maintenance
+-----------
+
+View DB backups::
+
+    heroku pg:backups --app dear-petition
+
+Capture a DB backup now::
+
+    heroku pg:backups:capture --app dear-petition
