@@ -1,0 +1,89 @@
+{
+  "addons": [
+    "mailgun",
+    "heroku-postgresql",
+    "heroku-redis"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "https://github.com/carwow/heroku-buildpack-pdftotext.git"
+    }
+  ],
+  "env": {
+    "CELERY_BROKER_URL": {
+      "required": true
+    },
+    "CIPRS_READER_SOURCE": {
+      "required": true
+    },
+    "DJANGO_ADMIN_URL": {
+      "required": true
+    },
+    "DJANGO_ALLOWED_HOSTS": {
+      "required": true
+    },
+    "DJANGO_AWS_ACCESS_KEY_ID": {
+      "required": true
+    },
+    "DJANGO_AWS_SECRET_ACCESS_KEY": {
+      "required": true
+    },
+    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
+      "required": true
+    },
+    "DJANGO_DEBUG": {
+      "required": true
+    },
+    "DJANGO_SECRET_KEY": {
+      "required": true
+    },
+    "DJANGO_SECURE_SSL_REDIRECT": {
+      "required": true
+    },
+    "DJANGO_SETTINGS_MODULE": {
+      "required": true
+    },
+    "MAILGUN_API_KEY": {
+      "required": true
+    },
+    "MAILGUN_DOMAIN": {
+      "required": true
+    },
+    "MAILGUN_PUBLIC_KEY": {
+      "required": true
+    },
+    "MAILGUN_SMTP_LOGIN": {
+      "required": true
+    },
+    "MAILGUN_SMTP_PASSWORD": {
+      "required": true
+    },
+    "MAILGUN_SMTP_PORT": {
+      "required": true
+    },
+    "MAILGUN_SMTP_SERVER": {
+      "required": true
+    },
+    "REDIS_URL": {
+      "required": true
+    },
+    "SENTRY_DSN": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "dear-petition",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
