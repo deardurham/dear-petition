@@ -35,8 +35,8 @@ Environment variables::
     heroku config:set DJANGO_AWS_S3_REGION_NAME="us-east-1" --remote staging
     heroku config:set SENTRY_DSN="" --remote staging
     heroku config:set DJANGO_ALLOWED_HOSTS=dear-petition-staging.herokuapp.com --remote staging
-    heroku config:set DJANGO_DEBUG=1 --remote staging
-    heroku config:set DJANGO_SECURE_SSL_REDIRECT=0 --remote staging
+    heroku config:set DJANGO_DEBUG=0 --remote staging
+    heroku config:set DJANGO_SECURE_SSL_REDIRECT=1 --remote staging
     heroku config:set CELERY_BROKER_URL="" --remote staging
     heroku config:set CIPRS_READER_SOURCE="true" --remote staging
 
