@@ -18,11 +18,31 @@
   "env": {
     "DJANGO_SETTINGS_MODULE": {
       "value": "config.settings.production"
+    },
+    "DJANGO_SECRET_KEY": {
+      "description": "Django's secret key",
+      "generator": "secret"
+    },
+    "DJANGO_AWS_ACCESS_KEY_ID": {
+      "value": "awsaccesskey"
+    },
+    "DJANGO_AWS_SECRET_ACCESS_KEY": {
+      "value": "awssecretaccesskey"
+    },
+    "DJANGO_AWS_STORAGE_BUCKET_NAME": {
+      "value": "awsbucketname"
+    },
+    "DJANGO_ADMIN_URL": {
+      "value": "admin-test/"
+    },
+    "SENTRY_DSN": {
+      "value": ""
     }
   },
   "formation": {
     "web": {
-      "quantity": 1
+      "quantity": 1,
+      "size": "free"
     }
   },
   "name": "dear-petition",

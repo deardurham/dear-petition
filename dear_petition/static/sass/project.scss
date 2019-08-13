@@ -16,6 +16,7 @@ $black: #000;
 $pink: #f2dede;
 $dark-pink: #eed3d7;
 $red: #b94a48;
+$teal: #107F8E;
 
 ////////////////////////////////
 		//Alerts//
@@ -47,4 +48,8 @@ div#source pre {
 
 h1.page-header {
   margin-top: 1.5rem;
+}
+
+.bg-light {
+  background-color: $teal !important;
 }
