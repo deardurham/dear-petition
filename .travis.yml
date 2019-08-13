@@ -1,7 +1,12 @@
 language: python
 python:
   - "3.6"
+services:
+- postgresql
 install:
   - pip install -r requirements/local.txt
 script:
   - "pytest"
+env:
+  global:
+    - DATABASE_URL=postgres://postgres@localhost/travisdb
