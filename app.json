@@ -32,7 +32,7 @@
     "DJANGO_AWS_STORAGE_BUCKET_NAME": {
       "value": "awsbucketname"
     },
-    "ADMIN_URL": {
+    "DJANGO_ADMIN_URL": {
       "value": "admin-test/"
     },
     "SENTRY_DSN": {
@@ -41,7 +41,8 @@
   },
   "formation": {
     "web": {
-      "quantity": 1
+      "quantity": 1,
+      "size": "free"
     }
   },
   "name": "dear-petition",
