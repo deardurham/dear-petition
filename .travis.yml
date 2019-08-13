@@ -9,4 +9,5 @@ script:
   - "pytest"
 env:
   global:
+    - DJANGO_SETTINGS_MODULE=config.settings.test
     - DATABASE_URL=postgres://postgres@localhost/travisdb
