@@ -281,3 +281,4 @@ notebooks/ignore
 .env
 .envs/*
 !.envs/.local/
+*.code-workspace
