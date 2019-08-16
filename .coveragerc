@@ -1,5 +1,5 @@
 [run]
 include = dear_petition/*
-omit = *migrations*, *tests*
+omit = *migrations*, *tests*, *templates*
 plugins =
     django_coverage_plugin
