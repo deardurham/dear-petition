@@ -13,7 +13,7 @@ project for creating petition forms.
 Begin by cloning the repository:
 
 ```
-git clone https://github.com/deardurham/dear-petition.git
+git clone git@github.com:deardurham/dear-petition.git
 ```
 
 

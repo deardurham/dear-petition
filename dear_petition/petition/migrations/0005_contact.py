@@ -5,22 +5,34 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('petition', '0004_auto_20190518_2129'),
-    ]
+    dependencies = [("petition", "0004_auto_20190518_2129")]
 
     operations = [
         migrations.CreateModel(
-            name='Contact',
+            name="Contact",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=512)),
-                ('category', models.CharField(choices=[('attorney', 'Attorney'), ('agency', 'Agency')], max_length=16)),
-                ('address1', models.CharField(blank=True, max_length=512)),
-                ('address2', models.CharField(blank=True, max_length=512)),
-                ('city', models.CharField(blank=True, max_length=64)),
-                ('state', models.CharField(blank=True, max_length=64)),
-                ('zipcode', models.CharField(blank=True, max_length=16)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=512)),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[("attorney", "Attorney"), ("agency", "Agency")],
+                        max_length=16,
+                    ),
+                ),
+                ("address1", models.CharField(blank=True, max_length=512)),
+                ("address2", models.CharField(blank=True, max_length=512)),
+                ("city", models.CharField(blank=True, max_length=64)),
+                ("state", models.CharField(blank=True, max_length=64)),
+                ("zipcode", models.CharField(blank=True, max_length=16)),
             ],
-        ),
+        )
     ]

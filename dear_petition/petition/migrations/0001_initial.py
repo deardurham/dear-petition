@@ -8,18 +8,25 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='CIPRSRecord',
+            name="CIPRSRecord",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('label', models.CharField(max_length=2048)),
-                ('date_uploaded', models.DateTimeField(auto_now_add=True)),
-                ('report_pdf', models.FileField(upload_to='ciprs/')),
-                ('data', django.contrib.postgres.fields.jsonb.JSONField(blank=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("label", models.CharField(max_length=2048)),
+                ("date_uploaded", models.DateTimeField(auto_now_add=True)),
+                ("report_pdf", models.FileField(upload_to="ciprs/")),
+                ("data", django.contrib.postgres.fields.jsonb.JSONField(blank=True)),
             ],
-        ),
+        )
     ]
