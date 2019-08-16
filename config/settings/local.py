@@ -83,10 +83,7 @@ LOGGING = {
         }
     },
     "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "propagate": True,
-        },
+        "django": {"handlers": ["console"], "propagate": True},
         "django.template": {
             "level": "ERROR",
             "handlers": ["console"],
@@ -97,11 +94,7 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "ciprs": {
-            "level": APP_LOG_LEVEL,
-            "handlers": ["console"],
-            "propagate": False,
-        },
+        "ciprs": {"level": APP_LOG_LEVEL, "handlers": ["console"], "propagate": False},
     },
 }
 

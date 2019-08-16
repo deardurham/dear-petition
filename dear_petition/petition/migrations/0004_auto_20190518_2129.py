@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('petition', '0003_auto_20190518_1915'),
-    ]
+    dependencies = [("petition", "0003_auto_20190518_1915")]
 
     operations = [
         migrations.AlterField(
-            model_name='ciprsrecord',
-            name='report_pdf',
-            field=models.FileField(blank=True, null=True, upload_to='ciprs/', verbose_name='Report PDF'),
-        ),
+            model_name="ciprsrecord",
+            name="report_pdf",
+            field=models.FileField(
+                blank=True, null=True, upload_to="ciprs/", verbose_name="Report PDF"
+            ),
+        )
     ]
