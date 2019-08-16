@@ -5,7 +5,7 @@ import json
 import argparse
 
 parser = argparse.ArgumentParser(
-    description="This will take a court record pdf from CIPRS software and use the data in the pdf to write an expungement petition form pdf."
+    description="This will take a court record pdf from CIPRS software and use the data in the pdf to write an expungement petition form pdf."  # noqa
 )
 parser.add_argument("input_path", help="The path to the CIPRS court record pdf")
 parser.add_argument(

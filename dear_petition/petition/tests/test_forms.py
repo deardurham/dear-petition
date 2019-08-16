@@ -1,6 +1,3 @@
-import pytest
-from unittest.mock import MagicMock
-
 from dear_petition.petition.models import CIPRSRecord
 from dear_petition.petition.forms import GeneratePetitionForm
 
