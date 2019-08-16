@@ -26,3 +26,13 @@ class TestPetitionCheckboxes:
         form = GeneratePetitionForm(record=record)
         form.clean()
         assert "Superior" not in form.record.data["General"]
+
+    def test_date_clean(self):
+        record = CIPRSRecord(
+            data={"Defendant": {"Date of Birth/Estimated Age": "1985-01-02"}}
+        )
+        form = GeneratePetitionForm(record=record)
+        form.clean()
+        assert (
+            form.record.data["Defendant"]["Date of Birth/Estimated Age"] == "01/02/1985"
+        )

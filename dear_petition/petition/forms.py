@@ -1,6 +1,7 @@
 import io
 import os
 import pdfrw
+import dateutil.parser
 
 from django import forms
 from django.conf import settings
@@ -95,6 +96,16 @@ class GeneratePetitionForm(forms.Form):
             )
         return data
 
+    def clean_dob(self):
+        data = self.record.data
+        try:
+            dob = dateutil.parser.parse(
+                data.get("Defendant", {}).get("Date of Birth/Estimated Age", "")
+            )
+        except ValueError:
+            return
+        return dob.date().strftime("%m/%d/%Y")
+
     def clean(self):
         # make sure checkbox is checked on PDF
         checked_box = pdfrw.PdfName("Yes")
@@ -102,6 +113,9 @@ class GeneratePetitionForm(forms.Form):
             self.record.data["General"]["District"] = checked_box
         if "General" in self.record.data and "Superior" in self.record.data["General"]:
             self.record.data["General"]["Superior"] = checked_box
+        cleaned_dob = self.clean_dob()
+        if cleaned_dob:
+            self.record.data["Defendant"]["Date of Birth/Estimated Age"] = cleaned_dob
 
     def save(self):
         output = io.BytesIO()
