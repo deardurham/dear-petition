@@ -25,10 +25,13 @@ def view_record(request, pk):
         form = GeneratePetitionForm(request.POST, record=record)
         if form.is_valid():
             output = form.save()
-            extra = {"filename": "petition.pdf"}
+            resp = FileResponse(output)
+            resp["Content-Type"] = "application/pdf"
             if form.cleaned_data["as_attachment"]:
-                extra = {"as_attachment": True}
-            return FileResponse(output, **extra)
+                resp["Content-Disposition"] = 'attachment; filename="petition.pdf"'
+            else:
+                resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
+            return resp
     else:
         form = GeneratePetitionForm(record=record)
     if "_meta" in record.data and "source" in record.data["_meta"]:
