@@ -1,6 +1,6 @@
 def map_data(json):
 
-    return {
+	data = {
         "County": {"V": json.get("General", {}).get("County", "")},
         # File No
         "ConsJdgmntFileNum": {"V": json.get("General", {}).get("File No", "")},
@@ -49,3 +49,18 @@ def map_data(json):
         "StateAgency2": {"V": json.get("StateAgency2", "")},
         "ZipAgency2": {"V": json.get("ZipAgency2", "")},
     }
+
+	i=1
+	for record in json.get('Offense Record', {}).get('Records',[]):
+		offense_datetime = json.get('Case Information', {}).get('Offense Date', '')
+		offense_date = offense_datetime.split('T')[0]
+
+		data["Fileno:"+str(i)] = {"V":json.get('General',{}).get('File No','')}
+		data["ArrestDate:"+str(i)] = {"V":offense_date}
+		data["Description:"+str(i)] = {"V":record.get('Description','')}
+		data["DOOF:"+str(i)] = {"V":offense_date}
+		data["Disposition:"+str(i)] = {"V":json.get('Offense Record').get('Disposition Method')}
+		data["DispositionDate:"+str(i)] = {"V":offense_date}
+		i+=1
+
+	return data
