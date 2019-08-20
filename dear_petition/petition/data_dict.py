@@ -61,6 +61,8 @@ def map_data(json):
         data["Disposition:" + str(i)] = {
             "V": json.get("Offense Record").get("Disposition Method")
         }
-        data["DispositionDate:" + str(i)] = {"V": offense_date}
+        data["DispositionDate:" + str(i)] = {
+            "V": json.get("Offense Record").get("Disposed On")
+        }
 
     return data
