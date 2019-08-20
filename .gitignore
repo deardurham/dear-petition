@@ -283,3 +283,8 @@ notebooks/ignore
 .envs/*
 !.envs/.local/
 *.code-workspace
+
+# Generated files
+
+dear_petition/static/css/project.min.css
+dear_petition/static/js/project.min.js
