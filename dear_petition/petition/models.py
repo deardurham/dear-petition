@@ -74,6 +74,10 @@ class CIPRSRecord(models.Model):
     def superior_court(self):
         return self.data["General"].get("Superior", "")
 
+    @property
+    def offenses(self):
+        for offense in self.data["Offense Record"].get("Records",[]):
+            yield offense
 
 class Contact(models.Model):
 
