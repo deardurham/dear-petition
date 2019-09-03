@@ -104,7 +104,30 @@ class GeneratePetitionForm(forms.Form):
             )
         except ValueError:
             return
-        return dob.date().strftime("%m/%d/%Y")
+        cleaned_date = dob.date().strftime("%m/%d/%Y")
+        self.record.data["Defendant"]["Date of Birth/Estimated Age"] = cleaned_date
+
+    def clean_disposed_on_date(self):
+        data = self.record.data
+        try:
+            date = dateutil.parser.parse(
+                data.get("Offense Record", {}).get("Disposed On", "")
+            )
+        except ValueError:
+            return
+        cleaned_date = date.date().strftime("%m/%d/%Y")
+        self.record.data["Offense Record"]["Disposed On"] = cleaned_date
+
+    def clean_offense_date(self):
+        data = self.record.data
+        try:
+            date = dateutil.parser.parse(
+                data.get("Case Information", {}).get("Offense Date", "")
+            )
+        except ValueError:
+            return
+        cleaned_date = date.date().strftime("%m/%d/%Y")
+        self.record.data["Case Information"]["Offense Date"] = cleaned_date
 
     def clean(self):
         # make sure checkbox is checked on PDF
@@ -113,9 +136,9 @@ class GeneratePetitionForm(forms.Form):
             self.record.data["General"]["District"] = checked_box
         if "General" in self.record.data and "Superior" in self.record.data["General"]:
             self.record.data["General"]["Superior"] = checked_box
-        cleaned_dob = self.clean_dob()
-        if cleaned_dob:
-            self.record.data["Defendant"]["Date of Birth/Estimated Age"] = cleaned_dob
+        self.clean_dob()
+        self.clean_disposed_on_date()
+        self.clean_offense_date()
 
     def save(self):
         output = io.BytesIO()
