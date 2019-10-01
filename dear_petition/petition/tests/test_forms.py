@@ -60,3 +60,18 @@ class TestPetitionCheckboxes:
         form = GeneratePetitionForm(record=record)
         form.clean()
         assert form.record.data["Offense Record"]["Disposed On"] == "01/02/1985"
+
+    def test_charged_offenses(self):
+        data = {
+            "Offense Record": {
+                "Records": [
+                    {"Action": "CHARGED"},
+                    {"Action": "ARRAIGNED"},
+                    {"Action": "CONVICTED"},
+                ]
+            }
+        }
+        record = CIPRSRecord(data=data)
+        form = GeneratePetitionForm(record=record)
+        form.clean()
+        assert len(form.record.data["Offense Record"]["Records"]) == 1
