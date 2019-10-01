@@ -75,3 +75,4 @@ class TestPetitionCheckboxes:
         form = GeneratePetitionForm(record=record)
         form.clean()
         assert len(form.record.data["Offense Record"]["Records"]) == 1
+        assert form.record.data["Offense Record"]["Records"][0]["Action"] == "CHARGED"
