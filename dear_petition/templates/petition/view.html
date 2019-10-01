@@ -108,23 +108,20 @@
           </table>
           <h4>Offenses</h4>
           <table class="table table-hover table-sm">
-            <th>File #</th>
-            <th>Arrest Date</th>
+            <th></th>
             <th>Description</th>
-            <th>Offense Date</th>
-            <th>Disposition</th>
-            <th>Disposition Date</th>
+            <th>Severity</th>
+            <th>Law</th>
+            <th>NCAOC Code</th>
             <tbody>
               {% for offense in record.offenses %}
               <tr>
-                <td>{{record.file_no}}</td>
-                <td>{{record.offense_date}}</td>
-                <td>{{offense.Description}}</td>
-                <td>{{record.offense_date}}</td>
-                <td>{{record.disposition_method}}</td>
-                <td>{{record.disposed_on}}</td>
+                <td>{{ offense.Action }} </td>
+                <td>{{ offense.Description }} </td>
+                <td>{{ offense.Severity }} </td>
+                <td>{{ offense.Law }} </td>
+                <td>{{ offense.Code }} </td>
               </tr>
-              
               {% endfor %}
             </tbody>
           </table>
