@@ -129,6 +129,15 @@ class GeneratePetitionForm(forms.Form):
         cleaned_date = date.date().strftime("%m/%d/%Y")
         self.record.data["Case Information"]["Offense Date"] = cleaned_date
 
+    def clean_offenses(self):
+        offenses = self.record.data.get("Offense Record", {}).get("Records", [])
+        if offenses:
+            charged_offenses = []
+            for offense in offenses:
+                if offense["Action"].upper() == "CHARGED":
+                    charged_offenses.append(offense)
+            self.record.data["Offense Record"]["Records"] = charged_offenses
+
     def clean(self):
         # make sure checkbox is checked on PDF
         checked_box = pdfrw.PdfName("Yes")
@@ -139,6 +148,7 @@ class GeneratePetitionForm(forms.Form):
         self.clean_dob()
         self.clean_disposed_on_date()
         self.clean_offense_date()
+        self.clean_offenses()
 
     def save(self):
         output = io.BytesIO()
