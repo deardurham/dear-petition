@@ -1,4 +1,16 @@
-def map_data(json):
+import pdfrw
+import dateutil.parser
+
+
+def map_data(form_data, batch):
+    # dumb "latest" record, need to be smarter here
+    record = batch.records.first()
+    # clean record data to fix date formats, etc.
+    record = clean(record)
+    json = record.data
+    # add form data to json dict
+    for data in form_data.values():
+        json.update(data)
 
     data = {
         "County": {"V": json.get("General", {}).get("County", "")},
@@ -66,3 +78,63 @@ def map_data(json):
         }
 
     return data
+
+
+def clean_dob(record):
+    data = record.data
+    try:
+        dob = dateutil.parser.parse(
+            data.get("Defendant", {}).get("Date of Birth/Estimated Age", "")
+        )
+    except ValueError:
+        return
+    cleaned_date = dob.date().strftime("%m/%d/%Y")
+    record.data["Defendant"]["Date of Birth/Estimated Age"] = cleaned_date
+
+
+def clean_disposed_on_date(record):
+    data = record.data
+    try:
+        date = dateutil.parser.parse(
+            data.get("Offense Record", {}).get("Disposed On", "")
+        )
+    except ValueError:
+        return
+    cleaned_date = date.date().strftime("%m/%d/%Y")
+    record.data["Offense Record"]["Disposed On"] = cleaned_date
+
+
+def clean_offense_date(record):
+    data = record.data
+    try:
+        date = dateutil.parser.parse(
+            data.get("Case Information", {}).get("Offense Date", "")
+        )
+    except ValueError:
+        return
+    cleaned_date = date.date().strftime("%m/%d/%Y")
+    record.data["Case Information"]["Offense Date"] = cleaned_date
+
+
+def clean_offenses(record):
+    offenses = record.data.get("Offense Record", {}).get("Records", [])
+    if offenses:
+        charged_offenses = []
+        for offense in offenses:
+            if offense["Action"].upper() == "CHARGED":
+                charged_offenses.append(offense)
+        record.data["Offense Record"]["Records"] = charged_offenses
+
+
+def clean(record):
+    # make sure checkbox is checked on PDF
+    checked_box = pdfrw.PdfName("Yes")
+    if "General" in record.data and "District" in record.data["General"]:
+        record.data["General"]["District"] = checked_box
+    if "General" in record.data and "Superior" in record.data["General"]:
+        record.data["General"]["Superior"] = checked_box
+    clean_dob(record)
+    clean_disposed_on_date(record)
+    clean_offense_date(record)
+    clean_offenses(record)
+    return record

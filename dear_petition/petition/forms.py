@@ -1,7 +1,5 @@
 import io
 import os
-import pdfrw
-import dateutil.parser
 
 from django import forms
 from django.conf import settings
@@ -56,108 +54,47 @@ class GeneratePetitionForm(forms.Form):
     def clean_attorney(self):
         data = self.cleaned_data["attorney"]
         if data:
-            self.record.data.update(
-                {
-                    "NameAtty": data.name,
-                    "StAddrAtty": data.address1,
-                    "MailAddrAtty": data.address2,
-                    "CityAtty": data.city,
-                    "StateAtty": data.state,
-                    "ZipCodeAtty": data.zipcode,
-                }
-            )
-        return data
+            return {
+                "NameAtty": data.name,
+                "StAddrAtty": data.address1,
+                "MailAddrAtty": data.address2,
+                "CityAtty": data.city,
+                "StateAtty": data.state,
+                "ZipCodeAtty": data.zipcode,
+            }
 
     def clean_agency1(self):
         data = self.cleaned_data["agency1"]
         if data:
-            self.record.data.update(
-                {
-                    "NameAgency1": data.name,
-                    "AddrAgency1": data.address1,
-                    "MailAgency1": data.address2,
-                    "CityAgency1": data.city,
-                    "StateAgency1": data.state,
-                    "ZipAgency1": data.zipcode,
-                }
-            )
-        return data
+            return {
+                "NameAgency1": data.name,
+                "AddrAgency1": data.address1,
+                "MailAgency1": data.address2,
+                "CityAgency1": data.city,
+                "StateAgency1": data.state,
+                "ZipAgency1": data.zipcode,
+            }
 
     def clean_agency2(self):
         data = self.cleaned_data["agency2"]
         if data:
-            self.record.data.update(
-                {
-                    "NameAgency2": data.name,
-                    "AddrAgency2": data.address1,
-                    "MailAgency2": data.address2,
-                    "CityAgency2": data.city,
-                    "StateAgency2": data.state,
-                    "ZipAgency2": data.zipcode,
-                }
-            )
-        return data
-
-    def clean_dob(self):
-        data = self.record.data
-        try:
-            dob = dateutil.parser.parse(
-                data.get("Defendant", {}).get("Date of Birth/Estimated Age", "")
-            )
-        except ValueError:
-            return
-        cleaned_date = dob.date().strftime("%m/%d/%Y")
-        self.record.data["Defendant"]["Date of Birth/Estimated Age"] = cleaned_date
-
-    def clean_disposed_on_date(self):
-        data = self.record.data
-        try:
-            date = dateutil.parser.parse(
-                data.get("Offense Record", {}).get("Disposed On", "")
-            )
-        except ValueError:
-            return
-        cleaned_date = date.date().strftime("%m/%d/%Y")
-        self.record.data["Offense Record"]["Disposed On"] = cleaned_date
-
-    def clean_offense_date(self):
-        data = self.record.data
-        try:
-            date = dateutil.parser.parse(
-                data.get("Case Information", {}).get("Offense Date", "")
-            )
-        except ValueError:
-            return
-        cleaned_date = date.date().strftime("%m/%d/%Y")
-        self.record.data["Case Information"]["Offense Date"] = cleaned_date
-
-    def clean_offenses(self):
-        offenses = self.record.data.get("Offense Record", {}).get("Records", [])
-        if offenses:
-            charged_offenses = []
-            for offense in offenses:
-                if offense["Action"].upper() == "CHARGED":
-                    charged_offenses.append(offense)
-            self.record.data["Offense Record"]["Records"] = charged_offenses
-
-    def clean(self):
-        # make sure checkbox is checked on PDF
-        checked_box = pdfrw.PdfName("Yes")
-        if "General" in self.record.data and "District" in self.record.data["General"]:
-            self.record.data["General"]["District"] = checked_box
-        if "General" in self.record.data and "Superior" in self.record.data["General"]:
-            self.record.data["General"]["Superior"] = checked_box
-        self.clean_dob()
-        self.clean_disposed_on_date()
-        self.clean_offense_date()
-        self.clean_offenses()
+            return {
+                "NameAgency2": data.name,
+                "AddrAgency2": data.address1,
+                "MailAgency2": data.address2,
+                "CityAgency2": data.city,
+                "StateAgency2": data.state,
+                "ZipAgency2": data.zipcode,
+            }
 
     def save(self):
         output = io.BytesIO()
         template_path = os.path.join(
             settings.APPS_DIR, "static", "templates", "petition-template.pdf"
         )
-        petition = Writer(self.record.data, map_data, template_path, output)
+        form_data = self.cleaned_data.copy()
+        del form_data["as_attachment"]
+        petition = Writer(form_data, self.batch, template_path, output)
         petition.get_annotations()
         petition.write()
         output.seek(0)
