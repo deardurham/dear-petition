@@ -12,29 +12,14 @@
   <br />
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" id="petition-tab" data-toggle="tab" href="#petition" role="tab" aria-controls="petition" aria-selected="true">Petition Form</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="ciprs-tab" data-toggle="tab" href="#ciprs" role="tab" aria-controls="ciprs" aria-selected="true">CIPRS</a>
+      <a class="nav-link active" id="ciprs-tab" data-toggle="tab" href="#ciprs" role="tab" aria-controls="ciprs" aria-selected="true">CIPRS</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" id="source-tab" data-toggle="tab" href="#source" role="tab" aria-controls="profile" aria-selected="false">Source</a>
     </li>
   </ul>
   <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="petition" role="tabpanel" aria-labelledby="petition-tab">
-      <div class="row">
-        <div class="col-7">
-          <h3>Petition Form</h3>
-          <form method="POST" action="{% url 'view-record' record.pk %}">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button class="primaryAction btn btn-primary" type="submit">{% trans "Generate Petition Form" %}</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="tab-pane fade" id="ciprs" role="tabpanel" aria-labelledby="ciprs-tab">
+    <div class="tab-pane fade show active" id="ciprs" role="tabpanel" aria-labelledby="ciprs-tab">
       <div class="row">
         <div class="col">
           <h3>CIPRS Data</h3>

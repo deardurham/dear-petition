@@ -6,26 +6,28 @@ import dateutil.parser
 from django import forms
 from django.conf import settings
 
-from dear_petition.petition.models import CIPRSRecord, Contact
+from dear_petition.petition.models import CIPRSRecord, Contact, Batch
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
 
 
 class UploadFileForm(forms.Form):
-    file = forms.FileField(label="CIRPS Detail Report")
+    files = forms.FileField(widget=forms.ClearableFileInput(attrs={"multiple": True}))
 
     def save(self):
-        file_ = self.cleaned_data["file"]
-        record = CIPRSRecord()
-        if settings.CIPRS_SAVE_PDF:
-            record.report_pdf = file_
-        record.data = record.parse_report(file_)
-        if "error" in record.data:
-            raise forms.ValidationError(record.data["error"])
-        if "Defendant" in record.data and "Name" in record.data["Defendant"]:
-            record.label = record.data["Defendant"]["Name"]
-        record.save()
-        return record
+        batch = Batch.objects.create()
+        for file_ in self.files.getlist("files"):
+            record = CIPRSRecord()
+            if settings.CIPRS_SAVE_PDF:
+                record.report_pdf = file_
+            record.data = record.parse_report(file_)
+            if "error" in record.data:
+                raise forms.ValidationError(record.data["error"])
+            if "Defendant" in record.data and "Name" in record.data["Defendant"]:
+                record.label = record.data["Defendant"]["Name"]
+            record.save()
+            batch.records.add(record)
+        return batch
 
 
 class GeneratePetitionForm(forms.Form):
@@ -48,7 +50,7 @@ class GeneratePetitionForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.record = kwargs.pop("record")
+        self.batch = kwargs.pop("batch")
         super().__init__(*args, **kwargs)
 
     def clean_attorney(self):
