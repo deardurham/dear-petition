@@ -1,5 +1,7 @@
 import pdfrw
 
+from dear_petition.petition.data_dict import map_data
+
 
 class Writer:
 
@@ -10,11 +12,11 @@ class Writer:
     SUBTYPE_KEY = "/Subtype"
     WIDGET_SUBTYPE_KEY = "/Widget"
 
-    def __init__(self, json, map_data, template_path, output_path):
+    def __init__(self, form_data, batch, template_path, output_path):
         def read_template(template_path):
             return pdfrw.PdfReader(template_path)
 
-        self.data = map_data(json)
+        self.data = map_data(form_data, batch)
         self.output_path = output_path
         self.template = read_template(template_path)
         self.template.Root.AcroForm.update(
