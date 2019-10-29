@@ -3,12 +3,14 @@ import logging
 import os
 import subprocess
 import tempfile
-import ciprs_reader
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+
+import ciprs_reader
 
 
 logger = logging.getLogger(__name__)
@@ -105,3 +107,7 @@ class Batch(models.Model):
     def offenses(self):
         for record in self.records.all():
             yield from record.offenses()
+
+    @property
+    def file_no(self):
+        return max([datetime.strptime(record.offense_date,"%Y-%m-%dT%H:%M:%S") for record in self.records.all()])
