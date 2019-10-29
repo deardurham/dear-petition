@@ -110,4 +110,14 @@ class Batch(models.Model):
 
     @property
     def file_no(self):
-        return max([datetime.strptime(record.offense_date,"%Y-%m-%dT%H:%M:%S") for record in self.records.all()])
+        first_record = self.records.first()
+        most_recent_offense_date = datetime.strptime(first_record.offense_date, "%Y-%m-%dT%H:%M:%S")
+        file_no = first_record.file_no
+
+        for record in self.records.all()[1:]:
+            offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
+            if offense_date > most_recent_offense_date:
+                file_no = record.file_no
+            
+        return file_no
+
