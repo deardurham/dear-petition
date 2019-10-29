@@ -100,3 +100,8 @@ class Contact(models.Model):
 class Batch(models.Model):
 
     records = models.ManyToManyField(CIPRSRecord)
+
+    @property
+    def offenses(self):
+        for record in self.records.all():
+            yield from record.offenses()
