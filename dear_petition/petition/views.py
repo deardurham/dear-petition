@@ -12,7 +12,7 @@ def upload_report(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             batch = form.save()
-            return redirect("view-record", pk=batch.records.first().pk)
+            return redirect("create-petition", pk=batch.pk)
     else:
         form = UploadFileForm()
     return render(request, "petition/upload.html", {"form": form})
