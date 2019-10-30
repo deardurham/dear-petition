@@ -3,13 +3,14 @@ import logging
 import os
 import subprocess
 import tempfile
-import ciprs_reader
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
+import ciprs_reader
 from dear_petition.petition.data_dict import clean
 
 
@@ -123,3 +124,19 @@ class Batch(models.Model):
             data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
             petition_offenses.update(data)
         return petition_offenses
+
+    @property
+    def file_no(self):
+        ordered_records = self.records.order_by("pk")
+        first_record = ordered_records[0]
+        most_recent_offense_date = datetime.strptime(
+            first_record.offense_date, "%Y-%m-%dT%H:%M:%S"
+        )
+        file_no = first_record.file_no
+
+        for record in ordered_records[1:]:
+            offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
+            if offense_date > most_recent_offense_date:
+                file_no = record.file_no
+
+        return file_no
