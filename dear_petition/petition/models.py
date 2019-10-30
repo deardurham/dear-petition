@@ -3,12 +3,15 @@ import logging
 import os
 import subprocess
 import tempfile
-import ciprs_reader
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+
+import ciprs_reader
+from dear_petition.petition.data_dict import clean
 
 
 logger = logging.getLogger(__name__)
@@ -97,6 +100,41 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
+
 class Batch(models.Model):
 
     records = models.ManyToManyField(CIPRSRecord)
+
+    @property
+    def offenses(self):
+        for record in self.records.all():
+            record = clean(record)
+            for offense in record.offenses:
+                yield (record, offense)
+
+    def get_petition_offenses(self):
+        petition_offenses = {}
+        for i, (record, offense) in enumerate(self.offenses, 1):
+            data = {}
+            data["Fileno:" + str(i)] = {"V": record.file_no}
+            data["ArrestDate:" + str(i)] = {"V": record.offense_date}
+            data["Description:" + str(i)] = {"V": offense.get("Description", "")}
+            data["DOOF:" + str(i)] = {"V": record.offense_date}
+            data["Disposition:" + str(i)] = {"V": record.disposition_method}
+            data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
+            petition_offenses.update(data)
+        return petition_offenses
+
+    @property
+    def most_recent_record(self):
+        ordered_records = self.records.order_by('pk')
+        most_recent_record = ordered_records[0]
+        most_recent_offense_date = datetime.strptime(most_recent_record.offense_date, "%Y-%m-%dT%H:%M:%S")
+        
+
+        for record in ordered_records[1:]:
+            offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
+            if offense_date > most_recent_offense_date:
+                most_recent_record = record
+            
+        return most_recent_record
