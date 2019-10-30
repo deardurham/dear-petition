@@ -128,8 +128,9 @@ class Batch(models.Model):
     @property
     def most_recent_record(self):
         ordered_records = self.records.order_by('pk')
-        most_recent_offense_date = datetime.strptime(first_record.offense_date, "%Y-%m-%dT%H:%M:%S")
         most_recent_record = ordered_records[0]
+        most_recent_offense_date = datetime.strptime(most_recent_record.offense_date, "%Y-%m-%dT%H:%M:%S")
+        
 
         for record in ordered_records[1:]:
             offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
