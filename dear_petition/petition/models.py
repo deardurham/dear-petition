@@ -126,17 +126,14 @@ class Batch(models.Model):
         return petition_offenses
 
     @property
-    def file_no(self):
-        ordered_records = self.records.order_by("pk")
-        first_record = ordered_records[0]
-        most_recent_offense_date = datetime.strptime(
-            first_record.offense_date, "%Y-%m-%dT%H:%M:%S"
-        )
-        file_no = first_record.file_no
+    def most_recent_record(self):
+        ordered_records = self.records.order_by('pk')
+        most_recent_offense_date = datetime.strptime(first_record.offense_date, "%Y-%m-%dT%H:%M:%S")
+        most_recent_record = ordered_records[0]
 
         for record in ordered_records[1:]:
             offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
             if offense_date > most_recent_offense_date:
-                file_no = record.file_no
-
-        return file_no
+                most_recent_record = record
+            
+        return most_recent_record
