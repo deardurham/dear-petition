@@ -10,6 +10,8 @@ from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
+from dear_petition.petition.data_dict import clean
+
 
 logger = logging.getLogger(__name__)
 
@@ -97,6 +99,7 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
+
 class Batch(models.Model):
 
     records = models.ManyToManyField(CIPRSRecord)
@@ -104,4 +107,19 @@ class Batch(models.Model):
     @property
     def offenses(self):
         for record in self.records.all():
-            yield from record.offenses()
+            record = clean(record)
+            for offense in record.offenses:
+                yield (record, offense)
+
+    def get_petition_offenses(self):
+        petition_offenses = {}
+        for i, (record, offense) in enumerate(self.offenses, 1):
+            data = {}
+            data["Fileno:" + str(i)] = {"V": record.file_no}
+            data["ArrestDate:" + str(i)] = {"V": record.offense_date}
+            data["Description:" + str(i)] = {"V": offense.get("Description", "")}
+            data["DOOF:" + str(i)] = {"V": record.offense_date}
+            data["Disposition:" + str(i)] = {"V": record.disposition_method}
+            data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
+            petition_offenses.update(data)
+        return petition_offenses
