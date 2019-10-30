@@ -10,7 +10,8 @@ def map_data(form_data, batch):
     json = record.data
     # add form data to json dict
     for data in form_data.values():
-        json.update(data)
+        if data:
+            json.update(data)
 
     data = {
         "County": {"V": json.get("General", {}).get("County", "")},
@@ -62,20 +63,22 @@ def map_data(form_data, batch):
         "ZipAgency2": {"V": json.get("ZipAgency2", "")},
     }
 
-    for i, record in enumerate(json.get("Offense Record", {}).get("Records", []), 1):
-        offense_datetime = json.get("Case Information", {}).get("Offense Date", "")
-        offense_date = offense_datetime.split("T")[0]
+    data.update(batch.get_petition_offenses())
 
-        data["Fileno:" + str(i)] = {"V": json.get("General", {}).get("File No", "")}
-        data["ArrestDate:" + str(i)] = {"V": offense_date}
-        data["Description:" + str(i)] = {"V": record.get("Description", "")}
-        data["DOOF:" + str(i)] = {"V": offense_date}
-        data["Disposition:" + str(i)] = {
-            "V": json.get("Offense Record").get("Disposition Method")
-        }
-        data["DispositionDate:" + str(i)] = {
-            "V": json.get("Offense Record").get("Disposed On")
-        }
+    # for i, record in enumerate(json.get("Offense Record", {}).get("Records", []), 1):
+    #     offense_datetime = json.get("Case Information", {}).get("Offense Date", "")
+    #     offense_date = offense_datetime.split("T")[0]
+
+    #     data["Fileno:" + str(i)] = {"V": json.get("General", {}).get("File No", "")}
+    #     data["ArrestDate:" + str(i)] = {"V": offense_date}
+    #     data["Description:" + str(i)] = {"V": record.get("Description", "")}
+    #     data["DOOF:" + str(i)] = {"V": offense_date}
+    #     data["Disposition:" + str(i)] = {
+    #         "V": json.get("Offense Record").get("Disposition Method")
+    #     }
+    #     data["DispositionDate:" + str(i)] = {
+    #         "V": json.get("Offense Record").get("Disposed On")
+    #     }
 
     return data
 

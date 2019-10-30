@@ -11,6 +11,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 import ciprs_reader
+from dear_petition.petition.data_dict import clean
 
 
 logger = logging.getLogger(__name__)
@@ -99,6 +100,7 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
 
+
 class Batch(models.Model):
 
     records = models.ManyToManyField(CIPRSRecord)
@@ -106,19 +108,35 @@ class Batch(models.Model):
     @property
     def offenses(self):
         for record in self.records.all():
-            yield from record.offenses()
+            record = clean(record)
+            for offense in record.offenses:
+                yield (record, offense)
+
+    def get_petition_offenses(self):
+        petition_offenses = {}
+        for i, (record, offense) in enumerate(self.offenses, 1):
+            data = {}
+            data["Fileno:" + str(i)] = {"V": record.file_no}
+            data["ArrestDate:" + str(i)] = {"V": record.offense_date}
+            data["Description:" + str(i)] = {"V": offense.get("Description", "")}
+            data["DOOF:" + str(i)] = {"V": record.offense_date}
+            data["Disposition:" + str(i)] = {"V": record.disposition_method}
+            data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
+            petition_offenses.update(data)
+        return petition_offenses
 
     @property
     def file_no(self):
-        ordered_records = self.records.order_by('pk')
+        ordered_records = self.records.order_by("pk")
         first_record = ordered_records[0]
-        most_recent_offense_date = datetime.strptime(first_record.offense_date, "%Y-%m-%dT%H:%M:%S")
+        most_recent_offense_date = datetime.strptime(
+            first_record.offense_date, "%Y-%m-%dT%H:%M:%S"
+        )
         file_no = first_record.file_no
 
         for record in ordered_records[1:]:
             offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
             if offense_date > most_recent_offense_date:
                 file_no = record.file_no
-            
-        return file_no
 
+        return file_no
