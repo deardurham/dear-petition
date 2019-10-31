@@ -115,7 +115,6 @@ class Batch(models.Model):
     def get_petition_offenses(self):
         petition_offenses = {}
         for i, (record, offense) in enumerate(self.offenses, 1):
-            print(offense)
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
             data["ArrestDate:" + str(i)] = {"V": record.offense_date}
