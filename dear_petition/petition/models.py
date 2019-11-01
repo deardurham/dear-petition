@@ -127,14 +127,11 @@ class Batch(models.Model):
 
     @property
     def most_recent_record(self):
-        ordered_records = self.records.order_by('pk')
-        most_recent_record = ordered_records[0]
-        most_recent_offense_date = datetime.strptime(most_recent_record.offense_date, "%Y-%m-%dT%H:%M:%S")
-        
-
-        for record in ordered_records[1:]:
+        most_recent_offense_date = datetime(1900, 1, 1)
+        for record in self.records.order_by("pk"):
+            if not record.offense_date:
+                continue
             offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
             if offense_date > most_recent_offense_date:
                 most_recent_record = record
-            
         return most_recent_record
