@@ -101,6 +101,16 @@ def clean_offense_date(record):
     cleaned_date = date.date().strftime("%m/%d/%Y")
     record.data["Case Information"]["Offense Date"] = cleaned_date
 
+def clean_arrest_date(record):
+    data = record.data
+    try:
+        date = dateutil.parser.parse(
+            data.get("Case Information", {}).get("Arrest Date", "")
+        )
+    except ValueError:
+        return
+    cleaned_date = date.date().strftime("%m/%d/%Y")
+    record.data["Case Information"]["Arrest Date"] = cleaned_date
 
 def clean_offenses(record):
     offenses = record.data.get("Offense Record", {}).get("Records", [])
@@ -122,5 +132,6 @@ def clean(record):
     clean_dob(record)
     clean_disposed_on_date(record)
     clean_offense_date(record)
+    clean_arrest_date(record)
     clean_offenses(record)
     return record
