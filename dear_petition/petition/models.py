@@ -62,6 +62,10 @@ class CIPRSRecord(models.Model):
         return self.data["Case Information"].get("Offense Date", "")
 
     @property
+    def arrest_date(self):
+        return self.data["Offense Record"].get("Arrest Date", self.offense_date)
+
+    @property
     def disposed_on(self):
         return self.data["Offense Record"].get("Disposed On", "")
 
@@ -117,7 +121,7 @@ class Batch(models.Model):
         for i, (record, offense) in enumerate(self.offenses, 1):
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": record.offense_date}
+            data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
             data["Description:" + str(i)] = {"V": offense.get("Description", "")}
             data["DOOF:" + str(i)] = {"V": record.offense_date}
             data["Disposition:" + str(i)] = {"V": record.disposition_method}
