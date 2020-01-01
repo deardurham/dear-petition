@@ -1,6 +1,11 @@
+import datetime as dt
+import pytz
 import pdfrw
 import dateutil.parser
 
+now = dt.datetime.now()
+now.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('EST')).date()
+now = now.strftime("%m/%d/%Y")
 
 def map_data(form_data, batch):
     record = batch.most_recent_record
@@ -60,6 +65,10 @@ def map_data(form_data, batch):
         "CityAgency2": {"V": json.get("CityAgency2", "")},
         "StateAgency2": {"V": json.get("StateAgency2", "")},
         "ZipAgency2": {"V": json.get("ZipAgency2", "")},
+        #Petition to Expunge Section
+        "PetitionNotFiledSignDate": {"V": now},
+        "PetitionNotFiledSignName": {"V": json.get("NameAtty", "")},
+        "PetitionerAttorneyCbx": {"AS": "Yes"},
     }
 
     data.update(batch.get_petition_offenses())
