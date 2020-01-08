@@ -3,9 +3,6 @@ import pytz
 import pdfrw
 import dateutil.parser
 
-now = dt.datetime.now()
-now.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('EST')).date()
-now = now.strftime("%m/%d/%Y")
 
 def map_data(form_data, batch):
     record = batch.most_recent_record
@@ -16,6 +13,10 @@ def map_data(form_data, batch):
     for data in form_data.values():
         if data:
             json.update(data)
+
+    now = dt.datetime.now()
+    now.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("EST")).date()
+    now = now.strftime("%m/%d/%Y")
 
     data = {
         "County": {"V": json.get("General", {}).get("County", "")},
@@ -65,7 +66,7 @@ def map_data(form_data, batch):
         "CityAgency2": {"V": json.get("CityAgency2", "")},
         "StateAgency2": {"V": json.get("StateAgency2", "")},
         "ZipAgency2": {"V": json.get("ZipAgency2", "")},
-        #Petition to Expunge Section
+        # Petition to Expunge Section
         "PetitionNotFiledSignDate": {"V": now},
         "PetitionNotFiledSignName": {"V": json.get("NameAtty", "")},
         "PetitionerAttorneyCbx": {"AS": "Yes"},
@@ -110,6 +111,7 @@ def clean_offense_date(record):
     cleaned_date = date.date().strftime("%m/%d/%Y")
     record.data["Case Information"]["Offense Date"] = cleaned_date
 
+
 def clean_arrest_date(record):
     data = record.data
     try:
@@ -120,6 +122,7 @@ def clean_arrest_date(record):
         return
     cleaned_date = date.date().strftime("%m/%d/%Y")
     record.data["Case Information"]["Arrest Date"] = cleaned_date
+
 
 def clean_offenses(record):
     offenses = record.data.get("Offense Record", {}).get("Records", [])
