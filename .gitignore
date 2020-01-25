@@ -288,3 +288,5 @@ notebooks/ignore
 
 dear_petition/static/css/project.min.css
 dear_petition/static/js/project.min.js
+
+local.yml
