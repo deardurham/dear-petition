@@ -28,13 +28,6 @@ CACHES = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
 TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa F405
 
-# EMAIL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = 1025
-
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
