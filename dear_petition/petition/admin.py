@@ -34,6 +34,11 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
     action_parse_report_pdf.short_description = "Parse PDF Report..."
 
 
+class CIPRSRecordInline(admin.StackedInline):
+    model = models.CIPRSRecord
+    extra = 1
+
+
 @admin.register(models.Batch)
 class BatchAdmin(admin.ModelAdmin):
     list_display = ("pk", "label", "record_count", "user", "date_uploaded")
@@ -41,6 +46,7 @@ class BatchAdmin(admin.ModelAdmin):
     date_hierarchy = "date_uploaded"
     search_fields = ("label",)
     ordering = ("-date_uploaded", "label")
+    inlines = (CIPRSRecordInline,)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

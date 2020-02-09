@@ -28,6 +28,9 @@ class CIPRSRecord(models.Model):
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.label} ({self.pk})"
+
     class Meta:
         verbose_name = "CIPRSRecord"
 
