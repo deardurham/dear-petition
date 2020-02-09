@@ -12,6 +12,7 @@ from django.db import models
 
 import ciprs_reader
 from dear_petition.petition.data_dict import clean
+from dear_petition.users.models import User
 
 
 logger = logging.getLogger(__name__)
@@ -113,6 +114,7 @@ class Batch(models.Model):
 
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="batches", on_delete="CASCADE")
 
     class Meta:
         verbose_name_plural = "Batches"
