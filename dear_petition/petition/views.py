@@ -11,7 +11,7 @@ def upload_report(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            batch = form.save()
+            batch = form.save(user=request.user)
             return redirect("create-petition", pk=batch.pk)
     else:
         form = UploadFileForm()

@@ -12,17 +12,21 @@ from dear_petition.petition.data_dict import map_data
 class UploadFileForm(forms.Form):
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={"multiple": True}))
 
-    def save(self):
-        batch = Batch.objects.create()
-        for file_ in self.files.getlist("files"):
-            record = CIPRSRecord()
+    def save(self, user):
+        batch = Batch.objects.create(user=user)
+        for idx, file_ in enumerate(self.files.getlist("files")):
+            record = CIPRSRecord(batch=batch)
             if settings.CIPRS_SAVE_PDF:
                 record.report_pdf = file_
             record.data = record.parse_report(file_)
             if "error" in record.data:
                 raise forms.ValidationError(record.data["error"])
             if "Defendant" in record.data and "Name" in record.data["Defendant"]:
-                record.label = record.data["Defendant"]["Name"]
+                label = record.data["Defendant"]["Name"]
+                record.label = label
+                if idx == 0:
+                    batch.label = label
+                    batch.save()
             record.save()
             batch.records.add(record)
         return batch
