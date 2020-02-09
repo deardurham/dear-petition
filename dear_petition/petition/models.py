@@ -19,12 +19,16 @@ logger = logging.getLogger(__name__)
 
 class CIPRSRecord(models.Model):
 
+    batch = models.ForeignKey("Batch", related_name="records", on_delete="CASCADE")
     date_uploaded = models.DateTimeField(auto_now_add=True)
     report_pdf = models.FileField(
         "Report PDF", upload_to="ciprs/", blank=True, null=True
     )
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "CIPRSRecord"
 
     def parse_report(self, report_pdf=None):
         """Save file locally, parse PDF, save to JSONField"""
@@ -107,7 +111,14 @@ class Contact(models.Model):
 
 class Batch(models.Model):
 
-    records = models.ManyToManyField(CIPRSRecord)
+    label = models.CharField(max_length=2048, blank=True)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Batches"
+
+    def __str__(self):
+        return f"{self.pk}: {self.label}"
 
     @property
     def offenses(self):
