@@ -36,8 +36,8 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
 
 @admin.register(models.Batch)
 class BatchAdmin(admin.ModelAdmin):
-    list_display = ("pk", "label", "record_count", "date_uploaded")
-    list_filter = ("date_uploaded",)
+    list_display = ("pk", "label", "record_count", "user", "date_uploaded")
+    list_filter = ("date_uploaded", "user")
     date_hierarchy = "date_uploaded"
     search_fields = ("label",)
     ordering = ("-date_uploaded", "label")
