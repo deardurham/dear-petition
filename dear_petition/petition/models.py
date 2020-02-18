@@ -12,6 +12,7 @@ from django.db import models
 
 import ciprs_reader
 from dear_petition.petition.data_dict import clean
+from dear_petition.users.models import User
 
 
 logger = logging.getLogger(__name__)
@@ -19,12 +20,19 @@ logger = logging.getLogger(__name__)
 
 class CIPRSRecord(models.Model):
 
+    batch = models.ForeignKey("Batch", related_name="records", on_delete="CASCADE")
     date_uploaded = models.DateTimeField(auto_now_add=True)
     report_pdf = models.FileField(
         "Report PDF", upload_to="ciprs/", blank=True, null=True
     )
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.label} ({self.pk})"
+
+    class Meta:
+        verbose_name = "CIPRSRecord"
 
     def parse_report(self, report_pdf=None):
         """Save file locally, parse PDF, save to JSONField"""
@@ -107,7 +115,15 @@ class Contact(models.Model):
 
 class Batch(models.Model):
 
-    records = models.ManyToManyField(CIPRSRecord)
+    label = models.CharField(max_length=2048, blank=True)
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="batches", on_delete="CASCADE")
+
+    class Meta:
+        verbose_name_plural = "Batches"
+
+    def __str__(self):
+        return f"{self.pk}: {self.label}"
 
     @property
     def offenses(self):

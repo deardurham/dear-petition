@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 
 from dear_petition.petition import models
@@ -8,7 +9,10 @@ from dear_petition.petition import models
 class CIPRSRecordAdmin(admin.ModelAdmin):
 
     actions = ("action_parse_report_pdf",)
-    list_display = ("pk", "label", "report_pdf", "date_uploaded")
+    list_display = ("pk", "label", "batch", "date_uploaded")
+    list_filter = ("date_uploaded",)
+    date_hierarchy = "date_uploaded"
+    search_fields = ("label",)
     ordering = ("-date_uploaded",)
 
     def action_parse_report_pdf(self, request, queryset):
@@ -28,6 +32,29 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
         return redirect("admin:petition_ciprsrecord_changelist")
 
     action_parse_report_pdf.short_description = "Parse PDF Report..."
+
+
+class CIPRSRecordInline(admin.StackedInline):
+    model = models.CIPRSRecord
+    extra = 1
+
+
+@admin.register(models.Batch)
+class BatchAdmin(admin.ModelAdmin):
+    list_display = ("pk", "label", "record_count", "user", "date_uploaded")
+    list_filter = ("date_uploaded", "user")
+    date_hierarchy = "date_uploaded"
+    search_fields = ("label",)
+    ordering = ("-date_uploaded", "label")
+    inlines = (CIPRSRecordInline,)
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(_record_count=Count("records", distinct=True),)
+        return queryset
+
+    def record_count(self, obj):
+        return obj._record_count
 
 
 @admin.register(models.Contact)
