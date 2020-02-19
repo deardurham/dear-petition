@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
+from django.core.exceptions import PermissionDenied
 
 from .models import CIPRSRecord, Batch
 from .forms import GeneratePetitionForm, UploadFileForm
+from .permissions import is_owner
 
 
 @login_required
@@ -21,6 +23,8 @@ def upload_report(request):
 @login_required
 def view_record(request, pk):
     record = get_object_or_404(CIPRSRecord, pk=pk)
+    if not is_owner(request.user,record.batch) and not request.user.is_superuser:
+        raise PermissionDenied
     if "_meta" in record.data and "source" in record.data["_meta"]:
         source = record.data["_meta"]["source"]
     else:
@@ -32,6 +36,8 @@ def view_record(request, pk):
 @login_required
 def create_petition(request, pk):
     batch = get_object_or_404(Batch, pk=pk)
+    if not is_owner(request.user,batch) and not request.user.is_superuser:
+        raise PermissionDenied
     if request.method == "POST":
         form = GeneratePetitionForm(request.POST, batch=batch)
         if form.is_valid():
