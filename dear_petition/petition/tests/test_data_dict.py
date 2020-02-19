@@ -6,5 +6,5 @@ pytestmark = pytest.mark.django_db
 
 
 def test_most_recent_record_none(batch):
-    with pytest.raises(ValueError):
+    with pytest.raises(Exception):
         assert map_data({}, batch)
