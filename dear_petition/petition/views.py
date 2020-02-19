@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 
@@ -6,6 +7,7 @@ from .models import CIPRSRecord, Batch
 from .forms import GeneratePetitionForm, UploadFileForm
 
 
+@transaction.atomic
 @login_required
 def upload_report(request):
     if request.method == "POST":
