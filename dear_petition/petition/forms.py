@@ -91,6 +91,11 @@ class GeneratePetitionForm(forms.Form):
                 "ZipAgency2": data.zipcode,
             }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.batch.most_recent_record:
+            raise forms.ValidationError("Unable to find most recent record")
+
     def save(self):
         output = io.BytesIO()
         template_path = os.path.join(

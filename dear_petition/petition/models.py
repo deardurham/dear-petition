@@ -147,19 +147,14 @@ class Batch(models.Model):
 
     @property
     def most_recent_record(self):
-        records = self.records.all()
-        most_recent_record = records[0]
-        most_recent_offense_date = most_recent_record.offense_date if most_recent_record.offense_date else datetime.min #The first record will just be returned if no other record has valid offense date
-        for record in records[1:]:
+        most_recent_record = None
+        most_recent_offense_date = datetime(1900, 1, 1)
+        for record in self.records.order_by("pk"):
             if not record.offense_date:
-                logger.info(f"[most_recent_record] record pk={record.pk} does not have an offense date. Skipping.")
                 continue
-            try:
-                offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
-            except:
-                logger.error(f"[most_recent_record] offense_date {record.offense_date} not in expected format, expecting %Y-%m-%dT%H:%M:%S")
+            offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
             if offense_date > most_recent_offense_date:
                 most_recent_record = record
+        if not most_recent_record:
+            most_recent_record = self.records.order_by("pk").first()
         return most_recent_record
-            
-

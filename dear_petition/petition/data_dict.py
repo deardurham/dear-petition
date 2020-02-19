@@ -6,6 +6,8 @@ import dateutil.parser
 
 def map_data(form_data, batch):
     record = batch.most_recent_record
+    if not record:
+        raise ValueError("Batch contains no valid records")
     # clean record data to fix date formats, etc.
     record = clean(record)
     json = record.data
