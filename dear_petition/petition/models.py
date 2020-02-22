@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.urls import reverse
 
 import ciprs_reader
 from dear_petition.petition.data_dict import clean
@@ -33,6 +34,9 @@ class CIPRSRecord(models.Model):
 
     class Meta:
         verbose_name = "CIPRSRecord"
+
+    def get_absolute_url(self):
+        return reverse("view-record", kwargs={"pk": self.pk})
 
     def parse_report(self, report_pdf=None):
         """Save file locally, parse PDF, save to JSONField"""
@@ -124,6 +128,9 @@ class Batch(models.Model):
 
     def __str__(self):
         return f"{self.pk}: {self.label}"
+
+    def get_absolute_url(self):
+        return reverse("create-petition", kwargs={"pk": self.pk})
 
     @property
     def offenses(self):
