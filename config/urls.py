@@ -3,15 +3,11 @@ from django.urls import include, path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView
 from django.views import defaults as default_views
 
 urlpatterns = [
-    path(
-        "",
-        login_required(TemplateView.as_view(template_name="pages/home.html")),
-        name="home",
-    ),
+    path("", RedirectView.as_view(pattern_name="upload-report"), name="home",),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
