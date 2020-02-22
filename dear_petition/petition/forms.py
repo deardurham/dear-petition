@@ -91,6 +91,18 @@ class GeneratePetitionForm(forms.Form):
                 "ZipAgency2": data.zipcode,
             }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.batch.most_recent_record:
+            raise forms.ValidationError(
+                "All associated CIPRS records are missing offense dates"
+            )
+        # Run map_data() now so we can raise exceptions as form errors
+        try:
+            map_data(cleaned_data, self.batch)
+        except Exception as e:
+            raise forms.ValidationError(str(e))
+
     def save(self):
         output = io.BytesIO()
         template_path = os.path.join(
