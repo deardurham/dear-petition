@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import PermissionDenied
@@ -8,6 +9,7 @@ from .forms import GeneratePetitionForm, UploadFileForm
 from .permissions import is_owner
 
 
+@transaction.atomic
 @login_required
 def upload_report(request):
     if request.method == "POST":
