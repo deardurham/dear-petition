@@ -155,7 +155,7 @@ class Batch(models.Model):
     @property
     def most_recent_record(self):
         most_recent_record = None
-        most_recent_offense_date = datetime(1900, 1, 1)
+        most_recent_offense_date = datetime.min
         for record in self.records.order_by("pk"):
             if not record.offense_date:
                 continue
