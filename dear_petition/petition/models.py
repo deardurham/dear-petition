@@ -179,19 +179,7 @@ class CIPRSRecord(models.Model):
     def get_arrest_date(self, data):
         offense_date = data["Case Information"].get("Offense Date", "")
         return data["Offense Record"].get("Arrest Date", offense_date)
-
-    # Offense Model Or Offense Record Model
-    # def get_disposed_on(self):
-    #     return self.data["Offense Record"].get("Disposed On", "")
-
-    # def get_disposition_method(self):
-    #     return self.data["Offense Record"].get("Disposition Method", "")
-
-    # This method will becomes its own model: Offense Model and OffenseRecord Model
-    # def get_offenses(self):
-    #     for offense in self.data["Offense Record"].get("Records", []):
-    #         yield offense
-
+ 
 
 class Contact(models.Model):
 
