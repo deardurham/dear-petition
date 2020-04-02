@@ -78,14 +78,6 @@ class CIPRSRecord(models.Model):
         return self.data["Offense Record"].get("Arrest Date", self.offense_date)
 
     @property
-    def disposed_on(self):
-        return self.data["Offense Record"].get("Disposed On", "")
-
-    @property
-    def disposition_method(self):
-        return self.data["Offense Record"].get("Disposition Method", "")
-
-    @property
     def district_court(self):
         return self.data["General"].get("District", "")
 
@@ -93,10 +85,28 @@ class CIPRSRecord(models.Model):
     def superior_court(self):
         return self.data["General"].get("Superior", "")
 
-    @property
-    def offenses(self):
-        for offense in self.data["Offense Record"].get("Records", []):
-            yield offense
+class Offense(model.Models):
+    ciprs_record = models.ForeignKey(
+        'CIPRSRecord',
+        related_name='offenses',
+        on_delete='CASCADE'
+    )
+    disposed_on = models.DateField()
+    disposition_method = models.CharField()
+
+
+class OffenseRecord(model.Models):
+    offense = models.ForeignKey(
+        'Offense',
+        related_name='offense_records',
+        on_delete='CASCADE'
+    )
+    law = models.CharField(max_length=256, blank=True)
+    code = models.IntegerField()
+    action = models.CharField(max_length=256)
+    severity = models.CharField(max_length=256)
+    description = models.CharField(max_length=256)
+
 
 
 class Contact(models.Model):
