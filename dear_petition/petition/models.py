@@ -15,9 +15,55 @@ import ciprs_reader
 from dear_petition.petition.data_dict import clean
 from dear_petition.users.models import User
 
+from .constants import (
+    JURISDICTION_CHOICES,
+    DISTRICT_COURT,
+    SUPERIOR_COURT,
+    NOT_AVAILABLE,
+    SEX_CHOICES,
+    MALE,
+    FEMALE,
+    UNISEX
+)
+
 
 logger = logging.getLogger(__name__)
 
+class CIPRSRecordManager(models.Manager):
+
+    def create_record(self, batch, date_uploaded, report_pdf, label, data):
+        '''Extract General, Case, and Defendant details from data 
+
+        Parses the raw data from our JSONField (data) and
+        places values in their associated model fields
+        '''
+        file_no = self.get_file_no(data)
+        county = self.get_county(data)
+        dob = self.get_dob(data)
+        sex = self.get_sex(data)
+        race = self.get_race(data)
+        case_status = self.get_case_status(data)
+        offense_date = self.get_offense_date(data)
+        arrest_date = self.get_arrest_date(data)
+        jurisdiction = self.get_jurisdiction(data)
+
+        ciprs_record = self.create(
+            batch=batch,
+            date_uploaded=date_uploaded,
+            report_pdf=report_pdf,
+            label=label,
+            data=data,
+            file_no=file_no,
+            county=county,
+            dob=dob,
+            sex=sex,
+            race=race,
+            case_status=case_status,
+            offense_date=offense_date,
+            arrest_date=arrest_date,
+            jurisdiction=jurisdiction
+        )
+        return ciprs_record
 
 class CIPRSRecord(models.Model):
 
@@ -28,6 +74,21 @@ class CIPRSRecord(models.Model):
     )
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
+    file_no = models.CharField(max_length=256, blank=True)
+    county = models.CharField(max_length=256, blank=True)
+    dob = models.DateField(null=True)
+    sex = models.CharField(max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE)
+    race = models.CharField(max_length=256, blank=True)
+    case_status = models.CharField(max_length=256, blank=True)
+    offense_date = models.DateTimeField(null=True)
+    arrest_date = models.DateField(null=True)
+    jurisdiction = models.CharField(
+        max_length=16,
+        choices=JURISDICTION_CHOICES,
+        default=NOT_AVAILABLE
+    )
+
+    objects = CIPRSRecordManager()
 
     def __str__(self):
         return f"{self.label} ({self.pk})"
@@ -52,51 +113,84 @@ class CIPRSRecord(models.Model):
                 logger.exception(e)
                 data = {"error": str(e)}
             return data
+    
+    def refresh_record(self):
+        '''Updates model fields that depends on the data JSONField
 
-    @property
-    def file_no(self):
-        return self.data["General"].get("File No", "")
+        The record exists, but the raw data (data - JSONFIELD) has
+        changed. Let's update the models that are extracting data
+        from this field.
+        '''
+        record = CIPRSRecord.objects.get(pk=self.pk)
+        record.file_no = self.get_file_no(self.data)
+        record.county = self.get_county(self.data)
+        record.dob = self.get_dob(self.data)
+        record.sex = self.get_sex(self.data)
+        record.race = self.get_race(self.data)
+        record.case_status = self.get_case_status(self.data)
+        record.offense_date = self.get_offense_date(self.data)
+        record.arrest_date = self.get_arrest_date(self.data)
+        record.jurisdiction = self.get_jurisdiction(self.data)
+        
+        
+        return record.save(update_fields=[
+            'file_no',
+            'county',
+            'dob',
+            'sex',
+            'race',
+            'case_status',
+            'offense_date',
+            'arrest_date',
+            'jurisdiction'
+        ])
 
-    @property
-    def county(self):
-        return self.data["General"].get("County", "")
+    def get_file_no(self, data):
+        return data["General"].get("File No", "")
 
-    @property
-    def dob(self):
-        return self.data["Defendant"].get("Date of Birth/Estimated Age", "")
+    def get_county(self, data):
+        return data["General"].get("County", "")
 
-    @property
-    def case_status(self):
-        return self.data["Case Information"].get("Case Status", "")
+    def get_dob(self, data):
+        return data["Defendant"].get("Date of Birth/Estimated Age", "")
+    
+    def get_sex(self, data):
+        return data["Defendant"].get("Sex", "")
 
-    @property
-    def offense_date(self):
-        return self.data["Case Information"].get("Offense Date", "")
+    def get_race(self, data):
+        return data["Defendant"].get("Race", "")
 
-    @property
-    def arrest_date(self):
-        return self.data["Offense Record"].get("Arrest Date", self.offense_date)
+    def get_case_status(self, data):
+        return data["Case Information"].get("Case Status", "")
 
-    @property
-    def disposed_on(self):
-        return self.data["Offense Record"].get("Disposed On", "")
+    def get_offense_date(self, data):
+        return data["Case Information"].get("Offense Date", "")
 
-    @property
-    def disposition_method(self):
-        return self.data["Offense Record"].get("Disposition Method", "")
+    def get_jurisdiction(self, data):
+        is_superior = data["General"].get("Superior", "")
+        is_district = data["General"].get("District", "")
+        if is_superior:
+            return SUPERIOR_COURT
+        elif is_district:
+            return DISTRICT_COURT
+        else:
+            return NOT_AVAILABLE
 
-    @property
-    def district_court(self):
-        return self.data["General"].get("District", "")
+    def get_arrest_date(self, data):
+        offense_date = data["Case Information"].get("Offense Date", "")
+        return data["Offense Record"].get("Arrest Date", offense_date)
 
-    @property
-    def superior_court(self):
-        return self.data["General"].get("Superior", "")
+    # Offense Model Or Offense Record Model
+    # def get_disposed_on(self):
+    #     return self.data["Offense Record"].get("Disposed On", "")
 
-    @property
-    def offenses(self):
-        for offense in self.data["Offense Record"].get("Records", []):
-            yield offense
+    # def get_disposition_method(self):
+    #     return self.data["Offense Record"].get("Disposition Method", "")
+
+    # This method will becomes its own model: Offense Model and OffenseRecord Model
+    # def get_offenses(self):
+    #     for offense in self.data["Offense Record"].get("Records", []):
+    #         yield offense
 
 
 class Contact(models.Model):
