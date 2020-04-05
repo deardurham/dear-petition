@@ -14,6 +14,7 @@ class UploadFileForm(forms.Form):
 
     def save(self, user):
         batch = Batch.objects.create(user=user)
+        records = []
         for idx, file_ in enumerate(self.files.getlist("files")):
             record = CIPRSRecord(batch=batch)
             if settings.CIPRS_SAVE_PDF:
@@ -23,12 +24,17 @@ class UploadFileForm(forms.Form):
                 raise forms.ValidationError(record.data["error"])
             if "Defendant" in record.data and "Name" in record.data["Defendant"]:
                 label = record.data["Defendant"]["Name"]
-                record.label = label
                 if idx == 0:
-                    batch.label = label
-                    batch.save()
-            record.save()
-            batch.records.add(record)
+                    batch.label = label   
+                elif label != batch.label:
+                    raise forms.ValidationError(f"We were provided one record with the name {batch.label} and another with the name {label}. All records must have the same name.")         
+                record.label = label
+            records.append(record)
+
+        batch.save()
+        CIPRSRecord.objects.bulk_create(records)
+        batch.records.add(*records)
+
         return batch
 
 
