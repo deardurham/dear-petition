@@ -23,7 +23,7 @@ from .constants import (
     SEX_CHOICES,
     MALE,
     FEMALE,
-    UNISEX,
+    UNKNOWN,
     CONTACT_CATEGORIES,
 )
 

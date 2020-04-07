@@ -10,11 +10,11 @@ JURISDICTION_CHOICES = (
 
 MALE = "M"
 FEMALE = "F"
-UNISEX = "U"
+UNKNOWN = "U"
 SEX_CHOICES = (
     (MALE, "Male"),
     (FEMALE, "Female"),
-    (UNISEX, "Unisex"),
+    (UNKNOWN, "Unknown"),
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
