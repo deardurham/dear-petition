@@ -85,21 +85,21 @@ class CIPRSRecord(models.Model):
     def superior_court(self):
         return self.data["General"].get("Superior", "")
 
+
 class Offense(models.Model):
     ciprs_record = models.ForeignKey(
-        'CIPRSRecord',
-        related_name='offenses',
-        on_delete='CASCADE'
+        "CIPRSRecord", related_name="offenses", on_delete="CASCADE"
     )
-    disposed_on = models.DateField()
+    disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"offense ${self.pk}"
 
 
 class OffenseRecord(models.Model):
     offense = models.ForeignKey(
-        'Offense',
-        related_name='offense_records',
-        on_delete='CASCADE'
+        "Offense", related_name="offense_records", on_delete="CASCADE"
     )
     law = models.CharField(max_length=256, blank=True)
     code = models.IntegerField()
@@ -107,6 +107,8 @@ class OffenseRecord(models.Model):
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
 
+    def __str__(self):
+        return f"offense record {self.pk}"
 
 
 class Contact(models.Model):
