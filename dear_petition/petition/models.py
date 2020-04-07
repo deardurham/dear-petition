@@ -27,12 +27,17 @@ from .constants import (
     CONTACT_CATEGORIES,
 )
 
+from .utils import (
+    dt_obj_to_date,
+    make_date_obj_aware,
+)
+
 
 logger = logging.getLogger(__name__)
 
 
 class CIPRSRecordManager(models.Manager):
-    def create_record(self, batch, date_uploaded, report_pdf, label, data):
+    def create_record(self, batch, label, data):
         """Extract General, Case, and Defendant details from data 
 
         Parses the raw data from our JSONField (data) and
@@ -43,7 +48,7 @@ class CIPRSRecordManager(models.Manager):
         report_pdf, and label alongside data. Although data is
         all that is needed when refresh_record_from_data is called.
         """
-        ciprs_record = CIPRSRecord(batch, date_uploaded, report_pdf, label, data)
+        ciprs_record = CIPRSRecord(batch=batch, label=label, data=data)
         ciprs_record.refresh_record_from_data()
         ciprs_record.save()
 
@@ -108,9 +113,11 @@ class CIPRSRecord(models.Model):
         self.sex = self.data["Defendant"].get("Sex", "")
         self.race = self.data["Defendant"].get("Race", "")
         self.case_status = self.data["Case Information"].get("Case Status", "")
-        self.offense_date = self.data["Case Information"].get("Offense Date", "")
+        self.offense_date = make_date_obj_aware(
+            self.data["Case Information"].get("Offense Date", "")
+        )
         self.arrest_date = self.data["Offense Record"].get(
-            "Arrest Date", self.offense_date
+            "Arrest Date", dt_obj_to_date(self.offense_date)
         )
         self.jurisdiction = self.get_jurisdiction()
         self.save()
