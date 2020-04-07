@@ -65,7 +65,7 @@ class OffenseAdmin(admin.ModelAdmin):
         )
         return queryset
 
-    def _offense_record_count(self, obj):
+    def offense_record_count(self, obj):
         return obj._record_count
 
 
@@ -99,7 +99,7 @@ class BatchAdmin(admin.ModelAdmin):
         queryset = queryset.annotate(_record_count=Count("records", distinct=True),)
         return queryset
 
-    def _record_count(self, obj):
+    def record_count(self, obj):
         return obj._record_count
 
 
