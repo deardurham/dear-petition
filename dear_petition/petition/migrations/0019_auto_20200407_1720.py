@@ -2,6 +2,14 @@
 
 from django.db import migrations
 
+from ..constants import (
+    SUPERIOR_COURT,
+    DISTRICT_COURT,
+    NOT_AVAILABLE,
+)
+
+from ..utils import make_date_obj_aware, dt_obj_to_date
+
 
 def update_existing_ciprs_records(apps, schema_editor):
     CIPRSRecord = apps.get_model("petition", "CIPRSRecord")
@@ -17,7 +25,7 @@ def refresh_record_from_data(record):
     changed. Let's update the models that are extracting data
     from this field.
     """
-    record.file_no = self.data["General"].get("File No", "")
+    record.file_no = record.data["General"].get("File No", "")
     record.county = record.data["General"].get("County", "")
     record.dob = record.data["Defendant"].get("Date of Birth/Estimated Age", "")
     record.sex = record.data["Defendant"].get("Sex", "")

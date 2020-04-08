@@ -107,30 +107,48 @@ class CIPRSRecord(models.Model):
         changed. Let's update the models that are extracting data
         from this field.
         """
-        self.file_no = self.data["General"].get("File No", "")
-        self.county = self.data["General"].get("County", "")
-        self.dob = self.data["Defendant"].get("Date of Birth/Estimated Age", "")
-        self.sex = self.data["Defendant"].get("Sex", "")
-        self.race = self.data["Defendant"].get("Race", "")
-        self.case_status = self.data["Case Information"].get("Case Status", "")
-        self.offense_date = make_date_obj_aware(
-            self.data["Case Information"].get("Offense Date", "")
+        self.file_no = self.data["General"].get("File No", "") if self.data else ""
+        self.county = self.data["General"].get("County", "") if self.data else ""
+        self.dob = (
+            self.data["Defendant"].get("Date of Birth/Estimated Age", None)
+            if self.data
+            else None
         )
-        self.arrest_date = self.data["Offense Record"].get(
-            "Arrest Date", dt_obj_to_date(self.offense_date)
+        self.sex = (
+            self.data["Defendant"].get("Sex", NOT_AVAILABLE)
+            if self.data
+            else NOT_AVAILABLE
+        )
+        self.race = self.data["Defendant"].get("Race", "") if self.data else ""
+        self.case_status = (
+            self.data["Case Information"].get("Case Status", "") if self.data else ""
+        )
+        self.offense_date = (
+            make_date_obj_aware(self.data["Case Information"].get("Offense Date", None))
+            if self.data
+            else None
+        )
+        self.arrest_date = (
+            self.data["Offense Record"].get(
+                "Arrest Date", dt_obj_to_date(self.offense_date)
+            )
+            if self.data
+            else None
         )
         self.jurisdiction = self.get_jurisdiction()
         self.save()
 
     def get_jurisdiction(self):
-        is_superior = self.data["General"].get("Superior", "")
-        is_district = self.data["General"].get("District", "")
-        if is_superior:
-            return SUPERIOR_COURT
-        elif is_district:
-            return DISTRICT_COURT
-        else:
-            return NOT_AVAILABLE
+        if self.data:
+            is_superior = self.data["General"].get("Superior", "")
+            is_district = self.data["General"].get("District", "")
+            if is_superior:
+                return SUPERIOR_COURT
+            elif is_district:
+                return DISTRICT_COURT
+            else:
+                return NOT_AVAILABLE
+        return NOT_AVAILABLE
 
 
 class Contact(models.Model):
