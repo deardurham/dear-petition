@@ -29,7 +29,7 @@ from .constants import (
 
 from .utils import (
     dt_obj_to_date,
-    make_date_obj_aware,
+    make_datetime_aware,
 )
 
 
@@ -124,7 +124,7 @@ class CIPRSRecord(models.Model):
             self.data["Case Information"].get("Case Status", "") if self.data else ""
         )
         self.offense_date = (
-            make_date_obj_aware(self.data["Case Information"].get("Offense Date", None))
+            make_datetime_aware(self.data["Case Information"].get("Offense Date", None))
             if self.data
             else None
         )

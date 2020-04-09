@@ -8,7 +8,7 @@ from ..constants import (
     NOT_AVAILABLE,
 )
 
-from ..utils import make_date_obj_aware, dt_obj_to_date
+from ..utils import make_datetime_aware, dt_obj_to_date
 
 
 def update_existing_ciprs_records(apps, schema_editor):
@@ -31,7 +31,7 @@ def refresh_record_from_data(record):
     record.sex = record.data["Defendant"].get("Sex", "")
     record.race = record.data["Defendant"].get("Race", "")
     record.case_status = record.data["Case Information"].get("Case Status", "")
-    record.offense_date = make_date_obj_aware(
+    record.offense_date = make_datetime_aware(
         record.data["Case Information"].get("Offense Date", "")
     )
     record.arrest_date = record.data["Offense Record"].get(

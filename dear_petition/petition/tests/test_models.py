@@ -10,7 +10,7 @@ from ..models import CIPRSRecord
 
 from ..utils import (
     dt_obj_to_date,
-    make_date_obj_aware,
+    make_datetime_aware,
 )
 
 pytestmark = pytest.mark.django_db
@@ -115,7 +115,7 @@ def test_refresh_record_from_data():
     )
     assert ciprs_record.offense_date.strftime(
         "%Y-%m-%dT%H:%M:%S"
-    ) == make_date_obj_aware(
+    ) == make_datetime_aware(
         ciprs_record.data["Case Information"].get("Offense Date", None)
     ).strftime(
         "%Y-%m-%dT%H:%M:%S"
@@ -136,7 +136,7 @@ def test_refresh_record_from_data():
     assert ciprs_record.sex == sex
     assert ciprs_record.offense_date.strftime(
         "%Y-%m-%dT%H:%M:%S"
-    ) == make_date_obj_aware(offense_date).strftime("%Y-%m-%dT%H:%M:%S")
+    ) == make_datetime_aware(offense_date).strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def test_refresh_record_from_data_multi():
@@ -158,7 +158,7 @@ def test_refresh_record_from_data_multi():
     )
     assert ciprs_record.offense_date.strftime(
         "%Y-%m-%dT%H:%M:%S"
-    ) == make_date_obj_aware(
+    ) == make_datetime_aware(
         ciprs_record.data["Case Information"].get("Offense Date", None)
     ).strftime(
         "%Y-%m-%dT%H:%M:%S"
