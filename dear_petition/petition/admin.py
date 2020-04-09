@@ -66,7 +66,7 @@ class OffenseAdmin(admin.ModelAdmin):
         return queryset
 
     def offense_record_count(self, obj):
-        return obj._record_count
+        return obj._offense_record_count
 
 
 @admin.register(models.OffenseRecord)
