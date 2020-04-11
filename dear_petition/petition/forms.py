@@ -115,3 +115,10 @@ class GeneratePetitionForm(forms.Form):
         petition.write()
         output.seek(0)
         return output
+
+
+class CommentForm(forms.Form):
+
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={"placeholder": "Add a comment..."})
+    )
