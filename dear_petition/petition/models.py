@@ -107,29 +107,37 @@ class CIPRSRecord(models.Model):
         changed. Let's update the models that are extracting data
         from this field.
         """
-        self.file_no = self.data["General"].get("File No", "") if self.data else ""
-        self.county = self.data["General"].get("County", "") if self.data else ""
+        self.file_no = (
+            self.data.get("General", {}).get("File No", "") if self.data else ""
+        )
+        self.county = (
+            self.data.get("General", {}).get("County", "") if self.data else ""
+        )
         self.dob = (
-            self.data["Defendant"].get("Date of Birth/Estimated Age", None)
+            self.data.get("Defendant", {}).get("Date of Birth/Estimated Age", None)
             if self.data
             else None
         )
         self.sex = (
-            self.data["Defendant"].get("Sex", NOT_AVAILABLE)
+            self.data.get("Defendant", {}).get("Sex", NOT_AVAILABLE)
             if self.data
             else NOT_AVAILABLE
         )
-        self.race = self.data["Defendant"].get("Race", "") if self.data else ""
+        self.race = self.data.get("Defendant", {}).get("Race", "") if self.data else ""
         self.case_status = (
-            self.data["Case Information"].get("Case Status", "") if self.data else ""
+            self.data.get("Case Information", {}).get("Case Status", "")
+            if self.data
+            else ""
         )
         self.offense_date = (
-            make_datetime_aware(self.data["Case Information"].get("Offense Date", None))
+            make_datetime_aware(
+                self.data.get("Case Information", {}).get("Offense Date", None)
+            )
             if self.data
             else None
         )
         self.arrest_date = (
-            self.data["Offense Record"].get(
+            self.data.get("Offense Record", {}).get(
                 "Arrest Date", dt_obj_to_date(self.offense_date)
             )
             if self.data
@@ -140,8 +148,8 @@ class CIPRSRecord(models.Model):
 
     def get_jurisdiction(self):
         if self.data:
-            is_superior = self.data["General"].get("Superior", "")
-            is_district = self.data["General"].get("District", "")
+            is_superior = self.data.get("General", {}).get("Superior", "")
+            is_district = self.data.get("General", {}).get("District", "")
             if is_superior:
                 return SUPERIOR_COURT
             elif is_district:

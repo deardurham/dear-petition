@@ -10,6 +10,10 @@ def dt_obj_to_date(dt_obj):
 
 def make_datetime_aware(dt_str):
     """makes datetime string an aware datetime object (UTC ==> America/New York)"""
+    if dt_str is None or dt_str == "":
+        return None
     datetime_obj = datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S")
-    aware_datetime_obj = make_aware(datetime_obj, timezone=pytz.utc)
+    aware_datetime_obj = datetime_obj.replace(tzinfo=pytz.utc).astimezone(
+        pytz.timezone("America/New_York")
+    )
     return aware_datetime_obj

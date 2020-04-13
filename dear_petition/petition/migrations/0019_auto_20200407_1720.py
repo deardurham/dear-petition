@@ -25,16 +25,16 @@ def refresh_record_from_data(record):
     changed. Let's update the models that are extracting data
     from this field.
     """
-    record.file_no = record.data["General"].get("File No", "")
-    record.county = record.data["General"].get("County", "")
-    record.dob = record.data["Defendant"].get("Date of Birth/Estimated Age", "")
-    record.sex = record.data["Defendant"].get("Sex", "")
-    record.race = record.data["Defendant"].get("Race", "")
-    record.case_status = record.data["Case Information"].get("Case Status", "")
+    record.file_no = record.data.get("General", {}).get("File No", "")
+    record.county = record.data.get("General", {}).get("County", "")
+    record.dob = record.data.get("Defendant", {}).get("Date of Birth/Estimated Age", "")
+    record.sex = record.data.get("Defendant", {}).get("Sex", "")
+    record.race = record.data.get("Defendant", {}).get("Race", "")
+    record.case_status = record.data.get("Case Information", {}).get("Case Status", "")
     record.offense_date = make_datetime_aware(
-        record.data["Case Information"].get("Offense Date", "")
+        record.data.get("Case Information", {}).get("Offense Date", None)
     )
-    record.arrest_date = record.data["Offense Record"].get(
+    record.arrest_date = record.data.get("Offense Record", {}).get(
         "Arrest Date", dt_obj_to_date(record.offense_date)
     )
     record.jurisdiction = get_jurisdiction(record)
@@ -42,8 +42,8 @@ def refresh_record_from_data(record):
 
 
 def get_jurisdiction(record):
-    is_superior = record.data["General"].get("Superior", "")
-    is_district = record.data["General"].get("District", "")
+    is_superior = record.data.get("General", {}).get("Superior", "")
+    is_district = record.data.get("General", {}).get("District", "")
     if is_superior:
         return SUPERIOR_COURT
     elif is_district:

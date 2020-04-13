@@ -1,4 +1,5 @@
 import pytest
+from django.utils.timezone import localtime
 
 from .factories import (
     BatchFactory,
@@ -37,9 +38,13 @@ def test_ciprs_record_create():
     assert ciprs_record.sex == data["Defendant"].get("Sex", "")
     assert ciprs_record.race == data["Defendant"].get("Race", "")
     assert ciprs_record.case_status == data["Case Information"].get("Case Status", "")
-    assert ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S") == data[
-        "Case Information"
-    ].get("Offense Date", None)
+    assert make_datetime_aware(
+        ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S")
+    ).strftime("%Y-%m-%dT%H:%M:%S") == make_datetime_aware(
+        data["Case Information"].get("Offense Date", None)
+    ).strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     assert ciprs_record.arrest_date == data["Offense Record"].get(
         "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
     )
@@ -65,9 +70,13 @@ def test_ciprs_record_create_multi():
         assert ciprs_record.case_status == data["Case Information"].get(
             "Case Status", ""
         )
-        assert ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S") == data[
-            "Case Information"
-        ].get("Offense Date", None)
+        assert make_datetime_aware(
+            ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S")
+        ).strftime("%Y-%m-%dT%H:%M:%S") == make_datetime_aware(
+            data["Case Information"].get("Offense Date", None)
+        ).strftime(
+            "%Y-%m-%dT%H:%M:%S"
+        )
         assert ciprs_record.arrest_date == data["Offense Record"].get(
             "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
         )
@@ -137,6 +146,19 @@ def test_refresh_record_from_data():
     assert ciprs_record.offense_date.strftime(
         "%Y-%m-%dT%H:%M:%S"
     ) == make_datetime_aware(offense_date).strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def test_refresh_record_from_data_empty_data_dict():
+    ciprs_record = CIPRSRecordFactory()
+    ciprs_record.data = {}
+    assert ciprs_record.file_no == ""
+    assert ciprs_record.county == ""
+    assert ciprs_record.dob == None
+    assert ciprs_record.sex == "N/A"
+    assert ciprs_record.race == ""
+    assert ciprs_record.case_status == ""
+    assert ciprs_record.offense_date == None
+    assert ciprs_record.arrest_date == None
 
 
 def test_refresh_record_from_data_multi():
