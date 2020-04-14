@@ -150,7 +150,29 @@ def test_refresh_record_from_data():
 
 def test_refresh_record_from_data_empty_data_dict():
     ciprs_record = CIPRSRecordFactory()
+    ciprs_record.refresh_record_from_data()
+    assert ciprs_record.file_no == ciprs_record.data["General"].get("File No", "")
+    assert ciprs_record.county == ciprs_record.data["General"].get("County", "")
+    assert ciprs_record.dob == ciprs_record.data["Defendant"].get(
+        "Date of Birth/Estimated Age", None
+    )
+    assert ciprs_record.sex == ciprs_record.data["Defendant"].get("Sex", "")
+    assert ciprs_record.race == ciprs_record.data["Defendant"].get("Race", "")
+    assert ciprs_record.case_status == ciprs_record.data["Case Information"].get(
+        "Case Status", ""
+    )
+    assert ciprs_record.offense_date.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    ) == make_datetime_aware(
+        ciprs_record.data["Case Information"].get("Offense Date", None)
+    ).strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
+    assert ciprs_record.arrest_date == ciprs_record.data["Offense Record"].get(
+        "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
+    )
     ciprs_record.data = {}
+    ciprs_record.refresh_record_from_data()
     assert ciprs_record.file_no == ""
     assert ciprs_record.county == ""
     assert ciprs_record.dob == None

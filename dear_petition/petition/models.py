@@ -25,6 +25,7 @@ from .constants import (
     FEMALE,
     UNKNOWN,
     CONTACT_CATEGORIES,
+    DATETIME_FORMAT,
 )
 
 from .utils import (
@@ -216,7 +217,7 @@ class Batch(models.Model):
         for record in self.records.order_by("pk"):
             if not record.offense_date:
                 continue
-            offense_date = datetime.strptime(record.offense_date, "%Y-%m-%dT%H:%M:%S")
+            offense_date = datetime.strptime(record.offense_date, DATETIME_FORMAT)
             if offense_date > most_recent_offense_date:
                 most_recent_record = record
         if not most_recent_record:
