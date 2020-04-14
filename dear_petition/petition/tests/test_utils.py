@@ -41,5 +41,7 @@ def test_make_datetime_aware():
     dt_str = datetime.now().strftime(DATETIME_FORMAT)
     aware_dt = make_datetime_aware(dt_str)
     datetime_obj = datetime.strptime(dt_str, DATETIME_FORMAT)
-    aware_datetime_obj = datetime_obj.astimezone(pytz.timezone(settings.TIME_ZONE))
+    aware_datetime_obj = datetime_obj.replace(tzinfo=pytz.utc).astimezone(
+        pytz.timezone(settings.TIME_ZONE)
+    )
     assert aware_dt == aware_datetime_obj

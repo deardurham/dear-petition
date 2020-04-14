@@ -17,5 +17,7 @@ def make_datetime_aware(dt_str):
     if dt_str is None or dt_str == "":
         return None
     datetime_obj = datetime.strptime(dt_str, DATETIME_FORMAT)
-    aware_datetime_obj = datetime_obj.astimezone(pytz.timezone(settings.TIME_ZONE))
+    aware_datetime_obj = datetime_obj.replace(tzinfo=pytz.utc).astimezone(
+        pytz.timezone(settings.TIME_ZONE)
+    )
     return aware_datetime_obj
