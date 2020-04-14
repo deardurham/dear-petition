@@ -27,7 +27,7 @@ def refresh_record_from_data(record):
     """
     record.file_no = record.data.get("General", {}).get("File No", "")
     record.county = record.data.get("General", {}).get("County", "")
-    record.dob = record.data.get("Defendant", {}).get("Date of Birth/Estimated Age", "")
+    record.dob = record.data.get("Defendant", {}).get("Date of Birth/Estimated Age", None)
     record.sex = record.data.get("Defendant", {}).get("Sex", "")
     record.race = record.data.get("Defendant", {}).get("Race", "")
     record.case_status = record.data.get("Case Information", {}).get("Case Status", "")
