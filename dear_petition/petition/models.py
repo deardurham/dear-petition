@@ -160,6 +160,31 @@ class CIPRSRecord(models.Model):
         return NOT_AVAILABLE
 
 
+class Offense(models.Model):
+    ciprs_record = models.ForeignKey(
+        "CIPRSRecord", related_name="offenses", on_delete="CASCADE"
+    )
+    disposed_on = models.DateField(blank=True, null=True)
+    disposition_method = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"offense ${self.pk}"
+
+
+class OffenseRecord(models.Model):
+    offense = models.ForeignKey(
+        "Offense", related_name="offense_records", on_delete="CASCADE"
+    )
+    law = models.CharField(max_length=256, blank=True)
+    code = models.IntegerField()
+    action = models.CharField(max_length=256)
+    severity = models.CharField(max_length=256)
+    description = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"offense record {self.pk}"
+
+
 class Contact(models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(
