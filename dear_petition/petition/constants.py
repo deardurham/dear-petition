@@ -1,0 +1,23 @@
+DISTRICT_COURT = "D"
+SUPERIOR_COURT = "S"
+NOT_AVAILABLE = "N/A"
+
+JURISDICTION_CHOICES = (
+    (DISTRICT_COURT, "DISTRICT COURT"),
+    (SUPERIOR_COURT, "SUPERIOR COURT"),
+    (NOT_AVAILABLE, "NOT AVAILABLE"),
+)
+
+MALE = "M"
+FEMALE = "F"
+UNKNOWN = "U"
+SEX_CHOICES = (
+    (MALE, "Male"),
+    (FEMALE, "Female"),
+    (UNKNOWN, "Unknown"),
+    (NOT_AVAILABLE, "NOT AVAILABLE"),
+)
+
+CONTACT_CATEGORIES = (("agency", "Agency"), ("attorney", "Attorney"))
+
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
