@@ -171,7 +171,7 @@ class Batch(models.Model):
 class Comment(models.Model):
 
     user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
-    text = models.CharField(max_length=pc.COMMENT_MAX_LENGTH)
+    text = models.TextField()
     batch = models.ForeignKey(Batch, related_name="comments", on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
 
@@ -179,7 +179,7 @@ class Comment(models.Model):
         link = reverse(
             "create-petition", kwargs={"pk": self.batch.id, "tab": "comments"}
         )
-        if self.user.is_staff == False:
+        if self.user.is_staff:
             for staff_member in User.objects.filter(is_staff=True):
                 staff_member.send_email(
                     subject=pc.NEW_COMMENT_EMAIL_SUBJECT,

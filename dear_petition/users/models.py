@@ -19,5 +19,5 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
     def send_email(self, subject, message, send_anyway=False):
-        if settings.ENVIRONMENT == "PRODUCTION" or send_anyway == True:
+        if settings.ENVIRONMENT == "PRODUCTION" or send_anyway:
             send_mail(subject, message, uc.FROM_EMAIL_ADDRESS, [self.email])
