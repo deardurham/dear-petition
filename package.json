@@ -1,9 +1,6 @@
 {
   "name": "dear_petition",
   "version": "0.1.0",
-  "dependencies": {
-    "reaktus": "^0.1.6"
-  },
   "devDependencies": {
     "autoprefixer": "^9.4.7",
     "browser-sync": "^2.14.0",
