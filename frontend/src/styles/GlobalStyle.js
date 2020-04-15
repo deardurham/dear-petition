@@ -26,7 +26,7 @@ export default createGlobalStyle`
 
     body {
         margin: 0;
-        font-family: 'Inconsolata', monospace;
+        font-family: 'Courier New', Courier, monospace;
         font-size: 1.5rem;
         box-sizing: border-box;
     }
