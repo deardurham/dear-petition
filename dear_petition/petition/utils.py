@@ -6,18 +6,40 @@ from .constants import DATETIME_FORMAT
 
 
 def dt_obj_to_date(dt_obj):
-    """converts a datetime obj to a date"""
+    """
+    Convert a datetime obj to a date.
+
+    More technically, this function converts a datetime object to the date in the
+    settings.TIME_ZONE at the exact moment that the datetime object refers to.
+    For example, if dt_obj = datetime.datetime(2018, 1, 2, 1, 0, tzinfo=<UTC>),
+    then dt_obj refers to the moment that it was 01:00 in the UTC timezone on
+    January 2, 2018. If this project has settings.TIME_ZONE set to "America/New_York",
+    then at this moment in time would be 20:00 on January 1, 2018 in New York. As
+    a result, this function would return "2018-01-01".
+    """
     if isinstance(dt_obj, (datetime,)):
-        return dt_obj.date()
+        return dt_obj.astimezone(pytz.timezone(settings.TIME_ZONE)).date()
     return None
 
 
 def make_datetime_aware(dt_str):
-    """makes datetime string an aware datetime object (UTC ==> America/New York)"""
+    """
+    Take a datetime string in DATETIME_FORMAT and return a timezone-aware datetime object.
+
+    Note: we assume that we receive a datetime string like "2018-01-01T20:00:00",
+    which does not have a timezone attached to it, and that it refers to a datetime
+    in the settings.TIME_ZONE.
+    The steps we take are:
+      a) turn the datetime string into a timezone-naive datetime object
+      b) assign the timezone-naive datetime a timezone based on settings.TIME_ZONE
+    """
     if dt_str is None or dt_str == "":
         return None
-    datetime_obj = datetime.strptime(dt_str, DATETIME_FORMAT)
-    aware_datetime_obj = datetime_obj.replace(tzinfo=pytz.utc).astimezone(
-        pytz.timezone(settings.TIME_ZONE)
+    # a) Turn the datetime string into a timezone-naive datetime object
+    naive_datetime_obj = datetime.strptime(dt_str, DATETIME_FORMAT)
+    # b) Assign the timezone-naive datetime a timezone based on settings.TIME_ZONE
+    aware_datetime_obj = make_aware(
+        naive_datetime_obj, pytz.timezone(settings.TIME_ZONE)
     )
+    # Return the timezone aware object.
     return aware_datetime_obj
