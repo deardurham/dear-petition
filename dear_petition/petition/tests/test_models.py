@@ -1,4 +1,6 @@
 import pytest
+import pytz
+from django.conf import settings
 from django.utils.timezone import localtime
 
 from .factories import (
@@ -38,16 +40,15 @@ def test_ciprs_record_create():
     assert ciprs_record.sex == data["Defendant"].get("Sex", "")
     assert ciprs_record.race == data["Defendant"].get("Race", "")
     assert ciprs_record.case_status == data["Case Information"].get("Case Status", "")
-    assert make_datetime_aware(
-        ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S")
-    ).strftime("%Y-%m-%dT%H:%M:%S") == make_datetime_aware(
-        data["Case Information"].get("Offense Date", None)
-    ).strftime(
-        "%Y-%m-%dT%H:%M:%S"
-    )
-    assert ciprs_record.arrest_date == data["Offense Record"].get(
-        "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
-    )
+    record_offense_date_str = ciprs_record.offense_date.astimezone(
+        pytz.timezone(settings.TIME_ZONE)
+    ).strftime("%Y-%m-%dT%H:%M:%S")
+    data_offense_date_str = data.get("Case Information", {}).get("Offense Date", None)
+    assert record_offense_date_str == data_offense_date_str
+    data_arrest_date = data.get("Offense Record", {}).get("Arrest Date", "")
+    if not data_arrest_date:
+        data_arrest_date = dt_obj_to_date(ciprs_record.offense_date).strftime("%Y-%m-%d")
+    assert ciprs_record.arrest_date.strftime("%Y-%m-%d") == data_arrest_date
 
 
 def test_ciprs_record_create_multi():
@@ -70,16 +71,15 @@ def test_ciprs_record_create_multi():
         assert ciprs_record.case_status == data["Case Information"].get(
             "Case Status", ""
         )
-        assert make_datetime_aware(
-            ciprs_record.offense_date.strftime("%Y-%m-%dT%H:%M:%S")
-        ).strftime("%Y-%m-%dT%H:%M:%S") == make_datetime_aware(
-            data["Case Information"].get("Offense Date", None)
-        ).strftime(
-            "%Y-%m-%dT%H:%M:%S"
-        )
-        assert ciprs_record.arrest_date == data["Offense Record"].get(
-            "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
-        )
+        record_offense_date_str = ciprs_record.offense_date.astimezone(
+            pytz.timezone(settings.TIME_ZONE)
+        ).strftime("%Y-%m-%dT%H:%M:%S")
+        data_offense_date_str = data.get("Case Information", {}).get("Offense Date", None)
+        assert record_offense_date_str == data_offense_date_str
+        data_arrest_date = data.get("Offense Record", {}).get("Arrest Date", "")
+        if not data_arrest_date:
+            data_arrest_date = dt_obj_to_date(ciprs_record.offense_date).strftime("%Y-%m-%d")
+        assert ciprs_record.arrest_date.strftime("%Y-%m-%d") == data_arrest_date
 
 
 def test_ciprs_record_create_empty_data_dict():
