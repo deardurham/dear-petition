@@ -1,10 +1,26 @@
-import styled from 'styled-components';
+import React from "react";
+import PropTypes from 'prop-types';
+import ButtonStyled from './Button.styled';
 
-// Deps
-import { Button as ReaktusButton } from 'reaktus';
+export default function Button({ children, onClick, ...props }) {
 
+  const handleMouseUp = e => onClick(e);
 
-export default styled(ReaktusButton)`
-  font-size: calc(1.5rem + 0.5vw);
-  font-family: "Courier New", Courier, monospace;
-`;
+  return <ButtonStyled {...props} onMouseUp={handleMouseUp} >{children}</ButtonStyled>;
+}
+
+/* Props */
+export const POSITIVE = "positive";
+export const CAUTION = "caution";
+export const NEUTRAL = "neutral";
+
+Button.propTypes = {
+  /** Reflects the state of the button */
+  type: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
+  /** What happens when the button is clicked */
+  onClick: PropTypes.func.isRequired,
+};
+
+Button.defaultProps = {
+  type: POSITIVE,
+};
