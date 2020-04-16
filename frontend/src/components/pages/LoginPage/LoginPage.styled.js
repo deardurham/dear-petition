@@ -1,10 +1,10 @@
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
-export const LoginPageStyled = styled(motion.div)`
+export const LoginPageStyled = styled.main`
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100vw;
 `;
 
 export const LoginSplash = styled.div`
