@@ -39,11 +39,20 @@ function DragNDrop({ children, mimeTypes, maxFiles, maxSize, onDrop, onDragEnter
     const { dropEffect, files } = e.dataTransfer;
     if (dropEffect !== 'none') return;
 
+    _handleFiles(files);
+  };
+
+  const handleManualUpload = (e) => {
+    _handleFiles(e.target.files);
+  };
+
+  const _handleFiles = (files) => {
     const drop = {
       warnings: [],
       errors: [],
       files: [],
     };
+
     if (files.length > maxFiles) {
       drop.errors.push(EXCEED_LIMIT_MSG);
     } else {
@@ -65,7 +74,14 @@ function DragNDrop({ children, mimeTypes, maxFiles, maxSize, onDrop, onDragEnter
 
   return (
     <>
-      <FileInputStyled type="file" name="ciprs_file" id="ciprs_file" />
+      <FileInputStyled
+        type="file"
+        name="ciprs_file"
+        id="ciprs_file"
+        onChange={handleManualUpload}
+        accept={mimeTypes.join(',')}
+        multiple={!maxFiles || maxFiles > 1}
+      />
       <DragNDropStyled
         htmlFor="ciprs_file"
         onDragOver={(e) => e.preventDefault()}
@@ -73,6 +89,7 @@ function DragNDrop({ children, mimeTypes, maxFiles, maxSize, onDrop, onDragEnter
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         draggedOver={draggedOver}
+        positionTransition
       >
         {children}
       </DragNDropStyled>

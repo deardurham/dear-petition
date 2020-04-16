@@ -11,6 +11,7 @@ import {
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
 
+const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
 const MAX_FILE_SIZE = 30_000;
 
@@ -41,7 +42,7 @@ function HomePage(props) {
   return (
     <HomePageStyled>
       <HomeContent>
-        {files.length > 0 && (
+        {files && files.length > 0 && (
           <FilesList
             files={files}
             handleRemoveFile={handleRemoveFile}
@@ -49,7 +50,7 @@ function HomePage(props) {
           />
         )}
         <DragNDrop
-          mimeTypes={['application/pdf']}
+          mimeTypes={ALLOWED_MIME_TYPES}
           maxFiles={MAX_FILES}
           maxSize={MAX_FILE_SIZE}
           onDrop={handleDrop}
@@ -57,7 +58,7 @@ function HomePage(props) {
           <DnDContent>
             <div>
               <h2>Upload CIPRS Records</h2>
-              <p>up to 5 records</p>
+              <p>up to {MAX_FILES} records</p>
             </div>
             <div>
               {dragWarnings && (

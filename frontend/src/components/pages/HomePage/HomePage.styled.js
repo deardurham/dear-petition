@@ -25,7 +25,7 @@ export const HomeContent = styled.div`
 `;
 
 export const DnDContent = styled.div`
-  height: 400px;
+  height: 420px;
   width: 350px;
   display: flex;
   flex-direction: column;

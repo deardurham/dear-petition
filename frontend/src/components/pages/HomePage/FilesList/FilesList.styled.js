@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 export const FilesListWrapper = styled.div`
-  height: 400px;
+  height: 420px;
   width: 350px;
   overflow-y: hidden;
   display: flex;
