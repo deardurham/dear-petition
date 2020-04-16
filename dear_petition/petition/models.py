@@ -176,7 +176,7 @@ class OffenseRecord(models.Model):
         "Offense", related_name="offense_records", on_delete="CASCADE"
     )
     law = models.CharField(max_length=256, blank=True)
-    code = models.IntegerField()
+    code = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
@@ -218,8 +218,8 @@ class Batch(models.Model):
     @property
     def offenses(self):
         for record in self.records.all():
-            record = clean(record)
-            for offense in record.offenses:
+            o_records = record.offenses.first().offense_records.all()
+            for offense in o_records:
                 yield (record, offense)
 
     def get_petition_offenses(self):
@@ -228,10 +228,14 @@ class Batch(models.Model):
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
             data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
-            data["Description:" + str(i)] = {"V": offense.get("Description", "")}
+            data["Description:" + str(i)] = {"V": offense.description}
             data["DOOF:" + str(i)] = {"V": record.offense_date}
-            data["Disposition:" + str(i)] = {"V": record.disposition_method}
-            data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
+            data["Disposition:" + str(i)] = {
+                "V": record.offenses.first().disposition_method
+            }
+            data["DispositionDate:" + str(i)] = {
+                "V": record.offenses.first().disposed_on
+            }
             petition_offenses.update(data)
         return petition_offenses
 

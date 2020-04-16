@@ -45,8 +45,9 @@ class UploadFileForm(forms.Form):
                     o_record = OffenseRecord(
                         offense=offense,
                         law=offense_record.get("Law", ""),
-                        # should 0 be the integer we store if Code is not given?
-                        code=int(offense_record.get("Code", 0)),
+                        code=int(offense_record.get("Code"))
+                        if offense_record.get("Code", "") != ""
+                        else None,
                         action=offense_record.get("Action", ""),
                         severity=offense_record.get("Severity", ""),
                         description=offense_record.get("Description", ""),
