@@ -19,4 +19,5 @@ export const PageLogo = styled.div`
 
 export const PageContentWrapper = styled.section`
     flex: 1;
+    display: flex;
 `;

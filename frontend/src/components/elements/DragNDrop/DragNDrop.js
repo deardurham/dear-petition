@@ -1,16 +1,93 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DragNDropStyled } from './DragNDrop.styled';
+import { DragNDropStyled, FileInputStyled } from './DragNDrop.styled';
 
-function DragNDrop(props) {
+const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
+const BAD_TYPE_MSG = 'One or more of your files is not the right type';
+
+function DragNDrop({ children, mimeTypes, maxFiles, maxSize, onDrop, onDragEnter, onDragLeave }) {
+  const [draggedOver, setDraggedOver] = useState(false);
+
+  useEffect(() => {
+    // If user misses drag target, override browser's default behavior
+    function cancel(e) {
+      e.preventDefault();
+    }
+    window.addEventListener('dragover', cancel, false);
+    window.addEventListener('drop', cancel, false);
+    return () => {
+      window.removeEventListener('dragover', cancel, false);
+      window.removeEventListener('drop', cancel, false);
+    };
+  }, []);
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    setDraggedOver(true);
+    if (onDragEnter) onDragEnter(e);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDraggedOver(false);
+    if (onDragLeave) onDragLeave(e);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+
+    const { dropEffect, files } = e.dataTransfer;
+    if (dropEffect !== 'none') return;
+
+    const drop = {
+      warnings: [],
+      errors: [],
+      files: [],
+    };
+    if (files.length > maxFiles) {
+      drop.errors.push(EXCEED_LIMIT_MSG);
+    } else {
+      let badTypes = false;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (mimeTypes && !mimeTypes.includes(file.type)) {
+          badTypes = true;
+          continue;
+        }
+
+        drop.files.push(file);
+      }
+      if (badTypes) drop.warnings.push(BAD_TYPE_MSG);
+    }
+
+    onDrop(drop);
+  };
+
   return (
-    <DragNDropStyled>
-      <p>DragNDrop</p>
-    </DragNDropStyled>
+    <>
+      <FileInputStyled type="file" name="ciprs_file" id="ciprs_file" />
+      <DragNDropStyled
+        htmlFor="ciprs_file"
+        onDragOver={(e) => e.preventDefault()}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        draggedOver={draggedOver}
+      >
+        {children}
+      </DragNDropStyled>
+    </>
   );
 }
 
-DragNDrop.propTypes = {};
+DragNDrop.propTypes = {
+  mimeTypes: PropTypes.arrayOf(PropTypes.string),
+  maxFiles: PropTypes.number,
+  maxSize: PropTypes.number,
+  onDrop: PropTypes.func.isRequired,
+  onDragEnter: PropTypes.func,
+  onDragLeave: PropTypes.func,
+};
 
 DragNDrop.defaultProps = {};
 
