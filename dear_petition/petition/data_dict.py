@@ -3,6 +3,8 @@ import pytz
 import pdfrw
 import dateutil.parser
 
+from django.conf import settings
+
 
 def map_data(form_data, batch):
     record = batch.most_recent_record
@@ -15,7 +17,7 @@ def map_data(form_data, batch):
             json.update(data)
 
     now = dt.datetime.now()
-    now.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("EST")).date()
+    now.replace(tzinfo=pytz.utc).astimezone(pytz.timezone(settings.TIME_ZONE)).date()
     now = now.strftime("%m/%d/%Y")
 
     data = {
