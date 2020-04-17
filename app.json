@@ -1,8 +1,8 @@
 {
   "addons": [
-    "mailgun",
     "heroku-postgresql",
-    "heroku-redis"
+    "heroku-redis",
+    "sendgrid"
   ],
   "buildpacks": [
     {
