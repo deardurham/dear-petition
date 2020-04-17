@@ -48,7 +48,7 @@
   "environments": {
     "review": {
       "scripts": {
-        "postdeploy": "postdeploy.sh"
+        "postdeploy": "./postdeploy.sh"
       }
     }
   },
