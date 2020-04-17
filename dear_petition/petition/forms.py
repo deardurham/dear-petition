@@ -42,12 +42,14 @@ class UploadFileForm(forms.Form):
                 offense.save()
                 offense_records = offenses.get("Records", [])
                 for offense_record in offense_records:
+                    try:
+                        code = int(offense_record.get("Code"))
+                    except ValueError:
+                        code = None
                     o_record = OffenseRecord(
                         offense=offense,
                         law=offense_record.get("Law", ""),
-                        code=int(offense_record.get("Code"))
-                        if offense_record.get("Code", "") != ""
-                        else None,
+                        code=code if offense_record.get("Code", "") != "" else None,
                         action=offense_record.get("Action", ""),
                         severity=offense_record.get("Severity", ""),
                         description=offense_record.get("Description", ""),

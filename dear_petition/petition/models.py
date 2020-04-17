@@ -26,6 +26,7 @@ from .constants import (
     UNKNOWN,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
+    CHARGED,
 )
 
 from .utils import (
@@ -225,18 +226,19 @@ class Batch(models.Model):
     def get_petition_offenses(self):
         petition_offenses = {}
         for i, (record, offense) in enumerate(self.offenses, 1):
-            data = {}
-            data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
-            data["Description:" + str(i)] = {"V": offense.description}
-            data["DOOF:" + str(i)] = {"V": record.offense_date}
-            data["Disposition:" + str(i)] = {
-                "V": record.offenses.first().disposition_method
-            }
-            data["DispositionDate:" + str(i)] = {
-                "V": record.offenses.first().disposed_on
-            }
-            petition_offenses.update(data)
+            if offense.action == CHARGED:
+                data = {}
+                data["Fileno:" + str(i)] = {"V": record.file_no}
+                data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
+                data["Description:" + str(i)] = {"V": offense.description}
+                data["DOOF:" + str(i)] = {"V": record.offense_date}
+                data["Disposition:" + str(i)] = {
+                    "V": record.offenses.first().disposition_method
+                }
+                data["DispositionDate:" + str(i)] = {
+                    "V": record.offenses.first().disposed_on
+                }
+                petition_offenses.update(data)
         return petition_offenses
 
     @property

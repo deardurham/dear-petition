@@ -21,3 +21,5 @@ SEX_CHOICES = (
 CONTACT_CATEGORIES = (("agency", "Agency"), ("attorney", "Attorney"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+
+CHARGED = "CHARGED"

@@ -24,7 +24,7 @@ def upload_report(request):
 
 @login_required
 def view_record(request, pk):
-    record = CIPRSRecord.objects.get(pk=pk)
+    record = get_object_or_404(CIPRSRecord, pk=pk)
     if not is_owner(request.user, record.batch):
         raise PermissionDenied
     if "_meta" in record.data and "source" in record.data["_meta"]:
