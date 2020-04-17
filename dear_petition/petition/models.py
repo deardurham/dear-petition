@@ -224,6 +224,7 @@ class Batch(models.Model):
                 yield (record, offense)
 
     def get_petition_offenses(self):
+        # Only Charged Offenses should be shown on the generated petition
         charged_offenses = [
             (record, offense)
             for (record, offense) in self.offenses
