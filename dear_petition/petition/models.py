@@ -224,21 +224,25 @@ class Batch(models.Model):
                 yield (record, offense)
 
     def get_petition_offenses(self):
+        charged_offenses = [
+            (record, offense)
+            for (record, offense) in self.offenses
+            if offense.action == CHARGED
+        ]
         petition_offenses = {}
-        for i, (record, offense) in enumerate(self.offenses, 1):
-            if offense.action == CHARGED:
-                data = {}
-                data["Fileno:" + str(i)] = {"V": record.file_no}
-                data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
-                data["Description:" + str(i)] = {"V": offense.description}
-                data["DOOF:" + str(i)] = {"V": record.offense_date}
-                data["Disposition:" + str(i)] = {
-                    "V": record.offenses.first().disposition_method
-                }
-                data["DispositionDate:" + str(i)] = {
-                    "V": record.offenses.first().disposed_on
-                }
-                petition_offenses.update(data)
+        for i, (record, offense) in enumerate(charged_offenses, 1):
+            data = {}
+            data["Fileno:" + str(i)] = {"V": record.file_no}
+            data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
+            data["Description:" + str(i)] = {"V": offense.description}
+            data["DOOF:" + str(i)] = {"V": record.offense_date}
+            data["Disposition:" + str(i)] = {
+                "V": record.offenses.first().disposition_method
+            }
+            data["DispositionDate:" + str(i)] = {
+                "V": record.offenses.first().disposed_on
+            }
+            petition_offenses.update(data)
         return petition_offenses
 
     @property
