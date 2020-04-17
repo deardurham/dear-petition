@@ -232,6 +232,8 @@ class Batch(models.Model):
         ]
         petition_offenses = {}
         for i, (record, offense) in enumerate(charged_offenses, 1):
+            # The index of the offense determines what line on the petition form
+            # the offense will be on
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
             data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
