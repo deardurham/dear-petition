@@ -4,6 +4,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .models import CIPRSRecord, Batch, Comment
 from .forms import GeneratePetitionForm, UploadFileForm, CommentForm
@@ -64,14 +65,13 @@ def create_petition(request, pk, tab="petition"):
 
 
 @login_required
+@require_POST
 def create_comment(request, batch_id):
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            text = form.cleaned_data.get("text")
-            # batch = Batch.objects.get(batch_pk)
-            comment = Comment.objects.create(
-                user=user, text=text, batch_id=batch_id, time=timezone.now(),
-            )
-            return redirect("create-petition", pk=batch_id, tab="comments")
+    batch = get_object_or_404(Batch, pk=batch_id)
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.user = request.user
+        instance.batch = batch
+        instance.save()
+        return redirect("create-petition", pk=batch.pk, tab="comments")
