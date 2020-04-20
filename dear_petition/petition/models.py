@@ -235,19 +235,26 @@ class Batch(models.Model):
         for i, (record, offense) in enumerate(charged_offenses, 1):
             # The index of the offense determines what line on the petition form
             # the offense will be on
+            formatted_arrest_date = (
+                record.arrest_date.strftime(DATE_FORMAT) if record.arrest_date else ""
+            )
+            formatted_offense_date = (
+                record.offense_date.strftime(DATE_FORMAT) if record.offense_date else ""
+            )
+            formatted_disposed_on = (
+                record.offenses.first().disposed_on.strftime(DATE_FORMAT)
+                if record.offenses.first().disposed_on
+                else ""
+            )
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {
-                "V": record.arrest_date.strftime(DATE_FORMAT)
-            }
+            data["ArrestDate:" + str(i)] = {"V": formatted_arrest_date}
             data["Description:" + str(i)] = {"V": offense.description}
-            data["DOOF:" + str(i)] = {"V": record.offense_date.strftime(DATE_FORMAT)}
+            data["DOOF:" + str(i)] = {"V": formatted_offense_date}
             data["Disposition:" + str(i)] = {
                 "V": record.offenses.first().disposition_method
             }
-            data["DispositionDate:" + str(i)] = {
-                "V": record.offenses.first().disposed_on.strftime(DATE_FORMAT)
-            }
+            data["DispositionDate:" + str(i)] = {"V": formatted_disposed_on}
             petition_offenses.update(data)
         return petition_offenses
 
