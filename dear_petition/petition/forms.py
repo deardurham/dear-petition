@@ -49,7 +49,7 @@ class UploadFileForm(forms.Form):
                     o_record = OffenseRecord(
                         offense=offense,
                         law=offense_record.get("Law", ""),
-                        code=code if offense_record.get("Code", "") != "" else None,
+                        code=code,
                         action=offense_record.get("Action", ""),
                         severity=offense_record.get("Severity", ""),
                         description=offense_record.get("Description", ""),
