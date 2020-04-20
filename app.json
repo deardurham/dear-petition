@@ -46,8 +46,14 @@
     }
   },
   "name": "dear-petition",
+  "environments": {
+    "review": {
+      "scripts": {
+        "postdeploy": "./postdeploy.sh"
+      }
+    }
+  },
   "scripts": {
-    "postdeploy": "./postdeploy.sh"
   },
   "stack": "heroku-18"
 }
