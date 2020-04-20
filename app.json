@@ -49,6 +49,7 @@
     "review": {
       "scripts": {
         "postdeploy": "./postdeploy.sh"
+      }
     }
   },
   "scripts": {
