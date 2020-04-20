@@ -26,6 +26,7 @@ from .constants import (
     UNKNOWN,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
+    DATE_FORMAT,
     CHARGED,
 )
 
@@ -236,14 +237,16 @@ class Batch(models.Model):
             # the offense will be on
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
+            data["ArrestDate:" + str(i)] = {
+                "V": record.arrest_date.strftime(DATE_FORMAT)
+            }
             data["Description:" + str(i)] = {"V": offense.description}
-            data["DOOF:" + str(i)] = {"V": record.offense_date}
+            data["DOOF:" + str(i)] = {"V": record.offense_date.strftime(DATE_FORMAT)}
             data["Disposition:" + str(i)] = {
                 "V": record.offenses.first().disposition_method
             }
             data["DispositionDate:" + str(i)] = {
-                "V": record.offenses.first().disposed_on
+                "V": record.offenses.first().disposed_on.strftime(DATE_FORMAT)
             }
             petition_offenses.update(data)
         return petition_offenses
