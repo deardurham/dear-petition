@@ -25,7 +25,7 @@ def upload_report(request):
 @login_required
 def view_record(request, pk):
     record = get_object_or_404(CIPRSRecord, pk=pk)
-    if not is_owner(request.user,record.batch):
+    if not is_owner(request.user, record.batch):
         raise PermissionDenied
     if "_meta" in record.data and "source" in record.data["_meta"]:
         source = record.data["_meta"]["source"]
@@ -38,7 +38,7 @@ def view_record(request, pk):
 @login_required
 def create_petition(request, pk):
     batch = get_object_or_404(Batch, pk=pk)
-    if not is_owner(request.user,batch) and not request.user.is_superuser:
+    if not is_owner(request.user, batch) and not request.user.is_superuser:
         raise PermissionDenied
     if request.method == "POST":
         form = GeneratePetitionForm(request.POST, batch=batch)
