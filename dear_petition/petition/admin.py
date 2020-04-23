@@ -63,3 +63,13 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ("pk", "name", "category", "address1")
     list_filter = ("category",)
     ordering = ("category", "name")
+
+
+@admin.register(models.Comment)
+class CommentAdmin(admin.ModelAdmin):
+
+    list_display = ("pk", "user", "batch", "time")
+    search_fields = ("batch__label",)
+    date_hierarchy = "time"
+    list_filter = ("user", "time")
+    ordering = ("-time",)

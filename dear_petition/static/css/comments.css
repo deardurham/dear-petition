@@ -1,0 +1,30 @@
+ul.comments {
+    list-style-type: none;
+}
+li.comment {
+    list-style: none;
+}
+div.message-header {
+    flex: 1;
+    text-align: left;
+    display: flex;
+    align: bottom;
+    margin-bottom: 10px;
+}
+p.header-item {
+    padding-right: 22px;
+    border: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+p#comment-user-name {
+    font-weight: bold;
+}
+p#comment-user-time {
+    color: gray;
+    font-size: 14px;
+}
+div.message-actions {
+    position: absolute;
+    right: 0px;
+}
