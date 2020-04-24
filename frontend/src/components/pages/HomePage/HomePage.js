@@ -4,7 +4,7 @@ import {
   HomeContent,
   DnDContent,
   DragErrors,
-  DragWarnings,
+  DragWarnings
 } from './HomePage.styled';
 
 // Children
@@ -16,11 +16,12 @@ const MAX_FILES = 8;
 const MAX_FILE_SIZE = 30_000;
 
 function HomePage(props) {
+  const fileInputRef = React.createRef();
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [files, setFiles] = useState([]);
 
-  const handleDrop = (drop) => {
+  const handleDrop = drop => {
     setDragErrors(drop.errors);
     setDragWarnings(drop.warnings);
     if (files.length + drop.files.length > MAX_FILES) {
@@ -31,8 +32,14 @@ function HomePage(props) {
     setFiles([...files, ...drop.files]);
   };
 
-  const handleRemoveFile = (rmFile) => {
-    setFiles(files.filter((fl) => fl.name !== rmFile.name));
+  const handleRemoveFile = rmFile => {
+    // browser stores a "path" to the last file uploaded on the input.
+    // It's necessary to "clear" the inputs value here, but not on drop--
+    // the browser just replaces previous files in the case of a drop.
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    // TODO: It would be great to get this taken care of inside DragNDrop,
+    // TODO: but currently DragNDrop has no concept of a FilesList or removing files.
+    setFiles(files.filter(fl => fl.name !== rmFile.name));
   };
 
   const handleGeneratePetition = () => {
@@ -50,6 +57,7 @@ function HomePage(props) {
           />
         )}
         <DragNDrop
+          ref={fileInputRef}
           mimeTypes={ALLOWED_MIME_TYPES}
           maxFiles={MAX_FILES}
           maxSize={MAX_FILE_SIZE}
@@ -63,14 +71,14 @@ function HomePage(props) {
             <div>
               {dragWarnings && (
                 <DragWarnings>
-                  {dragWarnings.map((warning) => (
+                  {dragWarnings.map(warning => (
                     <p key={warning}>{warning}</p>
                   ))}
                 </DragWarnings>
               )}
               {dragErrors && (
                 <DragErrors>
-                  {dragErrors.map((error) => (
+                  {dragErrors.map(error => (
                     <p key={error}>{error}</p>
                   ))}
                 </DragErrors>

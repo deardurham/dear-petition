@@ -8,6 +8,7 @@ export const FilesListWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 2rem;
 `;
 
 export const FilesListStyled = styled.ul`
