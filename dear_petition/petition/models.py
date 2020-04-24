@@ -14,6 +14,7 @@ from django.urls import reverse
 import ciprs_reader
 from dear_petition.petition.data_dict import clean
 from dear_petition.users.models import User
+from . import constants as pc
 
 from .constants import (
     JURISDICTION_CHOICES,
@@ -272,3 +273,28 @@ class Batch(models.Model):
         if not most_recent_record:
             most_recent_record = self.records.order_by("pk").first()
         return most_recent_record
+
+
+class Comment(models.Model):
+
+    user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
+    text = models.TextField()
+    batch = models.ForeignKey(Batch, related_name="comments", on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        link = reverse(
+            "create-petition", kwargs={"pk": self.batch.id, "tab": "comments"}
+        )
+        if self.user.is_staff:
+            for staff_member in User.objects.filter(is_staff=True):
+                staff_member.send_email(
+                    subject=pc.NEW_COMMENT_EMAIL_SUBJECT,
+                    message=pc.NEW_COMMENT_EMAIL_MESSAGE.format(
+                        batch=self.batch.id,
+                        user=staff_member.name,
+                        text=self.text,
+                        link=link,
+                    ),
+                )
+        super(Comment, self).save(*args, **kwargs)

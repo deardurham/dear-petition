@@ -4,12 +4,14 @@ import os
 from django import forms
 from django.conf import settings
 
+
 from dear_petition.petition.models import (
     CIPRSRecord,
     Offense,
     OffenseRecord,
     Contact,
     Batch,
+    Comment
 )
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
@@ -142,3 +144,13 @@ class GeneratePetitionForm(forms.Form):
         petition.write()
         output.seek(0)
         return output
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["text"]
+
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={"placeholder": "Add a comment..."})
+    )
