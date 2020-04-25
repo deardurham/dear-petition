@@ -13,7 +13,7 @@ from ..utils import make_datetime_aware, dt_obj_to_date
 
 def update_existing_ciprs_records(apps, schema_editor):
     CIPRSRecord = apps.get_model("petition", "CIPRSRecord")
-    records = CIPRSRecord.objects.all()
+    records = CIPRSRecord.objects.exclude(data=None)
     for r in records:
         refresh_record_from_data(r)
 
@@ -27,7 +27,9 @@ def refresh_record_from_data(record):
     """
     record.file_no = record.data.get("General", {}).get("File No", "")
     record.county = record.data.get("General", {}).get("County", "")
-    record.dob = record.data.get("Defendant", {}).get("Date of Birth/Estimated Age", None)
+    record.dob = record.data.get("Defendant", {}).get(
+        "Date of Birth/Estimated Age", None
+    )
     record.sex = record.data.get("Defendant", {}).get("Sex", "")
     record.race = record.data.get("Defendant", {}).get("Race", "")
     record.case_status = record.data.get("Case Information", {}).get("Case Status", "")
