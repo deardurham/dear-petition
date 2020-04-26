@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("petition", "0019_remove_comment_parent"),
+        ("petition", "0022_remove_comment_parent"),
     ]
 
     operations = [
