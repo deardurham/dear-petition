@@ -54,7 +54,6 @@ class CIPRSRecordManager(models.Manager):
         """
         ciprs_record = CIPRSRecord(batch=batch, label=label, data=data)
         ciprs_record.refresh_record_from_data()
-        ciprs_record.save()
 
 
 class CIPRSRecord(models.Model):
@@ -149,6 +148,39 @@ class CIPRSRecord(models.Model):
         )
         self.jurisdiction = self.get_jurisdiction()
         self.save()
+        # Record has been saved, now let's update the offense data.
+        # we are using the get_or_create queryset method.
+        # based upon the kwargs we are passing, either a object will
+        # be retrieved from the db or the object will be created.
+        # Alternatively we could use update_or_create method, but since
+        # we are only getting this data by reading the pdf, I think
+        # get_or_create is more suitable. Essentially, we are just
+        # checking whether the defendant has more offenses since the last
+        # time we ran this method. If a additional offenses are found add
+        # the offense. If a UI interface is added that allows lawyers to
+        # make changes to a users a offenses (I doubt it) then we need
+        # think about revising the methods chosen here.
+        offenses = self.data.get("Offense Record", {})
+        if offenses:
+            offense, created = Offense.objects.get_or_create(
+                ciprs_record=self,
+                disposed_on=offenses.get("Disposed On", None),
+                disposition_method=offenses.get("Disposition Method", ""),
+            )
+            offense_records = offenses.get("Records", [])
+            for offense_record in offense_records:
+                try:
+                    code = int(offense_record.get("Code"))
+                except ValueError:
+                    code = None
+                o_record, created = OffenseRecord.objects.get_or_create(
+                    offense=offense,
+                    law=offense_record.get("Law", ""),
+                    code=code,
+                    action=offense_record.get("Action", ""),
+                    severity=offense_record.get("Severity", ""),
+                    description=offense_record.get("Description", ""),
+                )
 
     def get_jurisdiction(self):
         if self.data:
