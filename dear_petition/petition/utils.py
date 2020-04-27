@@ -38,8 +38,7 @@ def make_datetime_aware(dt_str):
     if dt_str is None or dt_str == "":
         return None
     # a) Turn the datetime string into a timezone-naive datetime object
-    for fmt in DATETIME_FORMAT:
-        naive_datetime_obj = dateutil.parser.parse(dt_str)
+    naive_datetime_obj = dateutil.parser.parse(dt_str)
 
     # b) Assign the timezone-naive datetime a timezone based on settings.TIME_ZONE
     aware_datetime_obj = make_aware(
