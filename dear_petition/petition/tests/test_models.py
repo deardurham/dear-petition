@@ -9,7 +9,7 @@ from .factories import (
     record_data,
 )
 
-from ..models import CIPRSRecord
+from ..models import CIPRSRecord, OffenseRecord
 
 from ..utils import (
     dt_obj_to_date,
@@ -51,6 +51,30 @@ def test_ciprs_record_create():
             "%Y-%m-%d"
         )
     assert ciprs_record.arrest_date.strftime("%Y-%m-%d") == data_arrest_date
+    # Offense Assertions
+    assert ciprs_record.offenses.first().disposed_on.strftime(
+        "%Y-%m-%d"
+    ) == ciprs_record.data.get("Offense Record").get("Disposed On")
+    assert ciprs_record.offenses.first().disposition_method == ciprs_record.data.get(
+        "Offense Record"
+    ).get("Disposition Method")
+
+    # OffenseRecord Assertions
+    raw_data_actions = []
+    raw_data_offense_records = ciprs_record.data.get("Offense Record").get("Records")
+    for offense_record in raw_data_offense_records:
+        for key, value in offense_record.items():
+            if "Action" in key:
+                raw_data_actions.extend(value)
+    stored_actions = []
+    stored_offense_records = list(ciprs_record.offenses.first().offense_records.all())
+    for offense_record in stored_offense_records:
+        stored_actions.extend(offense_record.action)
+
+    assert len(stored_offense_records) == len(raw_data_offense_records)
+    assert len(stored_actions) == len(raw_data_actions)
+    for action in stored_actions:
+        assert action in raw_data_actions
 
 
 def test_ciprs_record_create_multi():
@@ -86,6 +110,36 @@ def test_ciprs_record_create_multi():
                 "%Y-%m-%d"
             )
         assert ciprs_record.arrest_date.strftime("%Y-%m-%d") == data_arrest_date
+        # Offense Assertions
+        assert ciprs_record.offenses.first().disposed_on.strftime(
+            "%Y-%m-%d"
+        ) == ciprs_record.data.get("Offense Record").get("Disposed On")
+        assert ciprs_record.offenses.first().disposition_method == ciprs_record.data.get(
+            "Offense Record"
+        ).get(
+            "Disposition Method"
+        )
+
+        # OffenseRecord Assertions
+        raw_data_actions = []
+        raw_data_offense_records = ciprs_record.data.get("Offense Record").get(
+            "Records"
+        )
+        for offense_record in raw_data_offense_records:
+            for key, value in offense_record.items():
+                if "Action" in key:
+                    raw_data_actions.extend(value)
+        stored_actions = []
+        stored_offense_records = list(
+            ciprs_record.offenses.first().offense_records.all()
+        )
+        for offense_record in stored_offense_records:
+            stored_actions.extend(offense_record.action)
+
+        assert len(stored_offense_records) == len(raw_data_offense_records)
+        assert len(stored_actions) == len(raw_data_actions)
+        for action in stored_actions:
+            assert action in raw_data_actions
 
 
 def test_ciprs_record_create_empty_data_dict():
@@ -105,6 +159,10 @@ def test_ciprs_record_create_empty_data_dict():
     assert ciprs_record.case_status == ""
     assert ciprs_record.offense_date == None
     assert ciprs_record.arrest_date == None
+    offenses = ciprs_record.offenses.first()
+    offense_records = list(OffenseRecord.objects.filter(offense=offenses))
+    assert offenses == None
+    assert offense_records == []
 
 
 def test_refresh_record_from_data():
@@ -214,6 +272,10 @@ def test_refresh_record_from_data_empty_data_dict():
     assert ciprs_record.case_status == ""
     assert ciprs_record.offense_date == None
     assert ciprs_record.arrest_date == None
+    offenses = ciprs_record.offenses.first()
+    offense_records = list(OffenseRecord.objects.filter(offense=offenses))
+    assert offenses == None
+    assert offense_records == []
 
 
 def test_refresh_record_from_data_multi():
@@ -243,6 +305,30 @@ def test_refresh_record_from_data_multi():
     assert ciprs_record.arrest_date == ciprs_record.data["Offense Record"].get(
         "Arrest Date", dt_obj_to_date(ciprs_record.offense_date)
     )
+    # Offense Assertions
+    assert ciprs_record.offenses.first().disposed_on.strftime(
+        "%Y-%m-%d"
+    ) == ciprs_record.data.get("Offense Record").get("Disposed On")
+    assert ciprs_record.offenses.first().disposition_method == ciprs_record.data.get(
+        "Offense Record"
+    ).get("Disposition Method")
+
+    # OffenseRecord Assertions
+    raw_data_actions = []
+    raw_data_offense_records = ciprs_record.data.get("Offense Record").get("Records")
+    for offense_record in raw_data_offense_records:
+        for key, value in offense_record.items():
+            if "Action" in key:
+                raw_data_actions.extend(value)
+    stored_actions = []
+    stored_offense_records = list(ciprs_record.offenses.first().offense_records.all())
+    for offense_record in stored_offense_records:
+        stored_actions.extend(offense_record.action)
+
+    assert len(stored_offense_records) == len(raw_data_offense_records)
+    assert len(stored_actions) == len(raw_data_actions)
+    for action in stored_actions:
+        assert action in raw_data_actions
     # update file_no attribute in the raw data dictionary and refresh the record
     ciprs_record.data["General"]["File No"] = file_no
     ciprs_record.refresh_record_from_data()

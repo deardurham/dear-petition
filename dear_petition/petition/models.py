@@ -181,6 +181,15 @@ class CIPRSRecord(models.Model):
                     severity=offense_record.get("Severity", ""),
                     description=offense_record.get("Description", ""),
                 )
+        # Check and Remove any existing Offense Records and the existing Offense
+        # because they no longer exist as a part of the ciprs_record's raw data
+        else:
+            existing_offense_records = OffenseRecord.objects.filter(
+                offense=self.offenses.first()
+            )
+            existing_offenses = Offense.objects.filter(ciprs_record=self)
+            existing_offense_records.delete()
+            existing_offenses.delete()
 
     def get_jurisdiction(self):
         if self.data:
