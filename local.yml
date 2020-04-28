@@ -33,6 +33,19 @@ services:
     env_file:
       - ./.envs/.local/.postgres
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/frontend/node_modules
+      - .:/app/frontend
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
   mailhog:
     image: mailhog/mailhog:v1.0.0
     ports:
@@ -78,20 +91,3 @@ services:
   #   ports:
   #     - "5555:5555"
   #   command: /start-flower
-
-  node:
-    build:
-      context: .
-      dockerfile: ./compose/local/node/Dockerfile
-    image: dear_petition_local_node
-    depends_on:
-      - django
-    volumes:
-      - .:/app
-      # http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
-      - /app/node_modules
-    command: npm run dev
-    ports:
-      - "3000:3000"
-      # Expose browsersync UI: https://www.browsersync.io/docs/options/#option-ui
-      - "3001:3001"

@@ -9,7 +9,9 @@ project for creating petition forms.
 
 
 ## Frontend Development
-See [frontend README](frontend/README.md) for steps
+The front end can be run independently of the backend. If you don't wish to run the django API locally, see the [frontend README](frontend/README.md) for setup steps.
+
+Otherwise, the frontend can be launched from the same docker-compose file as the API.
 
 ## Local Development
 
@@ -37,7 +39,7 @@ Run the containers:
 
     docker-compose up -d
 
-Visit http://localhost:8000 in your browser.
+Visit http://localhost:3000 in your browser.
 
 
 ### Initial Setup
