@@ -168,12 +168,15 @@ class CIPRSRecord(models.Model):
                 disposition_method=offenses.get("Disposition Method", ""),
             )
             offense_records = offenses.get("Records", [])
+            if not created:
+                existing_offense_records = OffenseRecord.objects.filter(offense=offense)
+                existing_offense_records.delete()
             for offense_record in offense_records:
                 try:
                     code = int(offense_record.get("Code"))
                 except ValueError:
                     code = None
-                o_record, created = OffenseRecord.objects.get_or_create(
+                OffenseRecord.objects.create(
                     offense=offense,
                     law=offense_record.get("Law", ""),
                     code=code,
