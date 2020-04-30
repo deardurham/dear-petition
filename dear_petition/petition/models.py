@@ -161,6 +161,15 @@ class CIPRSRecord(models.Model):
         # make changes to a users a offenses (I doubt it) then we need
         # think about revising the methods chosen here.
         offenses = self.data.get("Offense Record", {})
+
+        # Check and remove any existing Offense Records and the existing Offenses
+        # before reading from raw_data
+        existing_offense_records = OffenseRecord.objects.filter(
+            offense=self.offenses.first()
+        )
+        existing_offenses = Offense.objects.filter(ciprs_record=self)
+        existing_offense_records.delete()
+        existing_offenses.delete()
         if offenses:
             offense, created = Offense.objects.get_or_create(
                 ciprs_record=self,
@@ -168,9 +177,6 @@ class CIPRSRecord(models.Model):
                 disposition_method=offenses.get("Disposition Method", ""),
             )
             offense_records = offenses.get("Records", [])
-            if not created:
-                existing_offense_records = OffenseRecord.objects.filter(offense=offense)
-                existing_offense_records.delete()
             for offense_record in offense_records:
                 try:
                     code = int(offense_record.get("Code"))
@@ -184,15 +190,6 @@ class CIPRSRecord(models.Model):
                     severity=offense_record.get("Severity", ""),
                     description=offense_record.get("Description", ""),
                 )
-        # Check and Remove any existing Offense Records and the existing Offense
-        # because they no longer exist as a part of the ciprs_record's raw data
-        else:
-            existing_offense_records = OffenseRecord.objects.filter(
-                offense=self.offenses.first()
-            )
-            existing_offenses = Offense.objects.filter(ciprs_record=self)
-            existing_offense_records.delete()
-            existing_offenses.delete()
 
     def get_jurisdiction(self):
         if self.data:

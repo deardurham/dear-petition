@@ -309,7 +309,6 @@ def test_refreshing_offenses():
     for offense_record in stored_offense_records:
         stored_codes.append(offense_record.code)
     assert len(stored_offense_records) == len(raw_data_offense_records)
-    assert len(stored_actions) == len(raw_data_actions)
     for code in stored_codes:
         assert code in o_record_int_code_list
 
