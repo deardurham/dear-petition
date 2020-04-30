@@ -165,7 +165,7 @@ class CIPRSRecord(models.Model):
         # Check and remove any existing Offense Records and the existing Offenses
         # before reading from raw_data
         existing_offense_records = OffenseRecord.objects.filter(
-            offense=self.offenses.first()
+            offense__ciprs_record=self
         )
         existing_offenses = Offense.objects.filter(ciprs_record=self)
         existing_offense_records.delete()
