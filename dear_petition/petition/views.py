@@ -3,9 +3,11 @@ from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
-from .models import CIPRSRecord, Batch
-from .forms import GeneratePetitionForm, UploadFileForm
+from .models import CIPRSRecord, Batch, Comment
+from .forms import GeneratePetitionForm, UploadFileForm, CommentForm
 from .permissions import is_owner
 
 
@@ -25,7 +27,7 @@ def upload_report(request):
 @login_required
 def view_record(request, pk):
     record = get_object_or_404(CIPRSRecord, pk=pk)
-    if not is_owner(request.user,record.batch):
+    if not is_owner(request.user, record.batch):
         raise PermissionDenied
     if "_meta" in record.data and "source" in record.data["_meta"]:
         source = record.data["_meta"]["source"]
@@ -36,9 +38,9 @@ def view_record(request, pk):
 
 
 @login_required
-def create_petition(request, pk):
+def create_petition(request, pk, tab="petition"):
     batch = get_object_or_404(Batch, pk=pk)
-    if not is_owner(request.user,batch) and not request.user.is_superuser:
+    if not is_owner(request.user, batch) and not request.user.is_superuser:
         raise PermissionDenied
     if request.method == "POST":
         form = GeneratePetitionForm(request.POST, batch=batch)
@@ -53,5 +55,23 @@ def create_petition(request, pk):
             return resp
     else:
         form = GeneratePetitionForm(batch=batch)
-    context = {"form": form, "batch": batch}
+    context = {
+        "form": form,
+        "batch": batch,
+        "tab": tab,
+        "comment_form": CommentForm(auto_id=False),
+    }
     return render(request, "petition/create.html", context)
+
+
+@login_required
+@require_POST
+def create_comment(request, batch_id):
+    batch = get_object_or_404(Batch, pk=batch_id)
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.user = request.user
+        instance.batch = batch
+        instance.save()
+        return redirect("create-petition", pk=batch.pk, tab="comments")

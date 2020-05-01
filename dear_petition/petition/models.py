@@ -14,6 +14,7 @@ from django.urls import reverse
 import ciprs_reader
 from dear_petition.petition.data_dict import clean
 from dear_petition.users.models import User
+from . import constants as pc
 
 from .constants import (
     JURISDICTION_CHOICES,
@@ -26,6 +27,8 @@ from .constants import (
     UNKNOWN,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
+    DATE_FORMAT,
+    CHARGED,
 )
 
 from .utils import (
@@ -176,7 +179,7 @@ class OffenseRecord(models.Model):
         "Offense", related_name="offense_records", on_delete="CASCADE"
     )
     law = models.CharField(max_length=256, blank=True)
-    code = models.IntegerField()
+    code = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
@@ -218,33 +221,80 @@ class Batch(models.Model):
     @property
     def offenses(self):
         for record in self.records.all():
-            record = clean(record)
-            for offense in record.offenses:
+            o_records = record.offenses.first().offense_records.all()
+            for offense in o_records:
                 yield (record, offense)
 
     def get_petition_offenses(self):
+        # Only Charged Offenses should be shown on the generated petition
+        charged_offenses = [
+            (record, offense)
+            for (record, offense) in self.offenses
+            if offense.action == CHARGED
+        ]
         petition_offenses = {}
-        for i, (record, offense) in enumerate(self.offenses, 1):
+        for i, (record, offense) in enumerate(charged_offenses, 1):
+            # The index of the offense determines what line on the petition form
+            # the offense will be on
+            formatted_arrest_date = (
+                record.arrest_date.strftime(DATE_FORMAT) if record.arrest_date else ""
+            )
+            formatted_offense_date = (
+                record.offense_date.strftime(DATE_FORMAT) if record.offense_date else ""
+            )
+            formatted_disposed_on = (
+                record.offenses.first().disposed_on.strftime(DATE_FORMAT)
+                if record.offenses.first().disposed_on
+                else ""
+            )
             data = {}
             data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": record.arrest_date}
-            data["Description:" + str(i)] = {"V": offense.get("Description", "")}
-            data["DOOF:" + str(i)] = {"V": record.offense_date}
-            data["Disposition:" + str(i)] = {"V": record.disposition_method}
-            data["DispositionDate:" + str(i)] = {"V": record.disposed_on}
+            data["ArrestDate:" + str(i)] = {"V": formatted_arrest_date}
+            data["Description:" + str(i)] = {"V": offense.description}
+            data["DOOF:" + str(i)] = {"V": formatted_offense_date}
+            data["Disposition:" + str(i)] = {
+                "V": record.offenses.first().disposition_method
+            }
+            data["DispositionDate:" + str(i)] = {"V": formatted_disposed_on}
             petition_offenses.update(data)
         return petition_offenses
 
     @property
     def most_recent_record(self):
         most_recent_record = None
-        most_recent_offense_date = datetime(1900, 1, 1)
+        most_recent_offense_date = make_datetime_aware(
+            datetime(1900, 1, 1).strftime(DATETIME_FORMAT)
+        )
         for record in self.records.order_by("pk"):
             if not record.offense_date:
                 continue
-            offense_date = datetime.strptime(record.offense_date, DATETIME_FORMAT)
-            if offense_date > most_recent_offense_date:
+            if record.offense_date > most_recent_offense_date:
                 most_recent_record = record
         if not most_recent_record:
             most_recent_record = self.records.order_by("pk").first()
         return most_recent_record
+
+
+class Comment(models.Model):
+
+    user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
+    text = models.TextField()
+    batch = models.ForeignKey(Batch, related_name="comments", on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        link = reverse(
+            "create-petition", kwargs={"pk": self.batch.id, "tab": "comments"}
+        )
+        if self.user.is_staff:
+            for staff_member in User.objects.filter(is_staff=True):
+                staff_member.send_email(
+                    subject=pc.NEW_COMMENT_EMAIL_SUBJECT,
+                    message=pc.NEW_COMMENT_EMAIL_MESSAGE.format(
+                        batch=self.batch.id,
+                        user=staff_member.name,
+                        text=self.text,
+                        link=link,
+                    ),
+                )
+        super(Comment, self).save(*args, **kwargs)

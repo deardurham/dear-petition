@@ -54,12 +54,12 @@
               <tr>
                 <th scope="row"></th>
                 <td>Sex</td>
-                <td>{{ record.data.Defendant.Sex }}</td>
+                <td>{{ record.sex}}</td>
               </tr>
               <tr>
                 <th scope="row"></th>
                 <td>Race</td>
-                <td>{{ record.data.Defendant.Race }}</td>
+                <td>{{ record.race }}</td>
               </tr>
               <tr>
                 <th scope="row"></th>
@@ -84,12 +84,12 @@
               <tr>
                 <th scope="row">Offense Record</th>
                 <td>Disposed On</td>
-                <td>{{ record.disposed_on }}</td>
+                <td>{{ record.offenses.first.disposed_on }}</td>
               </tr>
               <tr>
                 <th scope="row"></th>
                 <td>Disposition Method</td>
-                <td>{{ record.disposition_method }}</td>
+                <td>{{ record.offenses.first.disposition_method }}</td>
               </tr>
             </tbody>
           </table>
@@ -101,13 +101,13 @@
             <th>Law</th>
             <th>NCAOC Code</th>
             <tbody>
-              {% for offense in record.offenses %}
+              {% for offense in record.offenses.first.offense_records.all %}
               <tr>
-                <td>{{ offense.Action }} </td>
-                <td>{{ offense.Description }} </td>
-                <td>{{ offense.Severity }} </td>
-                <td>{{ offense.Law }} </td>
-                <td>{{ offense.Code }} </td>
+                <td>{{ offense.action }} </td>
+                <td>{{ offense.description }} </td>
+                <td>{{ offense.severity }} </td>
+                <td>{{ offense.law }} </td>
+                <td>{{ offense.code }} </td>
               </tr>
               {% endfor %}
             </tbody>

@@ -1,3 +1,4 @@
+
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"
@@ -21,3 +22,13 @@ SEX_CHOICES = (
 CONTACT_CATEGORIES = (("agency", "Agency"), ("attorney", "Attorney"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+DATE_FORMAT = "%m/%d/%Y"
+
+CHARGED = "CHARGED"
+ARRAIGNED = "ARRAIGNED"
+
+COMMENT_MAX_LENGTH = 8192
+
+NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
+NEW_COMMENT_EMAIL_MESSAGE = "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
+

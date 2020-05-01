@@ -4,8 +4,10 @@ from django.contrib.auth import get_user_model
 import factory
 
 
-from dear_petition.petition.models import CIPRSRecord, Batch
+from dear_petition.petition.models import CIPRSRecord, Batch, Offense, OffenseRecord
 from dear_petition.users.tests.factories import UserFactory
+
+from ..constants import CHARGED
 
 
 class BatchFactory(factory.DjangoModelFactory):
@@ -68,3 +70,24 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = CIPRSRecord
+
+
+class OffenseFactory(factory.DjangoModelFactory):
+    ciprs_record = factory.SubFactory(CIPRSRecordFactory)
+    disposed_on = factory.Faker("date_object")
+    disposition_method = "DISPOSED BY JUDGE"
+
+    class Meta:
+        model = Offense
+
+
+class OffenseRecordFactory(factory.DjangoModelFactory):
+    offense = factory.SubFactory(OffenseFactory)
+    law = "G.S. 20-141(B)"
+    code = "4450"
+    action = CHARGED
+    severity = "INFRACTION"
+    description = "SPEEDING(80 mph in a 65 mph zone)"
+
+    class Meta:
+        model = OffenseRecord
