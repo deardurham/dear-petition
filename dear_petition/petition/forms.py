@@ -11,7 +11,7 @@ from dear_petition.petition.models import (
     OffenseRecord,
     Contact,
     Batch,
-    Comment
+    Comment,
 )
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
@@ -34,29 +34,6 @@ class UploadFileForm(forms.Form):
                 batch.label = record.label
                 batch.save()
             record.refresh_record_from_data()
-            offenses = record.data.get("Offense Record", {})
-            if offenses:
-                offense = Offense(
-                    ciprs_record=record,
-                    disposed_on=offenses.get("Disposed On", None),
-                    disposition_method=offenses.get("Disposition Method", ""),
-                )
-                offense.save()
-                offense_records = offenses.get("Records", [])
-                for offense_record in offense_records:
-                    try:
-                        code = int(offense_record.get("Code"))
-                    except ValueError:
-                        code = None
-                    o_record = OffenseRecord(
-                        offense=offense,
-                        law=offense_record.get("Law", ""),
-                        code=code,
-                        action=offense_record.get("Action", ""),
-                        severity=offense_record.get("Severity", ""),
-                        description=offense_record.get("Description", ""),
-                    )
-                    o_record.save()
             batch.records.add(record)
         return batch
 
