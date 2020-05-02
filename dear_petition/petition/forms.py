@@ -4,7 +4,15 @@ import os
 from django import forms
 from django.conf import settings
 
-from dear_petition.petition.models import CIPRSRecord, Contact, Batch
+
+from dear_petition.petition.models import (
+    CIPRSRecord,
+    Offense,
+    OffenseRecord,
+    Contact,
+    Batch,
+    Comment,
+)
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
 
@@ -21,13 +29,11 @@ class UploadFileForm(forms.Form):
             record.data = record.parse_report(file_)
             if "error" in record.data:
                 raise forms.ValidationError(record.data["error"])
-            if "Defendant" in record.data and "Name" in record.data["Defendant"]:
-                label = record.data["Defendant"]["Name"]
-                record.label = label
-                if idx == 0:
-                    batch.label = label
-                    batch.save()
-            record.save()
+            record.label = record.data.get("Defendant", {}).get("Name", "")
+            if record.label and idx == 0:
+                batch.label = record.label
+                batch.save()
+            record.refresh_record_from_data()
             batch.records.add(record)
         return batch
 
@@ -115,3 +121,13 @@ class GeneratePetitionForm(forms.Form):
         petition.write()
         output.seek(0)
         return output
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["text"]
+
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={"placeholder": "Add a comment..."})
+    )

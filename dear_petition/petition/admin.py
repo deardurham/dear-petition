@@ -39,6 +39,52 @@ class CIPRSRecordInline(admin.StackedInline):
     extra = 1
 
 
+class OffenseRecordInline(admin.StackedInline):
+    model = models.OffenseRecord
+    extra = 1
+
+
+@admin.register(models.Offense)
+class OffenseAdmin(admin.ModelAdmin):
+    list_display = (
+        "pk",
+        "offense_record_count",
+        "ciprs_record",
+        "disposed_on",
+        "disposition_method",
+    )
+    list_filter = ("disposed_on",)
+    date_hierarchy = "disposed_on"
+    ordering = ("-disposed_on",)
+    inlines = (OffenseRecordInline,)
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(
+            _offense_record_count=Count("offense_records", distinct=True),
+        )
+        return queryset
+
+    def offense_record_count(self, obj):
+        return obj._offense_record_count
+
+
+@admin.register(models.OffenseRecord)
+class OffenseRecordAdmin(admin.ModelAdmin):
+    list_display = ("pk", "offense", "law", "code", "action", "severity", "description")
+    list_filter = (
+        "law",
+        "code",
+        "severity",
+    )
+    search_fields = (
+        "description",
+        "law",
+        "code",
+    )
+    ordering = ("law", "code", "offense")
+
+
 @admin.register(models.Batch)
 class BatchAdmin(admin.ModelAdmin):
     list_display = ("pk", "label", "record_count", "user", "date_uploaded")
@@ -63,3 +109,13 @@ class ContactAdmin(admin.ModelAdmin):
     list_display = ("pk", "name", "category", "address1")
     list_filter = ("category",)
     ordering = ("category", "name")
+
+
+@admin.register(models.Comment)
+class CommentAdmin(admin.ModelAdmin):
+
+    list_display = ("pk", "user", "batch", "time")
+    search_fields = ("batch__label",)
+    date_hierarchy = "time"
+    list_filter = ("user", "time")
+    ordering = ("-time",)
