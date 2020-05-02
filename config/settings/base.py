@@ -71,6 +71,14 @@ LOCAL_APPS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+# REST_FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ]
+}
+
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
