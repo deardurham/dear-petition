@@ -11,7 +11,7 @@ Authenication Using JWT Tokens
 Getting Access & Refresh Tokens (First Time)::
 
     curl \
-    -X POST
+    -X POST \
     -H "Content-Type: application/json" \
     -d '{"username": "<the-email-you-use-to-login>", "password": "<password>"}' \
     http://localhost:8000/petition/api/token/

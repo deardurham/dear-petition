@@ -3,6 +3,7 @@ Base settings to build other settings files upon.
 """
 
 import environ
+from datetime import timedelta
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -77,6 +78,11 @@ REST_FRAMEWORK = {
         # https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ]
+}
+
+SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
 }
 
 # MIGRATIONS
