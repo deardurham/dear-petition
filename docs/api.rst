@@ -49,7 +49,7 @@ Example Response::
 TTL - Time to Live
 ==================
 
-Currently access tokens have a time to live of 5 minutes. After 5 minutes, a new access token will be needed to access protected routes.
-Refresh tokens are currently set to live for 1 day. When refresh tokens expire users will need to request a new set of tokens (both access token and refresh token)
+Currently access tokens have a time to live of 6 hours. After 6 hours, a new access token will be needed to access protected routes.
+Refresh tokens are currently set to live for 2 weeks. When refresh tokens expire users will need to request a new set of tokens (both access token and refresh token)
 
 
