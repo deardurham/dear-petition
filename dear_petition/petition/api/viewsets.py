@@ -1,5 +1,11 @@
 from dear_petition.users.models import User
-from dear_petition.petition.models import CIPRSRecord, Contact, Batch
+from dear_petition.petition.models import (
+    CIPRSRecord,
+    Contact,
+    Batch,
+    Offense,
+    OffenseRecord,
+)
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import (
@@ -7,6 +13,8 @@ from .serializers import (
     CIPRSRecordSerializer,
     ContactSerializer,
     BatchSerializer,
+    OffenseSerializer,
+    OffenseRecordSerializer,
 )
 
 
@@ -21,6 +29,18 @@ class CIPRSRecordViewSet(viewsets.ModelViewSet):
 
     queryset = CIPRSRecord.objects.all()
     serializer_class = CIPRSRecordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class OffenseViewSet(viewsets.ModelViewSet):
+    queryset = Offense.objects.all()
+    serializer_class = OffenseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class OffenseRecordViewSet(viewsets.ModelViewSet):
+    queryset = OffenseRecord.objects.all()
+    serializer_class = OffenseRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 

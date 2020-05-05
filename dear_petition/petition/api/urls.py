@@ -9,6 +9,8 @@ from . import viewsets
 router = routers.DefaultRouter()
 router.register(r"users", viewsets.UserViewSet)
 router.register(r"ciprsrecord", viewsets.CIPRSRecordViewSet)
+router.register(r"offense", viewsets.OffenseViewSet)
+router.register(r"offenserecord", viewsets.OffenseRecordViewSet)
 router.register(r"contact", viewsets.ContactViewSet)
 router.register(r"batch", viewsets.BatchViewSet)
 
