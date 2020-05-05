@@ -4,6 +4,8 @@ from django.conf import settings
 from django.utils.timezone import make_aware
 from .constants import DATETIME_FORMAT
 
+import dateutil.parser
+
 
 def dt_obj_to_date(dt_obj):
     """
@@ -36,7 +38,8 @@ def make_datetime_aware(dt_str):
     if dt_str is None or dt_str == "":
         return None
     # a) Turn the datetime string into a timezone-naive datetime object
-    naive_datetime_obj = datetime.strptime(dt_str, DATETIME_FORMAT)
+    naive_datetime_obj = dateutil.parser.parse(dt_str)
+
     # b) Assign the timezone-naive datetime a timezone based on settings.TIME_ZONE
     aware_datetime_obj = make_aware(
         naive_datetime_obj, pytz.timezone(settings.TIME_ZONE)
