@@ -1,8 +1,8 @@
-import styled, { css } from "styled-components";
-import { POSITIVE, CAUTION, NEUTRAL } from "./Button";
-import { keyAndAmbientShadows } from "../../../styles/shadows";
-import { colorPrimary, colorWhite, colorCaution } from "../../../styles/colors";
-import { fontPrimary } from "../../../styles/fonts";
+import styled, { css } from 'styled-components';
+import { POSITIVE, CAUTION, NEUTRAL } from './Button';
+import { keyAndAmbientShadows } from '../../../styles/shadows';
+import { colorPrimary, colorWhite, colorCaution } from '../../../styles/colors';
+import { fontPrimary } from '../../../styles/fonts';
 
 export default styled.button`
   cursor: pointer;
@@ -12,7 +12,7 @@ export default styled.button`
   font-size: 1rem;
   padding: 0.5rem 1.5rem;
   outline: none;
-  
+
   font-size: calc(1.5rem + 0.5vw);
   font-family: ${fontPrimary};
 
@@ -45,10 +45,10 @@ function mapTypeToStartingState(type) {
 }
 
 const positive = css`
-    background: ${colorPrimary};
-    border: 1px solid ${colorPrimary};
-    color: ${colorWhite};
-`
+  background: ${colorPrimary};
+  border: 1px solid ${colorPrimary};
+  color: ${colorWhite};
+`;
 const caution = css`
   background: ${colorCaution};
   border: 1px solid ${colorCaution};
