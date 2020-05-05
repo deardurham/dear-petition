@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 import normalize from './normalize';
 import { colorFontPrimary, colorBlue } from './colors';
+import { fontPrimary } from './fonts';
 
 export default createGlobalStyle`
     ${normalize}
@@ -26,7 +27,7 @@ export default createGlobalStyle`
 
     body {
         margin: 0;
-        font-family: 'Inconsolata', monospace;
+        font-family: ${fontPrimary}
         font-size: 1.5rem;
         box-sizing: border-box;
     }
