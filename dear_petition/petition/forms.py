@@ -4,7 +4,15 @@ import os
 from django import forms
 from django.conf import settings
 
-from dear_petition.petition.models import CIPRSRecord, Contact, Batch
+
+from dear_petition.petition.models import (
+    CIPRSRecord,
+    Offense,
+    OffenseRecord,
+    Contact,
+    Batch,
+    Comment
+)
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
 
@@ -21,13 +29,34 @@ class UploadFileForm(forms.Form):
             record.data = record.parse_report(file_)
             if "error" in record.data:
                 raise forms.ValidationError(record.data["error"])
-            if "Defendant" in record.data and "Name" in record.data["Defendant"]:
-                label = record.data["Defendant"]["Name"]
-                record.label = label
-                if idx == 0:
-                    batch.label = label
-                    batch.save()
-            record.save()
+            record.label = record.data.get("Defendant", {}).get("Name", "")
+            if record.label and idx == 0:
+                batch.label = record.label
+                batch.save()
+            record.refresh_record_from_data()
+            offenses = record.data.get("Offense Record", {})
+            if offenses:
+                offense = Offense(
+                    ciprs_record=record,
+                    disposed_on=offenses.get("Disposed On", None),
+                    disposition_method=offenses.get("Disposition Method", ""),
+                )
+                offense.save()
+                offense_records = offenses.get("Records", [])
+                for offense_record in offense_records:
+                    try:
+                        code = int(offense_record.get("Code"))
+                    except ValueError:
+                        code = None
+                    o_record = OffenseRecord(
+                        offense=offense,
+                        law=offense_record.get("Law", ""),
+                        code=code,
+                        action=offense_record.get("Action", ""),
+                        severity=offense_record.get("Severity", ""),
+                        description=offense_record.get("Description", ""),
+                    )
+                    o_record.save()
             batch.records.add(record)
         return batch
 
@@ -115,3 +144,13 @@ class GeneratePetitionForm(forms.Form):
         petition.write()
         output.seek(0)
         return output
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["text"]
+
+    text = forms.CharField(
+        widget=forms.Textarea(attrs={"placeholder": "Add a comment..."})
+    )

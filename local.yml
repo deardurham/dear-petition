@@ -42,7 +42,7 @@ services:
       - "3000:3000"
     volumes:
       - /app/frontend/node_modules
-      - .:/app/frontend
+      - ./frontend/:/app/frontend
     environment:
       - CHOKIDAR_USEPOLLING=true
 
