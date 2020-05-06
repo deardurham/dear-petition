@@ -5,12 +5,12 @@ import { Route } from 'react-router';
 import LoginPage from '../pages/LoginPage/LoginPage';
 
 
-function ConnectedRoute({ children, ...props }) {
+function ProtectedRoute({ children, ...props }) {
     // TODO: When implementing auth, set this to some localStorage doo.
     const authorized = localStorage.getItem('AUTHORIZED') === 'true';
-    
-    if (!authorized) return <Route {...props}><LoginPage redirect/></Route>
+
+    if (!authorized) return <Route {...props}><LoginPage redirect /></Route>
     return <Route {...props}>{children}</Route>
 }
 
-export default ConnectedRoute;
+export default ProtectedRoute;

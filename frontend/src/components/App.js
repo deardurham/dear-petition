@@ -20,7 +20,7 @@ function App() {
             <ProtectedRoute exact path="/">
               <HomePage />
             </ProtectedRoute>
-            <ProtectedRoute exact path="/generate">
+            <ProtectedRoute exact path="/generate/:batchId">
               <GenerationPage />
             </ProtectedRoute>
           </Switch>
