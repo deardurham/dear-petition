@@ -35,7 +35,16 @@ function HomePage(props) {
       return;
     }
     // TODO: Reject files with duplicate file.name
-    setFiles(_mergeFileSets(drop.files));
+
+    let hasDups = false;
+    files.forEach(file => {
+      const dup = drop.files.find(newFile => newFile.name === file.name);
+      if (dup) {
+        setDragErrors([`Cannot upload duplicate file "${dup.name}"`]);
+        hasDups = true;
+      }
+    });
+    if (!hasDups) setFiles(_mergeFileSets(drop.files));
   };
 
   const handleRemoveFile = file => {
