@@ -6,7 +6,7 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
 )
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from rest_framework import permissions
 from .serializers import (
     UserSerializer,
@@ -15,6 +15,7 @@ from .serializers import (
     BatchSerializer,
     OffenseSerializer,
     OffenseRecordSerializer,
+    PetitionSerializer,
 )
 
 
@@ -53,6 +54,17 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 class BatchViewSet(viewsets.ModelViewSet):
 
-    queryset = Batch.objects.all()
+    queryset = Batch.objects.prefetch_related(
+        "petitions", "records__offenses__offense_records"
+    )
     serializer_class = BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "head", "put"]
+
+
+class GeneratePetitionView(viewsets.ViewSet):
+
+    serializer_class = PetitionSerializer
+
+    def create(self, request):
+        pass

@@ -29,6 +29,7 @@ from .constants import (
     DATETIME_FORMAT,
     DATE_FORMAT,
     CHARGED,
+    FORM_TYPES,
 )
 
 from .utils import (
@@ -42,11 +43,11 @@ logger = logging.getLogger(__name__)
 
 class CIPRSRecordManager(models.Manager):
     def create_record(self, batch, label, data):
-        """Extract General, Case, and Defendant details from data 
+        """Extract General, Case, and Defendant details from data
 
         Parses the raw data from our JSONField (data) and
         places values in their associated model fields.
-        
+
         Note: This method is use to create the record that
         is why we are also passing batch, date_uploaded,
         report_pdf, and label alongside data. Although data is
@@ -339,3 +340,18 @@ class Comment(models.Model):
                     ),
                 )
         super(Comment, self).save(*args, **kwargs)
+
+
+# Inputs
+#
+#
+#
+#
+
+
+class Petition(models.Model):
+
+    form_type = models.CharField(choices=FORM_TYPES, max_length=255)
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
+    county = models.CharField(max_length=255)
+    jurisdiction = models.CharField(choices=JURISDICTION_CHOICES, max_length=255)

@@ -5,6 +5,7 @@ from dear_petition.petition.models import (
     Batch,
     Offense,
     OffenseRecord,
+    Petition,
 )
 from rest_framework import serializers
 
@@ -58,9 +59,34 @@ class ContactSerializer(serializers.ModelSerializer):
         ]
 
 
+class PetitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Petition
+        fields = ["pk", "form_type", "county", "jurisdiction"]
+
+
 class BatchSerializer(serializers.ModelSerializer):
-    ciprsrecords = CIPRSRecordSerializer(many=True, read_only=True)
+    records = CIPRSRecordSerializer(many=True, read_only=True)
+    petitions = PetitionSerializer(many=True, read_only=True)
+    # ssn = serializers.CharField(allow_null=True)
+    # driver_license = serializers.CharField(allow_null=True)
+    # attorney = ContactSerializer(allow_null=True)
+    # agency =
 
     class Meta:
         model = Batch
-        fields = ["label", "date_uploaded", "user", "ciprsrecords"]
+        fields = [
+            "pk",
+            "label",
+            "date_uploaded",
+            "user",
+            "records",
+            "petitions",
+        ]
+        read_only_fields = ["user", "label"]
+
+
+class PetitionSerializer(serializers.Serializer):
+
+    ssn = serializers.CharField()
+    driver_license = serializers.CharField()

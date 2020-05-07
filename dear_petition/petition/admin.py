@@ -119,3 +119,13 @@ class CommentAdmin(admin.ModelAdmin):
     date_hierarchy = "time"
     list_filter = ("user", "time")
     ordering = ("-time",)
+
+
+@admin.register(models.Petition)
+class PetitionAdmin(admin.ModelAdmin):
+
+    list_display = ("pk", "batch", "form_type", "county", "jurisdiction")
+    search_fields = ("batch__label",)
+    list_filter = ("form_type", "county", "jurisdiction")
+    ordering = ("-batch__date_uploaded",)
+    raw_id_fields = ("batch",)
