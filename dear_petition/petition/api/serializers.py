@@ -12,13 +12,13 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "email"]
+        fields = ["pk", "username", "email"]
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = OffenseRecord
-        fields = ["offense", "law", "code", "action", "severity", "description"]
+        fields = ["pk", "offense", "law", "code", "action", "severity", "description"]
 
 
 class OffenseSerializer(serializers.ModelSerializer):
@@ -27,6 +27,7 @@ class OffenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offense
         fields = [
+            "pk",
             "ciprs_record",
             "disposed_on",
             "disposition_method",
@@ -39,13 +40,14 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CIPRSRecord
-        fields = ["batch", "date_uploaded", "label", "offenses"]
+        fields = ["pk", "batch", "date_uploaded", "label", "offenses"]
 
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = [
+            "pk",
             "name",
             "category",
             "address1",

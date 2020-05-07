@@ -77,7 +77,11 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ]
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    # https://www.django-rest-framework.org/api-guide/pagination/#setting-the-pagination-style
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
 }
 
 SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
