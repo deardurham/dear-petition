@@ -8,6 +8,7 @@ from dear_petition.petition.models import (
 )
 from rest_framework import viewsets, views
 from rest_framework import permissions
+from rest_framework.response import Response
 from .serializers import (
     UserSerializer,
     CIPRSRecordSerializer,
@@ -15,7 +16,7 @@ from .serializers import (
     BatchSerializer,
     OffenseSerializer,
     OffenseRecordSerializer,
-    PetitionSerializer,
+    GeneratePetitionSerializer,
 )
 
 
@@ -62,9 +63,12 @@ class BatchViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "head", "put"]
 
 
-class GeneratePetitionView(viewsets.ViewSet):
+class GeneratePetitionView(viewsets.GenericViewSet):
 
-    serializer_class = PetitionSerializer
+    serializer_class = GeneratePetitionSerializer
 
     def create(self, request):
-        pass
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print(serializer.data)
+        return Response("OK")

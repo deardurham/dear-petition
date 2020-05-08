@@ -68,10 +68,6 @@ class PetitionSerializer(serializers.ModelSerializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    # ssn = serializers.CharField(allow_null=True)
-    # driver_license = serializers.CharField(allow_null=True)
-    # attorney = ContactSerializer(allow_null=True)
-    # agency =
 
     class Meta:
         model = Batch
@@ -86,7 +82,26 @@ class BatchSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "label"]
 
 
-class PetitionSerializer(serializers.Serializer):
+class GeneratePetitionSerializer(serializers.Serializer):
 
-    ssn = serializers.CharField()
-    driver_license = serializers.CharField()
+    petition = serializers.ChoiceField(
+        choices=Petition.objects.values_list("pk", "pk"),
+        style={"base_template": "input.html"},
+    )
+    ssn = serializers.CharField(label="SSN")
+    drivers_license = serializers.CharField(label="Driver's License #")
+    attorney = serializers.ChoiceField(
+        choices=Contact.objects.filter(category="attorney").values_list("pk", "name")
+    )
+    agencies = serializers.MultipleChoiceField(
+        choices=Contact.objects.filter(category="agency").values_list("pk", "name")
+    )
+
+    def validate_petition(self, value):
+        return Petition.objects.get(pk=value)
+
+    def validate_attorney(self, value):
+        return Contact.objects.get(pk=value)
+
+    def validate_agencies(self, value):
+        return Contact.objects.filter(pk__in=value)
