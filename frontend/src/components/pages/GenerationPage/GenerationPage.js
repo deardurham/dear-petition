@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GenerationPageStyled, PetitionsList } from './GenerationPage.styled';
+import { GenerationPageStyled, PetitionsList, GenerationContentStyled } from './GenerationPage.styled';
 import { useParams } from 'react-router-dom';
 import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
@@ -31,14 +31,15 @@ function GenerationPage(props) {
       {loading
         ? <h2>Loading...</h2>
         : (
-          <>
+          <GenerationContentStyled>
+            <h2>{batch?.label}</h2>
             <GenerationInputs />
             <PetitionsList>
               {batch?.petitions?.map(petition => {
                 return <PetitionListItem petition={petition} />
               })}
             </PetitionsList>
-          </>
+          </GenerationContentStyled>
         )
       }
     </GenerationPageStyled>
