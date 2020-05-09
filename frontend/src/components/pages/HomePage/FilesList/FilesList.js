@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 // Children
 import Button from '../../../elements/Button/Button';
 
-function FilesList({ files = [], handleRemoveFile, handlePreparePetitions, ...props }) {
+function FilesList({ files, handleRemoveFile, handleGeneratePetition, ...props }) {
   return (
     <FilesListWrapper
       {...props}
@@ -15,7 +15,7 @@ function FilesList({ files = [], handleRemoveFile, handlePreparePetitions, ...pr
       exit={{ opacity: 0, x: '-50' }}
     >
       <FilesListStyled>
-        {files.map(file => {
+        {[...files].map((file, i) => {
           return (
             <AnimatePresence key={file.name}>
               <FilesListItem

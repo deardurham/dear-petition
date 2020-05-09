@@ -22,29 +22,46 @@ function HomePage(props) {
   const fileInputRef = React.createRef();
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(new Set());
   const [showModal, setShowModal] = useState(false);
   const history = useHistory();
+
+  const _mergeFileSets = newFiles => {
+    const mergedFiles = new Set(files);
+    newFiles.forEach(file => mergedFiles.add(file));
+    return mergedFiles;
+  };
 
   const handleDrop = drop => {
     setDragErrors(drop.errors);
     setDragWarnings(drop.warnings);
-    if (files.length + drop.files.length > MAX_FILES) {
+    if (files.size + drop.files.length > MAX_FILES) {
       setDragErrors(['Maximum file limit exceeded']);
       return;
     }
     // TODO: Reject files with duplicate file.name
-    setFiles([...files, ...drop.files]);
+
+    let hasDups = false;
+    files.forEach(file => {
+      const dup = drop.files.find(newFile => newFile.name === file.name);
+      if (dup) {
+        setDragErrors([`Cannot upload duplicate file "${dup.name}"`]);
+        hasDups = true;
+      }
+    });
+    if (!hasDups) setFiles(_mergeFileSets(drop.files));
   };
 
-  const handleRemoveFile = rmFile => {
+  const handleRemoveFile = file => {
     // browser stores a "path" to the last file uploaded on the input.
     // It's necessary to "clear" the inputs value here, but not on drop--
     // the browser just replaces previous files in the case of a drop.
     if (fileInputRef.current) fileInputRef.current.value = '';
     // TODO: It would be great to get this taken care of inside DragNDrop,
     // TODO: but currently DragNDrop has no concept of a FilesList or removing files.
-    setFiles(files.filter(fl => fl.name !== rmFile.name));
+    const copiedSet = new Set(files);
+    copiedSet.delete(file);
+    setFiles(copiedSet);
   };
 
   const handlePreparePetitions = () => {
@@ -63,7 +80,7 @@ function HomePage(props) {
     <>
       <HomePageStyled>
         <HomeContent>
-          {files && files.length > 0 && (
+          {files && files.size > 0 && (
             <FilesList
               files={files}
               handleRemoveFile={handleRemoveFile}
