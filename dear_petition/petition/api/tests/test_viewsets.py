@@ -1,8 +1,12 @@
 import pytest
-from django.test import TestCase
-from django.urls import reverse
+from datetime import timedelta
 
 from rest_framework import status
+from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.urls import reverse
+
+from dear_petition.users.tests.factories import UserFactory
 
 from ....petition.tests.factories import (
     BatchFactory,
@@ -12,13 +16,34 @@ from ....petition.tests.factories import (
 pytestmark = pytest.mark.django_db
 
 
-class TestBatchViewSet(TestCase):
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+    }
+
+
+class TestBatchViewSet(APITestCase):
     def setUp(self):
+        self.user = UserFactory()
         self.batch_1 = BatchFactory()
         self.batch_2 = BatchFactory()
         self.batch_3 = BatchFactory()
+        self.batch_list = [self.batch_1, self.batch_2, self.batch_3]
         self.list_url = reverse("api:batch-list")
         self.detail_url = reverse("api:batch-detail", args=[self.batch_1.pk])
+        # Create a token for the self.user, to be used with each request.
+        self.tokens = get_tokens_for_user(self.user)
+        self.access = self.tokens["access"]
+
+    def test_authorized(self):
+        with self.subTest("Get - List"):
+            response = self.client.get(
+                self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_unauthorized(self):
         """Unauthorized users may not use the API.
@@ -55,7 +80,7 @@ class TestBatchViewSet(TestCase):
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class TestCIPRSRecordViewSet(TestCase):
+class TestCIPRSRecordViewSet(APITestCase):
     def setUp(self):
         self.ciprsrecord_1 = CIPRSRecordFactory()
         self.ciprsrecord_2 = CIPRSRecordFactory()
