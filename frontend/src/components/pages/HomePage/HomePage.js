@@ -4,12 +4,15 @@ import {
   HomeContent,
   DnDContent,
   DragErrors,
-  DragWarnings
+  DragWarnings,
+  ModalStyled,
+  ModalContent
 } from './HomePage.styled';
 
 // Children
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
+import { useHistory } from 'react-router-dom';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
@@ -20,6 +23,8 @@ function HomePage(props) {
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [files, setFiles] = useState(new Set());
+  const [showModal, setShowModal] = useState(false);
+  const history = useHistory();
 
   const _mergeFileSets = newFiles => {
     const mergedFiles = new Set(files);
@@ -59,52 +64,67 @@ function HomePage(props) {
     setFiles(copiedSet);
   };
 
-  const handleGeneratePetition = () => {
-    console.log('pretending to generate petition!');
+  const handlePreparePetitions = () => {
+    // TODO: display loading modal
+    setShowModal(true);
+    // TODO: send all the files to API
+    let timeout = setTimeout(() => {
+      console.log('Pretend response!')
+      setShowModal(false);
+      history.push(`/generate/${100}`)
+    }, 1000)
+
   };
 
   return (
-    <HomePageStyled>
-      <HomeContent>
-        {files && files.size > 0 && (
-          <FilesList
-            files={files}
-            handleRemoveFile={handleRemoveFile}
-            handleGeneratePetition={handleGeneratePetition}
-          />
-        )}
-        <DragNDrop
-          ref={fileInputRef}
-          mimeTypes={ALLOWED_MIME_TYPES}
-          maxFiles={MAX_FILES}
-          maxSize={MAX_FILE_SIZE}
-          onDrop={handleDrop}
-        >
-          <DnDContent>
-            <div>
-              <h2>Upload CIPRS Records</h2>
-              <p>up to {MAX_FILES} records</p>
-            </div>
-            <div>
-              {dragWarnings && (
-                <DragWarnings>
-                  {dragWarnings.map(warning => (
-                    <p key={warning}>{warning}</p>
-                  ))}
-                </DragWarnings>
-              )}
-              {dragErrors && (
-                <DragErrors>
-                  {dragErrors.map(error => (
-                    <p key={error}>{error}</p>
-                  ))}
-                </DragErrors>
-              )}
-            </div>
-          </DnDContent>
-        </DragNDrop>
-      </HomeContent>
-    </HomePageStyled>
+    <>
+      <HomePageStyled>
+        <HomeContent>
+          {files && files.size > 0 && (
+            <FilesList
+              files={files}
+              handleRemoveFile={handleRemoveFile}
+              handlePreparePetitions={handlePreparePetitions}
+            />
+          )}
+          <DragNDrop
+            ref={fileInputRef}
+            mimeTypes={ALLOWED_MIME_TYPES}
+            maxFiles={MAX_FILES}
+            maxSize={MAX_FILE_SIZE}
+            onDrop={handleDrop}
+          >
+            <DnDContent>
+              <div>
+                <h2>Upload CIPRS Records</h2>
+                <p>up to {MAX_FILES} records</p>
+              </div>
+              <div>
+                {dragWarnings && (
+                  <DragWarnings>
+                    {dragWarnings.map(warning => (
+                      <p key={warning}>{warning}</p>
+                    ))}
+                  </DragWarnings>
+                )}
+                {dragErrors && (
+                  <DragErrors>
+                    {dragErrors.map(error => (
+                      <p key={error}>{error}</p>
+                    ))}
+                  </DragErrors>
+                )}
+              </div>
+            </DnDContent>
+          </DragNDrop>
+        </HomeContent>
+      </HomePageStyled>
+      <ModalStyled isVisible={showModal} closeModal={() => setShowModal(false)}>
+        <ModalContent>
+          <h2>Preparing petitions...</h2>
+        </ModalContent>
+      </ModalStyled>
+    </>
   );
 }
 

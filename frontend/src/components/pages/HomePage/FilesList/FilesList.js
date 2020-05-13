@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 // Children
 import Button from '../../../elements/Button/Button';
 
-function FilesList({ files, handleRemoveFile, handleGeneratePetition, ...props }) {
+function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }) {
   return (
     <FilesListWrapper
       {...props}
@@ -31,7 +31,7 @@ function FilesList({ files, handleRemoveFile, handleGeneratePetition, ...props }
           );
         })}
       </FilesListStyled>
-      <Button onClick={handleGeneratePetition}>Create petition</Button>
+      <Button onClick={handlePreparePetitions}>Prepare petitions</Button>
     </FilesListWrapper>
   );
 }
