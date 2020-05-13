@@ -60,7 +60,6 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     serializer_class = BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ["get", "post", "head", "put"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

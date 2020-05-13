@@ -79,7 +79,7 @@ class BatchSerializer(serializers.ModelSerializer):
             "records",
             "petitions",
         ]
-        read_only_fields = ["user", "label"]
+        read_only_fields = ["user"]
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
