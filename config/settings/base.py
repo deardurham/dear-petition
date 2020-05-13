@@ -3,6 +3,7 @@ Base settings to build other settings files upon.
 """
 
 import environ
+from datetime import timedelta
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -70,6 +71,23 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# REST_FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        # https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    # https://www.django-rest-framework.org/api-guide/pagination/#setting-the-pagination-style
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
+}
+
+SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
+}
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
