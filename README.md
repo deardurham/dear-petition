@@ -8,6 +8,11 @@ project for creating petition forms.
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
+## Frontend Development
+The front end can be run independently of the backend. If you don't wish to run the django API locally, see the [frontend README](frontend/README.md) for setup steps.
+
+Otherwise, the frontend can be launched from the same docker-compose file as the API.
+
 ## Local Development
 
 Begin by cloning the repository:
@@ -34,7 +39,7 @@ Run the containers:
 
     docker-compose up -d
 
-Visit http://localhost:8000 in your browser.
+Visit http://localhost:3000 in your browser.
 
 
 ### Initial Setup
