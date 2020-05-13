@@ -1,4 +1,3 @@
-
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"
@@ -32,3 +31,12 @@ COMMENT_MAX_LENGTH = 8192
 NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
 NEW_COMMENT_EMAIL_MESSAGE = "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
 
+
+DISMISSED = "AOC-CR-287"
+NOT_GUILTY = "AOC-CR-288"
+MISDEMEANOR = "AOC-CR-281"
+FORM_TYPES = (
+    (DISMISSED, "Dismissed Charges"),
+    (NOT_GUILTY, "Not Guilty"),
+    (MISDEMEANOR, "Nonviolent Felony or Misdemeanor"),
+)

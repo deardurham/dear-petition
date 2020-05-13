@@ -13,6 +13,9 @@ router.register(r"offense", viewsets.OffenseViewSet)
 router.register(r"offenserecord", viewsets.OffenseRecordViewSet)
 router.register(r"contact", viewsets.ContactViewSet)
 router.register(r"batch", viewsets.BatchViewSet)
+router.register(
+    r"generate-petition", viewsets.GeneratePetitionView, basename="generate-petition",
+)
 
 app_name = "api"
 

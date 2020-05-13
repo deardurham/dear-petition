@@ -6,8 +6,9 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
 )
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from rest_framework import permissions
+from rest_framework.response import Response
 from .serializers import (
     UserSerializer,
     CIPRSRecordSerializer,
@@ -15,6 +16,7 @@ from .serializers import (
     BatchSerializer,
     OffenseSerializer,
     OffenseRecordSerializer,
+    GeneratePetitionSerializer,
 )
 
 
@@ -53,7 +55,9 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 class BatchViewSet(viewsets.ModelViewSet):
 
-    queryset = Batch.objects.all()
+    queryset = Batch.objects.prefetch_related(
+        "petitions", "records__offenses__offense_records"
+    )
     serializer_class = BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -62,3 +66,14 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class GeneratePetitionView(viewsets.GenericViewSet):
+
+    serializer_class = GeneratePetitionSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print(serializer.data)
+        return Response("OK")

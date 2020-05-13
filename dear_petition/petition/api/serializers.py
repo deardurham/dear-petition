@@ -5,6 +5,7 @@ from dear_petition.petition.models import (
     Batch,
     Offense,
     OffenseRecord,
+    Petition,
 )
 from rest_framework import serializers
 
@@ -58,10 +59,49 @@ class ContactSerializer(serializers.ModelSerializer):
         ]
 
 
+class PetitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Petition
+        fields = ["pk", "form_type", "county", "jurisdiction"]
+
+
 class BatchSerializer(serializers.ModelSerializer):
-    ciprsrecords = CIPRSRecordSerializer(many=True, read_only=True)
+    records = CIPRSRecordSerializer(many=True, read_only=True)
+    petitions = PetitionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Batch
-        fields = ["label", "date_uploaded", "user", "ciprsrecords"]
+        fields = [
+            "pk",
+            "label",
+            "date_uploaded",
+            "user",
+            "records",
+            "petitions",
+        ]
         read_only_fields = ["user"]
+
+
+class GeneratePetitionSerializer(serializers.Serializer):
+
+    petition = serializers.ChoiceField(
+        choices=Petition.objects.values_list("pk", "pk"),
+        style={"base_template": "input.html"},
+    )
+    ssn = serializers.CharField(label="SSN")
+    drivers_license = serializers.CharField(label="Driver's License #")
+    attorney = serializers.ChoiceField(
+        choices=Contact.objects.filter(category="attorney").values_list("pk", "name")
+    )
+    agencies = serializers.MultipleChoiceField(
+        choices=Contact.objects.filter(category="agency").values_list("pk", "name")
+    )
+
+    def validate_petition(self, value):
+        return Petition.objects.get(pk=value)
+
+    def validate_attorney(self, value):
+        return Contact.objects.get(pk=value)
+
+    def validate_agencies(self, value):
+        return Contact.objects.filter(pk__in=value)
