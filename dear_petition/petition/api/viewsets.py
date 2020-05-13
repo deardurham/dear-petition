@@ -62,6 +62,12 @@ class BatchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "post", "head", "put"]
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class GeneratePetitionView(viewsets.GenericViewSet):
 
