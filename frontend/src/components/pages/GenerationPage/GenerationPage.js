@@ -33,10 +33,10 @@ function GenerationPage(props) {
         : (
           <GenerationContentStyled>
             <h2>{batch?.label}</h2>
-            <GenerationInputs />
+            <GenerationInputs s />
             <PetitionsList>
               {batch?.petitions?.map(petition => {
-                return <PetitionListItem petition={petition} />
+                return <PetitionListItem key={petition.id} petition={petition} />
               })}
             </PetitionsList>
           </GenerationContentStyled>

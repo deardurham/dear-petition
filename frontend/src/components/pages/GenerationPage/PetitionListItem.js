@@ -2,11 +2,14 @@ import React from 'react';
 import { PetitionListItemStyled, PetitionCellStyled } from './PetitionListItem.styled';
 
 function PetitionListItem({ petition }) {
+    const handlePetitionSelect = () => {
+        // do things
+    }
     return (
-        <PetitionListItemStyled>
+        <PetitionListItemStyled onClick={handlePetitionSelect}>
             <PetitionCellStyled>{petition.type}</PetitionCellStyled>
-            <PetitionCellStyled>{petition.county}</PetitionCellStyled>
-            <PetitionCellStyled>{petition.court}</PetitionCellStyled>
+            <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
+            <PetitionCellStyled>{petition.court} court</PetitionCellStyled>
         </PetitionListItemStyled>
     );
 }
