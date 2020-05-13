@@ -64,3 +64,4 @@ class BatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Batch
         fields = ["label", "date_uploaded", "user", "ciprsrecords"]
+        read_only_fields = ["user"]
