@@ -4,8 +4,8 @@ from dear_petition.petition.tests.factories import BatchFactory, CIPRSRecordFact
 
 
 @pytest.fixture
-def batch():
-    yield BatchFactory()
+def batch(user):
+    yield BatchFactory(user=user)
 
 
 @pytest.fixture
