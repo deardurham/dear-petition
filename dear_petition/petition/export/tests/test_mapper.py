@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
     "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
 )
 @pytest.mark.parametrize("county", ["DURHAM", "WAKE", "ORANGE"])
-def test_map(petition, county, jurisdiction):
+def test_map_petition(petition, county, jurisdiction):
     data = {}
     petition.county = county
     petition.jurisdiction = jurisdiction
