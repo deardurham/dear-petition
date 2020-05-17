@@ -5,8 +5,44 @@ import dateutil.parser
 
 from django.conf import settings
 
+from dear_petition.petition import constants
 
-def map_data(form_data, batch):
+
+def transform_data(petition, extra):
+    data = {}
+    mappers = (map_petition, map_petitioner, map_attorney, map_agencies, map_offenses)
+    for mapper in mappers:
+        mapper(data, petition, extra)
+    return data
+
+
+def map_petition(data, petition, extra={}):
+    data["County"] = petition.county
+    data["District"] = (
+        "Yes" if petition.jurisdiction == constants.DISTRICT_COURT else ""
+    )
+    data["Superior"] = (
+        "Yes" if petition.jurisdiction == constants.SUPERIOR_COURT else ""
+    )
+
+
+def map_petitioner(data, petition, extra={}):
+    pass
+
+
+def map_attorney(data, petition, extra={}):
+    pass
+
+
+def map_agencies(data, petition, extra={}):
+    pass
+
+
+def map_offenses(data, petition, extra={}):
+    pass
+
+
+def old(form_data, batch):
     record = batch.most_recent_record
     # clean record data to fix date formats, etc.
     record = clean(record)

@@ -3,7 +3,11 @@ import io
 import pytest
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from dear_petition.petition.tests.factories import BatchFactory, CIPRSRecordFactory
+from dear_petition.petition.tests.factories import (
+    BatchFactory,
+    CIPRSRecordFactory,
+    PetitionFactory,
+)
 
 
 @pytest.fixture
@@ -43,3 +47,8 @@ def fake_pdf():
 @pytest.fixture
 def fake_pdf2():
     return fake_file("sample2.pdf", "pdf")
+
+
+@pytest.fixture
+def petition(batch):
+    return PetitionFactory(batch=batch)
