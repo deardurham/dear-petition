@@ -6,6 +6,7 @@ import dateutil.parser
 from django.conf import settings
 
 from dear_petition.petition import constants
+from dear_petition.petition.export.annotate import Checkbox
 
 
 def build_pdf_template_context(petition, extra):
@@ -13,24 +14,19 @@ def build_pdf_template_context(petition, extra):
     mappers = (map_petition, map_petitioner, map_attorney, map_agencies, map_offenses)
     for mapper in mappers:
         mapper(data, petition, extra)
-    add_pdf_template_annotations(data)
     return data
-
-
-def add_pdf_template_annotations(data):
-    for key, value in data.items():
-        annotated_value = {"V": value}
-        data[key] = annotated_value
 
 
 def map_petition(data, petition, extra={}):
     data["County"] = petition.county
-    data["District"] = (
-        "Yes" if petition.jurisdiction == constants.DISTRICT_COURT else ""
-    )
-    data["Superior"] = (
-        "Yes" if petition.jurisdiction == constants.SUPERIOR_COURT else ""
-    )
+    if petition.jurisdiction == constants.DISTRICT_COURT:
+        data["District"] = Checkbox("Yes")
+    else:
+        data["District"] = Checkbox("")
+    if petition.jurisdiction == constants.SUPERIOR_COURT:
+        data["Superior"] = Checkbox("Yes")
+    else:
+        data["Superior"] = Checkbox("")
 
 
 def map_petitioner(data, petition, extra={}):
