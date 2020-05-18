@@ -1,4 +1,7 @@
 import json
+
+from django.http import FileResponse
+
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
     CIPRSRecord,
@@ -91,4 +94,7 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         buffer = generate_petition_pdf(serializer.data["petition"], serializer.data)
-        return Response("OK")
+        resp = FileResponse(buffer)
+        resp["Content-Type"] = "application/pdf"
+        resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
+        return resp

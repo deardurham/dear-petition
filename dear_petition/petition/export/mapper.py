@@ -13,8 +13,14 @@ def build_pdf_template_context(petition, extra):
     mappers = (map_petition, map_petitioner, map_attorney, map_agencies, map_offenses)
     for mapper in mappers:
         mapper(data, petition, extra)
-    # TODO: add V/AS mappings
+    add_pdf_template_annotations(data)
     return data
+
+
+def add_pdf_template_annotations(data):
+    for key, value in data.items():
+        annotated_value = {"V": value}
+        data[key] = annotated_value
 
 
 def map_petition(data, petition, extra={}):
