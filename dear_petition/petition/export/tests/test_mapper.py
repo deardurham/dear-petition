@@ -7,20 +7,25 @@ from dear_petition.petition.export import mapper
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize(
-    "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
-)
-@pytest.mark.parametrize("county", ["DURHAM", "WAKE", "ORANGE"])
-def test_map_petition(petition, county, jurisdiction):
+@pytest.mark.parametrize("county", ["DURHAM", "WAKE"])
+def test_map_petition__county(petition, county):
     data = {}
     petition.county = county
-    petition.jurisdiction = jurisdiction
     mapper.map_petition(data, petition)
-    assert {"County", "District", "Superior"} == data.keys()
     assert data["County"] == county
-    if jurisdiction == constants.DISTRICT_COURT:
-        assert data["District"] == "Yes"
-        assert data["Superior"] == ""
-    elif jurisdiction == constants.SUPERIOR_COURT:
-        assert data["District"] == ""
-        assert data["Superior"] == "Yes"
+
+
+def test_map_petition__superior(petition):
+    data = {}
+    petition.jurisdiction = constants.SUPERIOR_COURT
+    mapper.map_petition(data, petition)
+    assert data["District"] == ""
+    assert data["Superior"] == "Yes"
+
+
+def test_map_petition__district(petition):
+    data = {}
+    petition.jurisdiction = constants.DISTRICT_COURT
+    mapper.map_petition(data, petition)
+    assert data["District"] == "Yes"
+    assert data["Superior"] == ""
