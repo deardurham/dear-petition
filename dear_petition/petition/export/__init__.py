@@ -1,1 +1,1 @@
-from .writer import write_pdf
+from .main import generate_petition_pdf  # noqa

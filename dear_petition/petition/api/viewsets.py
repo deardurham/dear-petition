@@ -21,6 +21,7 @@ from .serializers import (
     GeneratePetitionSerializer,
 )
 from dear_petition.petition.etl import import_ciprs_records
+from dear_petition.petition.export import generate_petition_pdf
 from rest_framework import status
 
 
@@ -89,5 +90,5 @@ class GeneratePetitionView(viewsets.GenericViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        print(serializer.data)
+        buffer = generate_petition_pdf(serializer.data["petition"], serializer.data)
         return Response("OK")

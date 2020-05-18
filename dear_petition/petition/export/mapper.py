@@ -8,7 +8,7 @@ from django.conf import settings
 from dear_petition.petition import constants
 
 
-def transform_data(petition, extra):
+def build_pdf_template_context(petition, extra):
     data = {}
     mappers = (map_petition, map_petitioner, map_attorney, map_agencies, map_offenses)
     for mapper in mappers:
