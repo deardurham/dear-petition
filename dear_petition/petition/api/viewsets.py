@@ -75,8 +75,10 @@ class GeneratePetitionView(viewsets.GenericViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        buffer = generate_petition_pdf(serializer.data["petition"], serializer.data)
-        resp = FileResponse(buffer)
+        generated_petition_pdf = generate_petition_pdf(
+            serializer.data["petition"], serializer.data
+        )
+        resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
         return resp

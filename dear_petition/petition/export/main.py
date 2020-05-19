@@ -9,5 +9,5 @@ __all__ = ("generate_petition_pdf",)
 def generate_petition_pdf(petition, extra):
     context = build_pdf_template_context(petition, extra)
     add_pdf_template_annotations(context)
-    buffer = write_pdf(context)
-    return buffer
+    generate_petition_pdf = write_pdf(context)
+    return generate_petition_pdf
