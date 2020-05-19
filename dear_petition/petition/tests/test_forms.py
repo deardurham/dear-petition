@@ -1,7 +1,7 @@
 from dear_petition.petition.models import CIPRSRecord
 from dear_petition.petition.forms import GeneratePetitionForm
 
-from dear_petition.petition import data_dict
+from dear_petition.petition.export import mapper as data_dict
 
 
 class TestRecordClean:

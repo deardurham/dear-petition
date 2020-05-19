@@ -1,6 +1,6 @@
 import pytest
 
-from dear_petition.petition.data_dict import map_data
+from dear_petition.petition.export.mapper import map_data
 
 pytestmark = pytest.mark.django_db
 

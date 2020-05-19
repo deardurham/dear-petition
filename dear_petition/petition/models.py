@@ -12,7 +12,6 @@ from django.db import models
 from django.urls import reverse
 
 import ciprs_reader
-from dear_petition.petition.data_dict import clean
 from dear_petition.users.models import User
 from . import constants as pc
 
@@ -355,3 +354,6 @@ class Petition(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
     county = models.CharField(max_length=255)
     jurisdiction = models.CharField(choices=JURISDICTION_CHOICES, max_length=255)
+
+    def __str__(self):
+        return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"

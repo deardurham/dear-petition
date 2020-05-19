@@ -1,6 +1,23 @@
-import pdfrw
+import io
+import os
 
-from dear_petition.petition.data_dict import map_data
+import pdfrw
+from django.conf import settings
+
+
+__all__ = ("write_pdf",)
+
+
+def write_pdf(data):
+    output = io.BytesIO()
+    template_path = os.path.join(
+        settings.APPS_DIR, "static", "templates", "petition-template.pdf"
+    )
+    petition = Writer(data, template_path, output)
+    petition.get_annotations()
+    petition.write()
+    output.seek(0)
+    return output
 
 
 class Writer:
@@ -12,11 +29,11 @@ class Writer:
     SUBTYPE_KEY = "/Subtype"
     WIDGET_SUBTYPE_KEY = "/Widget"
 
-    def __init__(self, form_data, batch, template_path, output_path):
+    def __init__(self, data, template_path, output_path):
         def read_template(template_path):
             return pdfrw.PdfReader(template_path)
 
-        self.data = map_data(form_data, batch)
+        self.data = data
         self.output_path = output_path
         self.template = read_template(template_path)
         self.template.Root.AcroForm.update(

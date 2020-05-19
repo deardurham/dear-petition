@@ -1,68 +1,54 @@
-import json
-from dear_petition.users.models import User
-from dear_petition.petition.models import (
-    CIPRSRecord,
-    Contact,
-    Batch,
-    Offense,
-    OffenseRecord,
-)
-from rest_framework import viewsets, views
-from rest_framework import permissions
+from django.http import FileResponse
+
+from rest_framework import parsers, permissions, status, viewsets
 from rest_framework.response import Response
-from rest_framework import parsers
-from .serializers import (
-    UserSerializer,
-    CIPRSRecordSerializer,
-    ContactSerializer,
-    BatchSerializer,
-    OffenseSerializer,
-    OffenseRecordSerializer,
-    GeneratePetitionSerializer,
-)
+
+from dear_petition.users.models import User
+from dear_petition.petition import models as petition
+from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
-from rest_framework import status
+from dear_petition.petition.export import generate_petition_pdf
 
 
 class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
 
-    queryset = CIPRSRecord.objects.all()
-    serializer_class = CIPRSRecordSerializer
+    queryset = petition.CIPRSRecord.objects.all()
+    serializer_class = serializers.CIPRSRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class OffenseViewSet(viewsets.ModelViewSet):
-    queryset = Offense.objects.all()
-    serializer_class = OffenseSerializer
+    queryset = petition.Offense.objects.all()
+    serializer_class = serializers.OffenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class OffenseRecordViewSet(viewsets.ModelViewSet):
-    queryset = OffenseRecord.objects.all()
-    serializer_class = OffenseRecordSerializer
+    queryset = petition.OffenseRecord.objects.all()
+    serializer_class = serializers.OffenseRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class ContactViewSet(viewsets.ModelViewSet):
 
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
+    queryset = petition.Contact.objects.all()
+    serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class BatchViewSet(viewsets.ModelViewSet):
 
-    queryset = Batch.objects.prefetch_related(
+    queryset = petition.Batch.objects.prefetch_related(
         "petitions", "records__offenses__offense_records"
     )
-    serializer_class = BatchSerializer
+    serializer_class = serializers.BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
 
@@ -84,10 +70,15 @@ class BatchViewSet(viewsets.ModelViewSet):
 
 class GeneratePetitionView(viewsets.GenericViewSet):
 
-    serializer_class = GeneratePetitionSerializer
+    serializer_class = serializers.GeneratePetitionSerializer
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        print(serializer.data)
-        return Response("OK")
+        generated_petition_pdf = generate_petition_pdf(
+            serializer.data["petition"], serializer.data
+        )
+        resp = FileResponse(generated_petition_pdf)
+        resp["Content-Type"] = "application/pdf"
+        resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
+        return resp

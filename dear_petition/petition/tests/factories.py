@@ -1,13 +1,15 @@
-from typing import Any, Sequence
-
-from django.contrib.auth import get_user_model
 import factory
 
-
-from dear_petition.petition.models import CIPRSRecord, Batch, Offense, OffenseRecord
+from dear_petition.petition.models import (
+    CIPRSRecord,
+    Batch,
+    Offense,
+    OffenseRecord,
+    Petition,
+)
 from dear_petition.users.tests.factories import UserFactory
 
-from ..constants import CHARGED
+from ..constants import CHARGED, DISMISSED, DISTRICT_COURT
 
 
 class BatchFactory(factory.DjangoModelFactory):
@@ -91,3 +93,13 @@ class OffenseRecordFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = OffenseRecord
+
+
+class PetitionFactory(factory.DjangoModelFactory):
+    batch = factory.SubFactory(BatchFactory)
+    county = "DURHAM"
+    form_type = DISMISSED
+    jurisdiction = DISTRICT_COURT
+
+    class Meta:
+        model = Petition
