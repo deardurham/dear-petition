@@ -45,7 +45,7 @@ def map_offenses(data, petition, extra={}):
     pass
 
 
-def old(form_data, batch):
+def map_data(form_data, batch):
     record = batch.most_recent_record
     # clean record data to fix date formats, etc.
     record = clean(record)
