@@ -2,3 +2,5 @@
 !.coveragerc
 !.env
 !.pylintrc
+./node_modules/*
+./frontend/*

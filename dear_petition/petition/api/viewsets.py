@@ -1,3 +1,4 @@
+import json
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
     CIPRSRecord,
@@ -9,6 +10,7 @@ from dear_petition.petition.models import (
 from rest_framework import viewsets, views
 from rest_framework import permissions
 from rest_framework.response import Response
+from rest_framework import parsers
 from .serializers import (
     UserSerializer,
     CIPRSRecordSerializer,
@@ -18,6 +20,8 @@ from .serializers import (
     OffenseRecordSerializer,
     GeneratePetitionSerializer,
 )
+from dear_petition.petition.etl import import_ciprs_records
+from rest_framework import status
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -60,9 +64,19 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     serializer_class = BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(response, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        files = self.request.data.getlist("files")
+        batch = import_ciprs_records(files=files, user=self.request.user)
+        return {"id": batch.pk}
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)

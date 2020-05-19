@@ -16,26 +16,14 @@ from dear_petition.petition.models import (
 from dear_petition.petition.writer import Writer
 from dear_petition.petition.data_dict import map_data
 
+from dear_petition.petition.etl import import_ciprs_records
+
 
 class UploadFileForm(forms.Form):
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={"multiple": True}))
 
     def save(self, user):
-        batch = Batch.objects.create(user=user)
-        for idx, file_ in enumerate(self.files.getlist("files")):
-            record = CIPRSRecord(batch=batch)
-            if settings.CIPRS_SAVE_PDF:
-                record.report_pdf = file_
-            record.data = record.parse_report(file_)
-            if "error" in record.data:
-                raise forms.ValidationError(record.data["error"])
-            record.label = record.data.get("Defendant", {}).get("Name", "")
-            if record.label and idx == 0:
-                batch.label = record.label
-                batch.save()
-            record.refresh_record_from_data()
-            batch.records.add(record)
-        return batch
+        return import_ciprs_records(files=self.files.getlist("files"), user=user)
 
 
 class GeneratePetitionForm(forms.Form):

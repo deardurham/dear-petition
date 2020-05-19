@@ -69,7 +69,6 @@ class TestBatchViewSet(APITestCase):
                 self.list_url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.access}"
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            self.assertIn(data["label"], response.data["label"], response.data)
 
         with self.subTest("PUT"):
             pass

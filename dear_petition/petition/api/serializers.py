@@ -85,8 +85,7 @@ class BatchSerializer(serializers.ModelSerializer):
 class GeneratePetitionSerializer(serializers.Serializer):
 
     petition = serializers.ChoiceField(
-        choices=Petition.objects.values_list("pk", "pk"),
-        style={"base_template": "input.html"},
+        choices=[], style={"base_template": "input.html"},
     )
     ssn = serializers.CharField(label="SSN")
     drivers_license = serializers.CharField(label="Driver's License #")
@@ -96,6 +95,10 @@ class GeneratePetitionSerializer(serializers.Serializer):
     agencies = serializers.MultipleChoiceField(
         choices=Contact.objects.filter(category="agency").values_list("pk", "name")
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["petition"].choices = Petition.objects.values_list("pk", "pk")
 
     def validate_petition(self, value):
         return Petition.objects.get(pk=value)

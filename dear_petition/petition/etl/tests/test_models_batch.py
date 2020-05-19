@@ -1,11 +1,11 @@
 import pytest
-from .factories import (
+from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     OffenseFactory,
     OffenseRecordFactory,
 )
-from ..constants import CHARGED, ARRAIGNED
+from dear_petition.petition.constants import CHARGED, ARRAIGNED
 
 pytestmark = pytest.mark.django_db
 
