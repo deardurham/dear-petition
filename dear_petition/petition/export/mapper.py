@@ -57,7 +57,15 @@ def map_attorney(data, petition, extra={}):
 
 
 def map_agencies(data, petition, extra={}):
-    pass
+    agencies = extra.get("agencies", {})
+    if agencies:
+        agency = list(agencies)[0]
+    data["NameAgency1"] = getattr(agency, "name", None)
+    data["AddrAgency1"] = getattr(agency, "address1", None)
+    data["MailAgency1"] = getattr(agency, "address2", None)
+    data["CityAgency1"] = getattr(agency, "city", None)
+    data["StateAgency1"] = getattr(agency, "state", None)
+    data["ZipAgency1"] = getattr(agency, "zipcode", None)
 
 
 def map_offenses(data, petition, extra={}):
