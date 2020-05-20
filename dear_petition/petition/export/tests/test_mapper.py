@@ -163,3 +163,54 @@ def test_map_attorney__zipcode(petition, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["ZipCodeAtty"] == extra["attorney"].zipcode
+
+
+############################## map_agencies test ####################
+
+
+def test_map_agencies__name(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["NameAgency1"] == contact.name
+
+
+def test_map_agencies__street_address(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["AddrAgency1"] == contact.address1
+
+
+def test_map_agencies__mail_address(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["MailAgency1"] == contact.address2
+
+
+def test_map_agencies__city(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["CityAgency1"] == contact.city
+
+
+def test_map_agencies__state(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["StateAgency1"] == contact.state
+
+
+def test_map_agencies__zipcode(petition, contact):
+    data = {}
+    extra = {}
+    extra["agencies"] = [contact]
+    mapper.map_agencies(data, petition, extra)
+    assert data["ZipAgency1"] == contact.zipcode
