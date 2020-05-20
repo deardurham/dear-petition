@@ -180,7 +180,7 @@ class CIPRSRecord(models.Model):
             for offense_record in offense_records:
                 try:
                     code = int(offense_record.get("Code"))
-                except ValueError:
+                except (ValueError, TypeError):
                     code = None
                 OffenseRecord.objects.create(
                     offense=offense,
