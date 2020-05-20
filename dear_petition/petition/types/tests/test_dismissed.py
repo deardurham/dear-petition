@@ -1,7 +1,7 @@
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.petition.types import dismissed
+from dear_petition.petition.types import dismissed, identify_distinct_petitions
 from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     OffenseFactory,
@@ -57,3 +57,14 @@ def test_offense_records_by_jurisdiction(batch, jurisdiction):
     offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
     records = batch.dismissed_offense_records(jurisdiction=jurisdiction)
     assert offense_record in records
+
+
+def test_distinct_petition(batch, dismissed_offense):
+    """Non-CHARGED dismissed offense records should be exlucded."""
+    OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
+    petition_types = identify_distinct_petitions(batch.dismissed_offense_records())
+    expected = {
+        "jurisdiction": dismissed_offense.ciprs_record.jurisdiction,
+        "county": dismissed_offense.ciprs_record.county,
+    }
+    assert expected == petition_types.first()

@@ -1,1 +1,4 @@
-from dear_petition.petition.types.main import petition_offense_records  # noqa
+from dear_petition.petition.types.main import (  # noqa
+    identify_distinct_petitions,
+    petition_offense_records,
+)
