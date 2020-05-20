@@ -210,6 +210,8 @@ class Offense(models.Model):
     )
     disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)
+    verdict = models.CharField(max_length=256, blank=True)
+    plea = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f"offense ${self.pk}"
