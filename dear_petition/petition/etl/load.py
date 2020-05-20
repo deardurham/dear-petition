@@ -5,6 +5,7 @@ from django import forms
 
 from dear_petition.petition.models import Batch, CIPRSRecord
 from dear_petition.petition.etl.extract import parse_ciprs_document
+from dear_petition.petition.types import identify_distinct_petitions
 
 
 __all__ = ("import_ciprs_records",)
@@ -31,4 +32,17 @@ def import_ciprs_records(files, user):
             batch.save()
         record.refresh_record_from_data()
         batch.records.add(record)
+    create_batch_petitions(batch)
     return batch
+
+
+def create_batch_petitions(batch):
+    # Dismissed
+    dismissed_records = batch.dismissed_offense_records()
+    petition_types = identify_distinct_petitions(dismissed_records)
+    for petition in petition_types:
+        batch.petitions.create(
+            jurisdiction=petition["jurisdiction"], county=petition["county"]
+        )
+    # TODO: Not guilty
+    # TODO: Misdemeanor
