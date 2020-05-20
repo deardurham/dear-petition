@@ -31,16 +31,29 @@ def map_petition(data, petition, extra={}):
 
 def map_petitioner(data, petition, extra={}):
     record = petition.batch.most_recent_record
-    data["NamePetitioner"] = record.label  # load.py line 28 (label is set to name attr)
-    data["Race"] = record.race
-    data["Sex"] = record.sex
-    data["DOB"] = record.dob.strftime(constants.DATE_FORMAT)
+    data["NamePetitioner"] = getattr(
+        record, "label", None
+    )  # load.py line 28 (label is set to name attr)
+    data["SSN"] = extra.get("ssn", None)
+    data["DLNo"] = extra.get("drivers_license", None)
+    # data["DLState"] = extra["drivers_license_state"]
+    data["Race"] = getattr(record, "race", None)
+    data["Sex"] = getattr(record, "sex", None)
+    dob = getattr(record, "dob", None)
+    if dob:
+        data["DOB"] = dob.strftime(constants.DATE_FORMAT)
     # data["Age"] = record.age
-    data["ConsJdgmntFileNum"] = record.file_no
+    data["ConsJdgmntFileNum"] = getattr(record, "file_no", None)
 
 
 def map_attorney(data, petition, extra={}):
-    pass
+    attorney = extra.get("attorney", None)
+    data["NameAtty"] = getattr(attorney, "name", None)
+    data["StAddrAtty"] = getattr(attorney, "address1", None)
+    data["MailAddrAtty"] = getattr(attorney, "address2", None)
+    data["CityAtty"] = getattr(attorney, "city", None)
+    data["StateAtty"] = getattr(attorney, "state", None)
+    data["ZipCodeAtty"] = getattr(attorney, "zipcode", None)
 
 
 def map_agencies(data, petition, extra={}):

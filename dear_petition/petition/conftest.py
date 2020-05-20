@@ -7,6 +7,7 @@ from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     PetitionFactory,
+    ContactFactory,
 )
 
 
@@ -52,3 +53,8 @@ def fake_pdf2():
 @pytest.fixture
 def petition(batch):
     return PetitionFactory(batch=batch)
+
+
+@pytest.fixture
+def contact():
+    return ContactFactory()

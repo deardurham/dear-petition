@@ -6,6 +6,7 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
     Petition,
+    Contact,
 )
 from dear_petition.users.tests.factories import UserFactory
 
@@ -103,3 +104,8 @@ class PetitionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Petition
+
+
+class ContactFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Contact
