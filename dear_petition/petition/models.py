@@ -351,13 +351,6 @@ class Comment(models.Model):
         super(Comment, self).save(*args, **kwargs)
 
 
-# Inputs
-#
-#
-#
-#
-
-
 class Petition(models.Model):
 
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
@@ -367,3 +360,12 @@ class Petition(models.Model):
 
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
+
+    def get_offense_records(self):
+        """Return batch offenses for this petition type, jurisdiction, and county."""
+        qs = self.batch.petition_offense_records(petition_type=self.form_type)
+        qs = qs.filter(
+            offense__ciprs_record__jurisdiction=self.jurisdiction,
+            offense__ciprs_record__county=self.county,
+        )
+        return qs.order_by("offense__ciprs_record__offense_date")

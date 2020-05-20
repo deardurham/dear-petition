@@ -6,6 +6,7 @@ from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     OffenseFactory,
     OffenseRecordFactory,
+    PetitionFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -73,3 +74,14 @@ def test_distinct_petition__many(batch):
     for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
         for county in ["DURHAM", "WAKE"]:
             assert {"jurisdiction": jurisdiction, "county": county} in petition_types
+
+
+def test_petition_offenses(batch, record1, charged_dismissed_record):
+    """Petitions should return their own offense records."""
+    petition = PetitionFactory(
+        form_type=constants.DISMISSED,
+        jurisdiction=record1.jurisdiction,
+        county=record1.county,
+        batch=batch,
+    )
+    assert charged_dismissed_record in petition.get_offense_records()

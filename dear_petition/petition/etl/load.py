@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django import forms
 
+from dear_petition.petition.constants import DISMISSED
 from dear_petition.petition.models import Batch, CIPRSRecord
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import identify_distinct_petitions
@@ -42,7 +43,9 @@ def create_batch_petitions(batch):
     petition_types = identify_distinct_petitions(dismissed_records)
     for petition in petition_types:
         batch.petitions.create(
-            jurisdiction=petition["jurisdiction"], county=petition["county"]
+            form_type=DISMISSED,
+            jurisdiction=petition["jurisdiction"],
+            county=petition["county"],
         )
     # TODO: Not guilty
     # TODO: Misdemeanor
