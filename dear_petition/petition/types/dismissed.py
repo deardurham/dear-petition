@@ -14,8 +14,10 @@ DISPOSITION_METHODS = (
 )
 
 
-def get_offense_records(batch):
+def get_offense_records(batch, jurisdiction=""):
     qs = OffenseRecord.objects.filter(offense__ciprs_record__batch=batch)
+    if jurisdiction:
+        qs = qs.filter(offense__ciprs_record__jurisdiction=jurisdiction)
     qs = qs.filter(build_query())
     return qs.select_related("offense__ciprs_record__batch")
 

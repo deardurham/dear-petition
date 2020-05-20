@@ -7,6 +7,6 @@ TYPE_MAP = {
 }
 
 
-def petition_offense_records(batch, petition_type):
-    offense_records = TYPE_MAP.get(petition_type)
-    return offense_records(batch)
+def petition_offense_records(batch, petition_type, jurisdiction=""):
+    get_offense_records = TYPE_MAP.get(petition_type)
+    return get_offense_records(batch, jurisdiction)

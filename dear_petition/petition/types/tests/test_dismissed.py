@@ -1,7 +1,12 @@
 import pytest
 
+from dear_petition.petition import constants
 from dear_petition.petition.types import dismissed
-from dear_petition.petition.tests.factories import OffenseFactory, OffenseRecordFactory
+from dear_petition.petition.tests.factories import (
+    CIPRSRecordFactory,
+    OffenseFactory,
+    OffenseRecordFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -38,3 +43,17 @@ def test_non_dismissed_disposition_method(batch, non_dismissed_offense):
         action="CHARGED", offense=non_dismissed_offense
     )
     assert offense_record not in batch.dismissed_offense_records()
+
+
+@pytest.mark.parametrize(
+    "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
+)
+def test_offense_records_by_jurisdiction(batch, jurisdiction):
+    """Offense records helper function should allow filtering by jurisdiction."""
+    ciprs_record = CIPRSRecordFactory(jurisdiction=jurisdiction, batch=batch)
+    offense = OffenseFactory(
+        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=ciprs_record
+    )
+    offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
+    records = batch.dismissed_offense_records(jurisdiction=jurisdiction)
+    assert offense_record in records

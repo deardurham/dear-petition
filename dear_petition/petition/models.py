@@ -317,13 +317,13 @@ class Batch(models.Model):
             most_recent_record = self.records.order_by("pk").first()
         return most_recent_record
 
-    def petition_offense_records(self, petition_type):
+    def petition_offense_records(self, petition_type, jurisdiction=""):
         from dear_petition.petition.types import petition_offense_records
 
-        return petition_offense_records(self, petition_type)
+        return petition_offense_records(self, petition_type, jurisdiction)
 
-    def dismissed_offense_records(self):
-        return self.petition_offense_records(pc.DISMISSED)
+    def dismissed_offense_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.DISMISSED, jurisdiction)
 
 
 class Comment(models.Model):
