@@ -14,23 +14,20 @@ pytestmark = pytest.mark.django_db
 
 # map_petition test
 @pytest.mark.parametrize("county", ["DURHAM", "WAKE"])
-def test_map_petition__county(petition, county):
-    data = {}
+def test_map_petition__county(data, petition, county):
     petition.county = county
     mapper.map_petition(data, petition)
     assert data["County"] == county
 
 
-def test_map_petition__superior(petition):
-    data = {}
+def test_map_petition__superior(data, petition):
     petition.jurisdiction = constants.SUPERIOR_COURT
     mapper.map_petition(data, petition)
     assert data["District"] == ""
     assert data["Superior"] == "Yes"
 
 
-def test_map_petition__district(petition):
-    data = {}
+def test_map_petition__district(data, petition):
     petition.jurisdiction = constants.DISTRICT_COURT
     mapper.map_petition(data, petition)
     assert data["District"] == "Yes"
@@ -38,63 +35,35 @@ def test_map_petition__district(petition):
 
 
 # map_petitioner tests
-def test_map_petitioner__name(petition):
-    data = {}
-    batch = BatchFactory()
-    record = CIPRSRecordFactory(batch=batch)
-    record.refresh_record_from_data()
-    petition.batch = batch
+def test_map_petitioner__name(data, petition, record1):
     mapper.map_petitioner(data, petition)
-    assert data["NamePetitioner"] == record.label
+    assert data["NamePetitioner"] == record1.label
 
 
-def test_map_petitioner__race(petition):
-    data = {}
-    batch = BatchFactory()
-    record = CIPRSRecordFactory(batch=batch)
-    record.refresh_record_from_data()
-    petition.batch = batch
+def test_map_petitioner__race(data, petition, record1):
     mapper.map_petitioner(data, petition)
-    assert data["Race"] == record.race
+    assert data["Race"] == record1.race
 
 
-def test_map_petitioner__sex(petition):
-    data = {}
-    batch = BatchFactory()
-    record = CIPRSRecordFactory(batch=batch)
-    record.refresh_record_from_data()
-    petition.batch = batch
+def test_map_petitioner__sex(data, petition, record1):
     mapper.map_petitioner(data, petition)
-    assert data["Sex"] == record.sex
+    assert data["Sex"] == record1.sex
 
 
-def test_map_petitioner__dob(petition):
-    data = {}
-    batch = BatchFactory()
-    record = CIPRSRecordFactory(batch=batch)
-    record.refresh_record_from_data()
-    petition.batch = batch
+def test_map_petitioner__dob(data, petition, record1):
+    record1.dob = "2020-01-01"
+    record1.save()
     mapper.map_petitioner(data, petition)
-    assert data["DOB"] == make_datetime_aware(record.dob).date().strftime(
+    assert data["DOB"] == make_datetime_aware(record1.dob).date().strftime(
         constants.DATE_FORMAT
     )
 
 
-# def test_map_petitioner__age(petition):
-#     data = {}
-#     batch = BatchFactory()
-#     record = CIPRSRecordFactory(batch=batch)
-#     record.refresh_record_from_data()
-#     petition.batch = batch
+# def test_map_petitioner__age(data, petition, record1):
 #     mapper.map_petitioner(data, petition)
-#     assert data["Age"] == record.age
+#     assert data["Age"] == record1.age
 
 
-def test_map_petitioner__file_no(petition):
-    data = {}
-    batch = BatchFactory()
-    record = CIPRSRecordFactory(batch=batch)
-    record.refresh_record_from_data()
-    petition.batch = batch
+def test_map_petitioner__file_no(data, petition, record1):
     mapper.map_petitioner(data, petition)
-    assert data["ConsJdgmntFileNum"] == record.file_no
+    assert data["ConsJdgmntFileNum"] == record1.file_no
