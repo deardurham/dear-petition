@@ -1,8 +1,9 @@
 import pytest
+import datetime as dt
 
 from dear_petition.petition import constants
 from dear_petition.petition.export import mapper
-from dear_petition.petition.utils import make_datetime_aware
+from dear_petition.petition.utils import make_datetime_aware, dt_obj_to_date
 
 from dear_petition.petition.tests.factories import (
     BatchFactory,
@@ -163,6 +164,30 @@ def test_map_attorney__zipcode(petition, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["ZipCodeAtty"] == extra["attorney"].zipcode
+
+
+def test_map_attorney__petition_not_filed_sign_name(petition, contact):
+    data = {}
+    extra = {}
+    extra["attorney"] = contact
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionNotFiledSignName"] == contact.name
+
+
+def test_map_attorney__petition_attorney_cbx(petition):
+    data = {}
+    extra = {}
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionerAttorneyCbx"] == "Yes"
+
+
+def test_map_attorney__petition_not_filed_sign_date(petition):
+    data = {}
+    extra = {}
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionNotFiledSignDate"] == dt_obj_to_date(
+        dt.datetime.today()
+    ).strftime(constants.DATE_FORMAT)
 
 
 ############################## map_agencies test ####################
