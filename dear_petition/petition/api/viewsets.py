@@ -1,11 +1,15 @@
+from datetime import datetime
+from django.conf import settings
 from django.http import FileResponse
+from django.middleware import csrf
 
 from rest_framework import parsers, permissions, status, viewsets
 from rest_framework.response import Response
+from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition
-from dear_petition.petition.api import serializers
+from dear_petition.petition.api import serializers, authentication
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
@@ -82,3 +86,32 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         resp["Content-Type"] = "application/pdf"
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
         return resp
+
+class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
+    """
+    Subclasses simplejwt's TokenObtainPairView to handle tokens in cookies
+    """
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise exceptions.InvalidToken(e.args[0])
+
+        response = Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+        csrf.get_token(self.request)
+
+        response.set_cookie(
+            settings.AUTH_COOKIE_KEY, # get cookie key from settings
+            serializer.validated_data['access'], # pull access token out of validated_data
+            expires=datetime.now() + settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'], # expire access token when refresh token expires
+            domain=getattr(settings, 'AUTH_COOKIE_DOMAIN', None), # we can tie the cookie to a specific domain for added security
+            secure=settings.DEBUG == False, # browsers should only send the cookie using HTTPS
+            httponly=True, # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE
+        )
+
+        return response
