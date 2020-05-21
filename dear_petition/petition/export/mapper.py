@@ -30,7 +30,17 @@ def map_petition(data, petition, extra={}):
 
 
 def map_petitioner(data, petition, extra={}):
-    pass
+    record = petition.batch.most_recent_record
+    data["NamePetitioner"] = getattr(
+        record, "label", None
+    )  # load.py line 28 (label is set to name attr)
+    data["Race"] = getattr(record, "race", None)
+    data["Sex"] = getattr(record, "sex", None)
+    dob = getattr(record, "dob", None)
+    if dob:
+        data["DOB"] = dob.strftime(constants.DATE_FORMAT)
+    # data["Age"] = getattr(record, "age", None)
+    data["ConsJdgmntFileNum"] = getattr(record, "file_no", None)
 
 
 def map_attorney(data, petition, extra={}):

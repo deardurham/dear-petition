@@ -11,6 +11,11 @@ from dear_petition.petition.tests.factories import (
 
 
 @pytest.fixture
+def data():
+    return {}
+
+
+@pytest.fixture
 def batch(user):
     yield BatchFactory(user=user)
 
