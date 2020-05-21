@@ -49,16 +49,16 @@ def map_petitioner(data, petition, extra={}):
 
 def map_attorney(data, petition, extra={}):
     attorney = extra.get("attorney", None)
-    data["NameAtty"] = getattr(attorney, "name", None)
-    data["StAddrAtty"] = getattr(attorney, "address1", None)
-    data["MailAddrAtty"] = getattr(attorney, "address2", None)
-    data["CityAtty"] = getattr(attorney, "city", None)
-    data["StateAtty"] = getattr(attorney, "state", None)
-    data["ZipCodeAtty"] = getattr(attorney, "zipcode", None)
+    data["NameAtty"] = attorney.name
+    data["StAddrAtty"] = attorney.address1
+    data["MailAddrAtty"] = attorney.address2
+    data["CityAtty"] = attorney.city
+    data["StateAtty"] = attorney.state
+    data["ZipCodeAtty"] = attorney.zipcode
     ##### petition to expunge section ########
     # This section is signed by the Attorney
     ###########################################
-    data["PetitionNotFiledSignName"] = getattr(attorney, "name", None)
+    data["PetitionNotFiledSignName"] = attorney.name
     data["PetitionerAttorneyCbx"] = Checkbox("Yes")
     data["PetitionNotFiledSignDate"] = dt_obj_to_date(dt.datetime.today()).strftime(
         constants.DATE_FORMAT
@@ -67,14 +67,13 @@ def map_attorney(data, petition, extra={}):
 
 def map_agencies(data, petition, extra={}):
     agencies = extra.get("agencies", {})
-    if agencies:
-        agency1 = list(agencies)[0]
-        data["NameAgency1"] = getattr(agency1, "name", None)
-        data["AddrAgency1"] = getattr(agency1, "address1", None)
-        data["MailAgency1"] = getattr(agency1, "address2", None)
-        data["CityAgency1"] = getattr(agency1, "city", None)
-        data["StateAgency1"] = getattr(agency1, "state", None)
-        data["ZipAgency1"] = getattr(agency1, "zipcode", None)
+    for idx, agency in enumerate(agencies):
+        data[f"NameAgency{idx}"] = agency.name
+        data[f"AddrAgency{idx}"] = agency.address1
+        data[f"MailAgency{idx}"] = agency.address2
+        data[f"CityAgency1{idx}"] = agency.city
+        data[f"StateAgency1{idx}"] = agency.state
+        data[f"ZipAgency1{idx}"] = agency.zipcode
 
 
 def map_offenses(data, petition, extra={}):

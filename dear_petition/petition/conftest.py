@@ -66,5 +66,15 @@ def petition(batch):
 
 
 @pytest.fixture
-def contact():
-    return ContactFactory()
+def contact1():
+    return ContactFactory(name="George")
+
+
+@pytest.fixture
+def contact2():
+    return ContactFactory(name="Colin")
+
+
+@pytest.fixture
+def contact3():
+    return ContactFactory(name="Chris")
