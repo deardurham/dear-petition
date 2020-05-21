@@ -38,13 +38,13 @@ def map_petitioner(data, petition, extra={}):
     )  # load.py line 28 (label is set to name attr)
     data["SSN"] = extra.get("ssn", None)
     data["DLNo"] = extra.get("drivers_license", None)
-    data["DLState"] = extra["drivers_license_state"]
+    data["DLState"] = extra.get("drivers_license_state", None)
     data["Race"] = getattr(record, "race", None)
     data["Sex"] = getattr(record, "sex", None)
     dob = getattr(record, "dob", None)
     if dob:
         data["DOB"] = dob.strftime(constants.DATE_FORMAT)
-    # data["Age"] = record.age
+    # data["Age"] = getattr(record, "age", None)
     data["ConsJdgmntFileNum"] = getattr(record, "file_no", None)
 
 

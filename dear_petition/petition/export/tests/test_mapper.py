@@ -90,72 +90,54 @@ def test_map_petitioner__drivers_license_state(data, petition, extra):
 
 
 #################### map_attorney test ##################
-def test_map_attorney__name(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__name(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["NameAtty"] == extra["attorney"].name
 
 
-def test_map_attorney__street_address(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__street_address(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["StAddrAtty"] == extra["attorney"].address1
 
 
-def test_map_attorney__mail_address(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__mail_address(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["MailAddrAtty"] == extra["attorney"].address2
 
 
-def test_map_attorney__city(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__city(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["CityAtty"] == extra["attorney"].city
 
 
-def test_map_attorney__state(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__state(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["StateAtty"] == extra["attorney"].state
 
 
-def test_map_attorney__zipcode(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__zipcode(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["ZipCodeAtty"] == extra["attorney"].zipcode
 
 
-def test_map_attorney__petition_not_filed_sign_name(petition, contact):
-    data = {}
-    extra = {}
+def test_map_attorney__petition_not_filed_sign_name(data, petition, extra, contact):
     extra["attorney"] = contact
     mapper.map_attorney(data, petition, extra)
     assert data["PetitionNotFiledSignName"] == contact.name
 
 
-def test_map_attorney__petition_attorney_cbx(petition):
-    data = {}
-    extra = {}
+def test_map_attorney__petition_attorney_cbx(data, petition, extra):
     mapper.map_attorney(data, petition, extra)
     assert data["PetitionerAttorneyCbx"] == "Yes"
 
 
-def test_map_attorney__petition_not_filed_sign_date(petition):
-    data = {}
-    extra = {}
+def test_map_attorney__petition_not_filed_sign_date(data, petition, extra):
     mapper.map_attorney(data, petition, extra)
     assert data["PetitionNotFiledSignDate"] == dt_obj_to_date(
         dt.datetime.today()
@@ -165,49 +147,37 @@ def test_map_attorney__petition_not_filed_sign_date(petition):
 ############################## map_agencies test ####################
 
 
-def test_map_agencies__name(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__name(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["NameAgency1"] == contact.name
 
 
-def test_map_agencies__street_address(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__street_address(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["AddrAgency1"] == contact.address1
 
 
-def test_map_agencies__mail_address(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__mail_address(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["MailAgency1"] == contact.address2
 
 
-def test_map_agencies__city(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__city(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["CityAgency1"] == contact.city
 
 
-def test_map_agencies__state(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__state(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["StateAgency1"] == contact.state
 
 
-def test_map_agencies__zipcode(petition, contact):
-    data = {}
-    extra = {}
+def test_map_agencies__zipcode(data, petition, extra, contact):
     extra["agencies"] = [contact]
     mapper.map_agencies(data, petition, extra)
     assert data["ZipAgency1"] == contact.zipcode
