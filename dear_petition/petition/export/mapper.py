@@ -19,13 +19,12 @@ def build_pdf_template_context(petition, extra):
 
 
 def map_petition(data, petition, extra={}):
-    data["County"] = getattr(petition, "county", None)
-    jurisdiction = getattr(petition, "jurisdiction", None)
-    if jurisdiction == constants.DISTRICT_COURT:
+    data["County"] = petition.county
+    if petition.jurisdiction == constants.DISTRICT_COURT:
         data["District"] = Checkbox("Yes")
     else:
         data["District"] = Checkbox("")
-    if jurisdiction == constants.SUPERIOR_COURT:
+    if petition.jurisdiction == constants.SUPERIOR_COURT:
         data["Superior"] = Checkbox("Yes")
     else:
         data["Superior"] = Checkbox("")
