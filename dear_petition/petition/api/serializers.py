@@ -91,7 +91,6 @@ class GeneratePetitionSerializer(serializers.Serializer):
     ssn = serializers.CharField(label="SSN")
     drivers_license = serializers.CharField(label="Driver's License #")
     drivers_license_state = serializers.ChoiceField(choices=us_states.US_STATES)
-    # drivers_license_state = serializers.CharField(label="State of Driver's License")
     attorney = serializers.ChoiceField(
         choices=Contact.objects.filter(category="attorney").values_list("pk", "name")
     )
