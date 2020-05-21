@@ -92,16 +92,19 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     Subclasses simplejwt's TokenObtainPairView to handle tokens in cookies
     """
 
+    cookie_path = '/'
+
+    serializer_class = serializers.TokenObtainPairCookieSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
-        except TokenError as e:
+        except exceptions.TokenError as e:
             raise exceptions.InvalidToken(e.args[0])
 
         response = Response(serializer.validated_data, status=status.HTTP_200_OK)
-
         csrf.get_token(self.request)
 
         response.set_cookie(
@@ -109,9 +112,28 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             serializer.validated_data['access'], # pull access token out of validated_data
             expires=datetime.now() + settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'], # expire access token when refresh token expires
             domain=getattr(settings, 'AUTH_COOKIE_DOMAIN', None), # we can tie the cookie to a specific domain for added security
+            path=self.cookie_path,
             secure=settings.DEBUG == False, # browsers should only send the cookie using HTTPS
             httponly=True, # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE
         )
 
+        # We don't want 'access' or 'refresh' in response body
+        response.data = {
+            "detail": "success",
+            "user": response.data['user']
+        }
+
         return response
+
+    def delete(self, request, *args, **kwargs):
+        response = Response({})
+        response.delete_cookie(
+            settings.AUTH_COOKIE_KEY,
+            domain=getattr(settings, 'AUTH_COOKIE_DOMAIN', None),
+            path=self.cookie_path
+        )
+
+        return response
+    
+
