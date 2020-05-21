@@ -38,7 +38,7 @@ def map_petitioner(data, petition, extra={}):
     )  # load.py line 28 (label is set to name attr)
     data["SSN"] = extra.get("ssn", None)
     data["DLNo"] = extra.get("drivers_license", None)
-    # data["DLState"] = extra["drivers_license_state"]
+    data["DLState"] = extra["drivers_license_state"]
     data["Race"] = getattr(record, "race", None)
     data["Sex"] = getattr(record, "sex", None)
     dob = getattr(record, "dob", None)
@@ -70,12 +70,12 @@ def map_agencies(data, petition, extra={}):
     agencies = extra.get("agencies", {})
     if agencies:
         agency1 = list(agencies)[0]
-    data["NameAgency1"] = getattr(agency1, "name", None)
-    data["AddrAgency1"] = getattr(agency1, "address1", None)
-    data["MailAgency1"] = getattr(agency1, "address2", None)
-    data["CityAgency1"] = getattr(agency1, "city", None)
-    data["StateAgency1"] = getattr(agency1, "state", None)
-    data["ZipAgency1"] = getattr(agency1, "zipcode", None)
+        data["NameAgency1"] = getattr(agency1, "name", None)
+        data["AddrAgency1"] = getattr(agency1, "address1", None)
+        data["MailAgency1"] = getattr(agency1, "address2", None)
+        data["CityAgency1"] = getattr(agency1, "city", None)
+        data["StateAgency1"] = getattr(agency1, "state", None)
+        data["ZipAgency1"] = getattr(agency1, "zipcode", None)
 
 
 def map_offenses(data, petition, extra={}):
