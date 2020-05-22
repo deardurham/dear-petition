@@ -169,7 +169,6 @@ def test_refresh_record_from_data():
     # Prior to calling refresh_record_from_data(), the following fields do not
     # have the values from the ciprs_record's data attribute.
     assert ciprs_record.file_no != ciprs_record.data["General"].get("File No", "")
-    assert ciprs_record.county != ciprs_record.data["General"].get("County", "")
     assert ciprs_record.dob != ciprs_record.data["Defendant"].get(
         "Date of Birth/Estimated Age", None
     )
