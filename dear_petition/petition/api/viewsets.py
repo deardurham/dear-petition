@@ -134,6 +134,8 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             path=self.cookie_path
         )
 
+        response.data = {"detail": "success"}
+
         return response
     
 

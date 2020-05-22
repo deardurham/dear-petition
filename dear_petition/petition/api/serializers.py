@@ -112,8 +112,8 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
 class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):
     """
-    Subclass TokenObtainPairSerializer from simplejwt so that we return the user,
-    not the tokens in the response body.
+    Subclass TokenObtainPairSerializer from simplejwt so that we can add the requesting user
+    to response body
     """
 
     def validate(self, attrs):
