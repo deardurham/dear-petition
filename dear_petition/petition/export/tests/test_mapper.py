@@ -74,7 +74,7 @@ def test_map_petitioner__file_no(data, petition, record1):
 def test_map_petitioner__ssn(data, petition, extra):
     extra["ssn"] = "000-000-0000"
     mapper.map_petitioner(data, petition, extra)
-    assert data["SSN"] == extra["ssn"]
+    assert data["SNN"] == extra["ssn"]
 
 
 def test_map_petitioner__drivers_license(data, petition, extra):
