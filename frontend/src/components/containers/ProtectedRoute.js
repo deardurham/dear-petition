@@ -3,14 +3,18 @@ import { Route } from 'react-router';
 
 // Children
 import LoginPage from '../pages/LoginPage/LoginPage';
-
+import { USER } from '../../constants/authConstants';
 
 function ProtectedRoute({ children, ...props }) {
-    // TODO: When implementing auth, set this to some localStorage doo.
-    const authorized = localStorage.getItem('AUTHORIZED') === 'true';
+  const user = localStorage.getItem(USER);
 
-    if (!authorized) return <Route {...props}><LoginPage redirect /></Route>
-    return <Route {...props}>{children}</Route>
+  if (!user)
+    return (
+      <Route {...props}>
+        <LoginPage redirect />
+      </Route>
+    );
+  return <Route {...props}>{children}</Route>;
 }
 
 export default ProtectedRoute;

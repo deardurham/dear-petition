@@ -16,5 +16,6 @@ export const colorBackground = colorWhite;
 
 export const colorFontPrimary = colorBlack;
 
+export const colorSuccess = colorBlue;
 export const colorCaution = colorRed;
 export const colorWarning = colorYellow;

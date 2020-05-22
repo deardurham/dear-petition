@@ -1,20 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { InputStyled, ActualInputStyled } from './Input.styled';
+import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
+import { AnimatePresence } from 'framer-motion';
 
-function Input({ value, onChange, label }) {
-    return (
-        <InputStyled>
-            {label}
-            <ActualInputStyled value={value} onChange={onChange} />
-        </InputStyled>
-    );
+function Input({ value, onChange, label, type, errors, ...props }) {
+  return (
+    <InputWrapper {...props}>
+      <InputStyled>
+        {label}
+        <ActualInputStyled type={type} value={value} onChange={onChange} />
+      </InputStyled>
+      <AnimatePresence>
+        <InputErrors
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: '-50' }}
+          positionTransition
+        >
+          {errors && errors.map(errMsg => <p key={errMsg}>{errMsg}</p>)}
+        </InputErrors>
+      </AnimatePresence>
+    </InputWrapper>
+  );
 }
 
 Input.propTypes = {
-    value: PropTypes.any.isRequired,
-    onChange: PropTypes.func.isRequired,
-    label: PropTypes.string
+  value: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  label: PropTypes.string
 };
 
 Input.defaultProps = {};

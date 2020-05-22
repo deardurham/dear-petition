@@ -13,6 +13,7 @@ import {
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
 import { useHistory } from 'react-router-dom';
+import Axios from '../../../service/axios';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
@@ -69,11 +70,10 @@ function HomePage(props) {
     setShowModal(true);
     // TODO: send all the files to API
     let timeout = setTimeout(() => {
-      console.log('Pretend response!')
+      console.log('Pretend response!');
       setShowModal(false);
-      history.push(`/generate/${100}`)
-    }, 1000)
-
+      history.push(`/generate/${100}`);
+    }, 1000);
   };
 
   return (
