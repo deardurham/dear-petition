@@ -67,7 +67,7 @@ def map_attorney(data, petition, extra={}):
 
 def map_agencies(data, petition, extra={}):
     agencies = extra.get("agencies", {})
-    for idx, agency in enumerate(agencies):
+    for idx, agency in enumerate(agencies, 1):
         data[f"NameAgency{idx}"] = agency.name
         data[f"AddrAgency{idx}"] = agency.address1
         data[f"MailAgency{idx}"] = agency.address2
