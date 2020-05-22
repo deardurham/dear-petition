@@ -35,7 +35,8 @@ def map_petitioner(data, petition, extra={}):
     data["NamePetitioner"] = getattr(
         record, "label", None
     )  # load.py line 28 (label is set to name attr)
-    data["SSN"] = extra.get("ssn", None)
+    # note: SNN and not SSN due to bug in PDF field name
+    data["SNN"] = extra.get("ssn", None)
     data["DLNo"] = extra.get("drivers_license", None)
     data["DLState"] = extra.get("drivers_license_state", None)
     data["Race"] = getattr(record, "race", None)
