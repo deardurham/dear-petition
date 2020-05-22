@@ -22,7 +22,7 @@ def use_states_choices(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("petition", "0025_auto_20200521_1624"),
+        ("petition", "0026_auto_20200521_1624"),
     ]
 
     operations = [
