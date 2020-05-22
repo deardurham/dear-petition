@@ -8,6 +8,7 @@ from dear_petition.petition.models import (
     Petition,
 )
 from rest_framework import serializers
+from localflavor.us import us_states
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -89,6 +90,7 @@ class GeneratePetitionSerializer(serializers.Serializer):
     )
     ssn = serializers.CharField(label="SSN")
     drivers_license = serializers.CharField(label="Driver's License #")
+    drivers_license_state = serializers.ChoiceField(choices=us_states.US_STATES)
     attorney = serializers.ChoiceField(
         choices=Contact.objects.filter(category="attorney").values_list("pk", "name")
     )

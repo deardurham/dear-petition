@@ -7,6 +7,7 @@ from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     PetitionFactory,
+    ContactFactory,
     OffenseFactory,
     OffenseRecordFactory,
 )
@@ -15,6 +16,11 @@ from dear_petition.petition.types import dismissed
 
 @pytest.fixture
 def data():
+    return {}
+
+
+@pytest.fixture
+def extra():
     return {}
 
 
@@ -60,6 +66,21 @@ def fake_pdf2():
 @pytest.fixture
 def petition(batch):
     return PetitionFactory(batch=batch)
+
+
+@pytest.fixture
+def contact1():
+    return ContactFactory(name="George")
+
+
+@pytest.fixture
+def contact2():
+    return ContactFactory(name="Colin")
+
+
+@pytest.fixture
+def contact3():
+    return ContactFactory(name="Chris")
 
 
 @pytest.fixture

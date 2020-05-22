@@ -12,6 +12,7 @@ from django.db import models
 from django.urls import reverse
 
 import ciprs_reader
+from localflavor.us import us_states
 from dear_petition.users.models import User
 from . import constants as pc
 
@@ -239,7 +240,7 @@ class Contact(models.Model):
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
     city = models.CharField(max_length=64, blank=True)
-    state = models.CharField(max_length=64, blank=True)
+    state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
 
     def __str__(self):

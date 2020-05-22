@@ -40,3 +40,5 @@ FORM_TYPES = (
     (NOT_GUILTY, "Not Guilty"),
     (MISDEMEANOR, "Nonviolent Felony or Misdemeanor"),
 )
+
+NORTH_CAROLINA = "NC"

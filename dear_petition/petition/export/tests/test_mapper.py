@@ -1,8 +1,9 @@
 import pytest
+import datetime as dt
 
 from dear_petition.petition import constants
 from dear_petition.petition.export import mapper
-from dear_petition.petition.utils import make_datetime_aware
+from dear_petition.petition.utils import make_datetime_aware, dt_obj_to_date
 
 from dear_petition.petition.tests.factories import (
     BatchFactory,
@@ -12,7 +13,7 @@ from dear_petition.petition.tests.factories import (
 
 pytestmark = pytest.mark.django_db
 
-# map_petition test
+###################### map_petition test #########################
 @pytest.mark.parametrize("county", ["DURHAM", "WAKE"])
 def test_map_petition__county(data, petition, county):
     petition.county = county
@@ -34,6 +35,7 @@ def test_map_petition__district(data, petition):
     assert data["Superior"] == ""
 
 
+###################### map_petitioner tests #######################
 # map_petitioner tests
 def test_map_petitioner__name(data, petition, record1):
     mapper.map_petitioner(data, petition)
@@ -67,3 +69,157 @@ def test_map_petitioner__dob(data, petition, record1):
 def test_map_petitioner__file_no(data, petition, record1):
     mapper.map_petitioner(data, petition)
     assert data["ConsJdgmntFileNum"] == record1.file_no
+
+
+def test_map_petitioner__ssn(data, petition, extra):
+    extra["ssn"] = "000-000-0000"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["SNN"] == extra["ssn"]
+
+
+def test_map_petitioner__drivers_license(data, petition, extra):
+    extra["drivers_license"] = "3429043204D"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["DLNo"] == extra["drivers_license"]
+
+
+def test_map_petitioner__drivers_license_state(data, petition, extra):
+    extra["drivers_license_state"] = constants.NORTH_CAROLINA
+    mapper.map_petitioner(data, petition, extra)
+    assert data["DLState"] == extra["drivers_license_state"]
+
+
+#################### map_attorney test ##################
+def test_map_attorney__name(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["NameAtty"] == extra["attorney"].name
+
+
+def test_map_attorney__street_address(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["StAddrAtty"] == extra["attorney"].address1
+
+
+def test_map_attorney__mail_address(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["MailAddrAtty"] == extra["attorney"].address2
+
+
+def test_map_attorney__city(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["CityAtty"] == extra["attorney"].city
+
+
+def test_map_attorney__state(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["StateAtty"] == extra["attorney"].state
+
+
+def test_map_attorney__zipcode(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["ZipCodeAtty"] == extra["attorney"].zipcode
+
+
+def test_map_attorney__petition_not_filed_sign_name(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionNotFiledSignName"] == contact1.name
+
+
+def test_map_attorney__petition_attorney_cbx(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionerAttorneyCbx"] == "Yes"
+
+
+def test_map_attorney__petition_not_filed_sign_date(data, petition, extra, contact1):
+    extra["attorney"] = contact1
+    mapper.map_attorney(data, petition, extra)
+    assert data["PetitionNotFiledSignDate"] == dt_obj_to_date(
+        dt.datetime.today()
+    ).strftime(constants.DATE_FORMAT)
+
+
+############################## map_agencies test ####################
+
+
+def test_map_agencies__name(data, petition, extra, contact1, contact2, contact3):
+    extra["agencies"] = [contact1, contact2, contact3]
+    names = [contact.name for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_names = []
+    for key, value in data.items():
+        if "NameAgency" in key:
+            data_names.append(value)
+    for n in data_names:
+        assert n in names
+
+
+def test_map_agencies__street_address(
+    data, petition, extra, contact1, contact2, contact3
+):
+    extra["agencies"] = [contact1, contact2, contact3]
+    addresses = [contact.address1 for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_addresses = []
+    for key, value in data.items():
+        if "AddrAgency" in key:
+            data_addresses.append(value)
+    for a in data_addresses:
+        assert a in addresses
+
+
+def test_map_agencies__mail_address(
+    data, petition, extra, contact1, contact2, contact3
+):
+    extra["agencies"] = [contact1, contact2, contact3]
+    addresses = [contact.address2 for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_mail_addresses = []
+    for key, value in data.items():
+        if "MailAgency" in key:
+            data_mail_addresses.append(value)
+    for m in data_mail_addresses:
+        assert m in addresses
+
+
+def test_map_agencies__city(data, petition, extra, contact1, contact2, contact3):
+    extra["agencies"] = [contact1, contact2, contact3]
+    cities = [contact.city for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_cities = []
+    for key, value in data.items():
+        if "CityAgency" in key:
+            data_cities.append(value)
+    for c in data_cities:
+        assert c in cities
+
+
+def test_map_agencies__state(data, petition, extra, contact1, contact2, contact3):
+    extra["agencies"] = [contact1, contact2, contact3]
+    states = [contact.state for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_states = []
+    for key, value in data.items():
+        if "StateAgency" in key:
+            data_states.append(value)
+    for s in data_states:
+        assert s in states
+
+
+def test_map_agencies__zipcode(data, petition, extra, contact1, contact2, contact3):
+    extra["agencies"] = [contact1, contact2, contact3]
+    zipcodes = [contact.zipcode for contact in extra["agencies"]]
+    mapper.map_agencies(data, petition, extra)
+    data_zipcodes = []
+    for key, value in data.items():
+        if "ZipAgency" in key:
+            data_zipcodes.append(value)
+    for z in data_zipcodes:
+        assert z in zipcodes
