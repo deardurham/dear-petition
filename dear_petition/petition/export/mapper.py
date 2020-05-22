@@ -52,7 +52,8 @@ def map_agencies(data, petition, extra={}):
 
 
 def map_offenses(data, petition, extra={}):
-    pass
+    offense_records = petition.get_offense_records()
+    print(offense_records)
 
 
 def map_data(form_data, batch):

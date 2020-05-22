@@ -7,7 +7,10 @@ from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     PetitionFactory,
+    OffenseFactory,
+    OffenseRecordFactory,
 )
+from dear_petition.petition.types import dismissed
 
 
 @pytest.fixture
@@ -57,3 +60,20 @@ def fake_pdf2():
 @pytest.fixture
 def petition(batch):
     return PetitionFactory(batch=batch)
+
+
+@pytest.fixture
+def dismissed_offense(record1):
+    return OffenseFactory(
+        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=record1
+    )
+
+
+@pytest.fixture
+def non_dismissed_offense(record1):
+    return OffenseFactory(disposition_method="OTHER", ciprs_record=record1)
+
+
+@pytest.fixture
+def charged_dismissed_record(dismissed_offense):
+    return OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
