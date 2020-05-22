@@ -8,7 +8,10 @@ from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     PetitionFactory,
     ContactFactory,
+    OffenseFactory,
+    OffenseRecordFactory,
 )
+from dear_petition.petition.types import dismissed
 
 
 @pytest.fixture
@@ -78,3 +81,19 @@ def contact2():
 @pytest.fixture
 def contact3():
     return ContactFactory(name="Chris")
+
+
+def dismissed_offense(record1):
+    return OffenseFactory(
+        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=record1
+    )
+
+
+@pytest.fixture
+def non_dismissed_offense(record1):
+    return OffenseFactory(disposition_method="OTHER", ciprs_record=record1)
+
+
+@pytest.fixture
+def charged_dismissed_record(dismissed_offense):
+    return OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
