@@ -229,3 +229,34 @@ def test_map_agencies__zipcode(data, petition, extra, contact1, contact2, contac
 def test_map_offenses__fileno(data, petition, record2, offense1, offense_record1):
     mapper.map_offenses(data, petition)
     assert data["Fileno:1"] == record2.file_no
+
+
+def test_map_offenses__arrest_date(data, petition, record2, offense1, offense_record1):
+    mapper.map_offenses(data, petition)
+    assert data["ArrestDate:1"] == record2.arrest_date.strftime(constants.DATE_FORMAT)
+
+
+def test_map_offenses__description(data, petition, record2, offense1, offense_record1):
+    mapper.map_offenses(data, petition)
+    assert data["Description:1"] == offense_record1.description
+
+
+def test_map_offenses__offense_date(data, petition, record2, offense1, offense_record1):
+    mapper.map_offenses(data, petition)
+    assert data["DOOF:1"] == record2.offense_date.strftime(constants.DATE_FORMAT)
+
+
+def test_map_offenses__disposition_method(
+    data, petition, record2, offense1, offense_record1
+):
+    mapper.map_offenses(data, petition)
+    assert data["Disposition:1"] == offense1.disposition_method
+
+
+def test_map_offenses__disposition_date(
+    data, petition, record2, offense1, offense_record1
+):
+    mapper.map_offenses(data, petition)
+    assert data["DispositionDate:1"] == offense1.disposed_on.strftime(
+        constants.DATE_FORMAT
+    )
