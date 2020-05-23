@@ -12,7 +12,13 @@ from dear_petition.petition.models import (
 )
 from dear_petition.users.tests.factories import UserFactory
 
-from ..constants import CHARGED, DISMISSED, DISTRICT_COURT, SUPERIOR_COURT
+from ..constants import (
+    CHARGED,
+    DISMISSED,
+    DISTRICT_COURT,
+    SUPERIOR_COURT,
+    DURHAM_COUNTY,
+)
 
 
 class BatchFactory(factory.DjangoModelFactory):
@@ -104,7 +110,7 @@ class OffenseRecordFactory(factory.DjangoModelFactory):
 
 class PetitionFactory(factory.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
-    county = "DURHAM"
+    county = DURHAM_COUNTY
     form_type = DISMISSED
     jurisdiction = DISTRICT_COURT
 

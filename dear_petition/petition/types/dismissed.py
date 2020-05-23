@@ -1,17 +1,7 @@
 from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
-
-
-DISPOSITION_METHODS = (
-    "Dismissal without Leave by DA",
-    "Dismissed by Court",
-    "Deferred Prosecution Dismissal",
-    "Discharge and Dismissal",
-    "Conditional Discharge",
-    "No Probable Cause",
-    "Never To Be Served",
-)
+from dear_petition.petition.constants import DISPOSITION_METHODS
 
 
 def get_offense_records(batch, jurisdiction=""):

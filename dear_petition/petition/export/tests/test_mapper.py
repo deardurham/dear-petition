@@ -223,3 +223,9 @@ def test_map_agencies__zipcode(data, petition, extra, contact1, contact2, contac
             data_zipcodes.append(value)
     for z in data_zipcodes:
         assert z in zipcodes
+
+
+############################ map_offenses ################################
+def test_map_offenses__fileno(data, petition, record2, offense1, offense_record1):
+    mapper.map_offenses(data, petition)
+    assert data["Fileno:1"] == record2.file_no
