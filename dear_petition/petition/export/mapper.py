@@ -78,6 +78,32 @@ def map_agencies(data, petition, extra={}):
 
 
 def map_offenses(data, petition, extra={}):
-    pass
     offense_records = petition.get_offense_records()
-    print(offense_records)
+    for idx, offense_record in enumerate(offense_records, 1):
+        # The index of the offense determines what line on the petition form
+        # the offense will be on
+        formatted_arrest_date = (
+            offense_record.offense.ciprs_record.arrest_date.strftime(
+                constants.DATE_FORMAT
+            )
+            if offense_record.offense.ciprs_record.arrest_date
+            else ""
+        )
+        formatted_offense_date = (
+            offense_record.offense.ciprs_record.offense_date.strftime(
+                constants.DATE_FORMAT
+            )
+            if offense_record.offense.ciprs_record.offense_date
+            else ""
+        )
+        formatted_disposed_on = (
+            offense_record.offense.disposed_on.strftime(constants.DATE_FORMAT)
+            if offense_record.offense.disposed_on
+            else ""
+        )
+        data["Fileno:" + str(idx)] = offense_record.offense.ciprs_record.file_no
+        data["ArrestDate:" + str(idx)] = formatted_arrest_date
+        data["Description:" + str(idx)] = offense_record.description
+        data["DOOF:" + str(idx)] = formatted_offense_date
+        data["Disposition:" + str(idx)] = offense_record.offense.disposition_method
+        data["DispositionDate:" + str(idx)] = formatted_disposed_on
