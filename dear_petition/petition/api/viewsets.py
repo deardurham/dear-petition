@@ -44,13 +44,21 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 
 class BatchViewSet(viewsets.ModelViewSet):
-
     queryset = petition.Batch.objects.prefetch_related(
         "petitions", "records__offenses__offense_records"
     )
     serializer_class = serializers.BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_queryset(self):
+        """ Filter queryset so that user's only have read access on objects they have created
+        """
+        if self.request.user.is_superuser:
+            return self.queryset
+        return petition.Batch.objects.filter(user=self.request.user).prefetch_related(
+            "petitions", "records__offenses__offense_records"
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
