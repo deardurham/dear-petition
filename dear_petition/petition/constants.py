@@ -46,7 +46,7 @@ DURHAM_COUNTY = "DURHAM"
 
 DISTRICT_COURT_WITHOUT_DA_LEAVE = "Dismissal without Leave by DA"
 
-DISPOSITION_METHODS = (
+DISMISSED_DISPOSITION_METHODS = (
     DISTRICT_COURT_WITHOUT_DA_LEAVE,
     "Dismissed by Court",
     "Deferred Prosecution Dismissal",

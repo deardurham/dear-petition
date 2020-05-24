@@ -105,7 +105,8 @@ def contact3():
 @pytest.fixture
 def dismissed_offense(record1):
     return OffenseFactory(
-        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=record1
+        disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+        ciprs_record=record1,
     )
 
 
