@@ -269,40 +269,6 @@ class Batch(models.Model):
             for offense in o_records:
                 yield (record, offense)
 
-    def get_petition_offenses(self):
-        # Only Charged Offenses should be shown on the generated petition
-        charged_offenses = [
-            (record, offense)
-            for (record, offense) in self.offenses
-            if offense.action == CHARGED
-        ]
-        petition_offenses = {}
-        for i, (record, offense) in enumerate(charged_offenses, 1):
-            # The index of the offense determines what line on the petition form
-            # the offense will be on
-            formatted_arrest_date = (
-                record.arrest_date.strftime(DATE_FORMAT) if record.arrest_date else ""
-            )
-            formatted_offense_date = (
-                record.offense_date.strftime(DATE_FORMAT) if record.offense_date else ""
-            )
-            formatted_disposed_on = (
-                record.offenses.first().disposed_on.strftime(DATE_FORMAT)
-                if record.offenses.first().disposed_on
-                else ""
-            )
-            data = {}
-            data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": formatted_arrest_date}
-            data["Description:" + str(i)] = {"V": offense.description}
-            data["DOOF:" + str(i)] = {"V": formatted_offense_date}
-            data["Disposition:" + str(i)] = {
-                "V": record.offenses.first().disposition_method
-            }
-            data["DispositionDate:" + str(i)] = {"V": formatted_disposed_on}
-            petition_offenses.update(data)
-        return petition_offenses
-
     @property
     def most_recent_record(self):
         most_recent_record = None

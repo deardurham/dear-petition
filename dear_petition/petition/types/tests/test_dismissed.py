@@ -1,7 +1,7 @@
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.petition.types import dismissed, identify_distinct_petitions
+from dear_petition.petition.types import identify_distinct_petitions
 from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     OffenseFactory,
@@ -12,7 +12,7 @@ from dear_petition.petition.tests.factories import (
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize("method", dismissed.DISPOSITION_METHODS)
+@pytest.mark.parametrize("method", constants.DISMISSED_DISPOSITION_METHODS)
 def test_charged_disposition_methods(batch, record1, method):
     """CHARGED offense records should be included for all dismissed disposition methods."""
     offense = OffenseFactory(disposition_method=method, ciprs_record=record1)
@@ -41,7 +41,8 @@ def test_offense_records_by_jurisdiction(batch, jurisdiction):
     """Offense records helper function should allow filtering by jurisdiction."""
     ciprs_record = CIPRSRecordFactory(jurisdiction=jurisdiction, batch=batch)
     offense = OffenseFactory(
-        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=ciprs_record
+        disposition_method=constants.DISMISSED_DISPOSITION_METHODS[0],
+        ciprs_record=ciprs_record,
     )
     offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
     records = batch.dismissed_offense_records(jurisdiction=jurisdiction)
@@ -61,7 +62,7 @@ def test_distinct_petition(batch, dismissed_offense):
 
 def test_distinct_petition__many(batch):
     """Indentified petitions should include unique pairing of jurisdiction and county."""
-    method = dismissed.DISPOSITION_METHODS[0]
+    method = constants.DISMISSED_DISPOSITION_METHODS[0]
     for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
         for county in ["DURHAM", "WAKE"]:
             record = CIPRSRecordFactory(

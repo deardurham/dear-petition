@@ -12,6 +12,7 @@ from dear_petition.petition.tests.factories import (
     OffenseRecordFactory,
 )
 from dear_petition.petition.types import dismissed
+from dear_petition.petition import constants
 
 
 @pytest.fixture
@@ -36,7 +37,25 @@ def record1(batch):
 
 @pytest.fixture
 def record2(batch):
-    yield CIPRSRecordFactory(batch=batch, label=batch.label)
+    yield CIPRSRecordFactory(
+        batch=batch,
+        label=batch.label,
+        jurisdiction=constants.DISTRICT_COURT,
+        county=constants.DURHAM_COUNTY,
+    )
+
+
+@pytest.fixture
+def offense1(record2):
+    yield OffenseFactory(
+        ciprs_record=record2,
+        disposition_method=constants.DISTRICT_COURT_WITHOUT_DA_LEAVE,
+    )
+
+
+@pytest.fixture
+def offense_record1(offense1):
+    yield OffenseRecordFactory(offense=offense1)
 
 
 def fake_file(filename, content_type):
@@ -86,7 +105,8 @@ def contact3():
 @pytest.fixture
 def dismissed_offense(record1):
     return OffenseFactory(
-        disposition_method=dismissed.DISPOSITION_METHODS[0], ciprs_record=record1
+        disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+        ciprs_record=record1,
     )
 
 
