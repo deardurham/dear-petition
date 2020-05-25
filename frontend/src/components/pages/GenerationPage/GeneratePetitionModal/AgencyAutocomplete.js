@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Autosuggest from 'react-autosuggest';
 
 // Components
-import { AgencyAutocompleteStyled, BadgesListStyled } from './AgencyAutocomplete.styled';
+import { AgencyAutocompleteStyled, BadgesListStyled, AgencyAutoSuggestInputStyled, SuggestionStyled } from './AgencyAutocomplete.styled';
 import { Badge, AutoCompleteBadge } from '../../../elements/Badge/Badge';
 import AutoSuggestInput from '../../../elements/AutoSuggest/AutoSuggestInput';
 import AutoSuggestionContainer from '../../../elements/AutoSuggest/AutoSuggestionContainer';
@@ -16,6 +16,14 @@ const renderSuggestion = (suggestion, { isHighlighted }) => {
         <SuggestionStyled>
             <AutoCompleteBadge {...suggestion} isHighlighted={isHighlighted} />
         </SuggestionStyled>
+    );
+};
+
+const AgencyAutoSuggestInput = inputProps => {
+    return (
+        <AgencyAutoSuggestInputStyled>
+            <AutoSuggestInput label="Agencies" {...inputProps} />
+        </AgencyAutoSuggestInputStyled>
     );
 };
 
@@ -148,7 +156,6 @@ const AgencyAutocomplete = ({ ...props }) => {
 
     return (
         <AgencyAutocompleteStyled {...props} data-cy="agency_autocomplete">
-            <h3>Agencies</h3>
             <Autosuggest
                 suggestions={suggestions}
                 onSuggestionsFetchRequested={handleSuggestionsFetchRequested}
@@ -158,7 +165,7 @@ const AgencyAutocomplete = ({ ...props }) => {
                 inputProps={inputProps}
                 onSuggestionSelected={handleSuggestionSelected}
                 highlightFirstSuggestion
-                renderInputComponent={AutoSuggestInput}
+                renderInputComponent={AgencyAutoSuggestInput}
                 renderSuggestionsContainer={AutoSuggestionContainer}
             />
             <BadgesListStyled data-cy="label_list">
@@ -174,7 +181,5 @@ const AgencyAutocomplete = ({ ...props }) => {
         </AgencyAutocompleteStyled>
     );
 };
-
-const SuggestionStyled = styled.div``;
 
 export default AgencyAutocomplete;

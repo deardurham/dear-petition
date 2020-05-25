@@ -1,22 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorGrey } from '../../../styles/colors'
+import Input from '../Input/Input';
 
 const AutoSuggestInput = inputProps => {
     return (
-        <AutoSuggestInputStyled>
-            <InputStyled {...inputProps} />
-        </AutoSuggestInputStyled>
+        <InputStyled {...inputProps} />
     );
 };
 
-const AutoSuggestInputStyled = styled.div`
-`;
-
-const InputStyled = styled.input`
-  width: 100%;
-  border: 2px solid ${colorGrey};
-  padding: 1rem 2rem;
-`;
+const InputStyled = styled(Input)``;
 
 export default AutoSuggestInput;

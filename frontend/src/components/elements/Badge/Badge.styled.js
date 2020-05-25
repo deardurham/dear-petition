@@ -1,9 +1,9 @@
 import styled from 'styled-components';
-import { colorGreen, colorGrey, colorGreyLight, colorBlack, colorYellow } from '../../../styles/colors';
+import { colorGreen, colorGrey, colorGreyLight, colorBlack, colorYellow, colorPrimary } from '../../../styles/colors';
 
 const getBadgeColor = props => {
-    let baseColor = colorGreen;
-    return props.isHighlighted ? colorGrey : baseColor;
+  let baseColor = colorGreyLight;
+  return props.isHighlighted ? colorGrey : baseColor;
 };
 
 const AutoCompleteBadgeStyled = styled.div`
@@ -14,6 +14,7 @@ const AutoCompleteBadgeStyled = styled.div`
 
   margin: 0 2px 2px 0;
   border-radius: 1px;
+  cursor: pointer;
 
   p:first-of-type {
     white-space: nowrap;
@@ -22,7 +23,7 @@ const AutoCompleteBadgeStyled = styled.div`
     padding: 0 1.5rem;
 
     color: ${colorBlack};
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
 
@@ -39,22 +40,24 @@ const BadgeStyled = styled.div`
 
   margin: 0 2px 2px 0;
   border-radius: 1px;
+  padding: 10px 0px;
 
   p:first-of-type {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 0 1.5rem;
+    margin: 0;
 
     color: ${colorBlack};
-    font-size: 1rem;
+    font-size: 1.5rem;
   }
 
-  background-color: ${colorYellow};
+  background-color: ${colorGreyLight};
 `;
 
 const IconStyled = styled.p`
-  color: ${colorGrey};
+  color: ${colorBlack};
   font-size: 1rem;
   margin-left: 1rem;
   align-self: center;

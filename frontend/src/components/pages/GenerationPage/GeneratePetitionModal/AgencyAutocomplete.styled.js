@@ -14,4 +14,13 @@ const BadgesListStyled = styled.div`
   margin: 1rem 0;
 `;
 
-export { AgencyAutocompleteStyled, BadgesListStyled };
+const AgencyAutoSuggestInputStyled = styled.div`
+  display: flex;
+  width: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const SuggestionStyled = styled.div``;
+
+export { AgencyAutocompleteStyled, AgencyAutoSuggestInputStyled, BadgesListStyled, SuggestionStyled };
