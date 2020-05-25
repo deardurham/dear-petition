@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { GenerationInputsStyled, } from './GenerationInputs.styled';
 import Input from '../../elements/Input/Input';
 import Select from '../../elements/Input/Select';
