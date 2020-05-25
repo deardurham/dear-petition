@@ -27,6 +27,7 @@ function GenerationPage(props) {
   const [ssn, setSSN] = useState('');
   const [license, setLicense] = useState('');
   const [attorney, setAttorney] = useState('');
+  const [selectedAgencies, setSelectedAgencies] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -47,6 +48,8 @@ function GenerationPage(props) {
     setLicense,
     attorney,
     setAttorney,
+    selectedAgencies,
+    setSelectedAgencies,
   }
 
   return (

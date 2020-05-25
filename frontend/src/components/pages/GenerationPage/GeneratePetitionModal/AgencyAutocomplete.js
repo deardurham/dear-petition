@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 
 // Deps
@@ -9,6 +9,7 @@ import { AgencyAutocompleteStyled, BadgesListStyled } from './AgencyAutocomplete
 import { Badge, AutoCompleteBadge } from '../../../elements/Badge/Badge';
 import AutoSuggestInput from '../../../elements/AutoSuggest/AutoSuggestInput';
 import AutoSuggestionContainer from '../../../elements/AutoSuggest/AutoSuggestionContainer';
+import { GenerationContext } from '../GenerationPage';
 
 const renderSuggestion = (suggestion, { isHighlighted }) => {
     return (
@@ -21,7 +22,7 @@ const renderSuggestion = (suggestion, { isHighlighted }) => {
 const AgencyAutocomplete = ({ ...props }) => {
     const [suggestions, setSuggestions] = useState([]);
     const [suggestionValue, setSuggestionValue] = useState('');
-    const [selectedAgencies, setSelectedAgncies] = useState([]);
+    const { selectedAgencies, setSelectedAgencies } = useContext(GenerationContext)
 
     const searchAgencies = [
         {
@@ -124,8 +125,7 @@ const AgencyAutocomplete = ({ ...props }) => {
     const addAgency = thisAgency => {
         console.log(thisAgency);
         setSuggestionValue('');
-        setSelectedAgncies([...selectedAgencies, thisAgency]);
-
+        setSelectedAgencies([...selectedAgencies, thisAgency]);
     };
 
     const removeAgency = thisAgency => {
@@ -137,7 +137,7 @@ const AgencyAutocomplete = ({ ...props }) => {
         } else {
             theseAgencies.pop();
         }
-        setSelectedAgncies(theseAgencies);
+        setSelectedAgencies(theseAgencies);
     };
 
     const inputProps = {

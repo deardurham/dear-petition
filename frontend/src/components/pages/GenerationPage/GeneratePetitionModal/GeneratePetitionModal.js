@@ -4,11 +4,16 @@ import { ModalStyled, ModalContent } from '../../HomePage/HomePage.styled'
 import { GenerationContext } from '../GenerationPage';
 import useKeyPress from '../../../../hooks/useKeyPress';
 import AgencyAutocomplete from './AgencyAutocomplete';
+import Button from '../../../elements/Button/Button';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
-    const { petition } = useContext(GenerationContext);
+    const { petition, selectedAgencies } = useContext(GenerationContext);
 
     useKeyPress('Escape', closeModal);
+
+    const handleGenerate = () => {
+        console.log(selectedAgencies);
+    }
 
     return (
         <GeneratePetitionModalStyled isVisible={isVisible}>
@@ -21,6 +26,7 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
                             <li>County: {petition.county} County</li>
                         </ul>
                         <AgencyAutocomplete />
+                        <Button onClick={handleGenerate}>Generate</Button>
                         <div onClick={closeModal}>Close</div>
                     </>
                 ) : ''}
