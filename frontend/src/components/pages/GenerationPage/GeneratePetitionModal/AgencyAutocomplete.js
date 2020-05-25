@@ -137,6 +137,7 @@ const AgencyAutocomplete = ({ ...props }) => {
         } else {
             theseAgencies.pop();
         }
+        setSelectedAgncies(theseAgencies);
     };
 
     const inputProps = {
@@ -146,7 +147,7 @@ const AgencyAutocomplete = ({ ...props }) => {
     };
 
     return (
-        <AgencyAutocompleteStyled {...props} data-cy="label_filter">
+        <AgencyAutocompleteStyled {...props} data-cy="agency_autocomplete">
             <h3>Agencies</h3>
             <Autosuggest
                 suggestions={suggestions}

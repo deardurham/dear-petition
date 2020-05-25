@@ -4,9 +4,9 @@ import { colorWhite, colorBlack } from '../../../styles/colors'
 import { keyAndAmbientShadows } from '../../../styles/shadows'
 
 const AutoSuggestionContainer = ({ containerProps, children }) => {
-    return (
-        <AutoSuggestionContainerStyled {...containerProps}>{children}</AutoSuggestionContainerStyled>
-    );
+  return (
+    <AutoSuggestionContainerStyled {...containerProps}>{children}</AutoSuggestionContainerStyled>
+  );
 };
 
 const AutoSuggestionContainerStyled = styled.div`
