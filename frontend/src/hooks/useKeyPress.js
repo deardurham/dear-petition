@@ -11,7 +11,7 @@ const useKeyPress = (key, action) => {
         }
         window.addEventListener('keyup', handleKeyPress);
         return () => window.removeEventListener('keyup', handleKeyPress);
-    }, []);
+    }, [action]);
 };
 
 export default useKeyPress;

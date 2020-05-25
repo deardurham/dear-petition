@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { PetitionListItemStyled, PetitionCellStyled } from './PetitionListItem.styled';
 import { GenerationContext } from './GenerationPage';
-import GeneratePetitionModal from './GeneratePetitionModal'
+import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal'
 
 function PetitionListItem({ petition }) {
     const [showModal, setShowModal] = useState(false);

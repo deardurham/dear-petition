@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { ModalStyled, ModalContent } from '../HomePage/HomePage.styled'
-import { GenerationContext } from './GenerationPage';
-import useKeyPress from '../../../hooks/useKeyPress';
+import { ModalStyled, ModalContent } from '../../HomePage/HomePage.styled'
+import { GenerationContext } from '../GenerationPage';
+import useKeyPress from '../../../../hooks/useKeyPress';
+import AgencyAutocomplete from './AgencyAutocomplete';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     const { petition } = useContext(GenerationContext);
@@ -19,6 +20,7 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
                             <li>Jurisdiction: {petition.court}</li>
                             <li>County: {petition.county} County</li>
                         </ul>
+                        <AgencyAutocomplete />
                         <div onClick={closeModal}>Close</div>
                     </>
                 ) : ''}
