@@ -2,9 +2,12 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { ModalStyled, ModalContent } from '../HomePage/HomePage.styled'
 import { GenerationContext } from './GenerationPage';
+import useKeyPress from '../../../hooks/useKeyPress';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     const { petition } = useContext(GenerationContext);
+
+    useKeyPress('Escape', closeModal);
 
     return (
         <GeneratePetitionModalStyled isVisible={isVisible}>
