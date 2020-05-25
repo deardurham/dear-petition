@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { colorGreen, colorGrey, colorGreyLight, colorBlack, colorYellow, colorPrimary } from '../../../styles/colors';
+import { colorGrey, colorGreyLight, colorBlack } from '../../../styles/colors';
 
 const getBadgeColor = props => {
   let baseColor = colorGreyLight;

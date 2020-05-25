@@ -27,7 +27,6 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
                         </ul>
                         <AgencyAutocomplete />
                         <Button onClick={handleGenerate}>Generate</Button>
-                        <div onClick={closeModal}>Close</div>
                     </>
                 ) : ''}
             </ModalContent>
