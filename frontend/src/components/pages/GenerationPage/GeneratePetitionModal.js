@@ -12,6 +12,10 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
                 {petition ? (
                     <>
                         <h2>{petition.type}</h2>
+                        <ul>
+                            <li>Jurisdiction: {petition.court}</li>
+                            <li>County: {petition.county} County</li>
+                        </ul>
                         <div onClick={closeModal}>Close</div>
                     </>
                 ) : ''}
