@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { colorBlack } from '../../../../styles/colors';
 
 const AgencyAutocompleteStyled = styled.div`
   width: 100%;
