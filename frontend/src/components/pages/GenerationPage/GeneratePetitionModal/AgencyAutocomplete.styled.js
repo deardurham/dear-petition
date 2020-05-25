@@ -3,8 +3,7 @@ import { colorBlack } from '../../../../styles/colors';
 
 const AgencyAutocompleteStyled = styled.div`
   width: 100%;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid ${colorBlack};
+  padding: 1rem 0rem 2rem 0rem;
 `;
 
 const BadgesListStyled = styled.div`
