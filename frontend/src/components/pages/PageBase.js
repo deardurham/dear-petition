@@ -12,16 +12,17 @@ import DEAR_Logo from '../../assets/img/DEAR_logo.png';
 import Axios from '../../service/axios';
 
 // Constants
-import { USER } from '../../constants/authConstants';
+import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 
 // Router
 import { useHistory } from 'react-router-dom';
 
 function PageBase({ children, ...props }) {
   const history = useHistory();
-  const handleLogout = async () => {
+  const handleLogout = () => {
     Axios.delete('token/');
-    await localStorage.removeItem(USER);
+    localStorage.removeItem(CSRF_TOKEN_LS_KEY);
+    localStorage.removeItem(USER);
     history.replace('/');
   };
 

@@ -70,21 +70,19 @@ function HomePage(props) {
     try {
       const filesFormData = new FormData();
       files.forEach(file => filesFormData.append('file', file));
-      const response = await Axios.post('/batch/', filesFormData);
-      debugger;
+      const { data, status } = await Axios.post('/batch/', filesFormData);
+      if (status === 201) {
+        history.push(`/generate/${data.id}`);
+      }
     } catch (error) {
-      debugger;
+      console.error(error);
+      setShowModal(false);
     }
-  };
-
-  const handleIt = async () => {
-    const respones = await Axios.post('/batch/');
   };
 
   return (
     <>
       <HomePageStyled>
-        <button onClick={handleIt}>press me</button>
         <HomeContent>
           {files && files.size > 0 && (
             <FilesList

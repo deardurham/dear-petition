@@ -7,15 +7,7 @@ import {
 import { useParams } from 'react-router-dom';
 import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
-
-const FAKE_RESPONSE = {
-  id: 100,
-  label: 'John Doe',
-  petitions: [
-    { id: 200, type: 'AOC-CR-287', county: 'Durham', court: 'District' },
-    { id: 201, type: 'AOC-CR-288', county: 'Wake', court: 'District' }
-  ]
-};
+import Axios from '../../../service/axios';
 
 function GenerationPage(props) {
   const { batchId } = useParams();
@@ -24,10 +16,16 @@ function GenerationPage(props) {
 
   useEffect(() => {
     setLoading(true);
-    let timeout = setTimeout(() => {
-      setBatch(FAKE_RESPONSE);
-      setLoading(false);
-    }, 1000);
+    Axios.get(`/batch/${batchId}/`)
+      .then(({ data }) => {
+        setBatch(data);
+        console.log('setting batch to: ', data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setLoading(false);
+      });
   }, [batchId]);
 
   return (
