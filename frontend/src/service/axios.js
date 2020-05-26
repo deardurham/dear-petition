@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { USER } from '../constants/authConstants';
-// import extractFromCookies from '../util/extractFromCookies';
-// import { JWT_HEADER_KEY, CSRF_HEADER_KEY, CSRF_COOKIE_KEY } from '../constants/authConstants';
+import { CSRF_HEADER_KEY, CSRF_TOKEN_LS_KEY } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
@@ -16,8 +15,8 @@ const Axios = axios.create({
  */
 Axios.interceptors.request.use(
   request => {
-    // const csrfCookie = extractFromCookies(CSRF_COOKIE_KEY);
-    // if (csrfCookie) addCsrfToRequestHeader(request, csrfCookie);
+    const csrfToken = localStorage.getItem(CSRF_TOKEN_LS_KEY);
+    if (csrfToken) request.headers[CSRF_HEADER_KEY] = csrfToken;
     return request;
   },
   error => Promise.reject(error)
@@ -49,7 +48,6 @@ function handle403Response(error) {
   window.location = '/';
 }
 
-// function addCsrfToRequestHeader(request, csrfCookie) {
-//   const csrf = csrfCookie.split('=')[1];
-//   request.headers[CSRF_HEADER_KEY] = csrf;
-// }
+function addCsrfToRequestHeader(request, csrfToken) {
+  request.headers[CSRF_HEADER_KEY] = csrfToken;
+}

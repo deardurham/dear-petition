@@ -76,9 +76,14 @@ function HomePage(props) {
     }, 1000);
   };
 
+  const handleIt = async () => {
+    const respones = await Axios.post('/batch/');
+  };
+
   return (
     <>
       <HomePageStyled>
+        <button onClick={handleIt}>press me</button>
         <HomeContent>
           {files && files.size > 0 && (
             <FilesList
