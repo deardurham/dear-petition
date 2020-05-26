@@ -69,7 +69,7 @@ function HomePage(props) {
     setShowModal(true);
     try {
       const filesFormData = new FormData();
-      files.forEach(file => filesFormData.append('file', file));
+      files.forEach(file => filesFormData.append('files', file));
       const { data, status } = await Axios.post('/batch/', filesFormData);
       if (status === 201) {
         history.push(`/generate/${data.id}`);

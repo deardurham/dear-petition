@@ -9,7 +9,7 @@ import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
 import Axios from '../../../service/axios';
 
-function GenerationPage(props) {
+function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
@@ -38,7 +38,7 @@ function GenerationPage(props) {
           <GenerationInputs />
           <PetitionsList>
             {batch?.petitions?.map(petition => {
-              return <PetitionListItem key={petition.id} petition={petition} />;
+              return <PetitionListItem key={petition.pk} petition={petition} />;
             })}
           </PetitionsList>
         </GenerationContentStyled>
