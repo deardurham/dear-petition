@@ -13,6 +13,7 @@ import {
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
 import { useHistory } from 'react-router-dom';
+import Axios from '../../../service/axios';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
@@ -64,16 +65,14 @@ function HomePage(props) {
     setFiles(copiedSet);
   };
 
-  const handlePreparePetitions = () => {
-    // TODO: display loading modal
+  const handlePreparePetitions = async () => {
     setShowModal(true);
-    // TODO: send all the files to API
-    let timeout = setTimeout(() => {
-      console.log('Pretend response!')
-      setShowModal(false);
-      history.push(`/generate/${100}`)
-    }, 1000)
-
+    try {
+      const response = await Axios.post('/batch/', { files: [...files] });
+      debugger;
+    } catch (error) {
+      debugger;
+    }
   };
 
   return (
