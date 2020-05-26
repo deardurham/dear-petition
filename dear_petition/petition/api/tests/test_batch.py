@@ -10,7 +10,7 @@ pytestmark = pytest.mark.django_db
 
 def test_unauthorized_batch_post(api_client_anon):
     response = api_client_anon.post(reverse("api:batch-list"))
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_batch_post_file(api_client, fake_pdf, mock_import):
