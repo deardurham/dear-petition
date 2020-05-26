@@ -28,14 +28,64 @@ def get_tokens_for_user(user):
 class TestBatchViewSet(APITestCase):
     def setUp(self):
         self.user = UserFactory()
+        self.other_user = UserFactory()
         self.batch_1 = BatchFactory(user=self.user)
         self.batch_2 = BatchFactory(user=self.user)
         self.batch_3 = BatchFactory(user=self.user)
+        self.batch_4 = BatchFactory(user=self.other_user)
+        self.batch_5 = BatchFactory(user=self.other_user)
         self.list_url = reverse("api:batch-list")
         self.detail_url = reverse("api:batch-detail", args=[self.batch_1.pk])
         # Create a token for the self.user, to be used with each request.
         self.tokens = get_tokens_for_user(self.user)
         self.access = self.tokens["access"]
+        # other user's tokens and access token
+        self.other_user_tokens = get_tokens_for_user(self.other_user)
+        self.other_user_access = self.other_user_tokens["access"]
+
+    def test_user_permissions(self):
+        batch_list_user_owns = [self.batch_1, self.batch_2, self.batch_3]
+        batch_list_user_owns_labels = [batch.label for batch in batch_list_user_owns]
+        batch_list_other_user_owns = [self.batch_4, self.batch_5]
+        batch_list_other_user_owns_labels = [
+            batch.label for batch in batch_list_other_user_owns
+        ]
+        response = self.client.get(
+            self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+        )
+        # assert that the result count equals the amount of batches the user owns
+        self.assertEqual(response.data["count"], len(batch_list_user_owns))
+        results = [dict(batch) for batch in response.data["results"]]
+        result_labels = [batch["label"] for batch in results]
+        for label in result_labels:
+            # assert that the result contains labels that the user owns
+            self.assertIn(label, batch_list_user_owns_labels)
+            # assert that the result does not contain labels that the other user owns
+            self.assertNotIn(label, batch_list_other_user_owns_labels)
+
+    def test_superuser_permissions(self):
+        self.user.is_superuser = True
+        self.user.save()
+        batch_list_for_superuser = [
+            self.batch_1,
+            self.batch_2,
+            self.batch_3,
+            self.batch_4,
+            self.batch_5,
+        ]
+        batch_list_for_superuser_labels = [
+            batch.label for batch in batch_list_for_superuser
+        ]
+        response = self.client.get(
+            self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+        )
+        # assert that the result count equals the amount of batches the superuser "owns"
+        self.assertEqual(response.data["count"], len(batch_list_for_superuser))
+        results = [dict(batch) for batch in response.data["results"]]
+        result_labels = [batch["label"] for batch in results]
+        for label in result_labels:
+            # assert that the result contains labels that the superuser "owns"
+            self.assertIn(label, batch_list_for_superuser_labels)
 
     def test_authorized(self):
         with self.subTest("Get - List"):
