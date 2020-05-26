@@ -1,3 +1,5 @@
+import random
+
 import factory
 
 from dear_petition.petition.models import (
@@ -6,10 +8,17 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
     Petition,
+    Contact,
 )
 from dear_petition.users.tests.factories import UserFactory
 
-from ..constants import CHARGED, DISMISSED, DISTRICT_COURT
+from ..constants import (
+    CHARGED,
+    DISMISSED,
+    DISTRICT_COURT,
+    SUPERIOR_COURT,
+    DURHAM_COUNTY,
+)
 
 
 class BatchFactory(factory.DjangoModelFactory):
@@ -69,6 +78,12 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
     label = factory.Faker("name")
     data = factory.Sequence(record_data)
+    offense_date = factory.Faker("date_object")
+    arrest_date = factory.Faker("date_object")
+    jurisdiction = factory.LazyFunction(
+        lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT])
+    )
+    county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
 
     class Meta:
         model = CIPRSRecord
@@ -97,9 +112,14 @@ class OffenseRecordFactory(factory.DjangoModelFactory):
 
 class PetitionFactory(factory.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
-    county = "DURHAM"
+    county = DURHAM_COUNTY
     form_type = DISMISSED
     jurisdiction = DISTRICT_COURT
 
     class Meta:
         model = Petition
+
+
+class ContactFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Contact

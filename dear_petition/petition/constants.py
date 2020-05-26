@@ -40,3 +40,18 @@ FORM_TYPES = (
     (NOT_GUILTY, "Not Guilty"),
     (MISDEMEANOR, "Nonviolent Felony or Misdemeanor"),
 )
+
+NORTH_CAROLINA = "NC"
+DURHAM_COUNTY = "DURHAM"
+
+DISTRICT_COURT_WITHOUT_DA_LEAVE = "Dismissal without Leave by DA"
+
+DISMISSED_DISPOSITION_METHODS = (
+    DISTRICT_COURT_WITHOUT_DA_LEAVE,
+    "Dismissed by Court",
+    "Deferred Prosecution Dismissal",
+    "Discharge and Dismissal",
+    "Conditional Discharge",
+    "No Probable Cause",
+    "Never To Be Served",
+)
