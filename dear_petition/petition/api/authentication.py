@@ -18,8 +18,6 @@ class JWTHttpOnlyCookieAuthentication(JWTAuthentication):
     # override simplejwt's authenticate method to add cookie support.
 
     def _validate_token(self, token):
-        if token is None:
-            return None
         validated_token = self.get_validated_token(token)
         user = self.get_user(validated_token)
         if not user or not user.is_active:
@@ -28,6 +26,8 @@ class JWTHttpOnlyCookieAuthentication(JWTAuthentication):
 
     def authenticate(self, request):
         raw_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
+        if raw_token is None:
+            return None
         validated_user, validated_token = self._validate_token(raw_token)
         if not validated_user and validated_token:
             return None
