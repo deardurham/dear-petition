@@ -8,6 +8,7 @@ from dear_petition.petition.models import (
     Petition,
 )
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from localflavor.us import us_states
 
 
@@ -110,3 +111,15 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def validate_agencies(self, value):
         return Contact.objects.filter(pk__in=value)
+
+class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):
+    """
+    Subclass TokenObtainPairSerializer from simplejwt so that we can add the requesting user
+    to response body
+    """
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user_serializer = UserSerializer(self.user)
+        data['user'] = user_serializer.data
+        return data

@@ -1,17 +1,15 @@
-import pytest
 from datetime import timedelta
 
+import pytest
+from django.conf import settings
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.urls import reverse
 
 from dear_petition.users.tests.factories import UserFactory
 
-from ....petition.tests.factories import (
-    BatchFactory,
-    CIPRSRecordFactory,
-)
+from ....petition.tests.factories import BatchFactory, CIPRSRecordFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -90,9 +88,9 @@ class TestBatchViewSet(APITestCase):
     def test_authorized(self):
         with self.subTest("Get - List"):
             batch_list = [self.batch_1, self.batch_2, self.batch_3]
-            response = self.client.get(
-                self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
-            )
+            self.client.cookies[settings.AUTH_COOKIE_KEY] = self.access
+
+            response = self.client.get(self.list_url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["count"], len(batch_list))
             results = [dict(batch) for batch in response.data["results"]]
@@ -141,27 +139,27 @@ class TestBatchViewSet(APITestCase):
 
         with self.subTest("Get - List"):
             response = self.client.get(self.list_url)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         with self.subTest("Get - Detail"):
             response = self.client.get(self.detail_url)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         with self.subTest("POST"):
             data = {"code": "NEWPROJECT"}
             response = self.client.post(self.list_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         with self.subTest("PUT"):
             data = {"code": "NEWPROJECT"}
             response = self.client.put(self.detail_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         with self.subTest("PATCH"):
             data = {"code": "NEWPROJECT"}
             response = self.client.patch(self.detail_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         with self.subTest("DELETE"):
             response = self.client.delete(self.detail_url)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

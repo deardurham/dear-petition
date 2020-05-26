@@ -1,10 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 from . import viewsets
+from dear_petition.petition.api import authentication
 
 router = routers.DefaultRouter()
 router.register(r"users", viewsets.UserViewSet)
@@ -21,6 +18,5 @@ app_name = "api"
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/", viewsets.TokenObtainPairCookieView.as_view(), name="token_obtain_pair"),
 ]
