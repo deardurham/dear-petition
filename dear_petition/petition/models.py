@@ -12,6 +12,7 @@ from django.db import models
 from django.urls import reverse
 
 import ciprs_reader
+from localflavor.us import us_states
 from dear_petition.users.models import User
 from . import constants as pc
 
@@ -180,7 +181,7 @@ class CIPRSRecord(models.Model):
             for offense_record in offense_records:
                 try:
                     code = int(offense_record.get("Code"))
-                except ValueError:
+                except (ValueError, TypeError):
                     code = None
                 OffenseRecord.objects.create(
                     offense=offense,
@@ -210,6 +211,8 @@ class Offense(models.Model):
     )
     disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)
+    verdict = models.CharField(max_length=256, blank=True)
+    plea = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f"offense ${self.pk}"
@@ -237,7 +240,7 @@ class Contact(models.Model):
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
     city = models.CharField(max_length=64, blank=True)
-    state = models.CharField(max_length=64, blank=True)
+    state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
 
     def __str__(self):
@@ -266,40 +269,6 @@ class Batch(models.Model):
             for offense in o_records:
                 yield (record, offense)
 
-    def get_petition_offenses(self):
-        # Only Charged Offenses should be shown on the generated petition
-        charged_offenses = [
-            (record, offense)
-            for (record, offense) in self.offenses
-            if offense.action == CHARGED
-        ]
-        petition_offenses = {}
-        for i, (record, offense) in enumerate(charged_offenses, 1):
-            # The index of the offense determines what line on the petition form
-            # the offense will be on
-            formatted_arrest_date = (
-                record.arrest_date.strftime(DATE_FORMAT) if record.arrest_date else ""
-            )
-            formatted_offense_date = (
-                record.offense_date.strftime(DATE_FORMAT) if record.offense_date else ""
-            )
-            formatted_disposed_on = (
-                record.offenses.first().disposed_on.strftime(DATE_FORMAT)
-                if record.offenses.first().disposed_on
-                else ""
-            )
-            data = {}
-            data["Fileno:" + str(i)] = {"V": record.file_no}
-            data["ArrestDate:" + str(i)] = {"V": formatted_arrest_date}
-            data["Description:" + str(i)] = {"V": offense.description}
-            data["DOOF:" + str(i)] = {"V": formatted_offense_date}
-            data["Disposition:" + str(i)] = {
-                "V": record.offenses.first().disposition_method
-            }
-            data["DispositionDate:" + str(i)] = {"V": formatted_disposed_on}
-            petition_offenses.update(data)
-        return petition_offenses
-
     @property
     def most_recent_record(self):
         most_recent_record = None
@@ -314,6 +283,14 @@ class Batch(models.Model):
         if not most_recent_record:
             most_recent_record = self.records.order_by("pk").first()
         return most_recent_record
+
+    def petition_offense_records(self, petition_type, jurisdiction=""):
+        from dear_petition.petition.types import petition_offense_records
+
+        return petition_offense_records(self, petition_type, jurisdiction)
+
+    def dismissed_offense_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.DISMISSED, jurisdiction)
 
 
 class Comment(models.Model):
@@ -341,13 +318,6 @@ class Comment(models.Model):
         super(Comment, self).save(*args, **kwargs)
 
 
-# Inputs
-#
-#
-#
-#
-
-
 class Petition(models.Model):
 
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
@@ -357,3 +327,12 @@ class Petition(models.Model):
 
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
+
+    def get_offense_records(self):
+        """Return batch offenses for this petition type, jurisdiction, and county."""
+        qs = self.batch.petition_offense_records(petition_type=self.form_type)
+        qs = qs.filter(
+            offense__ciprs_record__jurisdiction=self.jurisdiction,
+            offense__ciprs_record__county=self.county,
+        )
+        return qs.order_by("offense__ciprs_record__offense_date")
