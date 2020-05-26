@@ -9,7 +9,7 @@ from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition
-from dear_petition.petition.api import serializers, authentication
+from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 

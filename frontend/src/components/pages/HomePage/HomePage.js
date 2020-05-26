@@ -68,7 +68,9 @@ function HomePage(props) {
   const handlePreparePetitions = async () => {
     setShowModal(true);
     try {
-      const response = await Axios.post('/batch/', { files: [...files] });
+      const filesFormData = new FormData();
+      files.forEach(file => filesFormData.append('file', file));
+      const response = await Axios.post('/batch/', filesFormData);
       debugger;
     } catch (error) {
       debugger;

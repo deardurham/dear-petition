@@ -44,6 +44,7 @@ Axios.interceptors.response.use(
 export default Axios;
 
 function handle403Response(error) {
+  debugger;
   console.warn('user is logged out!');
   localStorage.removeItem(USER);
   window.location = '/';

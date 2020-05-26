@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ value, onChange, label, type, errors, maxlength, ...props }) {
+function Input({ value, onChange, label, type, errors, maxLength, ...props }) {
   return (
     <InputWrapper {...props}>
       <InputStyled>
