@@ -18,7 +18,7 @@ function PetitionListItem({ petition }) {
       <GeneratePetitionModal
         isVisible={showGenerationModal}
         closeModal={() => setShowGenerationModal(false)}
-      ></GeneratePetitionModal>
+      />
     </>
   );
 }

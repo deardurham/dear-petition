@@ -41,7 +41,7 @@ const BadgeStyled = styled.div`
   margin: 0 2px 2px 0;
   border-radius: 1px;
   padding: 10px 0px;
-
+   box-sizing: content-box;
   p:first-of-type {
     white-space: nowrap;
     overflow: hidden;
