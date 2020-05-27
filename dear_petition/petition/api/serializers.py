@@ -62,6 +62,8 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class PetitionSerializer(serializers.ModelSerializer):
+    jurisdiction = serializers.CharField(source="get_jurisdiction_display")
+
     class Meta:
         model = Petition
         fields = ["pk", "form_type", "county", "jurisdiction"]
