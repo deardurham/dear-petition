@@ -10,7 +10,7 @@ ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # (dear_petition/config/settings/base.py - 3 = dear_petition/)
 APPS_DIR = ROOT_DIR.path("dear_petition")
-FRONTEND_BUILD_DIR = Path(ROOT_DIR) / "frontend" / "build"
+FRONTEND_BUILD_DIR = Path(ROOT_DIR) / "build"
 
 env = environ.Env()
 
