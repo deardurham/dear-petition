@@ -38,7 +38,6 @@ function GenerationPage() {
   const context = {
     batch,
     petition,
-    setPetition,
     ssn,
     setSSN,
     license,
