@@ -21,4 +21,9 @@ const AgencyAutoSuggestInputStyled = styled.div`
 
 const SuggestionStyled = styled.div``;
 
-export { AgencyAutocompleteStyled, AgencyAutoSuggestInputStyled, BadgesListStyled, SuggestionStyled };
+export {
+  AgencyAutocompleteStyled,
+  AgencyAutoSuggestInputStyled,
+  BadgesListStyled,
+  SuggestionStyled
+};

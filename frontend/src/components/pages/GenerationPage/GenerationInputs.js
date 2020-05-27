@@ -1,16 +1,18 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { GenerationInputsStyled, GenerationInputWrapper } from './GenerationInputs.styled';
+// Constants
+import US_STATES from '../../../constants/US_STATES';
+
+// Ajax
+import Axios from '../../../service/axios';
+
+// Children
 import Input from '../../elements/Input/Input';
 import Select from '../../elements/Input/Select';
-import US_STATES from '../../../constants/US_STATES';
 import { GenerationContext } from './GenerationPage';
 
-const FAKE_ATTORNEYS = [
-  { id: 0, name: 'Jeff' },
-  { id: 1, name: 'Madge' }
-];
-
 function GenerationInputs() {
+  const [attornies, setAttornies] = useState([]);
   const {
     attorney,
     ssn,
@@ -24,12 +26,15 @@ function GenerationInputs() {
   } = useContext(GenerationContext);
 
   useEffect(() => {
-    // fetch attornies
-  });
-
-  const mapAttorneysToOptions = () => {
-    return FAKE_ATTORNEYS.map(att => ({ value: att.id, label: att.name }));
-  };
+    (async function() {
+      try {
+        const { data } = await Axios.get('/contact/?category=attorney');
+        setAttornies(data?.results || []);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
 
   return (
     <GenerationInputsStyled>
@@ -38,7 +43,7 @@ function GenerationInputs() {
           label="Attorney"
           value={attorney}
           onChange={val => setAttorney(val)}
-          options={mapAttorneysToOptions()}
+          options={attornies.map(att => ({ value: att.pk, label: att.name }))}
           errors={formErrors?.attorney}
         />
       </GenerationInputWrapper>
