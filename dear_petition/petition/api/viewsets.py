@@ -13,6 +13,8 @@ from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
+from .filters import ContactFilter
+
 
 class UserViewSet(viewsets.ModelViewSet):
 
@@ -45,6 +47,7 @@ class ContactViewSet(viewsets.ModelViewSet):
     queryset = petition.Contact.objects.all()
     serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filterset_class = ContactFilter
 
 
 class BatchViewSet(viewsets.ModelViewSet):
@@ -94,12 +97,13 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
         return resp
 
+
 class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     """
     Subclasses simplejwt's TokenObtainPairView to handle tokens in cookies
     """
 
-    cookie_path = '/'
+    cookie_path = "/"
 
     serializer_class = serializers.TokenObtainPairCookieSerializer
 
@@ -115,21 +119,29 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         csrf_token = csrf.get_token(self.request)
 
         response.set_cookie(
-            settings.AUTH_COOKIE_KEY, # get cookie key from settings
-            serializer.validated_data['access'], # pull access token out of validated_data
-            expires=datetime.now() + settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'], # expire access token when refresh token expires
-            domain=getattr(settings, 'AUTH_COOKIE_DOMAIN', None), # we can tie the cookie to a specific domain for added security
+            settings.AUTH_COOKIE_KEY,  # get cookie key from settings
+            serializer.validated_data[
+                "access"
+            ],  # pull access token out of validated_data
+            expires=datetime.now()
+            + settings.SIMPLE_JWT[
+                "REFRESH_TOKEN_LIFETIME"
+            ],  # expire access token when refresh token expires
+            domain=getattr(
+                settings, "AUTH_COOKIE_DOMAIN", None
+            ),  # we can tie the cookie to a specific domain for added security
             path=self.cookie_path,
-            secure=settings.DEBUG == False, # browsers should only send the cookie using HTTPS
-            httponly=True, # browsers should not allow javascript access to this cookie
-            samesite=settings.AUTH_COOKIE_SAMESITE
+            secure=settings.DEBUG
+            == False,  # browsers should only send the cookie using HTTPS
+            httponly=True,  # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE,
         )
 
         # We don't want 'access' or 'refresh' in response body
         response.data = {
             "detail": "success",
-            "user": response.data['user'],
-            "csrftoken": csrf_token
+            "user": response.data["user"],
+            "csrftoken": csrf_token,
         }
 
         return response
@@ -138,12 +150,10 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         response = Response({})
         response.delete_cookie(
             settings.AUTH_COOKIE_KEY,
-            domain=getattr(settings, 'AUTH_COOKIE_DOMAIN', None),
-            path=self.cookie_path
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
         )
 
         response.data = {"detail": "success"}
 
         return response
-    
-
