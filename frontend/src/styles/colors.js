@@ -2,8 +2,7 @@
 export const colorWhite = '#ffffff';
 export const colorBlack = '#262626';
 
-export const colorGrey = '#82908d';
-export const colorGreyLight = '#d4d4d4';
+export const colorGrey = '#82908d'; // green/grey
 
 export const colorGreen = '#89af5b';
 export const colorRed = '#b04846';
@@ -19,3 +18,11 @@ export const colorFontPrimary = colorBlack;
 export const colorSuccess = colorBlue;
 export const colorCaution = colorRed;
 export const colorWarning = colorYellow;
+
+/**
+ * greyScale
+ * @param {number} degree - Number, 0 - 10. 0 being black 10 being white
+ */
+export function greyScale(degree) {
+  return `hsl(0, 0%, ${degree * 10}%)`;
+}

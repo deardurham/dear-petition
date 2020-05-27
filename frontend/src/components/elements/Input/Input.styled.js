@@ -15,6 +15,9 @@ export const ActualInputStyled = styled.input`
   display: block;
   border-radius: 5px;
   padding: 1rem 2rem;
+
+  width: 100%;
+  max-width: 300px;
   border: 1px solid ${colorGrey};
   font-size: 16px;
   font-family: ${fontPrimary};

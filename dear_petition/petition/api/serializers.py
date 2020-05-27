@@ -62,6 +62,8 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class PetitionSerializer(serializers.ModelSerializer):
+    jurisdiction = serializers.CharField(source="get_jurisdiction_display")
+
     class Meta:
         model = Petition
         fields = ["pk", "form_type", "county", "jurisdiction"]
@@ -92,16 +94,18 @@ class GeneratePetitionSerializer(serializers.Serializer):
     ssn = serializers.CharField(label="SSN")
     drivers_license = serializers.CharField(label="Driver's License #")
     drivers_license_state = serializers.ChoiceField(choices=us_states.US_STATES)
-    attorney = serializers.ChoiceField(
-        choices=Contact.objects.filter(category="attorney").values_list("pk", "name")
-    )
-    agencies = serializers.MultipleChoiceField(
-        choices=Contact.objects.filter(category="agency").values_list("pk", "name")
-    )
+    attorney = serializers.ChoiceField(choices=[])
+    agencies = serializers.MultipleChoiceField(choices=[])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["petition"].choices = Petition.objects.values_list("pk", "pk")
+        self.fields["attorney"].choices = Contact.objects.filter(
+            category="attorney"
+        ).values_list("pk", "name")
+        self.fields["agencies"].choices = Contact.objects.filter(
+            category="agency"
+        ).values_list("pk", "name")
 
     def validate_petition(self, value):
         return Petition.objects.get(pk=value)

@@ -9,7 +9,7 @@ from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition
-from dear_petition.petition.api import serializers, authentication
+from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
@@ -48,13 +48,20 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 
 class BatchViewSet(viewsets.ModelViewSet):
-
     queryset = petition.Batch.objects.prefetch_related(
         "petitions", "records__offenses__offense_records"
     )
     serializer_class = serializers.BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_queryset(self):
+        """ Filter queryset so that user's only have read access on objects they have created
+        """
+        qs = super().get_queryset()
+        if not self.request.user.is_superuser:
+            qs = qs.filter(user=self.request.user)
+        return qs
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

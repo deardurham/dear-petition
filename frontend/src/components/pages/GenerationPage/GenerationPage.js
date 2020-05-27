@@ -7,19 +7,11 @@ import {
 import { useParams } from 'react-router-dom';
 import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
-
-const FAKE_RESPONSE = {
-  id: 100,
-  label: 'John Doe',
-  petitions: [
-    { id: 200, type: 'AOC-CR-287', county: 'Durham', court: 'District' },
-    { id: 201, type: 'AOC-CR-288', county: 'Wake', court: 'District' }
-  ]
-};
+import Axios from '../../../service/axios';
 
 export const GenerationContext = createContext(null);
 
-function GenerationPage(props) {
+function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
@@ -31,10 +23,16 @@ function GenerationPage(props) {
 
   useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      setBatch(FAKE_RESPONSE);
-      setLoading(false);
-    }, 1000);
+    Axios.get(`/batch/${batchId}/`)
+      .then(({ data }) => {
+        setBatch(data);
+        console.log('setting batch to: ', data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setLoading(false);
+      });
   }, [batchId]);
 
   const context = {
@@ -60,10 +58,10 @@ function GenerationPage(props) {
         ) : (
             <GenerationContentStyled>
               <h2>{batch?.label}</h2>
-              <GenerationInputs s />
+              <GenerationInputs />
               <PetitionsList>
                 {batch?.petitions?.map(petition => {
-                  return <PetitionListItem key={petition.id} petition={petition} />;
+                  return <PetitionListItem key={petition.pk} petition={petition} />;
                 })}
               </PetitionsList>
             </GenerationContentStyled>

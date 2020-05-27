@@ -4,7 +4,8 @@ import Select from 'react-select';
 export const SelectStyled = styled.label``;
 
 export const ActualSelectStyled = styled(Select)`
-  max-width: 200px;
+  width: 100%;
+  min-width: 300px;
 `;
 
 export const OptionStyled = styled.option``;
