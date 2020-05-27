@@ -40,7 +40,6 @@ function GenerationPage() {
     petition,
     ssn,
     license,
-    setLicense,
     attorney,
     setAttorney,
     selectedAgencies,
