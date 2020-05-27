@@ -173,7 +173,6 @@ const AgencyAutocomplete = ({ ...props }) => {
                         {...thisAgency}
                         key={`${i}_${thisAgency.name}`}
                         remove={() => removeAgency(thisAgency)}
-                        data-cy="label_item"
                     />
                 ))}
             </BadgesListStyled>
