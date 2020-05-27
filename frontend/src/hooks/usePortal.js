@@ -29,7 +29,7 @@ const usePortal = id => {
         parentElem.remove();
       }
     };
-  }, []);
+  }, [id]);
 
   function getRootElem() {
     if (!rootElemRef.current) {

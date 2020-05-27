@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { GenerationInputsStyled, GenerationInputWrapper } from './GenerationInputs.styled';
 import Input from '../../elements/Input/Input';
 import Select from '../../elements/Input/Select';
+import { GenerationContext } from './GenerationPage';
 
 const FAKE_ATTORNEYS = [
   { id: 0, name: 'Jeff' },
@@ -9,9 +10,7 @@ const FAKE_ATTORNEYS = [
 ];
 
 function GenerationInputs(props) {
-  const [ssn, setSSN] = useState('');
-  const [license, setLicense] = useState('');
-  const [attorney, setAttorney] = useState('');
+  const { attorney, ssn, license, setAttorney, setSSN, setLicense } = useContext(GenerationContext);
 
   useEffect(() => {
     // fetch attornies

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import {
   GenerationPageStyled,
   PetitionsList,
@@ -9,10 +9,17 @@ import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
 import Axios from '../../../service/axios';
 
+export const GenerationContext = createContext(null);
+
 function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
+  const [petition, setPetition] = useState();
+  const [ssn, setSSN] = useState('');
+  const [license, setLicense] = useState('');
+  const [attorney, setAttorney] = useState('');
+  const [selectedAgencies, setSelectedAgencies] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -27,22 +34,38 @@ function GenerationPage() {
       });
   }, [batchId]);
 
+  const context = {
+    batch,
+    petition,
+    setPetition,
+    ssn,
+    setSSN,
+    license,
+    setLicense,
+    attorney,
+    setAttorney,
+    selectedAgencies,
+    setSelectedAgencies,
+  }
+
   return (
-    <GenerationPageStyled>
-      {loading ? (
-        <h2>Loading...</h2>
-      ) : (
-        <GenerationContentStyled>
-          <h2>{batch?.label}</h2>
-          <GenerationInputs />
-          <PetitionsList>
-            {batch?.petitions?.map(petition => {
-              return <PetitionListItem key={petition.pk} petition={petition} />;
-            })}
-          </PetitionsList>
-        </GenerationContentStyled>
-      )}
-    </GenerationPageStyled>
+    <GenerationContext.Provider value={context}>
+      <GenerationPageStyled>
+        {loading ? (
+          <h2>Loading...</h2>
+        ) : (
+            <GenerationContentStyled>
+              <h2>{batch?.label}</h2>
+              <GenerationInputs />
+              <PetitionsList>
+                {batch?.petitions?.map(petition => {
+                  return <PetitionListItem key={petition.pk} petition={petition} />;
+                })}
+              </PetitionsList>
+            </GenerationContentStyled>
+          )}
+      </GenerationPageStyled>
+    </GenerationContext.Provider >
   );
 }
 
