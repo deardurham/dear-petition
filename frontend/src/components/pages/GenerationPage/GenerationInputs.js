@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GenerationInputsStyled, GenerationInputWrapper } from './GenerationInputs.styled';
 import Input from '../../elements/Input/Input';
 import Select from '../../elements/Input/Select';
+import US_STATES from '../../../constants/US_STATES';
 
 const FAKE_ATTORNEYS = [
   { id: 0, name: 'Jeff' },
@@ -9,9 +10,10 @@ const FAKE_ATTORNEYS = [
 ];
 
 function GenerationInputs(props) {
-  const [ssn, setSSN] = useState('');
-  const [license, setLicense] = useState('');
   const [attorney, setAttorney] = useState('');
+  const [ssn, setSSN] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [licenseState, setLicenseState] = useState('');
 
   useEffect(() => {
     // fetch attornies
@@ -42,7 +44,20 @@ function GenerationInputs(props) {
       </GenerationInputWrapper>
 
       <GenerationInputWrapper>
-        <Input label="License #" value={license} onChange={e => setLicense(e.target.value)} />
+        <Input
+          label="License #"
+          value={licenseNumber}
+          onChange={e => setLicenseNumber(e.target.value)}
+        />
+      </GenerationInputWrapper>
+
+      <GenerationInputWrapper>
+        <Select
+          label="License state"
+          value={licenseState}
+          onChange={val => setLicenseState(val)}
+          options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
+        />
       </GenerationInputWrapper>
     </GenerationInputsStyled>
   );
