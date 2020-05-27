@@ -1,47 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { GenerationPageStyled, PetitionsList, GenerationContentStyled } from './GenerationPage.styled';
+import {
+  GenerationPageStyled,
+  PetitionsList,
+  GenerationContentStyled
+} from './GenerationPage.styled';
 import { useParams } from 'react-router-dom';
 import GenerationInputs from './GenerationInputs';
 import PetitionListItem from './PetitionListItem';
+import Axios from '../../../service/axios';
 
-const FAKE_RESPONSE = {
-  "id": 100,
-  "label": "John Doe",
-  "petitions": [
-    { "id": 200, "type": "AOC-CR-287", "county": "Durham", "court": "District" },
-    { "id": 201, "type": "AOC-CR-288", "county": "Wake", "court": "District" }
-  ]
-}
-
-function GenerationPage(props) {
+function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
 
   useEffect(() => {
     setLoading(true);
-    let timeout = setTimeout(() => {
-      setBatch(FAKE_RESPONSE);
-      setLoading(false);
-    }, 1000)
-  }, [batchId])
+    Axios.get(`/batch/${batchId}/`)
+      .then(({ data }) => {
+        setBatch(data);
+        console.log('setting batch to: ', data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(error);
+        setLoading(false);
+      });
+  }, [batchId]);
 
   return (
     <GenerationPageStyled>
-      {loading
-        ? <h2>Loading...</h2>
-        : (
-          <GenerationContentStyled>
-            <h2>{batch?.label}</h2>
-            <GenerationInputs s />
-            <PetitionsList>
-              {batch?.petitions?.map(petition => {
-                return <PetitionListItem key={petition.id} petition={petition} />
-              })}
-            </PetitionsList>
-          </GenerationContentStyled>
-        )
-      }
+      {loading ? (
+        <h2>Loading...</h2>
+      ) : (
+        <GenerationContentStyled>
+          <h2>{batch?.label}</h2>
+          <GenerationInputs />
+          <PetitionsList>
+            {batch?.petitions?.map(petition => {
+              return <PetitionListItem key={petition.pk} petition={petition} />;
+            })}
+          </PetitionsList>
+        </GenerationContentStyled>
+      )}
     </GenerationPageStyled>
   );
 }

@@ -19,6 +19,7 @@ export const FilesListItem = styled(motion.li)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin: 1rem 0;
 
   p {
     flex: 1;

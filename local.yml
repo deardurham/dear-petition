@@ -42,6 +42,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     stdin_open: true
+    depends_on:
+      - django
     ports:
       - "3000:3000"
     volumes:

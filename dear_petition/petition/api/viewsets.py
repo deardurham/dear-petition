@@ -9,7 +9,7 @@ from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition
-from dear_petition.petition.api import serializers, authentication
+from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
@@ -112,7 +112,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             raise exceptions.InvalidToken(e.args[0])
 
         response = Response(serializer.validated_data, status=status.HTTP_200_OK)
-        csrf.get_token(self.request)
+        csrf_token = csrf.get_token(self.request)
 
         response.set_cookie(
             settings.AUTH_COOKIE_KEY, # get cookie key from settings
@@ -128,7 +128,8 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         # We don't want 'access' or 'refresh' in response body
         response.data = {
             "detail": "success",
-            "user": response.data['user']
+            "user": response.data['user'],
+            "csrftoken": csrf_token
         }
 
         return response

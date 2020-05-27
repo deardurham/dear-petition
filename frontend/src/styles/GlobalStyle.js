@@ -10,6 +10,14 @@ export default createGlobalStyle`
         font-size: 10px;
     }
 
+    *,
+    *::after,
+    *::before {
+        margin: 0;
+        padding: 0;
+        box-sizing: inherit;
+    }
+
     ul, ol {
         margin: 0;
         padding: 0;
@@ -27,7 +35,7 @@ export default createGlobalStyle`
 
     body {
         margin: 0;
-        font-family: ${fontPrimary}
+        font-family: ${fontPrimary};
         font-size: 1.5rem;
         box-sizing: border-box;
     }
