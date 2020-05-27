@@ -18,7 +18,7 @@ function PetitionListItem({ petition }) {
         <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
         <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
       </PetitionListItemStyled>
-      <GeneratePetitionModal isVisible={showModal} closeModal={() => setShowModal(false) />
+      <GeneratePetitionModal isVisible={showModal} closeModal={() => setShowModal(false)} />
     </>
   );
 }
