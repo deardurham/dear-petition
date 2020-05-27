@@ -45,9 +45,6 @@ export default Axios;
 function handle403Response(error) {
   console.warn('user is logged out!');
   localStorage.removeItem(USER);
+  localStorage.removeItem(CSRF_TOKEN_LS_KEY);
   window.location = '/';
-}
-
-function addCsrfToRequestHeader(request, csrfToken) {
-  request.headers[CSRF_HEADER_KEY] = csrfToken;
 }

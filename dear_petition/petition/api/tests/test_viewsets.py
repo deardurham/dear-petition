@@ -48,9 +48,8 @@ class TestBatchViewSet(APITestCase):
         batch_list_other_user_owns_labels = [
             batch.label for batch in batch_list_other_user_owns
         ]
-        response = self.client.get(
-            self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
-        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.list_url)
         # assert that the result count equals the amount of batches the user owns
         self.assertEqual(response.data["count"], len(batch_list_user_owns))
         results = [dict(batch) for batch in response.data["results"]]
@@ -74,9 +73,8 @@ class TestBatchViewSet(APITestCase):
         batch_list_for_superuser_labels = [
             batch.label for batch in batch_list_for_superuser
         ]
-        response = self.client.get(
-            self.list_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
-        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.list_url)
         # assert that the result count equals the amount of batches the superuser "owns"
         self.assertEqual(response.data["count"], len(batch_list_for_superuser))
         results = [dict(batch) for batch in response.data["results"]]

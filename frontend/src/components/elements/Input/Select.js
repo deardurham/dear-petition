@@ -6,15 +6,7 @@ function Select({ value, onChange, label, options }) {
   return (
     <SelectStyled>
       {label}
-      <ActualSelectStyled value={value} onChange={onChange}>
-        {options.map(option => {
-          return (
-            <OptionStyled key={option.value} value={option.value}>
-              {option.name}
-            </OptionStyled>
-          );
-        })}
-      </ActualSelectStyled>
+      <ActualSelectStyled value={value} options={options} onChange={onChange} />
     </SelectStyled>
   );
 }
