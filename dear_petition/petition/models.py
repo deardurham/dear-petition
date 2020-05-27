@@ -182,7 +182,7 @@ class CIPRSRecord(models.Model):
                 try:
                     code = int(offense_record.get("Code"))
                 except (ValueError, TypeError):
-                    code = 0
+                    code = None
                 OffenseRecord.objects.create(
                     offense=offense,
                     law=offense_record.get("Law", ""),
