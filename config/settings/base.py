@@ -63,7 +63,13 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
 ]
-THIRD_PARTY_APPS = ["crispy_forms", "allauth", "allauth.account", "rest_framework"]
+THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "allauth",
+    "allauth.account",
+    "rest_framework",
+    "django_filters",
+]
 LOCAL_APPS = [
     "dear_petition.users.apps.UsersAppConfig",
     # Your stuff: custom apps go here
@@ -75,7 +81,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # REST_FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication", 
+        "rest_framework.authentication.SessionAuthentication",
         # SessionAuthentication needs to go before JWTHttpOnlyCookieAuthentication so that csrf is included in request
         "dear_petition.petition.api.authentication.JWTHttpOnlyCookieAuthentication",
     ],
@@ -272,8 +278,8 @@ SOCIALACCOUNT_ADAPTER = "dear_petition.users.adapters.SocialAccountAdapter"
 CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)
 CIPRS_SAVE_PDF = env.bool("CIPRS_SAVE_PDF", False)
 
-AUTH_COOKIE_KEY = 'Authorization'
+AUTH_COOKIE_KEY = "Authorization"
 # Set SAMESITE setting below to 'Strict' to ask recieving browsers not to send this cookie
-# across origins. This should work in this case, as long as we serve the API and Client from 
+# across origins. This should work in this case, as long as we serve the API and Client from
 # the same domain.
-AUTH_COOKIE_SAMESITE = 'Strict' # or 'Lax' or None
+AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
