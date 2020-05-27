@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import { colorGrey, colorGreyLight, colorBlack } from '../../../styles/colors';
+import { colorGrey, colorBlack, greyScale } from '../../../styles/colors';
 
 const getBadgeColor = props => {
-  let baseColor = colorGreyLight;
+  let baseColor = greyScale(9);
   return props.isHighlighted ? colorGrey : baseColor;
 };
 
@@ -53,7 +53,7 @@ const BadgeStyled = styled.div`
     font-size: 1.5rem;
   }
 
-  background-color: ${colorGreyLight};
+  background-color: ${greyScale(9)};
 `;
 
 const IconStyled = styled.p`
@@ -65,7 +65,7 @@ const IconStyled = styled.p`
   padding-right: 0.6rem;
 
   &:hover {
-    color: ${colorGreyLight};
+    color: ${greyScale(9)};
   }
 `;
 
