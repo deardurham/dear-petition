@@ -41,7 +41,6 @@ function GenerationPage() {
     ssn,
     license,
     attorney,
-    setAttorney,
     selectedAgencies,
     setSelectedAgencies,
   }
