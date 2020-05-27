@@ -9,7 +9,7 @@ function PetitionListItem({ petition }) {
     <PetitionListItemStyled onClick={handlePetitionSelect}>
       <PetitionCellStyled>{petition.form_type}</PetitionCellStyled>
       <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
-      <PetitionCellStyled>{petition.jurisdiction} court</PetitionCellStyled>
+      <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
     </PetitionListItemStyled>
   );
 }

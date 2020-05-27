@@ -19,7 +19,6 @@ function GenerationPage() {
     Axios.get(`/batch/${batchId}/`)
       .then(({ data }) => {
         setBatch(data);
-        console.log('setting batch to: ', data);
         setLoading(false);
       })
       .catch(error => {
