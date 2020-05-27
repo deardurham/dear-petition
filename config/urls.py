@@ -4,7 +4,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
 
+from dear_petition.views import index
+
 urlpatterns = [
+    path("", index, name="index"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
