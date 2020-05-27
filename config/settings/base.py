@@ -4,11 +4,13 @@ Base settings to build other settings files upon.
 
 import environ
 from datetime import timedelta
+from pathlib import Path
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # (dear_petition/config/settings/base.py - 3 = dear_petition/)
 APPS_DIR = ROOT_DIR.path("dear_petition")
+FRONTEND_BUILD_DIR = Path(ROOT_DIR) / "frontend" / "build"
 
 env = environ.Env()
 
@@ -155,7 +157,7 @@ STATIC_ROOT = str(ROOT_DIR("staticfiles"))
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [str(APPS_DIR.path("static"))]
+STATICFILES_DIRS = [str(APPS_DIR.path("static")), str(FRONTEND_BUILD_DIR / "static")]
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -177,7 +179,7 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
-        "DIRS": [str(APPS_DIR.path("templates"))],
+        "DIRS": [str(APPS_DIR.path("templates")), str(FRONTEND_BUILD_DIR)],
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             "debug": DEBUG,
