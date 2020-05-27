@@ -39,7 +39,6 @@ function GenerationPage() {
     batch,
     petition,
     ssn,
-    setSSN,
     license,
     setLicense,
     attorney,
