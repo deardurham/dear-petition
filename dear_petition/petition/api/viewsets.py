@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import FileResponse
 from django.middleware import csrf
 
-from rest_framework import parsers, permissions, status, viewsets
+from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
@@ -13,7 +13,7 @@ from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
-from .filters import ContactFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -47,7 +47,9 @@ class ContactViewSet(viewsets.ModelViewSet):
     queryset = petition.Contact.objects.all()
     serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_class = ContactFilter
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["category"]
+    search_fields = ["name"]
 
 
 class BatchViewSet(viewsets.ModelViewSet):
