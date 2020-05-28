@@ -8,11 +8,6 @@ project for creating petition forms.
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
-## Frontend Development
-The front end can be run independently of the backend. If you don't wish to run the django API locally, see the [frontend README](frontend/README.md) for setup steps.
-
-Otherwise, the frontend can be launched from the same docker-compose file as the API.
-
 ## Local Development
 
 Begin by cloning the repository:
@@ -22,7 +17,22 @@ git clone git@github.com:deardurham/dear-petition.git
 ```
 
 
-## Local Development with Docker
+## Frontend Development
+
+The user facing side of the DEAR Petition Generator is a React single page app (SPA).
+
+
+### 🚀 Development
+
+(TODO: Something here about how to point your local frontend to staging API.)
+
+```bash
+npm i
+npm run start
+```
+
+
+## Local Backend Development with Docker
 
 To run this on a Mac, use [Docker for
 Mac](https://docs.docker.com/docker-for-mac/install/).
