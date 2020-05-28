@@ -24,7 +24,7 @@ function GenerationPage() {
   const [petition, setPetition] = useState();
   const [ssn, setSSN] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseState, setLicenseState] = useState('');
+  const [licenseState, setLicenseState] = useState({ label: 'NC', value: 'NC' });
   const [attorney, setAttorney] = useState('');
   const [selectedAgencies, setSelectedAgencies] = useState([]);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
