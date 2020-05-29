@@ -49,34 +49,6 @@ def test_offense_records_by_jurisdiction(batch, jurisdiction):
     assert offense_record in records
 
 
-def test_distinct_petition(batch, dismissed_offense):
-    """Expected jurisdiction and county shuold be in identified petition types."""
-    OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
-    petition_types = identify_distinct_petitions(batch.dismissed_offense_records())
-    expected = {
-        "jurisdiction": dismissed_offense.ciprs_record.jurisdiction,
-        "county": dismissed_offense.ciprs_record.county,
-    }
-    assert [expected] == list(petition_types)
-
-
-def test_distinct_petition__many(batch):
-    """Indentified petitions should include unique pairing of jurisdiction and county."""
-    method = constants.DISMISSED_DISPOSITION_METHODS[0]
-    for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
-        for county in ["DURHAM", "WAKE"]:
-            record = CIPRSRecordFactory(
-                jurisdiction=jurisdiction, county=county, batch=batch
-            )
-            offense = OffenseFactory(disposition_method=method, ciprs_record=record)
-            OffenseRecordFactory(action="CHARGED", offense=offense)
-    petition_types = identify_distinct_petitions(batch.dismissed_offense_records())
-    assert petition_types.count() == 4
-    for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
-        for county in ["DURHAM", "WAKE"]:
-            assert {"jurisdiction": jurisdiction, "county": county} in petition_types
-
-
 def test_petition_offenses(batch, record1, charged_dismissed_record):
     """Petitions should return their own offense records."""
     petition = PetitionFactory(

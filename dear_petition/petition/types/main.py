@@ -26,6 +26,6 @@ def identify_distinct_petitions(offense_records):
     qs = qs.values(
         jurisdiction=F("offense__ciprs_record__jurisdiction"),
         county=F("offense__ciprs_record__county"),
-    )
+    ).distinct()
     logger.info(f"Distinct petitions: {qs}")
     return qs
