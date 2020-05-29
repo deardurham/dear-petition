@@ -1,13 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SelectStyled, ActualSelectStyled, OptionStyled } from './Select.styled';
+import { SelectWrapper, SelectStyled, ActualSelectStyled, InputErrors } from './Select.styled';
+import { AnimatePresence } from 'framer-motion';
 
-function Select({ value, onChange, label, options }) {
+function Select({ value, onChange, label, errors, options }) {
   return (
-    <SelectStyled>
-      {label}
-      <ActualSelectStyled value={value} options={options} onChange={onChange} />
-    </SelectStyled>
+    <SelectWrapper>
+      <SelectStyled>
+        {label}
+        <ActualSelectStyled value={value} options={options} onChange={onChange} />
+      </SelectStyled>
+      <AnimatePresence>
+        <InputErrors
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: '-50' }}
+          positionTransition
+        >
+          {errors && errors.map(errMsg => <p key={errMsg}>{errMsg}</p>)}
+        </InputErrors>
+      </AnimatePresence>
+    </SelectWrapper>
   );
 }
 
