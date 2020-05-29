@@ -81,7 +81,7 @@ function Login() {
             </FormErrors>
           )}
         </AnimatePresence>
-        <Button onClick={handleLogin}>Fake log in</Button>
+        <Button onClick={handleLogin}>Log in</Button>
       </LoginForm>
     </LoginPageStyled>
   );
