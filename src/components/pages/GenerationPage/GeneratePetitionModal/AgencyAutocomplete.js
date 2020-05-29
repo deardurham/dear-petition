@@ -1,5 +1,8 @@
 import React, { useState, useContext } from 'react';
 
+// Ajax
+import Axios from '../../../../service/axios';
+
 // Deps
 import Autosuggest from 'react-autosuggest';
 
@@ -36,69 +39,6 @@ const AgencyAutocomplete = ({ ...props }) => {
   const [suggestionValue, setSuggestionValue] = useState('');
   const { selectedAgencies, setSelectedAgencies } = useContext(GenerationContext);
 
-  const searchAgencies = [
-    {
-      pk: 3,
-      name: 'Durham County Sheriff’s Office',
-      category: 'agency',
-      address1: '602 E. Main St.',
-      address2: 'Durham, NC 27701',
-      city: '',
-      state: '',
-      zipcode: ''
-    },
-    {
-      pk: 4,
-      name: 'Durham Police Department',
-      category: 'agency',
-      address1: '510 S. Dillard St.',
-      address2: 'Durham, NC 27701',
-      city: '',
-      state: '',
-      zipcode: ''
-    },
-    {
-      pk: 5,
-      name: 'Wake County Sheriff’s Office',
-      category: 'agency',
-      address1: '330 S. Salisbury St.',
-      address2: 'Raleigh, NC 27601',
-      city: '',
-      state: '',
-      zipcode: ''
-    },
-    {
-      pk: 6,
-      name: 'Raleigh Police Department',
-      category: 'agency',
-      address1: '6716 Six Forks Rd.',
-      address2: 'Raleigh, NC 27615',
-      city: '',
-      state: '',
-      zipcode: ''
-    },
-    {
-      pk: 7,
-      name: 'Orange County Sheriff',
-      category: 'agency',
-      address1: '106 E Margaret Ln',
-      address2: 'Hillsborough, NC 27278',
-      city: '',
-      state: '',
-      zipcode: ''
-    },
-    {
-      pk: 8,
-      name: 'Orange County Police Department',
-      category: 'agency',
-      address1: '127 N Churton St.',
-      address2: 'Hillsborough, NC 27278',
-      city: '',
-      state: '',
-      zipcode: ''
-    }
-  ];
-
   const handleHotKeyPressed = e => {
     e.stopPropagation();
     if (e.key === 'Backspace' && e.shiftKey) removeAgency();
@@ -109,25 +49,18 @@ const AgencyAutocomplete = ({ ...props }) => {
   };
 
   const handleSuggestionsFetchRequested = ({ value }) => {
-    setSuggestions(getSuggestions(value));
+    (async function () {
+      try {
+        const { data } = await Axios.get(`/contact/?category=agency&search=${value}`);
+        setSuggestions(data?.results || []);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
   };
 
   const handleSuggestionsClearRequested = () => {
     setSuggestions([]);
-  };
-
-  const getSuggestions = value => {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-    let availableAgencies = [...searchAgencies];
-    availableAgencies = availableAgencies.filter(
-      thisAgency => !selectedAgencies.map(innerAgency => innerAgency.name).includes(thisAgency.name)
-    );
-    return inputLength === 0
-      ? []
-      : availableAgencies.filter(
-          thisAgency => thisAgency.name.toLowerCase().slice(0, inputLength) === inputValue
-        );
   };
 
   const handleSuggestionSelected = (_, { suggestion }) => {
