@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
@@ -7,11 +7,13 @@ from django.views import defaults as default_views
 from dear_petition.views import index
 
 urlpatterns = [
-    path("", index, name="index"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
     path("petition/", include("dear_petition.petition.urls")),
+    # React SPA:
+    path(r"", index, name="index"),
+    re_path(r"^(?:.*)/?$", index, name="index-others"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
