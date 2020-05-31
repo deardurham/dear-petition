@@ -9,16 +9,19 @@ flower==0.9.3  # https://github.com/mher/flower
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.10  # pyup: < 2.1  # https://www.djangoproject.com/
+django==2.2.12  # pyup: < 2.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==3.1.2  # https://github.com/jazzband/django-model-utils
 django-allauth==0.39.1  # https://github.com/pennersr/django-allauth
 django-crispy-forms==1.7.2  # https://github.com/django-crispy-forms/django-crispy-forms
 django-redis==4.10.0  # https://github.com/niwinz/django-redis
+django-localflavor==3.0.1 # https://django-localflavor.readthedocs.io/en/latest/
+django-filter==2.2.0 # https://github.com/baskoopmans/django-filters/
 
 # Django REST Framework
-djangorestframework==3.9.2  # https://github.com/encode/django-rest-framework
+djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
+djangorestframework-simplejwt==4.4.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
 coreapi==2.3.3  # https://github.com/core-api/python-client
 
 pdfrw==0.4
--e git+https://github.com/codefordurham/ciprs-reader.git@v0.0.14#egg=ciprs-reader
+-e git+https://github.com/codefordurham/ciprs-reader.git@v0.0.16#egg=ciprs-reader

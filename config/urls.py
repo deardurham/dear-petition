@@ -1,20 +1,19 @@
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth.decorators import login_required
-from django.views.generic import RedirectView
 from django.views import defaults as default_views
 
+from dear_petition.views import index
+
 urlpatterns = [
-    path("", RedirectView.as_view(pattern_name="upload-report"), name="home",),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path("users/", include("dear_petition.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path("petition/", include("dear_petition.petition.urls")),
+    # React SPA:
+    path(r"", index, name="index"),
+    re_path(r"^(?:.*)/?$", index, name="index-others"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

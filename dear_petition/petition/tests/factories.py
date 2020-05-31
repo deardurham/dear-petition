@@ -1,11 +1,24 @@
-from typing import Any, Sequence
+import random
 
-from django.contrib.auth import get_user_model
 import factory
 
-
-from dear_petition.petition.models import CIPRSRecord, Batch
+from dear_petition.petition.models import (
+    CIPRSRecord,
+    Batch,
+    Offense,
+    OffenseRecord,
+    Petition,
+    Contact,
+)
 from dear_petition.users.tests.factories import UserFactory
+
+from ..constants import (
+    CHARGED,
+    DISMISSED,
+    DISTRICT_COURT,
+    SUPERIOR_COURT,
+    DURHAM_COUNTY,
+)
 
 
 class BatchFactory(factory.DjangoModelFactory):
@@ -65,6 +78,48 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
     label = factory.Faker("name")
     data = factory.Sequence(record_data)
+    offense_date = factory.Faker("date_object")
+    arrest_date = factory.Faker("date_object")
+    jurisdiction = factory.LazyFunction(
+        lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT])
+    )
+    county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
 
     class Meta:
         model = CIPRSRecord
+
+
+class OffenseFactory(factory.DjangoModelFactory):
+    ciprs_record = factory.SubFactory(CIPRSRecordFactory)
+    disposed_on = factory.Faker("date_object")
+    disposition_method = "DISPOSED BY JUDGE"
+
+    class Meta:
+        model = Offense
+
+
+class OffenseRecordFactory(factory.DjangoModelFactory):
+    offense = factory.SubFactory(OffenseFactory)
+    law = "G.S. 20-141(B)"
+    code = "4450"
+    action = CHARGED
+    severity = "INFRACTION"
+    description = "SPEEDING(80 mph in a 65 mph zone)"
+
+    class Meta:
+        model = OffenseRecord
+
+
+class PetitionFactory(factory.DjangoModelFactory):
+    batch = factory.SubFactory(BatchFactory)
+    county = DURHAM_COUNTY
+    form_type = DISMISSED
+    jurisdiction = DISTRICT_COURT
+
+    class Meta:
+        model = Petition
+
+
+class ContactFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Contact

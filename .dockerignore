@@ -2,3 +2,10 @@
 !.coveragerc
 !.env
 !.pylintrc
+./node_modules/*
+./frontend/*
+node_modules
+build
+.dockerignore
+Dockerfile
+# Dockerfile.prod

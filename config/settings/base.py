@@ -3,11 +3,14 @@ Base settings to build other settings files upon.
 """
 
 import environ
+from datetime import timedelta
+from pathlib import Path
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # (dear_petition/config/settings/base.py - 3 = dear_petition/)
 APPS_DIR = ROOT_DIR.path("dear_petition")
+FRONTEND_BUILD_DIR = Path(ROOT_DIR) / "build"
 
 env = environ.Env()
 
@@ -62,7 +65,13 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
 ]
-THIRD_PARTY_APPS = ["crispy_forms", "allauth", "allauth.account", "rest_framework"]
+THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "allauth",
+    "allauth.account",
+    "rest_framework",
+    "django_filters",
+]
 LOCAL_APPS = [
     "dear_petition.users.apps.UsersAppConfig",
     # Your stuff: custom apps go here
@@ -70,6 +79,23 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# REST_FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        # SessionAuthentication needs to go before JWTHttpOnlyCookieAuthentication so that csrf is included in request
+        "dear_petition.petition.api.authentication.JWTHttpOnlyCookieAuthentication",
+    ],
+    # https://www.django-rest-framework.org/api-guide/pagination/#setting-the-pagination-style
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
+}
+
+SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
+}
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -131,7 +157,7 @@ STATIC_ROOT = str(ROOT_DIR("staticfiles"))
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [str(APPS_DIR.path("static"))]
+STATICFILES_DIRS = [str(APPS_DIR.path("static")), str(FRONTEND_BUILD_DIR / "static")]
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -153,7 +179,7 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
-        "DIRS": [str(APPS_DIR.path("templates"))],
+        "DIRS": [str(APPS_DIR.path("templates")), str(FRONTEND_BUILD_DIR)],
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             "debug": DEBUG,
@@ -253,3 +279,9 @@ SOCIALACCOUNT_ADAPTER = "dear_petition.users.adapters.SocialAccountAdapter"
 # ------------------------------------------------------------------------------
 CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)
 CIPRS_SAVE_PDF = env.bool("CIPRS_SAVE_PDF", False)
+
+AUTH_COOKIE_KEY = "Authorization"
+# Set SAMESITE setting below to 'Strict' to ask recieving browsers not to send this cookie
+# across origins. This should work in this case, as long as we serve the API and Client from
+# the same domain.
+AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
