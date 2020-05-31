@@ -282,6 +282,7 @@ notebooks/ignore
 .envs/*
 !.envs/.local/
 *.code-workspace
+docker-compose.override.yml
 
 # Generated files
 
