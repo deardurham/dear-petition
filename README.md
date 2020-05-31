@@ -62,6 +62,19 @@ See detailed [cookiecutter-django Docker
 documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
 
 
+### Restore database
+
+To restore a database dump, you can run:
+
+```sh
+docker-compose run --rm django sh
+$ dropdb dear_petition
+$ createdb dear_petition
+$ pg_restore -Ox -d dear_petition latest.dump
+$ python manage.py migrate
+```
+
+
 ## Setup (without Docker)
 
 Run the setup\_project.py script from the base directory, providing as a

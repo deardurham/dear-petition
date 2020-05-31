@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
     CIPRSRecord,
@@ -13,9 +15,17 @@ from localflavor.us import us_states
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    admin_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["pk", "username", "email"]
+        fields = ["pk", "username", "email", "admin_url"]
+
+    def get_admin_url(self, obj):
+        url = ""
+        if self.context["request"].user.is_staff:
+            url = reverse("admin:index")
+        return url
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):
