@@ -23,8 +23,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_admin_url(self, obj):
         url = ""
-        if self.context["request"].user.is_staff:
-            url = reverse("admin:index")
+        # if self.context["request"].user.is_staff:
+        #     url = reverse("admin:index")
         return url
 
 
