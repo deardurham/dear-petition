@@ -22,6 +22,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        return super().get_queryset().filter(pk=self.request.user.pk)
+
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
 
