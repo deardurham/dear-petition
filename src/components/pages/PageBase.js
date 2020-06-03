@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   PageBaseStyled,
   PageHeader,
   PageLogo,
+  AdminButton,
   LogoutButton,
   PageContentWrapper
 } from './PageBase.styled';
@@ -18,6 +19,7 @@ import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 import { useHistory } from 'react-router-dom';
 
 function PageBase({ children, ...props }) {
+  const [adminUrl, setAdminUrl] = useState('');
   const history = useHistory();
   const handleLogout = () => {
     Axios.delete('token/');
@@ -27,11 +29,12 @@ function PageBase({ children, ...props }) {
   };
 
   return (
-    <PageBaseStyled {...props}>
+    <PageBaseStyled {...props} onUserLoggedIn={(userData) => setAdminUrl(userData['admin_url'])} >
       <PageHeader>
         <PageLogo>
           <img src={DEAR_Logo} alt="DEAR logo" />
         </PageLogo>
+        {adminUrl ? <AdminButton href={adminUrl}>Admin</AdminButton> : null}
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </PageHeader>
       <PageContentWrapper>{children}</PageContentWrapper>
