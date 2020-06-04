@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PageBaseStyled,
   PageHeader,
@@ -28,8 +28,14 @@ function PageBase({ children, ...props }) {
     history.replace('/');
   };
 
+  useEffect(() => {
+    if (localStorage.getItem(USER)) {
+      Axios.get('/users/').then((data) => setAdminUrl(data.admin_url));
+    }
+  }, []);
+
   return (
-    <PageBaseStyled {...props} onUserLoggedIn={(userData) => setAdminUrl(userData['admin_url'])} >
+    <PageBaseStyled {...props}>
       <PageHeader>
         <PageLogo>
           <img src={DEAR_Logo} alt="DEAR logo" />
