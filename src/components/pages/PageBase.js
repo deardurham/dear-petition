@@ -30,7 +30,7 @@ function PageBase({ children, ...props }) {
 
   useEffect(() => {
     if (localStorage.getItem(USER)) {
-      Axios.get('/users/').then((data) => setAdminUrl(data.admin_url));
+      Axios.get('/users/').then(({ data }) => setAdminUrl(data?.results[0].admin_url || ''));
     }
   }, []);
 
