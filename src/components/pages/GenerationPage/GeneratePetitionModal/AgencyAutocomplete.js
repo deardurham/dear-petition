@@ -52,7 +52,8 @@ const AgencyAutocomplete = ({ ...props }) => {
     (async function () {
       try {
         const { data } = await Axios.get(`/contact/?category=agency&search=${value}`);
-        setSuggestions(data?.results || []);
+        const selectedAgencyNames = selectedAgencies.map((agency) => agency.name);
+        setSuggestions(data?.results.filter((agency) => !selectedAgencyNames.includes(agency.name)) || []);
       } catch (error) {
         console.error(error);
       }
