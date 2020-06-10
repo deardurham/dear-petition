@@ -17,12 +17,20 @@ export const PageHeader = styled.header`
 `;
 
 export const PageLogo = styled.div`
+  flex: 1;
   img {
     width: 260px;
   }
 `;
 
+export const AdminButton = styled.a`
+  margin: 0 1rem;
+  border: none;
+  color: ${colorGrey};
+`;
+
 export const LogoutButton = styled.button`
+  margin: 0 1rem;
   border: none;
   color: ${colorGrey};
   cursor: pointer;
