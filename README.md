@@ -34,7 +34,7 @@ npm run start
 
 By default, the frontend development server [proxies requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to [a staging API server](https://dear-petition-staging.herokuapp.com/).
 
-The staging API server is useful for developers who do not wish to build a local backend implementation. To fully use the staging backend, new developers must have an account set up on the staging server.
+The staging API server is useful for developers who do not wish to build a local backend implementation. New developers must have a user set up on the staging server in order to test most frontend functionality.
 
 
 ### Local Backend
