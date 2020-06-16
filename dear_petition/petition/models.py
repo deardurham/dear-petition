@@ -19,23 +19,14 @@ from . import constants as pc
 from .constants import (
     JURISDICTION_CHOICES,
     DISTRICT_COURT,
-    SUPERIOR_COURT,
     NOT_AVAILABLE,
     SEX_CHOICES,
-    MALE,
-    FEMALE,
-    UNKNOWN,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
-    DATE_FORMAT,
-    CHARGED,
     FORM_TYPES,
 )
 
-from .utils import (
-    dt_obj_to_date,
-    make_datetime_aware,
-)
+from .utils import make_datetime_aware
 
 
 logger = logging.getLogger(__name__)
@@ -105,109 +96,17 @@ class CIPRSRecord(models.Model):
             return data
 
     def refresh_record_from_data(self):
-        """Updates model fields that depends on the data JSONField
+        from dear_petition.petition.etl.refresh import refresh_record_from_data
 
-        The record exists, but the raw data (data - JSONFIELD) has
-        changed. Let's update the models that are extracting data
-        from this field.
-        """
-        self.file_no = (
-            self.data.get("General", {}).get("File No", "") if self.data else ""
-        )
-        self.county = (
-            self.data.get("General", {}).get("County", "") if self.data else ""
-        )
-        self.dob = (
-            self.data.get("Defendant", {}).get("Date of Birth/Estimated Age", None)
-            if self.data
-            else None
-        )
-        self.sex = (
-            self.data.get("Defendant", {}).get("Sex", NOT_AVAILABLE)
-            if self.data
-            else NOT_AVAILABLE
-        )
-        self.race = self.data.get("Defendant", {}).get("Race", "") if self.data else ""
-        self.case_status = (
-            self.data.get("Case Information", {}).get("Case Status", "")
-            if self.data
-            else ""
-        )
-        self.offense_date = (
-            make_datetime_aware(
-                self.data.get("Case Information", {}).get("Offense Date", None)
-            )
-            if self.data
-            else None
-        )
-        self.arrest_date = (
-            self.data.get("Offense Record", {}).get(
-                "Arrest Date", dt_obj_to_date(self.offense_date)
-            )
-            if self.data
-            else None
-        )
-        self.jurisdiction = self.get_jurisdiction()
-        self.save()
-        # Record has been saved, now let's update the offense data.
-        # we are using the get_or_create queryset method.
-        # based upon the kwargs we are passing, either a object will
-        # be retrieved from the db or the object will be created.
-        # Alternatively we could use update_or_create method, but since
-        # we are only getting this data by reading the pdf, I think
-        # get_or_create is more suitable. Essentially, we are just
-        # checking whether the defendant has more offenses since the last
-        # time we ran this method. If a additional offenses are found add
-        # the offense. If a UI interface is added that allows lawyers to
-        # make changes to a users a offenses (I doubt it) then we need
-        # think about revising the methods chosen here.
-        offenses = self.data.get("Offense Record", {})
-
-        # Check and remove any existing Offense Records and the existing Offenses
-        # before reading from raw_data
-        existing_offense_records = OffenseRecord.objects.filter(
-            offense__ciprs_record=self
-        )
-        existing_offenses = Offense.objects.filter(ciprs_record=self)
-        existing_offense_records.delete()
-        existing_offenses.delete()
-        if offenses:
-            offense, created = Offense.objects.get_or_create(
-                ciprs_record=self,
-                disposed_on=offenses.get("Disposed On", None),
-                disposition_method=offenses.get("Disposition Method", ""),
-            )
-            offense_records = offenses.get("Records", [])
-            for offense_record in offense_records:
-                try:
-                    code = int(offense_record.get("Code"))
-                except (ValueError, TypeError):
-                    code = None
-                OffenseRecord.objects.create(
-                    offense=offense,
-                    law=offense_record.get("Law", ""),
-                    code=code,
-                    action=offense_record.get("Action", ""),
-                    severity=offense_record.get("Severity", ""),
-                    description=offense_record.get("Description", ""),
-                )
-
-    def get_jurisdiction(self):
-        if self.data:
-            is_superior = self.data.get("General", {}).get("Superior", "")
-            is_district = self.data.get("General", {}).get("District", "")
-            if is_superior:
-                return SUPERIOR_COURT
-            elif is_district:
-                return DISTRICT_COURT
-            else:
-                return NOT_AVAILABLE
-        return NOT_AVAILABLE
+        refresh_record_from_data(self)
 
 
 class Offense(models.Model):
     ciprs_record = models.ForeignKey(
         "CIPRSRecord", related_name="offenses", on_delete="CASCADE"
+    )
+    jurisdiction = models.CharField(
+        choices=JURISDICTION_CHOICES, max_length=255, default=DISTRICT_COURT
     )
     disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)

@@ -7,7 +7,7 @@ import tempfile
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
-from ciprs_reader import PDFToTextReader
+from ciprs_reader.reader import PDFToTextReader
 
 
 __all__ = ("transform_ciprs_document", "parse_ciprs_document")
