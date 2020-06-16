@@ -1,4 +1,4 @@
-FROM alpine:3.9.3
+FROM alpine:3.10
 
 ENV PYTHONUNBUFFERED 1
 
