@@ -22,13 +22,28 @@ git clone git@github.com:deardurham/dear-petition.git
 The user facing side of the DEAR Petition Generator is a React single page app (SPA).
 
 
-### 🚀 Development
-
-(TODO: Something here about how to point your local frontend to staging API.)
+### 🚀 Quick Setup
 
 ```bash
 npm i
 npm run start
+```
+
+
+### Staging Backend
+
+By default, the frontend development server [proxies requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to [a staging API server](https://dear-petition-staging.herokuapp.com/).
+
+The staging API server is useful for developers who do not wish to build a local backend implementation. New developers must have a user set up on the staging server in order to test most frontend functionality.
+
+
+### Local Backend
+
+Developers who wish to use a local version of both the frontend and backend must set the `proxy` variable in `package.json` to the following:
+
+```diff
+-  "proxy": "https://dear-petition-staging.herokuapp.com/",
++  "proxy": "http://localhost:8000",
 ```
 
 
@@ -75,7 +90,7 @@ $ python manage.py migrate
 ```
 
 
-## Setup (without Docker)
+## Backend Development (without Docker)
 
 Run the setup\_project.py script from the base directory, providing as a
 command line argument the directory to the related ciprs-reader project.
@@ -123,17 +138,8 @@ Removing virtualenv (/Users/user/.local/share/virtualenvs/dear-petition-fJpn7FEC
 ```
 
 
-Basic Commands
---------------
+### Setting Up Your Users
 
-
-#### Setting Up Your Users
-
--   To create a **normal user account**, just go to Sign Up and fill out
-    the form. Once you submit it, you\'ll see a \"Verify Your E-mail
-    Address\" page. Go to your console to see a simulated email
-    verification message. Copy the link into your browser. Now the
-    user\'s email should be verified and ready to go.
 -   To create an **superuser account**, use this command:
 
         $ python manage.py createsuperuser
@@ -142,15 +148,17 @@ For convenience, you can keep your normal user logged in on Chrome and
 your superuser logged in on Firefox (or similar), so that you can see
 how the site behaves for both kinds of users.
 
+## Development Tools and Testing
 
-#### Type checks
+
+### Type checks
 
 Running type checks with mypy:
 
     $ mypy dear_petition
 
 
-#### Test coverage
+### Test coverage
 
 To run the tests, check your test coverage, and generate an HTML
 coverage report:
