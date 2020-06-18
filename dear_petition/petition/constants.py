@@ -8,6 +8,11 @@ JURISDICTION_CHOICES = (
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
+OFFENSE_HEADERS = (
+    (DISTRICT_COURT, "District Court Offense Information"),
+    (SUPERIOR_COURT, "Superior Court Offense Information"),
+)
+
 MALE = "M"
 FEMALE = "F"
 UNKNOWN = "U"
