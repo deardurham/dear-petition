@@ -32,7 +32,9 @@ def batch(user):
 
 @pytest.fixture
 def record1(batch):
-    yield CIPRSRecordFactory(batch=batch, label=batch.label)
+    yield CIPRSRecordFactory(
+        batch=batch, label=batch.label, jurisdiction=constants.DISTRICT_COURT
+    )
 
 
 @pytest.fixture
@@ -107,6 +109,7 @@ def dismissed_offense(record1):
     return OffenseFactory(
         disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
         ciprs_record=record1,
+        jurisdiction=constants.DISTRICT_COURT,
     )
 
 

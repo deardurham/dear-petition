@@ -231,6 +231,7 @@ class Petition(models.Model):
         """Return batch offenses for this petition type, jurisdiction, and county."""
         qs = self.batch.petition_offense_records(petition_type=self.form_type)
         qs = qs.filter(
+            offense__jurisdiction=self.jurisdiction,
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
