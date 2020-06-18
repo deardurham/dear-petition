@@ -235,4 +235,6 @@ class Petition(models.Model):
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
-        return qs.order_by("offense__ciprs_record__offense_date")
+        return qs.order_by(
+            "offense__ciprs_record__offense_date", "offense__ciprs_record__file_no"
+        )
