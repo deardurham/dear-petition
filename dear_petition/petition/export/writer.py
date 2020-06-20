@@ -11,7 +11,7 @@ __all__ = ("write_pdf",)
 def write_pdf(data):
     output = io.BytesIO()
     template_path = os.path.join(
-        settings.APPS_DIR, "static", "templates", "petition-template.pdf"
+        settings.APPS_DIR, "static", "templates", "AOC-CR-287.pdf"
     )
     petition = Writer(data, template_path, output)
     petition.get_annotations()

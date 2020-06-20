@@ -249,8 +249,12 @@ def test_map_offenses__offense_date(data, petition, record2, offense1, offense_r
 def test_map_offenses__disposition_method(
     data, petition, record2, offense1, offense_record1
 ):
+    breakpoint()
     mapper.map_offenses(data, petition)
-    assert data["Disposition:1"] == offense1.disposition_method
+    assert (
+        data["Disposition:1"]
+        == constants.DISPOSITION_METHOD_CODE_MAP[offense1.disposition_method]
+    )
 
 
 def test_map_offenses__disposition_date(
