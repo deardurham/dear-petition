@@ -12,17 +12,24 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "label",
-        "batch",
         "file_no",
         "jurisdiction",
+        "county",
         "sex",
         "race",
         "case_status",
         "date_uploaded",
     )
-    list_filter = ("date_uploaded", "jurisdiction", "sex", "race", "case_status")
+    list_filter = (
+        "date_uploaded",
+        "jurisdiction",
+        "county",
+        "sex",
+        "race",
+        "case_status",
+    )
     date_hierarchy = "date_uploaded"
-    search_fields = ("label",)
+    search_fields = ("label", "batch__label")
     ordering = ("-date_uploaded",)
 
     def action_parse_report_pdf(self, request, queryset):
