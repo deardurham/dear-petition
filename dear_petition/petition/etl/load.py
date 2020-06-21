@@ -26,7 +26,6 @@ def import_ciprs_records(files, user):
             record.refresh_record_from_data()
             if settings.CIPRS_SAVE_PDF:
                 record.report_pdf = file_
-            record.label = record.data.get("Defendant", {}).get("Name", "")
             if record.label and idx == 0:
                 batch.label = record.label
                 batch.save()
