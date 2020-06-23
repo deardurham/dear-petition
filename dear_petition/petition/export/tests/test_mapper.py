@@ -265,7 +265,7 @@ def test_map_offenses__disposition_method(
     offense1.save()
     mapper.map_offenses(data, petition)
     assert data["Disposition:1"] == constants.DISPOSITION_METHOD_CODE_MAP.get(
-        offense1.disposition_method
+        offense1.disposition_method.upper()
     )
 
 
