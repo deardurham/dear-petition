@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"
@@ -60,3 +62,16 @@ DISMISSED_DISPOSITION_METHODS = (
     "No Probable Cause",
     "Never To Be Served",
 )
+
+KNOWN_DISPOSITION_METHODS = {
+    "Dismissal without Leave by DA": "VD",
+    "Dismissed by Court": "DC",
+    "Deferred Prosecution Dismissal": "DPD",
+    "Discharge and Dismissal": "DD",
+    "Conditional Discharge": "DD",
+    "No Probable Cause": "NPC",
+    "Never To Be Served": "NTBS",
+    "Guilty to Lesser": "Glty to Lesser",
+}
+DISPOSITION_METHOD_CODE_MAP = defaultdict(lambda x: x)
+DISPOSITION_METHOD_CODE_MAP.update(KNOWN_DISPOSITION_METHODS)

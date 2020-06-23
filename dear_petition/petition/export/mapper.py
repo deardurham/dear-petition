@@ -91,7 +91,9 @@ def map_offenses(data, petition, extra={}):
         data["DOOF:" + str(idx)] = utils.format_petition_date(
             offense_record.offense.ciprs_record.offense_date
         )
-        data["Disposition:" + str(idx)] = offense_record.offense.disposition_method
+        data["Disposition:" + str(idx)] = constants.DISPOSITION_METHOD_CODE_MAP[
+            offense_record.offense.disposition_method
+        ]
         data["DispositionDate:" + str(idx)] = utils.format_petition_date(
             offense_record.offense.disposed_on
         )
