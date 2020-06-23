@@ -63,7 +63,7 @@ DISMISSED_DISPOSITION_METHODS = (
     "Never To Be Served",
 )
 
-KNOWN_DISPOSITION_METHODS = {
+DISPOSITION_METHOD_CODE_MAP = {
     "Dismissal without Leave by DA": "VD",
     "Dismissed by Court": "DC",
     "Deferred Prosecution Dismissal": "DPD",
@@ -73,5 +73,3 @@ KNOWN_DISPOSITION_METHODS = {
     "Never To Be Served": "NTBS",
     "Guilty to Lesser": "Glty to Lesser",
 }
-DISPOSITION_METHOD_CODE_MAP = defaultdict(lambda x: x)
-DISPOSITION_METHOD_CODE_MAP.update(KNOWN_DISPOSITION_METHODS)
