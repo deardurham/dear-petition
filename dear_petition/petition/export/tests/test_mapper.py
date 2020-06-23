@@ -246,9 +246,23 @@ def test_map_offenses__offense_date(data, petition, record2, offense1, offense_r
     assert data["DOOF:1"] == record2.offense_date.strftime(constants.DATE_FORMAT)
 
 
+@pytest.mark.parametrize(
+    "disposition_method",
+    [
+        "Dismissal without Leave by DA",
+        "Dismissed by Court",
+        "Deferred Prosecution Dismissal",
+        "Discharge and Dismissal",
+        "Conditional Discharge",
+        "No Probable Cause",
+        "Never To Be Served",
+    ],
+)
 def test_map_offenses__disposition_method(
-    data, petition, record2, offense1, offense_record1
+    data, petition, record2, offense1, offense_record1, disposition_method,
 ):
+    offense1.disposition_method = disposition_method
+    offense1.save()
     mapper.map_offenses(data, petition)
     assert (
         data["Disposition:1"]
