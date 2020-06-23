@@ -9,10 +9,27 @@ from dear_petition.petition import models
 class CIPRSRecordAdmin(admin.ModelAdmin):
 
     actions = ("action_parse_report_pdf",)
-    list_display = ("pk", "label", "batch", "date_uploaded")
-    list_filter = ("date_uploaded",)
+    list_display = (
+        "pk",
+        "label",
+        "file_no",
+        "jurisdiction",
+        "county",
+        "sex",
+        "race",
+        "case_status",
+        "date_uploaded",
+    )
+    list_filter = (
+        "date_uploaded",
+        "jurisdiction",
+        "county",
+        "sex",
+        "race",
+        "case_status",
+    )
     date_hierarchy = "date_uploaded"
-    search_fields = ("label",)
+    search_fields = ("label", "batch__label")
     ordering = ("-date_uploaded",)
 
     def action_parse_report_pdf(self, request, queryset):

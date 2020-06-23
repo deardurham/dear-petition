@@ -16,11 +16,11 @@ __all__ = ("transform_ciprs_document", "parse_ciprs_document")
 logger = logging.getLogger(__name__)
 
 
-def transform_ciprs_document(saved_file_path, source=settings.CIPRS_READER_SOURCE):
+def transform_ciprs_document(saved_file_path, save_source=settings.CIPRS_READER_SOURCE):
     """Run PDF extraction and return entity-extracted JSON data."""
     reader = PDFToTextReader(saved_file_path)
     try:
-        reader.parse(source=source)
+        reader.parse(save_source=save_source)
         data = json.loads(reader.json())
     except subprocess.CalledProcessError as e:
         logger.exception(str(e))

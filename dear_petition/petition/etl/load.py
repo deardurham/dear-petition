@@ -21,18 +21,14 @@ def import_ciprs_records(files, user):
     logger.info(f"Created batch {batch.id}")
     for idx, file_ in enumerate(files):
         logger.info(f"Importing file {file_}")
-        record = CIPRSRecord(batch=batch)
-        if settings.CIPRS_SAVE_PDF:
-            record.report_pdf = file_
-        record.data = parse_ciprs_document(file_)
-        if "error" in record.data:
-            raise forms.ValidationError(record.data["error"])
-        record.label = record.data.get("Defendant", {}).get("Name", "")
-        if record.label and idx == 0:
-            batch.label = record.label
-            batch.save()
-        record.refresh_record_from_data()
-        batch.records.add(record)
+        for record_data in parse_ciprs_document(file_):
+            record = CIPRSRecord(batch=batch, data=record_data)
+            record.refresh_record_from_data()
+            if settings.CIPRS_SAVE_PDF:
+                record.report_pdf = file_
+            if record.label and idx == 0:
+                batch.label = record.label
+                batch.save()
     create_batch_petitions(batch)
     return batch
 

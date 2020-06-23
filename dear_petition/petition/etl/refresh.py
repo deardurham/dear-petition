@@ -18,6 +18,7 @@ def get_jurisdiction(record):
 
 def refresh_record_from_data(record):
     """Transform record.data (JSONField) into model data."""
+    record.label = record.data.get("Defendant", {}).get("Name", "")
     record.file_no = record.data.get("General", {}).get("File No", "")
     record.county = record.data.get("General", {}).get("County", "")
     record.dob = record.data.get("Defendant", {}).get(
