@@ -64,12 +64,12 @@ DISMISSED_DISPOSITION_METHODS = (
 )
 
 DISPOSITION_METHOD_CODE_MAP = {
-    "Dismissal without Leave by DA": "VD",
-    "Dismissed by Court": "DC",
-    "Deferred Prosecution Dismissal": "DPD",
-    "Discharge and Dismissal": "DD",
-    "Conditional Discharge": "DD",
-    "No Probable Cause": "NPC",
-    "Never To Be Served": "NTBS",
-    "Guilty to Lesser": "Glty to Lesser",
+    "DISMISSAL WITHOUT LEAVE BY DA": "VD",
+    "DISMISSED BY COURT": "DC",
+    "DEFERRED PROSECUTION DISMISSAL": "DPD",
+    "DISCHARGE AND DISMISSAL": "DD",
+    "CONDITIONAL DISCHARGE": "DD",
+    "NO PROBABLE CAUSE": "NPC",
+    "NEVER TO BE SERVED": "NTBS",
+    "GUILTY TO LESSER": "Glty to Lesser",
 }
