@@ -5,7 +5,10 @@ import {
   SplashLogo,
   LoginForm,
   FormErrors,
-  InputStyled
+  InputStyled,
+  PasswordInputStyled,
+  ForgotPassword,
+  PasswordWrapper
 } from './LoginPage.styled';
 import Button from '../../elements/Button/Button';
 
@@ -62,13 +65,16 @@ function Login() {
           onChange={e => setUsername(e.target.value)}
           errors={errors.username}
         />
-        <InputStyled
-          label="password"
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          errors={errors.password}
-        />
+        <PasswordWrapper>
+          <PasswordInputStyled
+            label="password"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            errors={errors.password}
+          />
+          <ForgotPassword href='password_reset/'>Forgot Password?</ForgotPassword>
+        </PasswordWrapper>
         <AnimatePresence>
           {errors.detail && (
             <FormErrors
