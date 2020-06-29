@@ -126,6 +126,8 @@ class OffenseRecord(models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
+    plea = models.CharField(max_length=256, null=True)
+    verdict = models.CharField(max_length=256, null=True)
 
     def __str__(self):
         return f"offense record {self.pk}"

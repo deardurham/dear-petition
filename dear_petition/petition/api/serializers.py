@@ -45,6 +45,8 @@ class OffenseSerializer(serializers.ModelSerializer):
             "disposed_on",
             "disposition_method",
             "offense_records",
+            "plea",
+            "verdict",
         ]
 
 
