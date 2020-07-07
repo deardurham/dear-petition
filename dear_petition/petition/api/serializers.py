@@ -103,7 +103,7 @@ class GeneratePetitionSerializer(serializers.Serializer):
     )
     name_petitioner = serializers.CharField(label="Petitioner Name")
     address1 = serializers.CharField(label="Address Line 1")
-    address2 = serializers.CharField(label="Address Line 2")
+    address2 = serializers.CharField(label="Address Line 2", required=False, allow_blank=True)
     city = serializers.CharField(label="City")
     state = serializers.ChoiceField(choices=us_states.US_STATES)
     zip_code = serializers.CharField(label="Zip Code")
