@@ -33,9 +33,12 @@ def map_petition(data, petition, extra={}):
 
 def map_petitioner(data, petition, extra={}):
     record = petition.batch.most_recent_record
-    data["NamePetitioner"] = getattr(
-        record, "label", None
-    )  # load.py line 28 (label is set to name attr)
+    data["NamePetitioner"] = extra.get("name_petitioner", None)
+    data["StreetAddr"] = extra.get("address1", None)
+    data["MailAddr"] = extra.get("address2", None)
+    data["City"] = extra.get("city", None)
+    data["State"] = extra.get("state", None)
+    data["ZipCode"] = extra.get("zip_code", None)
     # note: SNN and not SSN due to bug in PDF field name
     data["SNN"] = extra.get("ssn", None)
     data["DLNo"] = extra.get("drivers_license", None)

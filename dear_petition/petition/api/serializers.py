@@ -101,6 +101,12 @@ class GeneratePetitionSerializer(serializers.Serializer):
     petition = serializers.ChoiceField(
         choices=[], style={"base_template": "input.html"},
     )
+    name_petitioner = serializers.CharField(label="Petitioner Name")
+    address1 = serializers.CharField(label="Address Line 1")
+    address2 = serializers.CharField(label="Address Line 2")
+    city = serializers.CharField(label="City")
+    state = serializers.ChoiceField(choices=us_states.US_STATES)
+    zip_code = serializers.CharField(label="Zip Code")
     ssn = serializers.CharField(label="SSN")
     drivers_license = serializers.CharField(label="Driver's License #")
     drivers_license_state = serializers.ChoiceField(choices=us_states.US_STATES)
