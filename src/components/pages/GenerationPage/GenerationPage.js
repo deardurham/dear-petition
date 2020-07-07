@@ -22,6 +22,7 @@ function GenerationPage() {
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
   const [petition, setPetition] = useState();
+  const [address, setAddress] = useState({ state: 'NC' });
   const [ssn, setSSN] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [licenseState, setLicenseState] = useState({ label: 'NC', value: 'NC' });
@@ -62,6 +63,22 @@ function GenerationPage() {
       errors.attorney = ['This field is required'];
       isValid = false;
     }
+    if (!address?.address1) {
+      errors.address = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.city) {
+      errors.city = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.state) {
+      errors.state = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.zipCode) {
+      errors.zipCode = ['This field is required'];
+      isValid = false;
+    }
 
     setFormErrors(errors);
 
@@ -79,6 +96,8 @@ function GenerationPage() {
   const context = {
     batch,
     petition,
+    address,
+    setAddress,
     ssn,
     setSSN,
     licenseNumber,
