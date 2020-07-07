@@ -2,6 +2,7 @@ from django.conf import settings
 from django.urls import include, path, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.views import defaults as default_views
 
 from dear_petition.views import index
@@ -11,6 +12,14 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
     path("petition/", include("dear_petition.petition.urls")),
+    # Password Reset
+    path("password_reset/", auth_views.PasswordResetView.as_view(
+        subject_template_name='accounts/password_reset_subject.txt',
+        email_template_name='accounts/password_reset_email.html',
+    ), name='password_reset'),
+    path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path("reset/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path("reset/done/", auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     # React SPA:
     path(r"", index, name="index"),
     re_path(r"^(?:.*)/?$", index, name="index-others"),
