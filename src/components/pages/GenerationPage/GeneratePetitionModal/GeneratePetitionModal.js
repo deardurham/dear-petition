@@ -10,6 +10,7 @@ import useKeyPress from '../../../../hooks/useKeyPress';
 import AgencyAutocomplete from './AgencyAutocomplete';
 import { GenerationContext } from '../GenerationPage';
 import Button from '../../../elements/Button/Button';
+import CloseIcon from '../../../elements/CloseIcon/CloseIcon';
 import Axios from '../../../../service/axios';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
@@ -62,9 +63,18 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     }
   };
 
+  const ButtonTopRight = styled(Button)`
+    position: absolute;
+    right: 0;
+    top: 0;
+  `;
+
   return (
     <GeneratePetitionModalStyled isVisible={isVisible}>
       <ModalContent>
+        <ButtonTopRight onClick={closeModal}>
+          <CloseIcon onClose={closeModal} />
+        </ButtonTopRight>
         {petition && (
           <>
             <h2>{petition.form_type}</h2>

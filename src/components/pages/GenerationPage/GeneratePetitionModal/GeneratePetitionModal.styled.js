@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { colorWhite } from '../../../../styles/colors';
 
 export const ModalContent = styled.div`
+  position: relative;
   background-color: ${colorWhite};
   width: 500px;
   padding: 6rem;

@@ -18,5 +18,3 @@ export const IconStyled = styled(FontAwesomeIcon)`
     }
   }};
 `;
-
-export const CloseIcon = styled(FontAwesomeIcon)``;
