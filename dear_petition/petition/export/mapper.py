@@ -15,7 +15,7 @@ def build_pdf_template_context(petition, extra):
 
 
 def map_petition(data, petition, extra={}):
-    data["County"] = petition.county
+    data[petition.form_field("County")] = petition.county
     if petition.jurisdiction == constants.DISTRICT_COURT:
         data["District"] = Checkbox("Yes")
     else:
@@ -71,6 +71,9 @@ def map_agencies(data, petition, extra={}):
         data[f"CityAgency1{idx}"] = agency.city
         data[f"StateAgency1{idx}"] = agency.state
         data[f"ZipAgency1{idx}"] = agency.zipcode
+    # AOC-CR-285
+    if petition.parent:
+        data["FormNo1"] = petition.parent.form_type.split("-")[-1]
 
 
 def map_offenses(data, petition, extra={}):
@@ -78,7 +81,9 @@ def map_offenses(data, petition, extra={}):
     for idx, offense_record in enumerate(offense_records, 1):
         # The index of the offense determines what line on the petition form
         # the offense will be on
-        data["Fileno:" + str(idx)] = offense_record.offense.ciprs_record.file_no
+        data[
+            petition.form_field("County")
+        ] = offense_record.offense.ciprs_record.file_no
         data["ArrestDate:" + str(idx)] = utils.format_petition_date(
             offense_record.offense.ciprs_record.arrest_date
         )
@@ -93,3 +98,6 @@ def map_offenses(data, petition, extra={}):
         data["DispositionDate:" + str(idx)] = utils.format_petition_date(
             offense_record.offense.disposed_on
         )
+    # AOC-CR-285
+    if petition.parent:
+        data["FormNo2"] = petition.parent.form_type.split("-")[-1]
