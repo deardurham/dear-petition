@@ -56,8 +56,10 @@ def offense1(record2):
 
 
 @pytest.fixture
-def offense_record1(offense1):
-    yield OffenseRecordFactory(offense=offense1)
+def offense_record1(offense1, petition):
+    record = OffenseRecordFactory(offense=offense1)
+    record.petitions.set([petition])
+    yield record
 
 
 def fake_file(filename, content_type):

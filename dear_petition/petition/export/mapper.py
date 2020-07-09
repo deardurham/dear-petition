@@ -79,7 +79,7 @@ def map_agencies(data, petition, extra={}):
 
 
 def map_offenses(data, petition, extra={}):
-    offense_records = petition.get_all_offense_records()
+    offense_records = petition.offense_records.all()
     for idx, offense_record in enumerate(offense_records, 1):
         # The index of the offense determines what line on the petition form
         # the offense will be on
