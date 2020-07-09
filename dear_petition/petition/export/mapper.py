@@ -1,9 +1,4 @@
 import datetime as dt
-import pytz
-import pdfrw
-import dateutil.parser
-
-from django.conf import settings
 
 from dear_petition.petition import constants
 from dear_petition.petition import utils

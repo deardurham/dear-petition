@@ -5,11 +5,6 @@ from dear_petition.petition import constants
 from dear_petition.petition.export import mapper
 from dear_petition.petition.utils import make_datetime_aware, dt_obj_to_date
 
-from dear_petition.petition.tests.factories import (
-    BatchFactory,
-    CIPRSRecordFactory,
-)
-
 
 pytestmark = pytest.mark.django_db
 
