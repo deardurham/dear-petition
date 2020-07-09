@@ -1,4 +1,5 @@
 import random
+from pytz import timezone
 
 import factory
 
@@ -78,7 +79,7 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
     label = factory.Faker("name")
     data = factory.Sequence(record_data)
-    offense_date = factory.Faker("date_object")
+    offense_date = factory.Faker("date_time", tzinfo=timezone("US/Eastern"))
     arrest_date = factory.Faker("date_object")
     jurisdiction = factory.LazyFunction(
         lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT])
