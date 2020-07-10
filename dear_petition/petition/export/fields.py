@@ -3,6 +3,8 @@ from dear_petition.petition import constants
 
 cr_287 = {
     "County": "County",
+    "FileNo": "ConsJdgmntFileNum",
+    "NamePetitioner": "NamePetitioner",
     "OffenseFileNoRow": "Fileno:{idx}",
     "OffenseArrestDateRow": "ArrestDate:{idx}",
     "OffenseDescriptionRow": "Description:{idx}",
@@ -11,8 +13,17 @@ cr_287 = {
     "OffenseDispositionDateRow": "DispositionDate:{idx}",
 }
 
-cr_285 = cr_287.copy()
-cr_285.update({"County": "CountyName"})
+cr_285 = {
+    "County": "CountyName",
+    "FileNo": "FileNo",
+    "NamePetitioner": "PetitionerName",
+    "OffenseFileNoRow": "FileNoRow{idx}",
+    "OffenseArrestDateRow": "ArrestDateRow{idx}",
+    "OffenseDescriptionRow": "OffenseDescRow{idx}",
+    "OffenseDOOFRow": "DateOfOffenseRow{idx}",
+    "OffenseDispositionRow": "DispositionRow{idx}",
+    "OffenseDispositionDateRow": "DispositionDateRow{idx}",
+}
 
 fields = {
     constants.MISDEMEANOR: {},  # TBD
