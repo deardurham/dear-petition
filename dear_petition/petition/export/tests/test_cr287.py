@@ -151,6 +151,83 @@ def test_map_attorney__petition_not_filed_sign_date(form, contact1):
 
 
 #
+# Agencies
+#
+
+
+def test_map_agencies__name(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    names = [contact.name for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_names = []
+    for key, value in form.data.items():
+        if "NameAgency" in key:
+            data_names.append(value)
+    for n in data_names:
+        assert n in names
+
+
+def test_map_agencies__street_address(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    addresses = [contact.address1 for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_addresses = []
+    for key, value in form.data.items():
+        if "AddrAgency" in key:
+            data_addresses.append(value)
+    for a in data_addresses:
+        assert a in addresses
+
+
+def test_map_agencies__mail_address(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    addresses = [contact.address2 for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_mail_addresses = []
+    for key, value in form.data.items():
+        if "MailAgency" in key:
+            data_mail_addresses.append(value)
+    for m in data_mail_addresses:
+        assert m in addresses
+
+
+def test_map_agencies__city(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    cities = [contact.city for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_cities = []
+    for key, value in form.data.items():
+        if "CityAgency" in key:
+            data_cities.append(value)
+    for c in data_cities:
+        assert c in cities
+
+
+def test_map_agencies__state(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    states = [contact.state for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_states = []
+    for key, value in form.data.items():
+        if "StateAgency" in key:
+            data_states.append(value)
+    for s in data_states:
+        assert s in states
+
+
+def test_map_agencies__zipcode(form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    zipcodes = [contact.zipcode for contact in form.extra["agencies"]]
+    form.map_agencies()
+    data_zipcodes = []
+    for key, value in form.data.items():
+        if "ZipAgency" in key:
+            data_zipcodes.append(value)
+    for z in data_zipcodes:
+        assert z in zipcodes
+
+
+#
 # Offenses
 #
 

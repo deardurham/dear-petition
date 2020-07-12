@@ -40,6 +40,9 @@ class AOCFormCR287(PetitionForm):
     def build_form_context(self):
         self.map_header()
         self.map_petitioner()
+        self.map_attorney()
+        self.map_agencies()
+        self.map_offenses()
 
     def map_header(self):
         self.data["County"] = self.petition.county
@@ -73,12 +76,22 @@ class AOCFormCR287(PetitionForm):
         self.data["CityAtty"] = attorney.city
         self.data["StateAtty"] = attorney.state
         self.data["ZipCodeAtty"] = attorney.zipcode
-        ##### petition to expunge section ########
-        # This section is signed by the Attorney
-        ###########################################
+        #
+        # Petition to expunge section
+        #
         self.data["PetitionNotFiledSignName"] = attorney.name
         self.data["PetitionerAttorneyCbx"] = Checkbox("Yes")
         self.data["PetitionNotFiledSignDate"] = self.format_date(dt.datetime.today())
+
+    def map_agencies(self):
+        agencies = self.extra.get("agencies", [])
+        for i, agency in enumerate(agencies, 1):
+            self.data[f"NameAgency{i}"] = agency.name
+            self.data[f"AddrAgency{i}"] = agency.address1
+            self.data[f"MailAgency{i}"] = agency.address2
+            self.data[f"CityAgency1{i}"] = agency.city
+            self.data[f"StateAgency1{i}"] = agency.state
+            self.data[f"ZipAgency1{i}"] = agency.zipcode
 
     def map_offenses(self):
         offense_records = self.get_ordered_offense_records()
