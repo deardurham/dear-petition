@@ -130,6 +130,7 @@ class AOCFormCR285(AOCFormCR287):
         self.map_file_no()
         self.map_header()
         self.map_petitioner()
+        self.map_agencies()
         self.map_offenses()
 
     def map_file_no(self):
@@ -143,6 +144,24 @@ class AOCFormCR285(AOCFormCR287):
         offense_record = self.get_most_recent_record()
         if offense_record:
             self.data["PetitionerName"] = offense_record.offense.ciprs_record.label
+
+    def map_agencies(self):
+        agencies = self.extra.get("agencies", [])
+        if len(agencies) > 0:
+            self.data["FormNo1"] = self.petition.parent.form_type.split("-")[-1]
+        for i, agency in enumerate(agencies, 1):
+            body = ""
+            for field_name in [
+                "name",
+                "address1",
+                "address2",
+                "city",
+                "state",
+                "zipcode",
+            ]:
+                field = getattr(agency, field_name)
+                body += f"{field}\n"
+            self.data[f"NameAddress{i}"] = body
 
     def map_offenses(self):
         self.data["FormNo2"] = self.petition.parent.form_type.split("-")[-1]

@@ -64,6 +64,21 @@ def test_map_petitioner__name(form, record2, offense_record1):
 
 
 #
+# Agencies
+#
+
+
+@pytest.mark.parametrize(
+    "field", ["name", "address1", "address2", "city", "state", "zipcode"],
+)
+def test_map_agencies__name(field, form, contact1, contact2, contact3):
+    form.extra["agencies"] = [contact1, contact2, contact3]
+    form.map_agencies()
+    for i, agency in enumerate(form.extra["agencies"], 1):
+        assert getattr(agency, field) in form.data[f"NameAddress{i}"]
+
+
+#
 # Offenses
 #
 
