@@ -43,6 +43,7 @@ class AOCFormCR287(PetitionForm):
     MULTIPLE_FILE_NO_MSG = "Multiple - See Below"
 
     def build_form_context(self):
+        self.map_file_no()
         self.map_header()
         self.map_petitioner()
         self.map_attorney()
@@ -63,6 +64,10 @@ class AOCFormCR287(PetitionForm):
     def map_file_no(self):
         if self.petition.offense_records.count() > 1:
             self.data["ConsJdgmntFileNum"] = "Multiple - See Below"
+        else:
+            record = self.get_most_recent_record()
+            if record:
+                self.data["ConsJdgmntFileNum"] = record.file_no
 
     def map_petitioner(self):
         # note: SNN and not SSN due to bug in PDF field name
@@ -75,7 +80,6 @@ class AOCFormCR287(PetitionForm):
             self.data["Race"] = record.race
             self.data["Sex"] = record.sex
             self.data["DOB"] = self.format_date(record.dob)
-            self.data["ConsJdgmntFileNum"] = record.file_no
 
     def map_attorney(self):
         attorney = self.extra["attorney"]
