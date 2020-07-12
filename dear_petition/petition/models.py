@@ -15,7 +15,6 @@ import ciprs_reader
 from localflavor.us import us_states
 from dear_petition.users.models import User
 from . import constants as pc
-from dear_petition.petition.export.fields import fields as petition_fields
 
 from .constants import (
     JURISDICTION_CHOICES,
@@ -241,16 +240,14 @@ class Petition(models.Model):
 
         return OffenseRecordPaginator(self)
 
-    def form_field(self, name):
-        """
-        Returns field name for a particular AOC form type, since AOC forms
-        may use different field names for certain fields.
-        """
-        field_name_mapper = petition_fields.get(self.form_type, {})
-        return field_name_mapper.get(name, "")
-
     def get_all_offense_records(self):
-        """Return all (nonpaginated) offenses for this petition type, jurisdiction, and county."""
+        """
+        Return all (nonpaginated) offenses for this petition type, jurisdiction, and
+        county. This is typically only used at the end of the ETL process to divide
+        offense records across any needed attachment forms.
+
+        Post-ETL usage should just use the offense_records ManyToManyField.
+        """
         qs = self.batch.petition_offense_records(petition_type=self.form_type)
         qs = qs.filter(
             offense__jurisdiction=self.jurisdiction,
