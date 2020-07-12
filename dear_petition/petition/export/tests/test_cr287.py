@@ -39,14 +39,14 @@ def test_map_header__district(form):
     assert form.data["Superior"] == ""
 
 
+def test_map_petitioner__file_no(form, record2, offense_record1):
+    form.map_file_no()
+    assert form.data["ConsJdgmntFileNum"] == record2.file_no
+
+
 #
 # Petitioner
 #
-
-
-def test_map_petitioner__file_no(form, record1):
-    form.map_petitioner()
-    assert form.data["ConsJdgmntFileNum"] == record1.file_no
 
 
 def test_map_petitioner__name(form, record1):

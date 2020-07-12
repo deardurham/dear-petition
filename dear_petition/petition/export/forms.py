@@ -65,9 +65,11 @@ class AOCFormCR287(PetitionForm):
         if self.petition.offense_records.count() > 1:
             self.data["ConsJdgmntFileNum"] = "Multiple - See Below"
         else:
-            record = self.get_most_recent_record()
-            if record:
-                self.data["ConsJdgmntFileNum"] = record.file_no
+            offense_record = self.get_most_recent_record()
+            if offense_record:
+                self.data[
+                    "ConsJdgmntFileNum"
+                ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
         # note: SNN and not SSN due to bug in PDF field name
