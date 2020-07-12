@@ -1,5 +1,5 @@
 from .annotate import add_pdf_template_annotations
-from .forms import AOCFormCR287
+from .forms import AOCFormCR287, AOCFormCR285
 from .writer import write_pdf
 
 from dear_petition.petition import constants
@@ -10,6 +10,7 @@ __all__ = ("generate_petition_pdf",)
 
 FORM_TYPE_MAP = {
     constants.DISMISSED: AOCFormCR287,
+    constants.ATTACHMENT: AOCFormCR285,
 }
 
 

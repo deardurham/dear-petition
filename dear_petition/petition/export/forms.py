@@ -26,6 +26,9 @@ class PetitionForm(metaclass=abc.ABCMeta):
             "pk",
         )
 
+    def get_most_recent_record(self):
+        return self.get_ordered_offense_records().last()
+
     @abc.abstractmethod
     def build_form_context(self):
         pass
@@ -36,6 +39,8 @@ class AOCFormCR287(PetitionForm):
     Petition and Orders of Expunction Under G.S. 15A-146(a) and G.S. 15A-146(a1) (Charge(s) Dismissed)
     https://www.nccourts.gov/assets/documents/forms/cr287.pdf
     """
+
+    MULTIPLE_FILE_NO_MSG = "Multiple - See Below"
 
     def build_form_context(self):
         self.map_header()
@@ -54,6 +59,10 @@ class AOCFormCR287(PetitionForm):
             self.data["Superior"] = Checkbox("Yes")
         else:
             self.data["Superior"] = Checkbox("")
+
+    def map_file_no(self):
+        if self.petition.offense_records.count() > 1:
+            self.data["ConsJdgmntFileNum"] = "Multiple - See Below"
 
     def map_petitioner(self):
         # note: SNN and not SSN due to bug in PDF field name
@@ -106,3 +115,45 @@ class AOCFormCR287(PetitionForm):
             self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
             self.data[f"Disposition:{i}"] = self.disposition_code(offense)
             self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
+
+
+class AOCFormCR285(AOCFormCR287):
+    """
+    Expunction Petition Attachment: Additional Agencies/Additional File Nos. And Offenses
+
+    https://www.nccourts.gov/assets/documents/forms/cr285-en.pdf
+    """
+
+    MULTIPLE_FILE_NO_MSG = "Multiple - See Petition and Below"
+
+    def build_form_context(self):
+        self.map_file_no()
+        self.map_header()
+        self.map_petitioner()
+        self.map_offenses()
+
+    def map_file_no(self):
+        self.data["FileNo"] = self.MULTIPLE_FILE_NO_MSG
+
+    def map_header(self):
+        super().map_header()
+        self.data["CountyName"] = self.petition.county
+
+    def map_petitioner(self):
+        offense_record = self.get_most_recent_record()
+        if offense_record:
+            self.data["PetitionerName"] = offense_record.offense.ciprs_record.label
+
+    def map_offenses(self):
+        self.data["FormNo2"] = self.petition.parent.form_type.split("-")[-1]
+        for i, offense_record in enumerate(self.get_ordered_offense_records(), 1):
+            row = {}
+            offense = offense_record.offense
+            ciprs_record = offense.ciprs_record
+            row[f"FileNoRow{i}"] = ciprs_record.file_no
+            row[f"ArrestDateRow{i}"] = self.format_date(ciprs_record.arrest_date)
+            row[f"OffenseDescRow{i}"] = offense_record.description
+            row[f"DateOfOffenseRow{i}"] = self.format_date(ciprs_record.offense_date)
+            row[f"DispositionRow{i}"] = self.disposition_code(offense)
+            row[f"DispositionDateRow{i}"] = self.format_date(offense.disposed_on)
+            self.data.update(row)
