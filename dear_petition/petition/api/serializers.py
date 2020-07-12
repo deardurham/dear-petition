@@ -76,7 +76,14 @@ class PetitionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Petition
-        fields = ["pk", "form_type", "county", "jurisdiction"]
+        fields = [
+            "pk",
+            "parent",
+            "form_type",
+            "county",
+            "jurisdiction",
+            "offense_records",
+        ]
 
 
 class BatchSerializer(serializers.ModelSerializer):
