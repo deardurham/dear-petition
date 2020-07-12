@@ -1,8 +1,8 @@
 import pytz
-from datetime import datetime, date
+from datetime import datetime
 from django.conf import settings
 from django.utils.timezone import make_aware
-from .constants import DATETIME_FORMAT, DATE_FORMAT
+from .constants import DATE_FORMAT
 
 import dateutil.parser
 
