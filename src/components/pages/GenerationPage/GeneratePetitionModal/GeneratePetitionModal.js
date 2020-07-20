@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
-import { ModalContent } from './GeneratePetitionModal.styled';
+import { ModalContent, CloseButton } from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
@@ -63,18 +63,12 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     }
   };
 
-  const ButtonTopRight = styled(Button)`
-    position: absolute;
-    right: 0;
-    top: 0;
-  `;
-
   return (
     <GeneratePetitionModalStyled isVisible={isVisible}>
       <ModalContent>
-        <ButtonTopRight onClick={closeModal}>
-          <CloseIcon onClose={closeModal} />
-        </ButtonTopRight>
+        <CloseButton onClick={closeModal}>
+          <CloseIcon />
+        </CloseButton>
         {petition && (
           <>
             <h2>{petition.form_type}</h2>
