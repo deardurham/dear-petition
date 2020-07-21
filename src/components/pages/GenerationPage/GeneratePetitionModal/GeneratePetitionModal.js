@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
-import { ModalContent } from './GeneratePetitionModal.styled';
+import { ModalContent, CloseButton } from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
@@ -10,6 +10,7 @@ import useKeyPress from '../../../../hooks/useKeyPress';
 import AgencyAutocomplete from './AgencyAutocomplete';
 import { GenerationContext } from '../GenerationPage';
 import Button from '../../../elements/Button/Button';
+import CloseIcon from '../../../elements/CloseIcon/CloseIcon';
 import Axios from '../../../../service/axios';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
@@ -65,6 +66,9 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   return (
     <GeneratePetitionModalStyled isVisible={isVisible}>
       <ModalContent>
+        <CloseButton onClick={closeModal}>
+          <CloseIcon />
+        </CloseButton>
         {petition && (
           <>
             <h2>{petition.form_type}</h2>
