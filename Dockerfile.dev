@@ -1,14 +1,14 @@
 FROM node:13.12.0-alpine
 
-RUN mkdir -p /app/frontend
-WORKDIR /app/frontend
+WORKDIR /app/
 
 ENV PATH /app/node_modules/.bin:$PATH
 
-COPY package*.json ./
+# Copy project contents since the mounted volume is not available yet
+COPY . ./
+
+# Dependencies will be persisted in /app/ volume under /app/node_modules
 RUN npm install
 RUN npm install react-scripts@3.4.1 -g
-
-COPY . ./
 
 CMD ["npm", "run", "start"]
