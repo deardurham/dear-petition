@@ -49,26 +49,26 @@ def test_map_petitioner__file_no(form, record2, offense_record1):
 #
 
 
-def test_map_petitioner__name(form, record1):
+def test_map_petitioner__name(form, record2, offense_record1):
     form.map_petitioner()
-    assert form.data["NamePetitioner"] == record1.label
+    assert form.data["NamePetitioner"] == record2.label
 
 
-def test_map_petitioner__race(form, record1):
+def test_map_petitioner__race(form, record2, offense_record1):
     form.map_petitioner()
-    assert form.data["Race"] == record1.race
+    assert form.data["Race"] == record2.race
 
 
-def test_map_petitioner__sex(form, record1):
+def test_map_petitioner__sex(form, record2, offense_record1):
     form.map_petitioner()
-    assert form.data["Sex"] == record1.sex
+    assert form.data["Sex"] == record2.sex
 
 
-def test_map_petitioner__dob(form, record1):
-    record1.dob = dt.date(2000, 1, 1)
-    record1.save()
+def test_map_petitioner__dob(form, record2, offense_record1):
+    record2.dob = dt.date(2000, 1, 1)
+    record2.save()
     form.map_petitioner()
-    assert form.data["DOB"] == utils.format_petition_date(record1.dob)
+    assert form.data["DOB"] == utils.format_petition_date(record2.dob)
 
 
 def test_map_petitioner__ssn(form):
