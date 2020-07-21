@@ -63,7 +63,7 @@ class AOCFormCR287(PetitionForm):
 
     def map_file_no(self):
         if self.petition.offense_records.count() > 1:
-            self.data["ConsJdgmntFileNum"] = "Multiple - See Below"
+            self.data["ConsJdgmntFileNum"] = self.MULTIPLE_FILE_NO_MSG
         else:
             offense_record = self.get_most_recent_record()
             if offense_record:
