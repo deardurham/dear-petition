@@ -17,8 +17,16 @@ class OffenseRecordPaginator:
     def __init__(
         self, petition, initial_page_size=None, attachment_page_size=None,
     ):
-        self.initial_page_size = initial_page_size or INITIAL_PAGE_SIZE
-        self.attachment_page_size = attachment_page_size or ATTACHMENT_PAGE_SIZE
+        self.initial_page_size = (
+            abs(initial_page_size)
+            if initial_page_size and initial_page_size >= 0
+            else INITIAL_PAGE_SIZE
+        )
+        self.attachment_page_size = (
+            abs(attachment_page_size)
+            if attachment_page_size and attachment_page_size >= 0
+            else ATTACHMENT_PAGE_SIZE
+        )
         self.petition = petition
         self.queryset = self.petition.get_all_offense_records()
 

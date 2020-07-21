@@ -1,6 +1,7 @@
 import pytest
 
 from dear_petition.petition.etl.load import link_offense_records_and_attachments
+from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
 from dear_petition.petition.tests.factories import (
@@ -43,6 +44,22 @@ def records_35(batch):
 @pytest.fixture
 def paginator(petition):
     return petition.get_offense_record_paginator()
+
+
+@pytest.mark.parametrize("initial_page_size,expected", [[10, 10], [0, 10], [-10, 10]])
+def test_paginator_initial_page_size(petition, initial_page_size, expected):
+    paginator = OffenseRecordPaginator(petition, initial_page_size=initial_page_size)
+    assert paginator.initial_page_size == expected
+
+
+@pytest.mark.parametrize(
+    "attachment_page_size,expected", [[10, 10], [0, 20], [-10, 20]]
+)
+def test_paginator_attachment_page_size(petition, attachment_page_size, expected):
+    paginator = OffenseRecordPaginator(
+        petition, attachment_page_size=attachment_page_size
+    )
+    assert paginator.attachment_page_size == expected
 
 
 def test_paginator_petition_offense_records(paginator, records_11):
