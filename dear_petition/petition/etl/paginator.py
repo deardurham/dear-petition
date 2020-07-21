@@ -6,11 +6,11 @@ class OffenseRecordPaginator:
     """
     Class to manage dividing up offense records across petition and petition attachments.
     A petition has attachments if the number of offense records exceeds the available
-    rows on the PDF, which in most cases in 10 records.
+    rows on the PDF, which in most cases is 10 records.
 
     Typically:
         * The first 10 offense records are on the petition.
-        * Recorts 11+ are on attachments
+        * Records 11+ are on attachments
         * Each attachment conains up to 20 offense records.
     """
 
