@@ -94,12 +94,13 @@ function GenerationInputs() {
     ssn,
     licenseNumber,
     licenseState,
-    address,
+    petitionerName,
+    setAddress,
     setAttorney,
     setSSN,
     setLicenseNumber,
     setLicenseState,
-    setAddress,
+    setPetitionerName,
     formErrors
   } = useContext(GenerationContext);
 
@@ -116,6 +117,14 @@ function GenerationInputs() {
 
   return (
     <GenerationInputsStyled>
+      <GenerationInputWrapper>
+        <Input
+          label="Petitioner"
+          value={petitionerName}
+          onChange={e => setPetitionerName(e.target.value)}
+          errors={formErrors?.petitionerName}
+        />
+      </GenerationInputWrapper>
       <FlexWrapper>
         <GenerationInputWrapper>
           <Select
