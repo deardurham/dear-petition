@@ -57,4 +57,4 @@ def test_petition_offenses(batch, record1, charged_dismissed_record):
         county=record1.county,
         batch=batch,
     )
-    assert charged_dismissed_record in petition.get_offense_records()
+    assert charged_dismissed_record in petition.get_all_offense_records()

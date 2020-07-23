@@ -141,8 +141,8 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(models.Petition)
 class PetitionAdmin(admin.ModelAdmin):
 
-    list_display = ("pk", "batch", "form_type", "county", "jurisdiction")
+    list_display = ("pk", "batch", "parent_id", "form_type", "county", "jurisdiction")
     search_fields = ("batch__label",)
     list_filter = ("form_type", "county", "jurisdiction")
     ordering = ("-batch__date_uploaded",)
-    raw_id_fields = ("batch",)
+    raw_id_fields = ("batch", "parent", "offense_records")

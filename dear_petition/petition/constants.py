@@ -39,13 +39,15 @@ NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
 NEW_COMMENT_EMAIL_MESSAGE = "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
 
 
+MISDEMEANOR = "AOC-CR-281"
+ATTACHMENT = "AOC-CR-285"
 DISMISSED = "AOC-CR-287"
 NOT_GUILTY = "AOC-CR-288"
-MISDEMEANOR = "AOC-CR-281"
 FORM_TYPES = (
-    (DISMISSED, "Dismissed Charges"),
-    (NOT_GUILTY, "Not Guilty"),
-    (MISDEMEANOR, "Nonviolent Felony or Misdemeanor"),
+    (MISDEMEANOR, MISDEMEANOR),
+    (ATTACHMENT, ATTACHMENT),
+    (DISMISSED, DISMISSED),
+    (NOT_GUILTY, NOT_GUILTY),
 )
 
 NORTH_CAROLINA = "NC"

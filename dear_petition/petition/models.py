@@ -223,12 +223,31 @@ class Petition(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
     county = models.CharField(max_length=255)
     jurisdiction = models.CharField(choices=JURISDICTION_CHOICES, max_length=255)
+    parent = models.ForeignKey(
+        "self",
+        related_name="attachments",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    offense_records = models.ManyToManyField(OffenseRecord, related_name="petitions")
 
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
 
-    def get_offense_records(self):
-        """Return batch offenses for this petition type, jurisdiction, and county."""
+    def get_offense_record_paginator(self):
+        from dear_petition.petition.etl.paginator import OffenseRecordPaginator
+
+        return OffenseRecordPaginator(self)
+
+    def get_all_offense_records(self):
+        """
+        Return all (nonpaginated) offenses for this petition type, jurisdiction, and
+        county. This is typically only used at the end of the ETL process to divide
+        offense records across any needed attachment forms.
+
+        Post-ETL usage should just use the offense_records ManyToManyField.
+        """
         qs = self.batch.petition_offense_records(petition_type=self.form_type)
         qs = qs.filter(
             offense__jurisdiction=self.jurisdiction,

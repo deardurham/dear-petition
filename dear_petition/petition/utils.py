@@ -1,8 +1,8 @@
 import pytz
-from datetime import datetime, date
+from datetime import datetime
 from django.conf import settings
 from django.utils.timezone import make_aware
-from .constants import DATETIME_FORMAT, DATE_FORMAT
+from .constants import DATE_FORMAT
 
 import dateutil.parser
 
@@ -48,7 +48,7 @@ def make_datetime_aware(dt_str):
     return aware_datetime_obj
 
 
-def format_petition_date(date):
+def format_petition_date(d):
     """ Format Date Objects for PDF Writer
 
     If date is true then the date object will be formatted
@@ -56,4 +56,6 @@ def format_petition_date(date):
     empty strings. Both of which can be written to the PDF
     correctly.
     """
-    return date.strftime(DATE_FORMAT) if date else ""
+    if isinstance(d, datetime):
+        d = dt_obj_to_date(d)
+    return d.strftime(DATE_FORMAT) if d else ""

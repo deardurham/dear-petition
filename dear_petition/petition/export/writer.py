@@ -8,10 +8,10 @@ from django.conf import settings
 __all__ = ("write_pdf",)
 
 
-def write_pdf(data):
+def write_pdf(data, form_type):
     output = io.BytesIO()
     template_path = os.path.join(
-        settings.APPS_DIR, "static", "templates", "AOC-CR-287.pdf"
+        settings.APPS_DIR, "static", "templates", f"{form_type}.pdf"
     )
     petition = Writer(data, template_path, output)
     petition.get_annotations()
