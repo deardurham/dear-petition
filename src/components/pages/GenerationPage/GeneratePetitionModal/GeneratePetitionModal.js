@@ -14,7 +14,7 @@ import CloseIcon from '../../../elements/CloseIcon/CloseIcon';
 import Axios from '../../../../service/axios';
 
 const GeneratePetitionModal = ({ closeModal, isVisible }) => {
-  const { petition, ssn, licenseNumber, licenseState, attorney, selectedAgencies } = useContext(
+  const { petition, petitionerName, address, ssn, licenseNumber, licenseState, attorney, selectedAgencies } = useContext(
     GenerationContext
   );
 
@@ -23,6 +23,12 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   const _buildPetition = () => {
     return {
       petition: petition.pk,
+      name_petitioner: petitionerName,
+      address1: address.address1,
+      address2: address.address2,
+      city: address.city,
+      state: address.state.value,
+      zip_code: address.zipCode,
       ssn,
       drivers_license: licenseNumber,
       drivers_license_state: licenseState.value,

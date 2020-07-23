@@ -37,9 +37,10 @@ def test_map_petition__district(data, petition):
 
 ###################### map_petitioner tests #######################
 # map_petitioner tests
-def test_map_petitioner__name(data, petition, record1):
-    mapper.map_petitioner(data, petition)
-    assert data["NamePetitioner"] == record1.label
+def test_map_petitioner__name(data, petition, extra):
+    extra["name_petitioner"] = "Test Name"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["NamePetitioner"] == extra["name_petitioner"]
 
 
 def test_map_petitioner__race(data, petition, record1):
@@ -69,6 +70,40 @@ def test_map_petitioner__dob(data, petition, record1):
 def test_map_petitioner__file_no(data, petition, record1):
     mapper.map_petitioner(data, petition)
     assert data["ConsJdgmntFileNum"] == record1.file_no
+
+
+def test_map_petitioner__address(data, petition, extra):
+    extra["address1"] = "123 Test Pl."
+    extra["address2"] = "Apt 404"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["StreetAddr"] == extra["address1"]
+    assert data["MailAddr"] == extra["address2"]
+
+
+def test_map_petitioner__address2_empty(data, petition, extra):
+    extra["address1"] = "123 Test Pl."
+    extra["address2"] = ""
+    mapper.map_petitioner(data, petition, extra)
+    assert data["StreetAddr"] == extra["address1"]
+    assert data["MailAddr"] == extra["address2"]
+
+
+def test_map_petitioner__city(data, petition, extra):
+    extra["city"] = "Test City"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["City"] == extra["city"]
+
+
+def test_map_petitioner__state(data, petition, extra):
+    extra["state"] = constants.NORTH_CAROLINA
+    mapper.map_petitioner(data, petition, extra)
+    assert data["State"] == extra["state"]
+
+
+def test_map_petitioner__zip_code(data, petition, extra):
+    extra["zip_code"] = "27701"
+    mapper.map_petitioner(data, petition, extra)
+    assert data["ZipCode"] == extra["zip_code"]
 
 
 def test_map_petitioner__ssn(data, petition, extra):

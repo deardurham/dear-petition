@@ -169,4 +169,10 @@ coverage report:
 
 ### Running tests with py.test
 
+#### Docker
+
+    $ docker-compose run --rm django pytest
+
+#### Without Docker
+
     $ pytest
