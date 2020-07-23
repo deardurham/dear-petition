@@ -154,9 +154,7 @@ class AOCFormCR285(AOCFormCR287):
         self.data["CountyName"] = self.petition.county
 
     def map_petitioner(self):
-        offense_record = self.get_most_recent_record()
-        if offense_record:
-            self.data["PetitionerName"] = offense_record.offense.ciprs_record.label
+        self.data["PetitionerName"] = self.extra.get("name_petitioner")
 
     def map_agencies(self):
         agencies = self.extra.get("agencies", [])

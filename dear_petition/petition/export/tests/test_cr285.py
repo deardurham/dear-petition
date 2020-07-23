@@ -58,9 +58,10 @@ def test_map_petitioner__file_no(form):
 #
 
 
-def test_map_petitioner__name(form, record2, offense_record1):
+def test_map_petitioner__name(form):
+    form.extra["name_petitioner"] = "Test Name"
     form.map_petitioner()
-    assert form.data["PetitionerName"] == record2.label
+    assert form.data["PetitionerName"] == form.extra["name_petitioner"]
 
 
 #
