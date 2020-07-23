@@ -49,9 +49,10 @@ def test_map_petitioner__file_no(form, record2, offense_record1):
 #
 
 
-def test_map_petitioner__name(form, record2, offense_record1):
+def test_map_petitioner__name(form):
+    form.extra["name_petitioner"] = "Test Name"
     form.map_petitioner()
-    assert form.data["NamePetitioner"] == record2.label
+    assert form.data["NamePetitioner"] == form.extra["name_petitioner"]
 
 
 def test_map_petitioner__race(form, record2, offense_record1):
@@ -69,6 +70,40 @@ def test_map_petitioner__dob(form, record2, offense_record1):
     record2.save()
     form.map_petitioner()
     assert form.data["DOB"] == utils.format_petition_date(record2.dob)
+
+
+def test_map_petitioner__address(form):
+    form.extra["address1"] = "123 Test Pl."
+    form.extra["address2"] = "Apt 404"
+    form.map_petitioner()
+    assert form.data["StreetAddr"] == form.extra["address1"]
+    assert form.data["MailAddr"] == form.extra["address2"]
+
+
+def test_map_petitioner__address2_empty(form):
+    form.extra["address1"] = "123 Test Pl."
+    form.extra["address2"] = ""
+    form.map_petitioner()
+    assert form.data["StreetAddr"] == form.extra["address1"]
+    assert form.data["MailAddr"] == form.extra["address2"]
+
+
+def test_map_petitioner__city(form):
+    form.extra["city"] = "Test City"
+    form.map_petitioner()
+    assert form.data["City"] == form.extra["city"]
+
+
+def test_map_petitioner__state(form):
+    form.extra["state"] = constants.NORTH_CAROLINA
+    form.map_petitioner()
+    assert form.data["State"] == form.extra["state"]
+
+
+def test_map_petitioner__zip_code(form):
+    form.extra["zip_code"] = "27701"
+    form.map_petitioner()
+    assert form.data["ZipCode"] == form.extra["zip_code"]
 
 
 def test_map_petitioner__ssn(form):

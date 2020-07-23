@@ -17,14 +17,18 @@ import PetitionListItem from './PetitionListItem';
 
 export const GenerationContext = createContext(null);
 
+const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
+
 function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
   const [petition, setPetition] = useState();
+  const [petitionerName, setPetitionerName] = useState();
+  const [address, setAddress] = useState({ state: DEFAULT_STATE_LABEL });
   const [ssn, setSSN] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseState, setLicenseState] = useState({ label: 'NC', value: 'NC' });
+  const [licenseState, setLicenseState] = useState(DEFAULT_STATE_LABEL);
   const [attorney, setAttorney] = useState('');
   const [selectedAgencies, setSelectedAgencies] = useState([]);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
@@ -35,6 +39,7 @@ function GenerationPage() {
     Axios.get(`/batch/${batchId}/`)
       .then(({ data }) => {
         setBatch(data);
+        setPetitionerName(data?.label);
         setLoading(false);
       })
       .catch(error => {
@@ -46,6 +51,10 @@ function GenerationPage() {
   const _petitionDataIsValid = () => {
     let isValid = true;
     const errors = {};
+    if (!petitionerName) {
+      errors.petitionerName = ['This field is required'];
+      isValid = false;
+    }
     if (!ssn) {
       errors.ssn = ['This field is required'];
       isValid = false;
@@ -60,6 +69,22 @@ function GenerationPage() {
     }
     if (!attorney) {
       errors.attorney = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.address1) {
+      errors.address = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.city) {
+      errors.city = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.state) {
+      errors.state = ['This field is required'];
+      isValid = false;
+    }
+    if (!address?.zipCode) {
+      errors.zipCode = ['This field is required'];
       isValid = false;
     }
 
@@ -79,6 +104,8 @@ function GenerationPage() {
   const context = {
     batch,
     petition,
+    address,
+    setAddress,
     ssn,
     setSSN,
     licenseNumber,
@@ -91,6 +118,8 @@ function GenerationPage() {
     setSelectedAgencies,
     showGenerationModal,
     setShowGenerationModal,
+    petitionerName,
+    setPetitionerName,
     formErrors,
     setFormErrors,
     handlePetitionSelect
@@ -103,7 +132,6 @@ function GenerationPage() {
           <h2>Loading...</h2>
         ) : (
           <GenerationContentStyled>
-            <h2>{batch?.label}</h2>
             <GenerationInputs />
             <PetitionsList>
               {batch?.petitions?.map(petition => {

@@ -72,6 +72,12 @@ class AOCFormCR287(PetitionForm):
                 ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
+        self.data["NamePetitioner"] = self.extra.get("name_petitioner")
+        self.data["StreetAddr"] = self.extra.get("address1")
+        self.data["MailAddr"] = self.extra.get("address2")
+        self.data["City"] = self.extra.get("city")
+        self.data["State"] = self.extra.get("state")
+        self.data["ZipCode"] = self.extra.get("zip_code")
         # note: SNN and not SSN due to bug in PDF field name
         self.data["SNN"] = self.extra.get("ssn")
         self.data["DLNo"] = self.extra.get("drivers_license")
