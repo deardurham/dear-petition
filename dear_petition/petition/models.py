@@ -68,6 +68,7 @@ class CIPRSRecord(models.Model):
     jurisdiction = models.CharField(
         max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE
     )
+    additional_offenses_exist = models.BooleanField(null=True, blank=True)
 
     objects = CIPRSRecordManager()
 

@@ -34,6 +34,9 @@ def refresh_record_from_data(record):
         "Arrest Date", dt_obj_to_date(record.offense_date)
     )
     record.jurisdiction = get_jurisdiction(record)
+    record.additional_offenses_exist = record.data.get("General", {}).get(
+        "Additional Offenses Exist", False
+    )
     record.save()
 
     # import both District and Superior court offenses

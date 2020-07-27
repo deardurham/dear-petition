@@ -24,6 +24,8 @@ export const ActualInputStyled = styled.input`
   color: ${colorFontPrimary};
 `;
 
+
+
 export const InputErrors = styled(motion.div)`
   margin: 1rem 0;
   p {

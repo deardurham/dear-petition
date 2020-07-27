@@ -55,7 +55,14 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CIPRSRecord
-        fields = ["pk", "batch", "date_uploaded", "label", "offenses"]
+        fields = [
+            "pk",
+            "batch",
+            "date_uploaded",
+            "label",
+            "offenses",
+            "additional_offenses_exist",
+        ]
 
 
 class ContactSerializer(serializers.ModelSerializer):

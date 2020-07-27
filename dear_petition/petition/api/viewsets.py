@@ -57,7 +57,7 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 class BatchViewSet(viewsets.ModelViewSet):
     queryset = petition.Batch.objects.prefetch_related(
-        "petitions", "records__offenses__offense_records"
+        "petitions", "records__offenses__offense_records", "records",
     )
     serializer_class = serializers.BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
