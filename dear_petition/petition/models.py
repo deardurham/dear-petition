@@ -192,6 +192,15 @@ class Batch(models.Model):
         return self.petition_offense_records(pc.DISMISSED, jurisdiction)
 
 
+class BatchFile(models.Model):
+    batch = models.ForeignKey(Batch, related_name="files", on_delete="CASCADE")
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to="ciprs/")
+
+    def __str__(self):
+        return f"{self.file.name}"
+
+
 class Comment(models.Model):
 
     user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
