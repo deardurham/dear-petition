@@ -52,9 +52,6 @@ class CIPRSRecord(models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete="CASCADE")
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    report_pdf = models.FileField(
-        "Report PDF", upload_to="ciprs/", blank=True, null=True
-    )
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
     file_no = models.CharField(max_length=256, blank=True)
