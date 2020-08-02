@@ -120,6 +120,19 @@ class BatchAdmin(admin.ModelAdmin):
         return obj._record_count
 
 
+@admin.register(models.BatchFile)
+class BatchFileAdmin(admin.ModelAdmin):
+    list_display = ("pk", "file", "batch", "date_uploaded")
+    list_filter = ("date_uploaded",)
+    date_hierarchy = "date_uploaded"
+    search_fields = (
+        "file",
+        "batch__label",
+    )
+    raw_id_fields = ("batch",)
+    ordering = ("-date_uploaded",)
+
+
 @admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
 
