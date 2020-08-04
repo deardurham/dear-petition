@@ -52,9 +52,6 @@ class CIPRSRecord(models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete="CASCADE")
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    report_pdf = models.FileField(
-        "Report PDF", upload_to="ciprs/", blank=True, null=True
-    )
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
     file_no = models.CharField(max_length=256, blank=True)
@@ -190,6 +187,15 @@ class Batch(models.Model):
 
     def dismissed_offense_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.DISMISSED, jurisdiction)
+
+
+class BatchFile(models.Model):
+    batch = models.ForeignKey(Batch, related_name="files", on_delete="CASCADE")
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to="ciprs/")
+
+    def __str__(self):
+        return f"{self.file.name}"
 
 
 class Comment(models.Model):
