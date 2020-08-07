@@ -176,3 +176,8 @@ coverage report:
 #### Without Docker
 
     $ pytest
+
+
+### Sign up for Sentry
+
+The dear-petition project is now on Sentry. Visit sentry.io and make an account or sign in with Github. Reach out to an existing member for an invite to the project.

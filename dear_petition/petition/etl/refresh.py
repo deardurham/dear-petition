@@ -51,6 +51,8 @@ def refresh_offenses(record, jurisdiction, offenses):
             jurisdiction=jurisdiction,
             disposed_on=data_offense.get("Disposed On", None),
             disposition_method=data_offense.get("Disposition Method", ""),
+            plea=data_offense.get("Plea", ""),
+            verdict=data_offense.get("Verdict", ""),
         )
         for data_offense_record in data_offense.get("Records", []):
             offense.offense_records.create(
