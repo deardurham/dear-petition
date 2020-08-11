@@ -39,11 +39,14 @@ The staging API server is useful for developers who do not wish to build a local
 
 ### Local Backend
 
-Developers who wish to use a local version of both the frontend and backend must set the `proxy` variable in `package.json` to the following:
+Developers who wish to use a local version of both the frontend and backend must change the `proxy` variable in `package.json`.
 
-```diff
--  "proxy": "https://dear-petition-staging.herokuapp.com/",
-+  "proxy": "http://localhost:8000",
+#### Docker Example
+
+When using `docker-compose up -d` to run both the backend and frontend within docker containers, use the following configuration:
+
+```json
+"proxy": "http://django:8000",
 ```
 
 
