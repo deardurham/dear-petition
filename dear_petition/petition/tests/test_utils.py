@@ -2,9 +2,9 @@ import pytest
 from pytest_django.fixtures import settings
 import pytz
 from django.conf import settings
-from django.utils.timezone import make_aware
+from django.utils.timezone import make_aware, utc
 from datetime import datetime, date
-from ..utils import dt_obj_to_date, make_datetime_aware
+from ..utils import dt_obj_to_date, make_datetime_aware, format_petition_date
 from ..constants import DATETIME_FORMAT
 
 
@@ -71,3 +71,10 @@ def test_make_datetime_aware(settings):
     dt_str = None
     aware_dt = make_datetime_aware(dt_str)
     assert aware_dt == None
+
+
+def test_format_petition_date(settings):
+    """Should return %m/%d/%Y date. If it is non-EST datetime, it will convert to EST first."""
+
+    date = datetime(year=2020, month=1, day=1, hour=11, minute=59, second=0, tzinfo=utc)
+    assert format_petition_date(date) == "01/01/2020"
