@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
 import { ModalContent, CloseButton } from './GeneratePetitionModal.styled';
@@ -17,8 +17,9 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   const { petition, petitionerName, address, ssn, licenseNumber, licenseState, attorney, selectedAgencies } = useContext(
     GenerationContext
   );
+  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null});
 
-  useKeyPress('Escape', closeModal);
+  console.log("render");
 
   const _buildPetition = () => {
     return {
@@ -47,14 +48,30 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
       return;
     }
 
-    const pdfBlobUrl = window.URL.createObjectURL(pdfBlob);
-    window.open(pdfBlobUrl);
+    // Clean up previous pdf when generating new one
+    const { handle: oldHandle, url: oldUrl } = pdfWindow;
+    if (oldUrl) window.URL.revokeObjectURL(oldUrl);
+    if (oldHandle) oldHandle.close();
 
-    setTimeout(function() {
-      // For Firefox it is necessary to delay revoking the ObjectURL
-      window.URL.revokeObjectURL(pdfBlobUrl);
-    }, 100);
+    const url = window.URL.createObjectURL(pdfBlob);
+    setPdfWindow({ handle: window.open(url), url });
   };
+
+  const closePdf = () => {
+    setPdfWindow(({ handle, url }) => {
+      console.log("CLEAN UP");
+      console.log(handle);
+      console.log(url);
+      if (url)
+        window.URL.revokeObjectURL(url);
+      if (handle)
+        handle.close();
+      return { handle: null, url: null };
+    });
+    closeModal();
+  };
+
+  useKeyPress('Escape', closePdf);
 
   const handleGenerate = async () => {
     const derivedPetition = _buildPetition();
@@ -72,7 +89,7 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   return (
     <GeneratePetitionModalStyled isVisible={isVisible}>
       <ModalContent>
-        <CloseButton onClick={closeModal}>
+        <CloseButton onClick={closePdf}>
           <CloseIcon />
         </CloseButton>
         {petition && (
