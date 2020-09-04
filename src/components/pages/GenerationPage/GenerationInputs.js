@@ -105,14 +105,18 @@ function GenerationInputs() {
   } = useContext(GenerationContext);
 
   useEffect(() => {
+    let isMounted = true;
     (async function() {
       try {
         const { data } = await Axios.get('/contact/?category=attorney');
-        setAttornies(data?.results || []);
+        // only update state when component is mounted
+        if (isMounted)
+          setAttornies(data?.results || []);
       } catch (error) {
         console.error(error);
       }
     })();
+    return () => isMounted = false;
   }, []);
 
   return (

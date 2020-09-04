@@ -1,24 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { PetitionListItemStyled, PetitionCellStyled } from './PetitionListItem.styled';
-import { GenerationContext } from './GenerationPage';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 
-function PetitionListItem({ petition }) {
-  const { showGenerationModal, setShowGenerationModal, handlePetitionSelect } = useContext(
-    GenerationContext
-  );
-
+function PetitionListItem({ petition, selectPetition }) {
+  const [isVisible, setIsVisible] = useState(false);
   return (
     <>
-      <PetitionListItemStyled onClick={() => handlePetitionSelect(petition)}>
+      <PetitionListItemStyled onClick={() => { selectPetition(); setIsVisible(true); } }>
         <PetitionCellStyled>{petition.form_type}</PetitionCellStyled>
         <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
         <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
       </PetitionListItemStyled>
-      <GeneratePetitionModal
-        isVisible={showGenerationModal}
-        closeModal={() => setShowGenerationModal(false)}
-      />
+      {isVisible && (
+        <GeneratePetitionModal isVisible={isVisible} closeModal={() => setIsVisible(false)}/>
+      )}
     </>
   );
 }

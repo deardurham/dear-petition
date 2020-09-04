@@ -19,8 +19,6 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   );
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null});
 
-  console.log("render");
-
   const _buildPetition = () => {
     return {
       petition: petition.pk,
@@ -57,17 +55,14 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     setPdfWindow({ handle: window.open(url), url });
   };
 
-  const closePdf = () => {
-    setPdfWindow(({ handle, url }) => {
-      console.log("CLEAN UP");
-      console.log(handle);
-      console.log(url);
-      if (url)
-        window.URL.revokeObjectURL(url);
-      if (handle)
-        handle.close();
-      return { handle: null, url: null };
-    });
+  const closePdf = async () => {
+    const { url, handle } = pdfWindow;
+    if (url)
+      window.URL.revokeObjectURL(url);
+    if (handle)
+      handle.close();
+
+    setPdfWindow({ handle: null, url: null });
     closeModal();
   };
 
