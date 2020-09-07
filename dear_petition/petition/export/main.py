@@ -1,5 +1,5 @@
 from .annotate import add_pdf_template_annotations
-from .forms import AOCFormCR287, AOCFormCR285
+from .forms import AOCFormCR287, AOCFormCR285, DataPetitionForm
 from .writer import write_pdf
 
 from dear_petition.petition import constants
@@ -9,13 +9,18 @@ __all__ = ("generate_petition_pdf",)
 
 
 FORM_TYPE_MAP = {
+    constants.DATA_PETITION: DataPetitionForm,
     constants.DISMISSED: AOCFormCR287,
     constants.ATTACHMENT: AOCFormCR285,
 }
 
 
 def build_pdf_template_context(petition, extra):
-    Form = FORM_TYPE_MAP.get(petition.form_type, AOCFormCR287)
+    if hasattr(petition, "data_only") and petition.data_only:
+        form_type = constants.DATA_PETITION
+    else:
+        form_type = petition.form_type
+    Form = FORM_TYPE_MAP.get(form_type, AOCFormCR287)
     form = Form(petition, extra=extra)
     form.build_form_context()
     return form.data

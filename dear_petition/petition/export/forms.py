@@ -34,6 +34,13 @@ class PetitionForm(metaclass=abc.ABCMeta):
         pass
 
 
+class DataPetitionForm(PetitionForm):
+    """A basic form that renders from a context dictionary."""
+
+    def build_form_context(self):
+        self.data = self.extra
+
+
 class AOCFormCR287(PetitionForm):
     """
     Petition and Orders of Expunction Under G.S. 15A-146(a) and G.S. 15A-146(a1) (Charge(s) Dismissed)
