@@ -13,10 +13,17 @@ router.register(r"batch", viewsets.BatchViewSet)
 router.register(
     r"generate-petition", viewsets.GeneratePetitionView, basename="generate-petition",
 )
+router.register(
+    r"generate-data-petition",
+    viewsets.GenerateDataPetitionView,
+    basename="generate-data-petition",
+)
 
 app_name = "api"
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("token/", viewsets.TokenObtainPairCookieView.as_view(), name="token_obtain_pair"),
+    path(
+        "token/", viewsets.TokenObtainPairCookieView.as_view(), name="token_obtain_pair"
+    ),
 ]
