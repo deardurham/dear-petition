@@ -92,7 +92,7 @@ function GenerationPage() {
     return isValid;
   };
 
-  const handlePetitionSelect = petition => {
+  const handlePetitionSelect = (petition) => {
     setFormErrors({});
     if (_petitionDataIsValid()) {
       setSelectedPetition(petition);
@@ -133,7 +133,7 @@ function GenerationPage() {
                 <PetitionListItem
                   key={petition.pk}
                   petition={petition}
-                  selectPetition={() => handlePetitionSelect(petition)} />
+                  handlePetitionSelect={handlePetitionSelect} />
               )}
             </PetitionsList>
           </GenerationContentStyled>

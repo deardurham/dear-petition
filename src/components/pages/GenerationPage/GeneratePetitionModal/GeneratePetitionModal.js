@@ -55,7 +55,7 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
     setPdfWindow({ handle: window.open(url), url });
   };
 
-  const closePdf = async () => {
+  const closePdf = () => {
     const { url, handle } = pdfWindow;
     if (url)
       window.URL.revokeObjectURL(url);

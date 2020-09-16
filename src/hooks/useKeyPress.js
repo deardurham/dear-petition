@@ -10,9 +10,8 @@ const useKeyPress = (key, action) => {
             if (e.key === key) action();
         }
         window.addEventListener('keyup', handleKeyPress);
-        console.log("Added event listener");
         return () => window.removeEventListener('keyup', handleKeyPress);
-    }, [key]);
+    }, [key, action]);
 };
 
 export default useKeyPress;
