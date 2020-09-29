@@ -9,6 +9,7 @@ from dear_petition.petition.models import (
     OffenseRecord,
     Petition,
 )
+from dear_petition.petition.constants import ATTACHMENT, DISMISSED
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from localflavor.us import us_states
@@ -155,3 +156,11 @@ class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):
         user_serializer = UserSerializer(self.user)
         data["user"] = user_serializer.data
         return data
+
+
+class DataPetitionSerializer(serializers.Serializer):
+
+    form_type = serializers.ChoiceField(
+        choices=((DISMISSED, DISMISSED), (ATTACHMENT, ATTACHMENT)), initial=DISMISSED
+    )
+    form_context = serializers.JSONField()

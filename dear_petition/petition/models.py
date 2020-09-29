@@ -3,6 +3,7 @@ import logging
 import os
 import subprocess
 import tempfile
+from collections import namedtuple
 from datetime import datetime
 
 from django.conf import settings
@@ -265,3 +266,7 @@ class Petition(models.Model):
         return qs.order_by(
             "offense__ciprs_record__offense_date", "offense__ciprs_record__file_no"
         )
+
+
+# Look-alike Petition object used to support JSON data-driven petitions
+DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[True])

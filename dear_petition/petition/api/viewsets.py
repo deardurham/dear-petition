@@ -103,6 +103,23 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         return resp
 
 
+class GenerateDataPetitionView(viewsets.GenericViewSet):
+
+    serializer_class = serializers.DataPetitionSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data_petition = petition.DataPetition(form_type=serializer.data["form_type"])
+        generated_petition_pdf = generate_petition_pdf(
+            data_petition, serializer.data["form_context"]
+        )
+        resp = FileResponse(generated_petition_pdf)
+        resp["Content-Type"] = "application/pdf"
+        resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
+        return resp
+
+
 class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     """
     Subclasses simplejwt's TokenObtainPairView to handle tokens in cookies
