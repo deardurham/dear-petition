@@ -23,15 +23,14 @@ function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
-  const [petition, setPetition] = useState();
-  const [petitionerName, setPetitionerName] = useState();
+  const [selectedPetition, setSelectedPetition] = useState();
+  const [petitionerName, setPetitionerName] = useState('');
   const [address, setAddress] = useState({ state: DEFAULT_STATE_LABEL });
   const [ssn, setSSN] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [licenseState, setLicenseState] = useState(DEFAULT_STATE_LABEL);
   const [attorney, setAttorney] = useState('');
   const [selectedAgencies, setSelectedAgencies] = useState([]);
-  const [showGenerationModal, setShowGenerationModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
@@ -93,17 +92,19 @@ function GenerationPage() {
     return isValid;
   };
 
-  const handlePetitionSelect = selectedPetition => {
+  const validatePetitionSelect = (petition) => {
     setFormErrors({});
     if (_petitionDataIsValid()) {
-      setPetition(selectedPetition);
-      setShowGenerationModal(true);
+      setSelectedPetition(petition);
+      return true;
+    } else {
+      return false;
     }
   };
 
   const context = {
     batch,
-    petition,
+    petition: selectedPetition,
     address,
     setAddress,
     ssn,
@@ -116,13 +117,10 @@ function GenerationPage() {
     setAttorney,
     selectedAgencies,
     setSelectedAgencies,
-    showGenerationModal,
-    setShowGenerationModal,
     petitionerName,
     setPetitionerName,
     formErrors,
     setFormErrors,
-    handlePetitionSelect
   };
 
   return (
@@ -134,9 +132,12 @@ function GenerationPage() {
           <GenerationContentStyled>
             <GenerationInputs />
             <PetitionsList>
-              {batch?.petitions?.map(petition => {
-                return <PetitionListItem key={petition.pk} petition={petition} />;
-              })}
+              {batch?.petitions?.map(petition =>
+                <PetitionListItem
+                  key={petition.pk}
+                  petition={petition}
+                  validatePetitionSelect={validatePetitionSelect} />
+              )}
             </PetitionsList>
           </GenerationContentStyled>
         )}

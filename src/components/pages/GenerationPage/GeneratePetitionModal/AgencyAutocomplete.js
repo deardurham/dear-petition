@@ -69,7 +69,6 @@ const AgencyAutocomplete = ({ ...props }) => {
   };
 
   const addAgency = thisAgency => {
-    console.log(thisAgency);
     setSuggestionValue('');
     setSelectedAgencies([...selectedAgencies, thisAgency]);
   };

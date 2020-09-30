@@ -7,11 +7,11 @@ import { useEffect } from 'react';
 const useKeyPress = (key, action) => {
     useEffect(() => {
         function handleKeyPress(e) {
-            if (e.key === 'Escape') action();
+            if (e.key === key) action();
         }
         window.addEventListener('keyup', handleKeyPress);
         return () => window.removeEventListener('keyup', handleKeyPress);
-    }, [action]);
+    }, [key, action]);
 };
 
 export default useKeyPress;
