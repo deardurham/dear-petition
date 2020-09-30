@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { PetitionListItemStyled, PetitionCellStyled } from './PetitionListItem.styled';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 
-function PetitionListItem({ petition, handlePetitionSelect }) {
+function PetitionListItem({ petition, validatePetitionSelect }) {
   const [isVisible, setVisible] = useState(false);
   const handleClick = () => {
-    handlePetitionSelect(petition);
-    setVisible(true);
+    if (validatePetitionSelect(petition)) {
+      setVisible(true);
+    }
   };
   return (
     <>
