@@ -13,6 +13,7 @@ from dear_petition.petition.tests.factories import (
 )
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
+from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 
 
 @pytest.fixture
@@ -123,3 +124,17 @@ def non_dismissed_offense(record1):
 @pytest.fixture
 def charged_dismissed_record(dismissed_offense):
     return OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
+
+
+@pytest.fixture
+def not_guilty_offense(record1):
+    return OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=constants.DISTRICT_COURT,
+        verdict="Not Guilty",
+    )
+
+
+@pytest.fixture
+def paginator(petition):
+    return OffenseRecordPaginator(petition)
