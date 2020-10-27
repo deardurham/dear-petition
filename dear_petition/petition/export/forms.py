@@ -194,3 +194,19 @@ class AOCFormCR285(AOCFormCR287):
             row[f"DispositionRow{i}"] = self.disposition_code(offense)
             row[f"DispositionDateRow{i}"] = self.format_date(offense.disposed_on)
             self.data.update(row)
+
+
+class AOCFormCR288(AOCFormCR287):
+    def map_offenses(self):
+        offense_records = self.get_ordered_offense_records()
+        for i, offense_record in enumerate(offense_records, 1):
+            offense = offense_record.offense
+            ciprs_record = offense.ciprs_record
+            # The index of the offense determines what line on the petition form
+            # the offense will be on
+            self.data[f"Fileno:{i}"] = ciprs_record.file_no
+            self.data[f"ArrestDate:{i}"] = self.format_date(ciprs_record.arrest_date)
+            self.data[f"Description:{i}"] = offense_record.description
+            self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
+            self.data[f"Disposition:{i}"] = "NOT GUILTY"
+            self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
