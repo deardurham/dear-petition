@@ -124,8 +124,6 @@ class OffenseRecord(models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
-    plea = models.CharField(max_length=256, blank=True)
-    verdict = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f"offense record {self.pk}"
@@ -172,7 +170,7 @@ class Batch(models.Model):
     def most_recent_record(self):
         most_recent_record = None
         most_recent_offense_date = make_datetime_aware(
-            datetime(1900, 1, 1).strftime(DATETIME_FORMAT)
+            datetime.min.strftime(DATETIME_FORMAT)
         )
         for record in self.records.order_by("pk"):
             if not record.offense_date:
@@ -190,6 +188,9 @@ class Batch(models.Model):
 
     def dismissed_offense_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.DISMISSED, jurisdiction)
+
+    def not_guilty_offense_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.NOT_GUILTY, jurisdiction)
 
 
 class BatchFile(models.Model):

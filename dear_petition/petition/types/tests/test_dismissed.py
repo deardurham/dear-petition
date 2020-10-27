@@ -1,7 +1,6 @@
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.petition.types import identify_distinct_petitions
 from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     OffenseFactory,
