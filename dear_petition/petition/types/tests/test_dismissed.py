@@ -57,3 +57,27 @@ def test_petition_offenses(batch, record1, charged_dismissed_record):
         batch=batch,
     )
     assert charged_dismissed_record in petition.get_all_offense_records()
+
+
+def test_guilty_to_lesser(batch, record1):
+    offense = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=constants.DISTRICT_COURT,
+        plea="GUILTY TO LESSER",
+        disposition_method="DISPOSED BY JUDGE",
+    )
+
+    offense_record_charged = OffenseRecordFactory(action="CHARGED", offense=offense)
+    offense_record_convicted = OffenseRecordFactory(action="CONVICTED", offense=offense)
+
+    petition = PetitionFactory(
+        form_type=constants.DISMISSED,
+        jurisdiction=record1.jurisdiction,
+        county=record1.county,
+        batch=batch,
+    )
+
+    petition_offense_records = petition.get_all_offense_records()
+
+    assert offense_record_charged in petition_offense_records
+    assert offense_record_convicted not in petition_offense_records
