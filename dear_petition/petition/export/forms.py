@@ -15,6 +15,8 @@ class PetitionForm(metaclass=abc.ABCMeta):
         return utils.format_petition_date(date)
 
     def disposition_code(self, offense):
+        if offense.plea == "GUILTY TO LESSER":
+            return "Glty to Lesser"
         method = offense.disposition_method
         return constants.DISPOSITION_METHOD_CODE_MAP.get(method.upper(), method)
 
