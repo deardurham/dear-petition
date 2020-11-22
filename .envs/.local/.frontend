@@ -1,0 +1,2 @@
+CHOKIDAR_USEPOLLING=true
+API_PROXY=http://django:8000

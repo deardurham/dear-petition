@@ -49,8 +49,10 @@ services:
     volumes:
       - /app/node_modules
       - ./:/app/
+    env_file:
+      - ./.envs/.local/.frontend
     environment:
-      - CHOKIDAR_USEPOLLING=true
+      - OVERRIDE_API_PROXY
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
