@@ -16,6 +16,12 @@ Begin by cloning the repository:
 git clone git@github.com:deardurham/dear-petition.git
 ```
 
+### 🚀 Docker Quick Start (recommended)
+
+```bash
+docker-compose up -d
+docker-compose run --rm django python manage.py createsuperuser
+```
 
 ## Frontend Development
 
@@ -32,22 +38,23 @@ npm run start
 
 ### Staging Backend
 
-By default, the frontend development server [proxies requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to [a staging API server](https://dear-petition-staging.herokuapp.com/).
+While running `npm run start`, the frontend development server will by default [proxy API requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to the [DEAR staging server](https://dear-petition-staging.herokuapp.com/).
 
-The staging API server is useful for developers who do not wish to build a local backend implementation. New developers must have a user set up on the staging server in order to test most frontend functionality.
+The staging server is useful for developers who do not wish to build and run a local backend. New developers must request the development team to have a user created on the staging server.
 
 
 ### Local Backend
 
-Developers who wish to use a local version of both the frontend and backend must change the `proxy` variable in `package.json`.
+Developers who wish to use a local version of both the frontend and backend must set the `API_PROXY` environment variable. Note: This is not necessary when using Docker.
 
-#### Docker Example
-
-When using `docker-compose up -d` to run both the backend and frontend within docker containers, use the following configuration:
-
-```json
-"proxy": "http://django:8000",
+```bash
+API_PROXY=http://localhost:8000 npm run start
 ```
+
+
+### Docker Proxy Override
+
+WIP
 
 
 ## Backend Development (with Docker)
