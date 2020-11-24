@@ -70,6 +70,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "rest_framework",
+    "rest_framework.authtoken",
     "django_filters",
 ]
 LOCAL_APPS = [

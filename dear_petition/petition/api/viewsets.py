@@ -6,6 +6,8 @@ from django.middleware import csrf
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
+from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition
@@ -88,7 +90,6 @@ class BatchViewSet(viewsets.ModelViewSet):
 
 
 class GeneratePetitionView(viewsets.GenericViewSet):
-
     serializer_class = serializers.GeneratePetitionSerializer
 
     def create(self, request):
@@ -104,7 +105,7 @@ class GeneratePetitionView(viewsets.GenericViewSet):
 
 
 class GenerateDataPetitionView(viewsets.GenericViewSet):
-
+    authentication_classes = [TokenAuthentication]
     serializer_class = serializers.DataPetitionSerializer
 
     def create(self, request):
