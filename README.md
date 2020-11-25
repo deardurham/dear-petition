@@ -7,21 +7,15 @@ project for creating petition forms.
 [![Build Status](https://travis-ci.org/deardurham/dear-petition.svg?branch=master)](https://travis-ci.org/deardurham/dear-petition)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-
-## Local Development
-
-Begin by cloning the repository:
-
-```
-git clone git@github.com:deardurham/dear-petition.git
-```
-
-### 🚀 Docker Quick Start (recommended)
+## 🚀 Docker Quick Start (recommended)
 
 ```bash
+git clone git@github.com:deardurham/dear-petition.git
+cd dear-petition
 docker-compose up -d
 docker-compose run --rm django python manage.py createsuperuser
 ```
+
 
 ## Frontend Development
 
@@ -36,25 +30,29 @@ npm run start
 ```
 
 
-### Staging Backend
+### API Proxy Configuration
 
-While running `npm run start`, the frontend development server will by default [proxy API requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to the [DEAR staging server](https://dear-petition-staging.herokuapp.com/).
+The Petition Generator app uses a React frontend with a Django REST API backend. In the development environment, the React development server and Django backend will likely be hosted on different ports, and thus hosted on different urls. This causes issues when the frontend code sends API requests, such as a login request. The solution is to [proxy the API requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to the url of the backend.
 
-The staging server is useful for developers who do not wish to build and run a local backend. New developers must request the development team to have a user created on the staging server.
+#### Docker Container
 
+When the frontend is run using docker, the `API_PROXY` environment variable is set to `http://django:8000`.
 
-### Local Backend
-
-Developers who wish to use a local version of both the frontend and backend must set the `API_PROXY` environment variable. Note: This is not necessary when using Docker.
+You can override the this proxy url by setting `OVERRIDE_API_PROXY`:
 
 ```bash
-API_PROXY=http://localhost:8000 npm run start
+OVERRIDE_API_PROXY=https://dear-petition-staging.herokuapp.com/ docker-compose up -d
 ```
 
+#### Local Frontend
 
-### Docker Proxy Override
+When using `npm run start` to run the frontend, the `API_PROXY` environment variable is unset. The fallback proxy is set to the staging backend url.
 
-WIP
+You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
+
+```bash
+API_PROXY=http://localhost:8000 docker-compose up -d
+```
 
 
 ## Backend Development (with Docker)
