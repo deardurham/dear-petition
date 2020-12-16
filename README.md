@@ -7,13 +7,13 @@ project for creating petition forms.
 [![Build Status](https://travis-ci.org/deardurham/dear-petition.svg?branch=master)](https://travis-ci.org/deardurham/dear-petition)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
+## 🚀 Docker Quick Start (recommended)
 
-## Local Development
-
-Begin by cloning the repository:
-
-```
+```bash
 git clone git@github.com:deardurham/dear-petition.git
+cd dear-petition
+docker-compose up -d
+docker-compose run --rm django python manage.py createsuperuser
 ```
 
 
@@ -30,23 +30,28 @@ npm run start
 ```
 
 
-### Staging Backend
+### API Proxy Configuration
 
-By default, the frontend development server [proxies requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to [a staging API server](https://dear-petition-staging.herokuapp.com/).
+The Petition Generator app uses a React frontend with a Django REST API backend. In the development environment, the React development server and Django backend will likely be hosted on different ports, and thus hosted on different urls. This causes issues when the frontend code sends API requests, such as a login request. The solution is to [proxy the API requests](https://create-react-app.dev/docs/proxying-api-requests-in-development/) to the url of the backend.
 
-The staging API server is useful for developers who do not wish to build a local backend implementation. New developers must have a user set up on the staging server in order to test most frontend functionality.
+#### Docker Container
 
+When the frontend is run using docker, the `API_PROXY` environment variable is set to `http://django:8000`.
 
-### Local Backend
+You can override the this proxy url by setting `OVERRIDE_API_PROXY`:
 
-Developers who wish to use a local version of both the frontend and backend must change the `proxy` variable in `package.json`.
+```bash
+OVERRIDE_API_PROXY=https://dear-petition-staging.herokuapp.com/ docker-compose up -d
+```
 
-#### Docker Example
+#### Local Frontend
 
-When using `docker-compose up -d` to run both the backend and frontend within docker containers, use the following configuration:
+When using `npm run start` to run the frontend, the `API_PROXY` environment variable is unset. The fallback proxy is set to the staging backend url.
 
-```json
-"proxy": "http://django:8000",
+You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
+
+```bash
+API_PROXY=http://localhost:8000 docker-compose up -d
 ```
 
 
