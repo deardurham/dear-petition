@@ -287,31 +287,8 @@ def test_map_offenses__offense_date(form, record2, offense_record1):
     assert form.data["DOOF:1"] == utils.format_petition_date(record2.offense_date)
 
 
-@pytest.mark.parametrize(
-    "disposition_method",
-    [
-        "Dismissal without Leave by DA",
-        "Dismissed by Court",
-        "Deferred Prosecution Dismissal",
-        "Discharge and Dismissal",
-        "Conditional Discharge",
-        "No Probable Cause",
-        "Never To Be Served",
-    ],
-)
-def test_map_offenses__disposition_method(
-    form, offense1, offense_record1, disposition_method,
-):
-    offense1.disposition_method = disposition_method
-    offense1.save()
-    form.map_offenses()
-    assert form.data["Disposition:1"] == constants.DISPOSITION_METHOD_CODE_MAP.get(
-        offense1.disposition_method.upper()
-    )
-
-
 def test_map_offenses__disposition_date(form, offense1, offense_record1):
     form.map_offenses()
-    assert form.data["DispositionDate:1"] == utils.format_petition_date(
+    assert form.data["DismissalDate:1"] == utils.format_petition_date(
         offense1.disposed_on
     )

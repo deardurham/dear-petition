@@ -1,10 +1,10 @@
-FROM alpine:3.10
+FROM alpine:3.12
 
 ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
   # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3 python3-dev musl-dev \
+  && apk add --virtual build-deps gcc python3 python3-dev py-pip musl-dev \
   && apk add postgresql-dev \
   # Pillow dependencies
   && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
@@ -22,6 +22,7 @@ RUN apk update \
   && apk add poppler-utils
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
+RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
