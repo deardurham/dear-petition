@@ -81,7 +81,8 @@ class AOCFormCR287(PetitionForm):
                 ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
-        self.data["NamePetitioner"] = self.extra.get("name_petitioner")
+        self.data["PetitionerName"] = self.extra.get("name_petitioner") #AOC-288
+        self.data["NamePetitioner"] = self.extra.get("name_petitioner") #AOC-287
         self.data["StreetAddr"] = self.extra.get("address1")
         self.data["MailAddr"] = self.extra.get("address2")
         self.data["City"] = self.extra.get("city")
@@ -135,8 +136,7 @@ class AOCFormCR287(PetitionForm):
             self.data[f"ArrestDate:{i}"] = self.format_date(ciprs_record.arrest_date)
             self.data[f"Description:{i}"] = offense_record.description
             self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
-            self.data[f"Disposition:{i}"] = self.disposition_code(offense)
-            self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
+            self.data[f"DismissalDate:{i}"] = self.format_date(offense.disposed_on)
 
 
 class AOCFormCR285(AOCFormCR287):
