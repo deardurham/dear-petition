@@ -23,7 +23,7 @@ class PetitionForm(metaclass=abc.ABCMeta):
     def get_ordered_offense_records(self):
         qs = self.petition.offense_records.select_related("offense__ciprs_record")
         return qs.order_by(
-            "offense__ciprs_record__offense_date",
+            "offense__ciprs_record__offense_date__year",
             "offense__ciprs_record__file_no",
             "pk",
         )
