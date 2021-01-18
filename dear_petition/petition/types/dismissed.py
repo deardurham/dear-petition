@@ -30,29 +30,29 @@ def build_guilty_to_lesser_query():
     return query
 
 
-def dismissed_query():
-    action = Q(action="CHARGED")
-    methods = Q()
-    for method in DISMISSED_DISPOSITION_METHODS:
-        methods |= Q(offense__disposition_method__iexact=method)
-    return action & methods
-
-
-def same_day_conviction(batch, jurisdiction):
+def same_day_convictions(dismissed_records):
     """
-    Logic:
-        I was charged with multiple offenses, and while the charges listed above were
-        dismissed, the following charges resulted in a conviction on the day of the
-        dismissal or had not yet reached final disposition.
+    To support field 3(b) on the AOC-CR-287 form, return a list of guilty
+    OffenseRecords that also had dismissals on the same day.
+
+    Petition language:
+        I was charged with multiple offenses, and while the charges
+        listed above were dismissed, the following charges resulted in a
+        conviction on the day of the dismissal or had not yet reached final
+        disposition.
     """
-    qs = OffenseRecord.objects.filter(
-        offense__ciprs_record__batch=batch,
-        offense__ciprs_record__jurisdiction=jurisdiction,
-    )
-    offenses = []
-    for record in batch.records.all():
-        dismissed = qs.filter(dismissed_query())
-        guilty = qs.filter(offense__verdict="GUILTY")
-        if dismissed.exists() and guilty.exists():
-            offenses.append(guilty.first())
-    return offenses
+    qs = dismissed_records.values_list(
+        "offense__ciprs_record", "offense__disposed_on"
+    ).distinct()
+    records = []
+    for ciprs_record_id, disposed_on in qs:
+        guilty_records = OffenseRecord.objects.filter(
+            offense__verdict="GUILTY",
+            offense__ciprs_record__id=ciprs_record_id,
+            offense__disposed_on=disposed_on,
+        )
+        if guilty_records.exists():
+            records.extend(
+                guilty_records.select_related("offense__ciprs_record__batch")
+            )
+    return records
