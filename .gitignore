@@ -315,3 +315,7 @@ yarn-error.log*
 
 # IDE
 .vscode
+
+latest.dump
+notebooks
+src/ciprs-reader
