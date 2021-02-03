@@ -22,7 +22,7 @@ def create_record(batch, jurisdiction, county):
         county=county,
     )
     guilty_offense = OffenseRecordFactory(
-        action="CHARGED",
+        action="CONVICTED",
         description="BREAK OR ENTER A MOTOR VEHICLE",
         severity="FELONY",
         offense=OffenseFactory(

@@ -41,15 +41,19 @@ def same_day_convictions(dismissed_records):
         conviction on the day of the dismissal or had not yet reached final
         disposition.
     """
-    qs = dismissed_records.values_list(
-        "offense__ciprs_record", "offense__disposed_on"
-    ).distinct()
+    dismissed_record_ids = dismissed_records.values_list("id", flat=True)
+    qs = (
+        OffenseRecord.objects.filter(pk__in=list(dismissed_record_ids))
+        .values_list("offense__ciprs_record", "offense__disposed_on")
+        .distinct()
+    )
     records = []
     for ciprs_record_id, disposed_on in qs:
         guilty_records = OffenseRecord.objects.filter(
             offense__verdict="GUILTY",
             offense__ciprs_record__id=ciprs_record_id,
             offense__disposed_on=disposed_on,
+            action="CONVICTED",
         )
         if guilty_records.exists():
             records.extend(
