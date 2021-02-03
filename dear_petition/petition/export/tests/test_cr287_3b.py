@@ -10,6 +10,7 @@ from dear_petition.petition.tests.factories import (
 )
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
+from dear_petition.petition.export.forms import AOCFormCR287
 
 pytestmark = pytest.mark.django_db
 
@@ -77,3 +78,10 @@ def durham_offense(durham_petition):
 def test_same_day_convictions(durham_offense, durham_petition):
     offenses = dismissed.same_day_convictions(durham_petition.get_all_offense_records())
     assert durham_offense in offenses
+
+
+def test_cr287_same_day_convictions(durham_offense, durham_petition):
+    form = AOCFormCR287(durham_petition)
+    form.map_same_day_offenses()
+    expected = f"{durham_offense.offense.ciprs_record.file_no} {durham_offense.description.title()}"
+    assert form.data["ChargedDesc"] == expected
