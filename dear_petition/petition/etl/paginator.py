@@ -31,8 +31,6 @@ class OffenseRecordPaginator:
         )
         self.petition = petition
         self.queryset = self.petition.get_all_offense_records()
-        if petition.form_type is DISMISSED or petition.form_type is ATTACHMENT:
-            self.queryset = self.queryset.exclude(severity="INFRACTION")
 
     def query(self, start, size):
         """Slice query aginst petition offense records."""

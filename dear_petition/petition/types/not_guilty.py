@@ -9,7 +9,7 @@ def get_offense_records(batch, jurisdiction=""):
     if jurisdiction:
         qs = qs.filter(offense__ciprs_record__jurisdiction=jurisdiction)
     query = build_query()
-    qs = qs.filter(query)
+    qs = qs.filter(query).exclude(severity="INFRACTION")
     return qs.select_related("offense__ciprs_record__batch")
 
 
