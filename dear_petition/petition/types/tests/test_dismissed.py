@@ -33,6 +33,14 @@ def test_non_dismissed_disposition_method(batch, non_dismissed_offense):
     assert offense_record not in batch.dismissed_offense_records()
 
 
+def test_infraction_severity_offense_record(batch, dismissed_offense):
+    """Offense records with severity INFRACTION should be excluded."""
+    infraction_record = OffenseRecordFactory(action="CHARGED", offense=dismissed_offense, severity="INFRACTION")
+    traffic_record = OffenseRecordFactory(action="CHARGED", offense=dismissed_offense, severity="TRAFFIC")
+    assert infraction_record not in batch.dismissed_offense_records()
+    assert traffic_record in batch.dismissed_offense_records()
+
+
 @pytest.mark.parametrize(
     "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
 )
