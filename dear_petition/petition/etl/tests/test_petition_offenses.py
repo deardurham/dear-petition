@@ -112,3 +112,25 @@ def test_link_offense_records__25(petition, records_35):
     assert attachments[0].offense_records.count() == 20
     # 2nd attachment has 5 records
     assert attachments[1].offense_records.count() == 5
+
+
+def test_paginator_same_record_number_order(petition, records_10):
+    # get the 10th offense record so we can attach one more offense
+    # record to the same CIPRSRecord, so that it crosses the
+    # attachment boundary
+    charge_1 = petition.get_all_offense_records().last()
+    # attach a 2nd dismissed charge
+    charge_2 = OffenseRecordFactory(
+        offense=OffenseFactory(
+            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            ciprs_record=charge_1.offense.ciprs_record,
+            jurisdiction=constants.DISTRICT_COURT,
+        ),
+        action="CHARGED",
+    )
+    link_offense_records_and_attachments(petition)
+    attachment = petition.attachments.order_by("pk").first()
+    # the 1st charge should always be on the first petition
+    assert charge_1.pk in petition.offense_records.values_list("pk", flat=True)
+    # the 2nd charge should always be on the attachment
+    assert charge_2.pk in attachment.offense_records.values_list("pk", flat=True)
