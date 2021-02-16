@@ -10,7 +10,7 @@ function Modal({ children, isVisible, closeModal, ...props }) {
   return ReactDOM.createPortal(
     <>
       {isVisible && [
-        <ModalUnderlay key="shade" onClick={closeModal}></ModalUnderlay>,
+        <ModalUnderlay key="shade" onClick={closeModal} />,
         <ModalStyled key="modal" {...props}>
           {children}
         </ModalStyled>

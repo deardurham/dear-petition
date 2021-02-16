@@ -1,78 +1,67 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { FlexWrapper, GenerationInputsStyled, GenerationInputWrapper } from './GenerationInputs.styled';
+import React, { useState, useEffect } from 'react';
+import { AddressLine, FlexWrapper, GenerationInput, GenerationSelect } from './GenerationInputs.styled';
 // Constants
 import US_STATES from '../../../constants/US_STATES';
 
 // Ajax
 import Axios from '../../../service/axios';
 
-// Children
-import Input from '../../elements/Input/Input';
-import Select from '../../elements/Input/Select';
-import { GenerationContext } from './GenerationPage';
+export function AddressInput({ address, setAddress, disabled, errors }) {
+  const [address1, setAddress1] = useState(address.address1);
+  const [address2, setAddress2] = useState(address.address2);
+  const [city, setCity] = useState(address.city);
+  const [state, setState] = useState(address.state);
+  const [zipCode, setZipCode] = useState(address.zipCode);
 
-function AddressInput({ setAddress, errors }) {
-  const [address1, setAddress1] = useState('');
-  const [address2, setAddress2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState({ label: 'NC', value: 'NC' });
-  const [zipCode, setZipCode] = useState('');
   return (
-    <FlexWrapper>
-      <GenerationInputWrapper>
-        <Input
-          label="Address Line 1"
-          value={address1}
-          onChange={e => {
-            const val = e.target.value;
-            setAddress1(val);
-            setAddress((prev) => ({ ...prev, address1: val }));
-          }}
-          errors={errors.address}
-        />
-      </GenerationInputWrapper>
-
-      <GenerationInputWrapper>
-        <Input
-          label="Address Line 2"
-          value={address2}
-          onChange={e => {
-            const val = e.target.value;
-            setAddress2(val);
-            setAddress((prev) => ({ ...prev, address2: val }));
-          }}
-        />
-      </GenerationInputWrapper>
-
-      <GenerationInputWrapper>
-        <Input
+    <>
+      <AddressLine
+        label="Address Line 1"
+        disabled={disabled}
+        value={address1}
+        onChange={e => {
+          const val = e.target.value;
+          setAddress1(val);
+          setAddress((prev) => ({ ...prev, address1: val }));
+        }}
+        errors={!disabled && errors.address}
+      />
+      <AddressLine
+        label="Address Line 2"
+        disabled={disabled}
+        value={address2}
+        onChange={e => {
+          const val = e.target.value;
+          setAddress2(val);
+          setAddress((prev) => ({ ...prev, address2: val }));
+        }}
+      />
+      <FlexWrapper>
+        <GenerationInput
           label="City"
+          disabled={disabled}
           value={city}
           onChange={e => {
             const val = e.target.value;
             setCity(val);
             setAddress((prev) => ({ ...prev, city: val }));
           }}
-          errors={errors.city}
+          errors={!disabled && errors.city}
         />
-      </GenerationInputWrapper>
-
-      <GenerationInputWrapper>
-        <Select
+        <GenerationSelect
           label="State"
+          disabled={disabled}
           value={state}
           onChange={val => {
             setState(val);
             setAddress((prev) => ({ ...prev, state: val }));
           }}
-          options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
-          errors={errors.state}
+          options={US_STATES.map(state => ({ value: state[0], label: state[1] }))}
+          errors={!disabled && errors.state}
         />
-      </GenerationInputWrapper>
-
-      <GenerationInputWrapper>
-        <Input
+        <GenerationInput
           label="Zip Code"
+          disabled={disabled}
           value={zipCode}
           maxLength={5}
           onChange={e => {
@@ -80,29 +69,15 @@ function AddressInput({ setAddress, errors }) {
             setZipCode(val);
             setAddress((prev) => ({ ...prev, zipCode: val }));
           }}
-          errors={errors.zipCode}
+          errors={!disabled && errors.zipCode}
         />
-      </GenerationInputWrapper>
-    </FlexWrapper>
+      </FlexWrapper>
+    </>
   );
 }
 
-function GenerationInputs() {
+export function AttorneyInput({ attorney, setAttorney, errors }) {
   const [attornies, setAttornies] = useState([]);
-  const {
-    attorney,
-    ssn,
-    licenseNumber,
-    licenseState,
-    petitionerName,
-    setAddress,
-    setAttorney,
-    setSSN,
-    setLicenseNumber,
-    setLicenseState,
-    setPetitionerName,
-    formErrors
-  } = useContext(GenerationContext);
 
   useEffect(() => {
     let isMounted = true;
@@ -120,59 +95,30 @@ function GenerationInputs() {
   }, []);
 
   return (
-    <GenerationInputsStyled>
-      <GenerationInputWrapper>
-        <Input
-          label="Petitioner"
-          value={petitionerName}
-          onChange={e => setPetitionerName(e.target.value)}
-          errors={formErrors?.petitionerName}
-        />
-      </GenerationInputWrapper>
-      <FlexWrapper>
-        <GenerationInputWrapper>
-          <Select
-            label="Attorney"
-            value={attorney}
-            onChange={val => setAttorney(val)}
-            options={attornies.map(att => ({ value: att.pk, label: att.name }))}
-            errors={formErrors?.attorney}
-          />
-        </GenerationInputWrapper>
-
-        <GenerationInputWrapper>
-          <Input
-            label="SSN"
-            value={ssn}
-            onChange={e => setSSN(e.target.value)}
-            maxLength={11} // in case they want to add dashes?
-            errors={formErrors?.ssn}
-          />
-        </GenerationInputWrapper>
-
-        <GenerationInputWrapper>
-          <Input
-            label="License #"
-            value={licenseNumber}
-            onChange={e => setLicenseNumber(e.target.value)}
-            errors={formErrors?.licenseNumber}
-          />
-        </GenerationInputWrapper>
-
-        <GenerationInputWrapper>
-          <Select
-            label="License state"
-            value={licenseState}
-            onChange={val => setLicenseState(val)}
-            options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
-            errors={formErrors?.licenseState}
-          />
-        </GenerationInputWrapper>
-      </FlexWrapper>
-
-      <AddressInput setAddress={setAddress} errors={formErrors} />
-    </GenerationInputsStyled>
+    <>
+      <GenerationSelect
+        label="Attorney Name"
+        value={attorney}
+        onChange={val => setAttorney(val)}
+        options={attornies.map(att => ({
+          value: att.pk,
+          label: att.name,
+          address: {
+            address1: att.address1,
+            address2: att.address2,
+            city: att.city,
+            state: {
+              label: att.state,
+              value: att.state,
+            },
+            zipCode: att.zipcode,
+          },
+        }))}
+        errors={errors.attorney}
+      />
+      {attorney && 
+        <AddressInput address={attorney.address} disabled />
+      }
+    </>
   );
 }
-
-export default GenerationInputs;

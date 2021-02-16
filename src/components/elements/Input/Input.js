@@ -3,12 +3,18 @@ import PropTypes from 'prop-types';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ value, onChange, label, type, errors, maxLength, ...props }) {
+function Input({ value, onChange, label, type, errors, maxLength, disabled, ...props }) {
   return (
     <InputWrapper {...props}>
       <InputStyled>
         {label}
-        <ActualInputStyled type={type} maxLength={maxLength} value={value} onChange={onChange} />
+        <ActualInputStyled
+          type={type}
+          maxLength={maxLength}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+        />
       </InputStyled>
       <AnimatePresence>
         <InputErrors

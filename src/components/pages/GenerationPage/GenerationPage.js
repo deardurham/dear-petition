@@ -1,7 +1,7 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
   GenerationPageStyled,
-  PetitionsList,
   GenerationContentStyled
 } from './GenerationPage.styled';
 
@@ -12,25 +12,54 @@ import { useParams } from 'react-router-dom';
 import Axios from '../../../service/axios';
 
 // Children
-import GenerationInputs from './GenerationInputs';
-import PetitionListItem from './PetitionListItem';
-
-export const GenerationContext = createContext(null);
+import { AddressInput, AttorneyInput } from './GenerationInputs';
+import { GenerationInput, GenerationSelect, FlexWrapper, SSN } from './GenerationInputs.styled';
+import { PetitionListStyled } from './PetitionList.styled'
+import { PetitionListItem } from './PetitionList';
+import US_STATES from '../../../constants/US_STATES';
+import { colorBlue } from '../../../styles/colors';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
+
+const GenerationSection = styled.div`
+  margin: 0rem 0rem 2rem 0rem;
+`;
+
+const Button = styled.button`
+  border: none;
+  color: ${colorBlue};
+  cursor: pointer;
+`;
+
+function CollapsibleSection({ label, children }) {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <GenerationSection>
+      <FlexWrapper>
+        <h3>{label}</h3>
+        <Button onClick={() => setCollapsed(!collapsed)}>{collapsed ? 'Edit' : 'Save'}</Button>
+      </FlexWrapper>
+      {!collapsed && children}
+    </GenerationSection>
+  );
+}
 
 function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
-  const [selectedPetition, setSelectedPetition] = useState();
   const [petitionerName, setPetitionerName] = useState('');
-  const [address, setAddress] = useState({ state: DEFAULT_STATE_LABEL });
   const [ssn, setSSN] = useState('');
+  const [address, setAddress] = useState({
+    address1: '',
+    address2: '',
+    city: '',
+    state: DEFAULT_STATE_LABEL,
+    zipCode: '',
+  });
   const [licenseNumber, setLicenseNumber] = useState('');
   const [licenseState, setLicenseState] = useState(DEFAULT_STATE_LABEL);
   const [attorney, setAttorney] = useState('');
-  const [selectedAgencies, setSelectedAgencies] = useState([]);
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
@@ -47,102 +76,69 @@ function GenerationPage() {
       });
   }, [batchId]);
 
-  const _petitionDataIsValid = () => {
-    let isValid = true;
-    const errors = {};
-    if (!petitionerName) {
-      errors.petitionerName = ['This field is required'];
-      isValid = false;
-    }
-    if (!ssn) {
-      errors.ssn = ['This field is required'];
-      isValid = false;
-    }
-    if (!licenseNumber) {
-      errors.licenseNumber = ['This field is required'];
-      isValid = false;
-    }
-    if (!licenseState) {
-      errors.licenseState = ['This field is required'];
-      isValid = false;
-    }
-    if (!attorney) {
-      errors.attorney = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.address1) {
-      errors.address = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.city) {
-      errors.city = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.state) {
-      errors.state = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.zipCode) {
-      errors.zipCode = ['This field is required'];
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-
-    return isValid;
-  };
-
-  const validatePetitionSelect = (petition) => {
-    setFormErrors({});
-    if (_petitionDataIsValid()) {
-      setSelectedPetition(petition);
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const context = {
-    batch,
-    petition: selectedPetition,
-    address,
-    setAddress,
-    ssn,
-    setSSN,
-    licenseNumber,
-    setLicenseNumber,
-    licenseState,
-    setLicenseState,
-    attorney,
-    setAttorney,
-    selectedAgencies,
-    setSelectedAgencies,
-    petitionerName,
-    setPetitionerName,
-    formErrors,
-    setFormErrors,
-  };
-
   return (
-    <GenerationContext.Provider value={context}>
-      <GenerationPageStyled>
-        {loading ? (
-          <h2>Loading...</h2>
-        ) : (
-          <GenerationContentStyled>
-            <GenerationInputs />
-            <PetitionsList>
+    <GenerationPageStyled>
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : (
+        <GenerationContentStyled>
+          <CollapsibleSection label='Attorney Information'>
+            <AttorneyInput attorney={attorney} setAttorney={setAttorney} errors={formErrors} />
+          </CollapsibleSection>
+          <CollapsibleSection label='Petitioner Information'>
+            <GenerationInput
+              label='Petitioner Name'
+              value={petitionerName}
+              onChange={e => setPetitionerName(e.target.value)}
+              errors={formErrors.petitionerName}
+            />
+            <SSN
+              label='SSN'
+              value={ssn}
+              maxLength={11}
+              onChange={e => setSSN(e.target.value.replace(/[^0-9-]/g, ''))}
+              errors={formErrors.ssn}
+            />
+            <FlexWrapper>
+              <GenerationInput
+                label="License #"
+                value={licenseNumber}
+                onChange={e => setLicenseNumber(e.target.value)}
+                errors={formErrors.licenseNumber}
+              />
+              <GenerationSelect
+                label="License state"
+                value={licenseState}
+                onChange={val => setLicenseState(val)}
+                options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
+                errors={formErrors.licenseState}
+              />
+            </FlexWrapper>
+            <AddressInput address={address} setAddress={setAddress} errors={formErrors} />
+          </CollapsibleSection>
+          <GenerationSection>
+            <h3>Petition List</h3>
+            <PetitionListStyled>
               {batch?.petitions?.map(petition =>
                 <PetitionListItem
                   key={petition.pk}
                   petition={petition}
-                  validatePetitionSelect={validatePetitionSelect} />
+                  attorney={attorney}
+                  petitionerData = {{
+                    petitionerName,
+                    ssn,
+                    address,
+                    licenseNumber,
+                    licenseState,
+                  }}
+                  onError={(errors) => setFormErrors(errors)}
+                />
               )}
-            </PetitionsList>
-          </GenerationContentStyled>
-        )}
-      </GenerationPageStyled>
-    </GenerationContext.Provider>
+            </PetitionListStyled>
+          </GenerationSection>
+        </GenerationContentStyled>
+      )}
+    </GenerationPageStyled>
   );
 }
 

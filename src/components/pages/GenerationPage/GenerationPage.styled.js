@@ -9,9 +9,3 @@ export const GenerationContentStyled = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
-export const PetitionsList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;

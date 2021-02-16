@@ -34,10 +34,9 @@ const AgencyAutoSuggestInput = inputProps => {
   );
 };
 
-const AgencyAutocomplete = ({ ...props }) => {
+const AgencyAutocomplete = ({ selectedAgencies, setSelectedAgencies, ...props }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
-  const { selectedAgencies, setSelectedAgencies } = useContext(GenerationContext);
 
   const handleHotKeyPressed = e => {
     e.stopPropagation();

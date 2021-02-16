@@ -3,11 +3,7 @@ import { colorGrey, colorRed, colorFontPrimary } from '../../../styles/colors';
 import { motion } from 'framer-motion';
 import { fontPrimary } from '../../../styles/fonts';
 
-export const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+export const InputWrapper = styled.div``;
 
 export const InputStyled = styled.label``;
 
@@ -17,7 +13,6 @@ export const ActualInputStyled = styled.input`
   padding: 1rem 2rem;
 
   width: 100%;
-  max-width: 300px;
   border: 1px solid ${colorGrey};
   font-size: 16px;
   font-family: ${fontPrimary};

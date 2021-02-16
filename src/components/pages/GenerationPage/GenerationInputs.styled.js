@@ -1,14 +1,11 @@
 import styled from 'styled-components';
+import Input from '../../elements/Input/Input';
+import Select from '../../elements/Input/Select';
 import { smallerThanTabletLandscape } from '../../../styles/media';
 
-export const GenerationInputsStyled = styled.div`
-`;
-
 export const FlexWrapper = styled.div`
-  margin: 2rem 0 4rem 0;
   display: flex;
   flex-flow: row wrap;
-  justify-content: center;
 
   @media (${smallerThanTabletLandscape}) {
     flex-direction: column;
@@ -17,6 +14,23 @@ export const FlexWrapper = styled.div`
   }
 `;
 
-export const GenerationInputWrapper = styled.div`
+export const GenerationInput = styled(Input)`
+  width: 25%;
+  min-width: 350px;
+  margin-top: 1rem;
   margin-right: 4rem;
+`;
+
+export const GenerationSelect = styled(Select)`
+  width: 25%;
+  min-width: 350px;
+  margin-top: 1rem;
+  margin-right: 4rem;
+`;
+
+export const SSN = styled(GenerationInput)`
+`;
+
+export const AddressLine = styled(GenerationInput)`
+  width: 50%;
 `;
