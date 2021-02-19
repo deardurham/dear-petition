@@ -5,6 +5,8 @@ import {
   PetitionListHeader
 } from './PetitionList.styled';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons'
 
 export function PetitionList({ children, className }) {
   return (
@@ -19,6 +21,10 @@ export function PetitionList({ children, className }) {
   );
 }
 
+const GenerateButton = () => (
+  <FontAwesomeIcon icon={faPlay} />
+);
+
 export function PetitionListItem({ petition, petitionerData, setPetitionerData }) {
   const [isVisible, setVisible] = useState(false);
   return (
@@ -27,6 +33,7 @@ export function PetitionListItem({ petition, petitionerData, setPetitionerData }
         <PetitionCellStyled>{petition.form_type}</PetitionCellStyled>
         <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
         <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
+        <GenerateButton />
       </PetitionListItemStyled>
       {isVisible && (
         <GeneratePetitionModal

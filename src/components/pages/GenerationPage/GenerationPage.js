@@ -17,32 +17,24 @@ import { GenerationInput, GenerationSelect, FlexWrapper, SSN } from './Generatio
 import { PetitionListStyled } from './PetitionList.styled'
 import { PetitionListItem } from './PetitionList';
 import US_STATES from '../../../constants/US_STATES';
-import { colorBlue } from '../../../styles/colors';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
-const GenerationSection = styled.div`
-  margin: 0rem 0rem 2rem 0rem;
+const SectionDiv = styled.div`
+  margin-bottom: 1rem;
 `;
 
-const Button = styled.button`
-  border: none;
-  color: ${colorBlue};
-  cursor: pointer;
+const SectionHeader = styled.h3`
+  margin-bottom: 2rem;
+  user-select: none;
 `;
 
-function CollapsibleSection({ label, children }) {
-  const [collapsed, setCollapsed] = useState(false);
-  return (
-    <GenerationSection>
-      <FlexWrapper>
-        <h3>{label}</h3>
-        <Button onClick={() => setCollapsed(!collapsed)}>{collapsed ? 'Edit' : 'Save'}</Button>
-      </FlexWrapper>
-      {!collapsed && children}
-    </GenerationSection>
-  );
-}
+const GenerationSection = ({ label, children }) => (
+  <SectionDiv>
+    <SectionHeader>{label}</SectionHeader>
+    {children}
+  </SectionDiv>
+);
 
 function GenerationPage() {
   const { batchId } = useParams();
@@ -82,10 +74,10 @@ function GenerationPage() {
         <h3>Loading...</h3>
       ) : (
         <GenerationContentStyled>
-          <CollapsibleSection label='Attorney Information'>
+          <GenerationSection label='Attorney Information'>
             <AttorneyInput attorney={attorney} setAttorney={setAttorney} errors={formErrors} />
-          </CollapsibleSection>
-          <CollapsibleSection label='Petitioner Information'>
+          </GenerationSection>
+          <GenerationSection label='Petitioner Information'>
             <GenerationInput
               label='Petitioner Name'
               value={petitionerName}
@@ -115,24 +107,25 @@ function GenerationPage() {
               />
             </FlexWrapper>
             <AddressInput address={address} setAddress={setAddress} errors={formErrors} />
-          </CollapsibleSection>
-          <GenerationSection>
-            <h3>Petition List</h3>
+          </GenerationSection>
+          <GenerationSection label='Petition List'>
             <PetitionListStyled>
               {batch?.petitions?.map(petition =>
-                <PetitionListItem
-                  key={petition.pk}
-                  petition={petition}
-                  attorney={attorney}
-                  petitionerData = {{
-                    petitionerName,
-                    ssn,
-                    address,
-                    licenseNumber,
-                    licenseState,
-                  }}
-                  onError={(errors) => setFormErrors(errors)}
-                />
+                <>
+                  <PetitionListItem
+                    key={petition.pk}
+                    petition={petition}
+                    attorney={attorney}
+                    petitionerData = {{
+                      petitionerName,
+                      ssn,
+                      address,
+                      licenseNumber,
+                      licenseState,
+                    }}
+                    onError={(errors) => setFormErrors(errors)}
+                  />
+                </>
               )}
             </PetitionListStyled>
           </GenerationSection>
