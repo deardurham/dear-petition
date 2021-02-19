@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import {
+  GenerateButtonCell,
   PetitionListItemStyled,
   PetitionCellStyled,
   PetitionListHeader
 } from './PetitionList.styled';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay } from '@fortawesome/free-solid-svg-icons'
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { AgencyInput } from './GenerationInputs';
 
 export function PetitionList({ children, className }) {
   return (
@@ -21,19 +23,20 @@ export function PetitionList({ children, className }) {
   );
 }
 
-const GenerateButton = () => (
-  <FontAwesomeIcon icon={faPlay} />
-);
+const GenerateButton = () => <FontAwesomeIcon icon={faPlay} />;
 
 export function PetitionListItem({ petition, petitionerData, setPetitionerData }) {
   const [isVisible, setVisible] = useState(false);
+
   return (
     <>
       <PetitionListItemStyled onClick={() => setVisible(true)}>
         <PetitionCellStyled>{petition.form_type}</PetitionCellStyled>
         <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
         <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
-        <GenerateButton />
+        <GenerateButtonCell>
+          <GenerateButton />
+        </GenerateButtonCell>
       </PetitionListItemStyled>
       {isVisible && (
         <GeneratePetitionModal

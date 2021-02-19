@@ -36,6 +36,9 @@ export const PetitionListItemStyled = styled(PetitionListRow)`
 `;
 
 export const PetitionCellStyled = styled.div`
-  display: flex;
-  width: 33.33%;
+  flex: 1;
+`;
+
+export const GenerateButtonCell = styled(PetitionCellStyled)`
+  flex: 0;
 `;

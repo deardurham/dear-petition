@@ -6,12 +6,33 @@ import US_STATES from '../../../constants/US_STATES';
 // Ajax
 import Axios from '../../../service/axios';
 
+const AddAgencySelect = ({ agency, setAgencies, disabled, errors }) => (
+  <GenerationSelect
+    disabled={disabled}
+    value={agency}
+    onChange={val => {
+      console.log(val);
+      setAgencies(oldAgencies => [...oldAgencies, val]);
+    }}
+    options={[{ value: 'Agency 1', label: 'Agency 1' }, { value: 'Agency 2', label: 'Agency 2' }, { value: 'Agency 2', label: 'Agency 3' }]}
+    errors={errors}
+  />
+);
+
+export function AgencyInput({ selectedAgencies, setSelectedAgencies }) {
+  const numAgencies = selectedAgencies.length;
+
+  return (
+    <div>
+      <AddAgencySelect setAgencies={setSelectedAgencies} agency={numAgencies > 0 ? selectedAgencies[0] : ''} />
+      {numAgencies >= 1 && <AddAgencySelect setAgencies={setSelectedAgencies} agency={selectedAgencies[1]} />}
+      {numAgencies >= 2 && <AddAgencySelect setAgencies={setSelectedAgencies} agency={selectedAgencies[2]} />}
+    </div>
+  );
+}
+
 export function AddressInput({ address, setAddress, disabled, errors }) {
-  const [address1, setAddress1] = useState(address.address1);
-  const [address2, setAddress2] = useState(address.address2);
-  const [city, setCity] = useState(address.city);
-  const [state, setState] = useState(address.state);
-  const [zipCode, setZipCode] = useState(address.zipCode);
+  const { address1, address2, city, state, zipCode } = address;
 
   return (
     <>
@@ -21,7 +42,6 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
         value={address1}
         onChange={e => {
           const val = e.target.value;
-          setAddress1(val);
           setAddress((prev) => ({ ...prev, address1: val }));
         }}
         errors={!disabled && errors.address}
@@ -32,7 +52,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
         value={address2}
         onChange={e => {
           const val = e.target.value;
-          setAddress2(val);
+          //setAddress2(val);
           setAddress((prev) => ({ ...prev, address2: val }));
         }}
       />
@@ -43,7 +63,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           value={city}
           onChange={e => {
             const val = e.target.value;
-            setCity(val);
+            //setCity(val);
             setAddress((prev) => ({ ...prev, city: val }));
           }}
           errors={!disabled && errors.city}
@@ -53,7 +73,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           disabled={disabled}
           value={state}
           onChange={val => {
-            setState(val);
+            //setState(val);
             setAddress((prev) => ({ ...prev, state: val }));
           }}
           options={US_STATES.map(state => ({ value: state[0], label: state[1] }))}
@@ -66,7 +86,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           maxLength={5}
           onChange={e => {
             const val = e.target.value;
-            setZipCode(val);
+            //setZipCode(val);
             setAddress((prev) => ({ ...prev, zipCode: val }));
           }}
           errors={!disabled && errors.zipCode}

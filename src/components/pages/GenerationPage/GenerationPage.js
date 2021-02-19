@@ -111,21 +111,19 @@ function GenerationPage() {
           <GenerationSection label='Petition List'>
             <PetitionListStyled>
               {batch?.petitions?.map(petition =>
-                <>
-                  <PetitionListItem
-                    key={petition.pk}
-                    petition={petition}
-                    attorney={attorney}
-                    petitionerData = {{
-                      petitionerName,
-                      ssn,
-                      address,
-                      licenseNumber,
-                      licenseState,
-                    }}
-                    onError={(errors) => setFormErrors(errors)}
-                  />
-                </>
+                <PetitionListItem
+                  key={petition.pk}
+                  petition={petition}
+                  attorney={attorney}
+                  petitionerData = {{
+                    petitionerName,
+                    ssn,
+                    address,
+                    licenseNumber,
+                    licenseState,
+                  }}
+                  onError={(errors) => setFormErrors(errors)}
+                />
               )}
             </PetitionListStyled>
           </GenerationSection>
