@@ -15,6 +15,7 @@ from dear_petition.users.tests.factories import UserFactory
 
 from ..constants import (
     CHARGED,
+    CONVICTED,
     DISMISSED,
     DISTRICT_COURT,
     SUPERIOR_COURT,
@@ -49,8 +50,8 @@ def record_data(idx):
                 {
                     "Action": "CHARGED",
                     "Description": "SPEEDING(80 mph in a 65 mph zone)",
-                    "Severity": "INFRACTION",
-                    "Law": "G.S. 20-141(B)",
+                    "Severity": "TRAFFIC",
+                    "Law": "20-141(J1)",
                     "Code": "4450",
                 },
                 {
@@ -59,13 +60,6 @@ def record_data(idx):
                     "Severity": "INFRACTION",
                     "Law": "G.S. 20-141(B)",
                     "Code": "4450",
-                },
-                {
-                    "Action": "CONVICTED",
-                    "Description": "IMPROPER EQUIP - SPEEDOMETER",
-                    "Severity": "INFRACTION",
-                    "Law": "G.S. 20-123.2",
-                    "Code": "4418",
                 },
             ],
             "Disposed On": "2018-02-01",
@@ -101,11 +95,11 @@ class OffenseFactory(factory.DjangoModelFactory):
 
 class OffenseRecordFactory(factory.DjangoModelFactory):
     offense = factory.SubFactory(OffenseFactory)
-    law = "G.S. 20-141(B)"
+    law = "20-141(J1)"
     code = "4450"
     action = CHARGED
-    severity = "INFRACTION"
-    description = "SPEEDING(80 mph in a 65 mph zone)"
+    severity = "TRAFFIC"
+    description = "SPEEDING(96 mph in a 70 mph zone) "
 
     class Meta:
         model = OffenseRecord
