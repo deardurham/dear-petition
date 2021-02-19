@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
+  Link,
+  LinksGroup,
   PageBaseStyled,
   PageHeader,
   PageLogo,
-  AdminButton,
-  LogoutButton,
   PageContentWrapper
 } from './PageBase.styled';
 import DEAR_Logo from '../../assets/img/DEAR_logo.png';
@@ -17,6 +18,12 @@ import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 
 // Router
 import { useHistory } from 'react-router-dom';
+
+const LogoLink = styled(Link)`
+  flex: 1;
+  border: none;
+  padding: 0;
+`;
 
 function PageBase({ children, ...props }) {
   const [adminUrl, setAdminUrl] = useState('');
@@ -37,11 +44,14 @@ function PageBase({ children, ...props }) {
   return (
     <PageBaseStyled {...props}>
       <PageHeader>
-        <PageLogo>
-          <img src={DEAR_Logo} alt="DEAR logo" />
-        </PageLogo>
-        {adminUrl ? <AdminButton href={adminUrl}>Admin</AdminButton> : null}
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+          <LogoLink href='/'>
+            <PageLogo src={DEAR_Logo} alt="DEAR logo" />
+          </LogoLink>
+          <LinksGroup>
+            {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
+            {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
+            <Link href='/' onClick={handleLogout}>Logout</Link>
+          </LinksGroup>
       </PageHeader>
       <PageContentWrapper>{children}</PageContentWrapper>
     </PageBaseStyled>

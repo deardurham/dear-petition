@@ -18,7 +18,7 @@ export const HomeContent = styled.div`
   justify-content: space-around;
   align-items: flex-start;
   flex: 1;
-  margin-top: calc(5rem + 0.5vw);
+  margin-top: calc(2rem + 0.5vw);
 
   @media (${smallerThanTabletLandscape}) {
     flex-direction: column;
