@@ -9,6 +9,7 @@ import {
   PageContentWrapper
 } from './PageBase.styled';
 import DEAR_Logo from '../../assets/img/DEAR_logo.png';
+import { smallerThanTabletLandscape } from '../../styles/media';
 
 // Ajax
 import Axios from '../../service/axios';
@@ -20,12 +21,15 @@ import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 import { useHistory } from 'react-router-dom';
 
 const LogoLink = styled(Link)`
-  flex: 1;
   border: none;
   padding: 0;
-  width: 100%;
-  max-width: 600px;
+  height: 80px;
+  width: 300px;
   margin: 0;
+  @media (${smallerThanTabletLandscape}) {
+    width: 400px;
+    height: auto;
+  }
 `;
 
 function PageBase({ children, ...props }) {

@@ -27,7 +27,7 @@ export const PageHeader = styled.header`
 
 export const PageLogo = styled.img`
   width: 100%;
-  height: auto;
+  height: 100%;
 `;
 
 export const LinksGroup = styled.div`
