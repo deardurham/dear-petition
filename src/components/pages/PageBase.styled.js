@@ -26,7 +26,6 @@ export const PageHeader = styled.header`
 `;
 
 export const PageLogo = styled.img`
-  max-width: 600px;
   width: 100%;
   height: auto;
 `;

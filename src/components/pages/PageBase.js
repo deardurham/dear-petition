@@ -23,6 +23,9 @@ const LogoLink = styled(Link)`
   flex: 1;
   border: none;
   padding: 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 0;
 `;
 
 function PageBase({ children, ...props }) {
@@ -48,8 +51,8 @@ function PageBase({ children, ...props }) {
             <PageLogo src={DEAR_Logo} alt="DEAR logo" />
           </LogoLink>
           <LinksGroup>
-            {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
             {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
+            {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
             <Link href='/' onClick={handleLogout}>Logout</Link>
           </LinksGroup>
       </PageHeader>
