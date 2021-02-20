@@ -10,7 +10,7 @@ export const PageBaseStyled = styled(motion.main)`
 `;
 
 export const PageHeader = styled.header`
-  padding: 3rem;
+  padding: 2rem;
   font-size: 1.75rem;
   font-weight: bold;
   display: flex;

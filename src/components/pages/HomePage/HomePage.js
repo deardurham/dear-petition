@@ -84,13 +84,6 @@ function HomePage(props) {
     <>
       <HomePageStyled>
         <HomeContent>
-          {files && files.size > 0 && (
-            <FilesList
-              files={files}
-              handleRemoveFile={handleRemoveFile}
-              handlePreparePetitions={handlePreparePetitions}
-            />
-          )}
           <DragNDrop
             ref={fileInputRef}
             mimeTypes={ALLOWED_MIME_TYPES}
@@ -121,6 +114,13 @@ function HomePage(props) {
               </div>
             </DnDContent>
           </DragNDrop>
+          {files && files.size > 0 && (
+            <FilesList
+              files={files}
+              handleRemoveFile={handleRemoveFile}
+              handlePreparePetitions={handlePreparePetitions}
+            />
+          )}
         </HomeContent>
       </HomePageStyled>
       <ModalStyled isVisible={showModal} closeModal={() => setShowModal(false)}>

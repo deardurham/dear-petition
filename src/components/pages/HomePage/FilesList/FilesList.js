@@ -14,6 +14,7 @@ function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }
       animate={{ opacity: 1, x: '0' }}
       exit={{ opacity: 0, x: '-50' }}
     >
+      <Button onClick={handlePreparePetitions}>Prepare petitions</Button>
       <FilesListStyled>
         {[...files].map((file, i) => {
           return (
@@ -31,7 +32,6 @@ function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }
           );
         })}
       </FilesListStyled>
-      <Button onClick={handlePreparePetitions}>Prepare petitions</Button>
     </FilesListWrapper>
   );
 }
