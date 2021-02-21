@@ -2,14 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ButtonStyled from './Button.styled';
 
-export default function Button({ children, onClick, ...props }) {
-  const handleMouseUp = (e) => onClick(e);
-
-  return (
-    <ButtonStyled {...props} onMouseUp={handleMouseUp}>
-      {children}
-    </ButtonStyled>
-  );
+export default function Button({ children, ...props }) {
+  return <ButtonStyled {...props}>{children}</ButtonStyled>;
 }
 
 /* Props */
