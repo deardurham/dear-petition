@@ -32,6 +32,10 @@ const LogoLink = styled(Link)`
   }
 `;
 
+const LogoutLink = styled(Link)`
+  cursor: pointer;
+`;
+
 function PageBase({ children, ...props }) {
   const [adminUrl, setAdminUrl] = useState('');
   const history = useHistory();
@@ -57,7 +61,7 @@ function PageBase({ children, ...props }) {
           <LinksGroup>
             {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
             {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
-            <Link href='/' onClick={handleLogout}>Logout</Link>
+            <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
           </LinksGroup>
       </PageHeader>
       <PageContentWrapper>{children}</PageContentWrapper>

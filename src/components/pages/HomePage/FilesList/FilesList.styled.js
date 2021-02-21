@@ -27,8 +27,4 @@ export const FilesListItem = styled(motion.li)`
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  span {
-    cursor: pointer;
-  }
 `;

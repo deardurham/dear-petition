@@ -3,7 +3,8 @@ import { FilesListWrapper, FilesListStyled, FilesListItem } from './FilesList.st
 import { AnimatePresence } from 'framer-motion';
 
 // Children
-import Button from '../../../elements/Button/Button';
+import { Button, CloseButton } from '../../../elements/Button/Button.styled';
+import CloseIcon from '../../../elements/Icon/CloseIcon';
 
 function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }) {
   return (
@@ -20,13 +21,15 @@ function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }
           return (
             <AnimatePresence key={file.name}>
               <FilesListItem
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: '-50' }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: '-50' }}
                 positionTransition
               >
                 <p>{file.name}</p>
-                <span onClick={() => handleRemoveFile(file)}>x</span>
+                <CloseButton onClick={() => handleRemoveFile(file)}>
+                  <CloseIcon />
+                </CloseButton>
               </FilesListItem>
             </AnimatePresence>
           );

@@ -1,10 +1,10 @@
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { POSITIVE, CAUTION, NEUTRAL } from './Button';
 import { keyAndAmbientShadows } from '../../../styles/shadows';
 import { colorPrimary, colorWhite, colorCaution } from '../../../styles/colors';
 import { fontPrimary } from '../../../styles/fonts';
 
-export default styled.button`
+export const Button = styled.button`
   cursor: pointer;
   ${({ type }) => mapTypeToStartingState(type)}
 
@@ -30,6 +30,27 @@ export default styled.button`
     transform: translateY(1px);
   }
 `;
+
+export const CloseButton = styled(Button)`
+  padding: 0 0.25rem;
+  border-radius: 0;
+  transition: none;
+  transform: none;
+  font-size: 1.25rem;
+
+  &:hover {
+    ${keyAndAmbientShadows.dp2};
+    transform: none;
+  }
+
+  &:active {
+    transform: none;
+  }
+`;
+
+export const POSITIVE = 'positive';
+export const CAUTION = 'caution';
+export const NEUTRAL = 'neutral';
 
 function mapTypeToStartingState(type) {
   switch (type) {
@@ -60,3 +81,14 @@ const neutral = css`
   border: 1px solid ${colorPrimary};
   color: ${colorPrimary};
 `;
+
+Button.propTypes = {
+  /** Reflects the state of the button */
+  type: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
+  /** What happens when the button is clicked */
+  onClick: PropTypes.func.isRequired
+};
+
+Button.defaultProps = {
+  type: POSITIVE
+};

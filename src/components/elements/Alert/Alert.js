@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertStyled, IconStyled } from './Alert.styled';
-import CloseIcon from '../CloseIcon/CloseIcon';
+import CloseIcon from '../Icon/CloseIcon';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 

@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
-import { ModalContent, CloseButton } from './GeneratePetitionModal.styled';
+import { ModalContent } from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
 
 // Children/Components
 import AgencyAutocomplete from './AgencyAutocomplete';
-import Button from '../../../elements/Button/Button';
-import CloseIcon from '../../../elements/CloseIcon/CloseIcon';
+import { Button, CloseButton } from '../../../elements/Button/Button.styled';
+import CloseIcon from '../../../elements/Icon/CloseIcon';
 import Axios from '../../../../service/axios';
+
+const ModalCloseButton = styled(CloseButton)`
+  position: absolute;
+  top: 0;
+  right: 0;
+`;
 
 const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) => {
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null});
@@ -81,9 +87,9 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
   return (
     <GeneratePetitionModalStyled>
       <ModalContent>
-        <CloseButton onClick={closePdf}>
+        <ModalCloseButton onClick={closePdf}>
           <CloseIcon />
-        </CloseButton>
+        </ModalCloseButton>
         {petition && (
           <>
             <h2>{petition.form_type}</h2>
