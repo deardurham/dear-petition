@@ -12,7 +12,6 @@ export const FilesListWrapper = styled.div`
 
 export const FilesListStyled = styled.ul`
   margin-top: 1rem;
-  overflow-y: scroll;
 `;
 
 export const FilesListItem = styled(motion.li)`

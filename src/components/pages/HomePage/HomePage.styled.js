@@ -14,16 +14,11 @@ export const HomePageStyled = styled(PageBase)`
 
 export const HomeContent = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: flex-start;
   flex: 1;
   margin-top: 1rem;
-
-  @media (${smallerThanTabletLandscape}) {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   }
 `;
 
