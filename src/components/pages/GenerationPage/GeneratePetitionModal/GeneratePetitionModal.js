@@ -25,12 +25,12 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
   const _buildPetition = () => {
     return {
       petition: petition.pk,
-      name_petitioner: petitionerData.name,
-      address1: petitionerData.address1,
-      address2: petitionerData.address2,
-      city: petitionerData.city,
-      state: petitionerData.state.value,
-      zip_code: petitionerData.zipCode,
+      name_petitioner: petitionerData.petitionerName,
+      address1: petitionerData.address.address1,
+      address2: petitionerData.address.address2,
+      city: petitionerData.address.city,
+      state: petitionerData.address.state.value,
+      zip_code: petitionerData.address.zipCode,
       ssn: petitionerData.ssn,
       drivers_license: petitionerData.licenseNumber,
       drivers_license_state: petitionerData.licenseState.value,
@@ -85,7 +85,7 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
   };
 
   return (
-    <GeneratePetitionModalStyled>
+    <GeneratePetitionModalStyled isVisible>
       <ModalContent>
         <ModalCloseButton onClick={closePdf}>
           <CloseIcon />

@@ -19,18 +19,6 @@ const AddAgencySelect = ({ agency, setAgencies, disabled, errors }) => (
   />
 );
 
-export function AgencyInput({ selectedAgencies, setSelectedAgencies }) {
-  const numAgencies = selectedAgencies.length;
-
-  return (
-    <div>
-      <AddAgencySelect setAgencies={setSelectedAgencies} agency={numAgencies > 0 ? selectedAgencies[0] : ''} />
-      {numAgencies >= 1 && <AddAgencySelect setAgencies={setSelectedAgencies} agency={selectedAgencies[1]} />}
-      {numAgencies >= 2 && <AddAgencySelect setAgencies={setSelectedAgencies} agency={selectedAgencies[2]} />}
-    </div>
-  );
-}
-
 export function AddressInput({ address, setAddress, disabled, errors }) {
   const { address1, address2, city, state, zipCode } = address;
 

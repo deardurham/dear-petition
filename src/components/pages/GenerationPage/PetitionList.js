@@ -8,7 +8,6 @@ import {
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
-import { AgencyInput } from './GenerationInputs';
 
 export function PetitionList({ children, className }) {
   return (
@@ -25,7 +24,7 @@ export function PetitionList({ children, className }) {
 
 const GenerateButton = () => <FontAwesomeIcon icon={faPlay} />;
 
-export function PetitionListItem({ petition, petitionerData, setPetitionerData }) {
+export function PetitionListItem({ attorney, petition, petitionerData, setPetitionerData }) {
   const [isVisible, setVisible] = useState(false);
 
   return (
@@ -42,6 +41,7 @@ export function PetitionListItem({ petition, petitionerData, setPetitionerData }
         <GeneratePetitionModal
           petition={petition}
           petitionerData={petitionerData}
+          attorney={attorney}
           setPetitionerData={setPetitionerData}
           onClose={() => setVisible(false)}
         />
