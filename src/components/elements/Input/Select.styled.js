@@ -5,7 +5,9 @@ import { colorRed } from '../../../styles/colors';
 
 export const SelectWrapper = styled.div``;
 
-export const SelectStyled = styled.label``;
+export const SelectStyled = styled.label`
+  user-select: none;
+`;
 
 export const ActualSelectStyled = styled(Select)`
   width: 100%;

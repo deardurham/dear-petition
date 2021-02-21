@@ -52,7 +52,6 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
         value={address2}
         onChange={e => {
           const val = e.target.value;
-          //setAddress2(val);
           setAddress((prev) => ({ ...prev, address2: val }));
         }}
       />
@@ -63,7 +62,6 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           value={city}
           onChange={e => {
             const val = e.target.value;
-            //setCity(val);
             setAddress((prev) => ({ ...prev, city: val }));
           }}
           errors={!disabled && errors.city}
@@ -73,7 +71,6 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           disabled={disabled}
           value={state}
           onChange={val => {
-            //setState(val);
             setAddress((prev) => ({ ...prev, state: val }));
           }}
           options={US_STATES.map(state => ({ value: state[0], label: state[1] }))}
@@ -86,7 +83,6 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           maxLength={5}
           onChange={e => {
             const val = e.target.value;
-            //setZipCode(val);
             setAddress((prev) => ({ ...prev, zipCode: val }));
           }}
           errors={!disabled && errors.zipCode}

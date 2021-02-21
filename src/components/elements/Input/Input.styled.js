@@ -5,7 +5,9 @@ import { fontPrimary } from '../../../styles/fonts';
 
 export const InputWrapper = styled.div``;
 
-export const InputStyled = styled.label``;
+export const InputStyled = styled.label`
+  user-select: none;
+`;
 
 export const ActualInputStyled = styled.input`
   display: block;
