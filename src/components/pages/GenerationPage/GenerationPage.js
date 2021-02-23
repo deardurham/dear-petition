@@ -22,6 +22,9 @@ const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
 const SectionDiv = styled.div`
   margin-bottom: 1rem;
+  min-width: 400px;
+  max-width: 1000px;
+  width: 80%;
 `;
 
 const SectionHeader = styled.h3`
@@ -78,19 +81,21 @@ function GenerationPage() {
             <AttorneyInput attorney={attorney} setAttorney={setAttorney} errors={formErrors} />
           </GenerationSection>
           <GenerationSection label='Petitioner Information'>
-            <GenerationInput
-              label='Petitioner Name'
-              value={petitionerName}
-              onChange={e => setPetitionerName(e.target.value)}
-              errors={formErrors.petitionerName}
-            />
-            <SSN
-              label='SSN'
-              value={ssn}
-              maxLength={11}
-              onChange={e => setSSN(e.target.value.replace(/[^0-9-]/g, ''))}
-              errors={formErrors.ssn}
-            />
+            <FlexWrapper>
+              <GenerationInput
+                label='Petitioner Name'
+                value={petitionerName}
+                onChange={e => setPetitionerName(e.target.value)}
+                errors={formErrors.petitionerName}
+              />
+              <SSN
+                label='SSN'
+                value={ssn}
+                maxLength={11}
+                onChange={e => setSSN(e.target.value.replace(/[^0-9-]/g, ''))}
+                errors={formErrors.ssn}
+              />
+            </FlexWrapper>
             <FlexWrapper>
               <GenerationInput
                 label="License #"

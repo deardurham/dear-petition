@@ -5,11 +5,9 @@ import { PetitionList } from './PetitionList';
 export const PetitionListStyled = styled(PetitionList)`
   display: flex;
   flex-direction: column;
-  width: 100%;
   border-style: solid;
   border-color: black;
   border-width: 1px;
-  margin: 1rem 0rem 0rem 0rem;
 `;
 
 const PetitionListRow = styled.li`

@@ -6,16 +6,11 @@ import { colorWhite, colorWarning, colorCaution } from '../../../styles/colors';
 import PageBase from '../PageBase';
 import Modal from '../../elements/Modal/Modal';
 
-export const HomePageStyled = styled(PageBase)`
-  section {
-    justify-content: center;
-  }
-`;
+export const HomePageStyled = styled(PageBase)``;
 
 export const HomeContent = styled.div`
+  margin-top: 4rem;
   display: flex;
-  flex: 1;
-  margin-top: 1rem;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;

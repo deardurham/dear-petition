@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AddressLine, FlexWrapper, GenerationInput, GenerationSelect } from './GenerationInputs.styled';
+import { AddressLine, FlexWrapper, GenerationInput, GenerationSelect, ZipCode } from './GenerationInputs.styled';
 // Constants
 import US_STATES from '../../../constants/US_STATES';
 
@@ -64,7 +64,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           options={US_STATES.map(state => ({ value: state[0], label: state[1] }))}
           errors={!disabled && errors.state}
         />
-        <GenerationInput
+        <ZipCode
           label="Zip Code"
           disabled={disabled}
           value={zipCode}

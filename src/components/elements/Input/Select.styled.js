@@ -10,8 +10,7 @@ export const SelectStyled = styled.label`
 `;
 
 export const ActualSelectStyled = styled(Select)`
-  width: 100%;
-  min-width: 300px;
+  min-width: 150px;
 `;
 
 export const InputErrors = styled(motion.div)`

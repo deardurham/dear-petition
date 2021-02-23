@@ -10,7 +10,7 @@ export const PageBaseStyled = styled(motion.main)`
 `;
 
 export const PageHeader = styled.header`
-  padding: 2rem;
+  padding: 0 4rem;
   font-size: 1.75rem;
   font-weight: bold;
   display: flex;
@@ -34,13 +34,15 @@ export const LinksGroup = styled.div`
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  a:not(:first-child) {
+    margin-left: 1rem;
+  }
   @media (${smallerThanTabletLandscape}) {
     margin-top: 2rem;
   }
 `;
 
 export const Link = styled.a`
-  margin-left: 1rem;
   border: 1px solid ${colorBlack};
   border-radius: 5px;
   padding: 2rem;
@@ -48,6 +50,6 @@ export const Link = styled.a`
 `;
 
 export const PageContentWrapper = styled.section`
+  padding: 2rem 4rem;
   flex: 1;
-  display: flex;
 `;
