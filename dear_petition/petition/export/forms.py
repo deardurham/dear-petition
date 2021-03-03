@@ -121,9 +121,9 @@ class AOCFormCR287(PetitionForm):
             self.data[f"NameAgency{i}"] = agency.name
             self.data[f"AddrAgency{i}"] = agency.address1
             self.data[f"MailAgency{i}"] = agency.address2
-            self.data[f"CityAgency1{i}"] = agency.city
-            self.data[f"StateAgency1{i}"] = agency.state
-            self.data[f"ZipAgency1{i}"] = agency.zipcode
+            self.data[f"CityAgency{i}"] = agency.city
+            self.data[f"StateAgency{i}"] = agency.state
+            self.data[f"ZipAgency{i}"] = agency.zipcode
 
     def map_offenses(self):
         offense_records = self.get_ordered_offense_records()
