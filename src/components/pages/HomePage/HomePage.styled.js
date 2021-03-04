@@ -45,7 +45,7 @@ export const DragErrors = styled.div`
 `;
 
 export const ModalStyled = styled(Modal)`
-  position: absolute;
+  position: fixed;
   bottom: 50%;
   left: 50%;
   transform: translate(-50%, 50%);
