@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
 import { ModalContent } from './GeneratePetitionModal.styled';
 
@@ -9,7 +11,6 @@ import useKeyPress from '../../../../hooks/useKeyPress';
 // Children/Components
 import AgencyAutocomplete from './AgencyAutocomplete';
 import { Button, CloseButton } from '../../../elements/Button/Button.styled';
-import CloseIcon from '../../../elements/Icon/CloseIcon';
 import Axios from '../../../../service/axios';
 
 const ModalCloseButton = styled(CloseButton)`
@@ -88,7 +89,7 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
     <GeneratePetitionModalStyled isVisible>
       <ModalContent>
         <ModalCloseButton onClick={closePdf}>
-          <CloseIcon />
+          <FontAwesomeIcon icon={faTimes} />
         </ModalCloseButton>
         {petition && (
           <>

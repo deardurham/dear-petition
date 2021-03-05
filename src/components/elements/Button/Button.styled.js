@@ -37,6 +37,7 @@ export const CloseButton = styled(Button)`
   transition: none;
   transform: none;
   font-size: 1.25rem;
+  box-shadow: none;
 
   &:hover {
     ${keyAndAmbientShadows.dp2};

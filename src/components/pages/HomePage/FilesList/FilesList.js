@@ -1,10 +1,11 @@
 import React from 'react';
 import { FilesListWrapper, FilesListStyled, FilesListItem } from './FilesList.styled';
 import { AnimatePresence } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 // Children
 import { Button, CloseButton } from '../../../elements/Button/Button.styled';
-import CloseIcon from '../../../elements/Icon/CloseIcon';
 
 function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }) {
   return (
@@ -28,7 +29,7 @@ function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }
               >
                 <p>{file.name}</p>
                 <CloseButton onClick={() => handleRemoveFile(file)}>
-                  <CloseIcon />
+                  <FontAwesomeIcon icon={faTimes} />
                 </CloseButton>
               </FilesListItem>
             </AnimatePresence>
