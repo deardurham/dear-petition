@@ -32,6 +32,7 @@ const GenerateButton = styled(Button)`
 
 const FormType = styled.div`
   margin-right: 4rem;
+  margin-left: 1rem;
 `;
 
 const Attachments = styled.div`
@@ -72,8 +73,9 @@ export function PetitionListItem({ attorney, petition, petitionerData, setPetiti
         {petition.attachments.length > 0 && (
           <Attachments>
             <h4>Attachments:</h4>
-            {petition.attachments.map(attachment => (
+            {petition.attachments.map((attachment, i) => (
               <SelectableRow key={attachment.pk} onClick={() => setVisible(true)}>
+                <span>{`${i+1})`}</span>
                 <FormType>{attachment.form_type}</FormType>
                 <GenerateButton>Generate</GenerateButton>
               </SelectableRow>
