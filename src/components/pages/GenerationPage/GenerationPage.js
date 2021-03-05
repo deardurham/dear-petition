@@ -32,6 +32,32 @@ const SectionHeader = styled.h3`
   user-select: none;
 `;
 
+function formPetitionData(petitions) {
+  const structuredData = {};
+  const attachments = [];
+  for (const petition of petitions) {
+    if (petition.parent) {
+      attachments.push(petition);
+      continue;
+    }
+    structuredData[petition.pk] = {
+      pk: petition.pk,
+      county: petition.county,
+      jurisdiction: petition.jurisdiction,
+      form_type: petition.form_type,
+      attachments: [],
+    };
+  }
+  for (const attachment of attachments) {
+    structuredData[attachment.parent].attachments.push({
+      pk: attachment.pk,
+      form_type: attachment.form_type,
+    });
+  }
+  console.log(structuredData);
+  return structuredData;
+}
+
 const GenerationSection = ({ label, children }) => (
   <SectionDiv>
     <SectionHeader>{label}</SectionHeader>
@@ -70,6 +96,11 @@ function GenerationPage() {
         setLoading(false);
       });
   }, [batchId]);
+
+  const structuredData = formPetitionData(batch?.petitions || []);
+  const sortedPetitions = Object.values(structuredData).sort((a, b) => {
+    return a.county.localeCompare(b.county) || a.jurisdiction.localeCompare(b.jurisdiction);
+  })
 
   return (
     <GenerationPageStyled>
@@ -115,7 +146,7 @@ function GenerationPage() {
           </GenerationSection>
           <GenerationSection label='Petition List'>
             <PetitionListStyled>
-              {batch?.petitions?.map(petition =>
+              {sortedPetitions.map(petition =>
                 <PetitionListItem
                   key={petition.pk}
                   petition={petition}

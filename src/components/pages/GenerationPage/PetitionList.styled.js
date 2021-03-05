@@ -11,13 +11,13 @@ export const PetitionListStyled = styled(PetitionList)`
 `;
 
 const PetitionListRow = styled.li`
-  display: flex;
-  padding: 2rem;
   margin: 0;
 `;
 
 export const PetitionListHeader = styled(PetitionListRow)`
+  padding: 2rem;
   font-weight: bold;
+  display: flex;
 `;
 
 export const PetitionListItemStyled = styled(PetitionListRow)`
@@ -26,11 +26,6 @@ export const PetitionListItemStyled = styled(PetitionListRow)`
   &:nth-child(even) {
     background-color: ${greyScale(9.5)};
   }
-
-  &:hover {
-    background: ${greyScale(8)};
-  }
-  padding: 2rem;
 `;
 
 export const PetitionCellStyled = styled.div`
