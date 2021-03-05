@@ -29,9 +29,9 @@ export const PetitionListItemStyled = styled(PetitionListRow)`
 `;
 
 export const PetitionCellStyled = styled.div`
-  flex: 1;
+  flex: 1 0 29.2%;
 `;
 
 export const GenerateButtonCell = styled(PetitionCellStyled)`
-  flex: 0;
+  flex: 0 0 12.5%;
 `;

@@ -19,7 +19,7 @@ export function PetitionList({ children, className }) {
         <PetitionCellStyled>County</PetitionCellStyled>
         <PetitionCellStyled>Jurisdiction</PetitionCellStyled>
         <PetitionCellStyled>Form Type</PetitionCellStyled>
-        <PetitionCellStyled />
+        <GenerateButtonCell />
       </PetitionListHeader>
       {children}
     </ul>
@@ -46,6 +46,7 @@ const Attachments = styled.div`
 `;
 
 const SelectableRow = styled.div`
+  font-size: 1.6rem;
   padding: 2rem;
   display: flex;
   &:hover {
