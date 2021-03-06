@@ -11,6 +11,8 @@ import { Button } from '../../elements/Button/Button.styled';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
+import useWindowSize from '../../../hooks/useWindowSize';
 
 export function PetitionList({ children, className }) {
   return (
@@ -26,12 +28,25 @@ export function PetitionList({ children, className }) {
   );
 }
 
-const GenerateButton = styled(Button)`
+const GenerateButtonStyled = styled(Button)`
   font-size: 1.4rem;
 `;
 
+function GenerateButton({ label, windowWidth }) {
+  const isDesktop = windowWidth >= TABLET_LANDSCAPE_SIZE;
+  return (
+    <GenerateButtonStyled>
+      {isDesktop ? label : <FontAwesomeIcon icon={faPlay} />}
+    </GenerateButtonStyled>
+  );
+}
+
+const AttachmentCell = styled.div`
+  display: flex;
+  flex: 0 0 29.2%;
+`;
+
 const FormType = styled.div`
-  margin-right: 4rem;
   margin-left: 1rem;
 `;
 
@@ -44,6 +59,10 @@ const Attachments = styled.div`
   & > div {
     padding: 1rem;
   }
+
+  & > h4 {
+    margin-bottom: 1rem;
+  }
 `;
 
 const SelectableRow = styled.div`
@@ -55,30 +74,51 @@ const SelectableRow = styled.div`
   }
 `;
 
+function AttachListItem({ i, attachment, setVisible }) {
+  const [wasAttachGenerated, setAttachGenerated] = useState(false);
+  const windowSize = useWindowSize();
+  return (
+    <SelectableRow key={attachment.pk} onClick={() => { setVisible(true); setAttachGenerated(true) }}>
+      <AttachmentCell>
+        <span>{`${i+1})`}</span>
+        <FormType>{attachment.form_type}</FormType>
+      </AttachmentCell>
+      <GenerateButton label={wasAttachGenerated ? 'Re-generate' : 'Generate'} windowWidth={windowSize.width} />
+    </SelectableRow>
+  );
+}
+
 export function PetitionListItem({ attorney, petition, petitionerData, setPetitionerData }) {
   const [isVisible, setVisible] = useState(false);
   const [wasGenerated, setGenerated] = useState(false);
+  const windowSize = useWindowSize();
 
   return (
     <>
       <PetitionListItemStyled>
-        <SelectableRow onClick={() => { setVisible(true); setGenerated(true) }}>
+        <SelectableRow
+          onClick={() => {
+            setVisible(true);
+            setGenerated(true);
+          }}
+        >
           <PetitionCellStyled>{petition.county} County</PetitionCellStyled>
           <PetitionCellStyled>{petition.jurisdiction}</PetitionCellStyled>
           <PetitionCellStyled>{petition.form_type}</PetitionCellStyled>
           <GenerateButtonCell>
-            <GenerateButton>{wasGenerated ? "Regenerate" : 'Generate'}</GenerateButton>
+            <GenerateButton label={wasGenerated ? 'Re-generate' : 'Generate'} windowWidth={windowSize.width} />
           </GenerateButtonCell>
         </SelectableRow>
         {petition.attachments.length > 0 && (
           <Attachments>
             <h4>Attachments:</h4>
             {petition.attachments.map((attachment, i) => (
-              <SelectableRow key={attachment.pk} onClick={() => setVisible(true)}>
-                <span>{`${i+1})`}</span>
-                <FormType>{attachment.form_type}</FormType>
-                <GenerateButton>Generate</GenerateButton>
-              </SelectableRow>
+              <AttachListItem
+                key={attachment.pk}
+                attachment={attachment}
+                i={i}
+                setVisible={setVisible}
+              />
             ))}
           </Attachments>
         )}
