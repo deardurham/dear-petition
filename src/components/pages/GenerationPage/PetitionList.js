@@ -17,19 +17,15 @@ const PetitionTable = styled(Table)`
   font-family: Arial, Helvetica, sans-serif;
 `;
 
-function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
-  const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
-  return (
-    <GenerateButtonStyled onClick={onClick}>
-      {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
-    </GenerateButtonStyled>
-  );
-}
-
 const Attachments = styled.ul`
   & > li:not(:last-child) {
     margin-bottom: 1rem;
   }
+`;
+
+const Label = styled.span`
+  font-size: 1.75rem;
+  margin-right: 1rem;
 `;
 
 const REQUIRED_FIELDS = [
@@ -42,6 +38,15 @@ const REQUIRED_FIELDS = [
   'state',
   'zipCode'
 ];
+
+function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
+  const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
+  return (
+    <GenerateButtonStyled onClick={onClick}>
+      {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
+    </GenerateButtonStyled>
+  );
+}
 
 export default function PetitionList({ petitions, attorney, petitionerData, onError }) {
   const [selectedPetition, setSelectedPetition] = useState();
@@ -89,7 +94,7 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
               <Attachments>
                 {petition.attachments.map((attachment, i) => (
                   <li key={attachment.pk}>
-                    <span>{`${i + 1}) `}</span>
+                    <Label>{`${i + 1}) `}</Label>
                     <GenerateButton
                       collapsedIcon={faDownload}
                       windowWidth={windowSize.width}
