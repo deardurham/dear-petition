@@ -9,7 +9,7 @@ import { ModalContent } from './GeneratePetitionModal.styled';
 import useKeyPress from '../../../../hooks/useKeyPress';
 
 // Children/Components
-import AgencyAutocomplete from './AgencyAutocomplete';
+import AgencyAutocomplete from '../GenerationInput/AgencyAutocomplete';
 import { Button, CloseButton } from '../../../elements/Button/Button.styled';
 import Axios from '../../../../service/axios';
 
@@ -19,9 +19,12 @@ const ModalCloseButton = styled(CloseButton)`
   right: 0;
 `;
 
-const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) => {
-  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null});
-  const [selectedAgencies, setSelectedAgencies] = useState([]);
+const Content = styled.ul`
+  font-size: 1.6rem;
+`;
+
+const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition, petitionerData, onClose, setAgencies }) => {
+  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
 
   const _buildPetition = () => {
     return {
@@ -36,7 +39,7 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
       drivers_license: petitionerData.licenseNumber,
       drivers_license_state: petitionerData.licenseState.value,
       attorney: attorney.value,
-      agencies: selectedAgencies.map(agency => agency.pk)
+      agencies: agencies.map(agency => agency.pk)
     };
   };
 
@@ -94,11 +97,12 @@ const GeneratePetitionModal = ({ petition, petitionerData, attorney, onClose }) 
         {petition && (
           <>
             <h2>{petition.form_type}</h2>
-            <ul>
-              <li>Jurisdiction: {petition.jurisdiction}</li>
+            <Content>
+              {attachmentNumber && <li>Attachment #: {attachmentNumber}</li>}
               <li>County: {petition.county} County</li>
-            </ul>
-            <AgencyAutocomplete selectedAgencies={selectedAgencies} setSelectedAgencies={setSelectedAgencies} />
+              <li>Jurisdiction: {petition.jurisdiction}</li>
+            </Content>
+            <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
             <Button onClick={handleGenerate}>Generate</Button>
           </>
         )}

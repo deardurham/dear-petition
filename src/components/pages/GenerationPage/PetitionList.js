@@ -25,19 +25,7 @@ const Attachments = styled.ul`
 
 const Label = styled.span`
   font-size: 1.75rem;
-  margin-right: 1rem;
 `;
-
-const REQUIRED_FIELDS = [
-  'name',
-  'ssn',
-  'licenseNumber',
-  'licenseState',
-  'address1',
-  'city',
-  'state',
-  'zipCode'
-];
 
 function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
   const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
@@ -48,27 +36,69 @@ function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
   );
 }
 
-export default function PetitionList({ petitions, attorney, petitionerData, onError }) {
+function PetitionRow({ attorney, petition, petitionerData, validateInput }) {
+  const [agencies, setAgencies] = useState([]);
+  const [attachmentNumber, setAttachmentNumber] = useState();
   const [selectedPetition, setSelectedPetition] = useState();
   const windowSize = useWindowSize();
 
-  const handleSelect = petition => {
-    let hasErrors = false;
-    if (!attorney) {
-      onError({ attorney: ['Please select an attorney from the list'] });
-      hasErrors = true;
-    }
-    REQUIRED_FIELDS.forEach(key => {
-      if (!petitionerData[key]) {
-        onError({ [key]: ['This field is required'] });
-        hasErrors = true;
+  const handleSelect = (newPetition, num) => {
+    if (validateInput()) {
+      setSelectedPetition(newPetition);
+      if (num) {
+        setAttachmentNumber(num);
       }
-    });
-    if (!hasErrors) {
-      setSelectedPetition(petition);
     }
   };
 
+  return (
+    <>
+      <TableRow key={petition.pk}>
+        <TableCell>{petition.county}</TableCell>
+        <TableCell>{petition.jurisdiction}</TableCell>
+        <TableCell>
+          <GenerateButton
+            collapsedIcon={faDownload}
+            windowWidth={windowSize.width}
+            label={petition.form_type}
+            onClick={() => handleSelect(petition)}
+          />
+        </TableCell>
+        <TableCell>
+          <Attachments>
+            {petition.attachments.map((attachment, i) => (
+              <li key={attachment.pk}>
+                <Label>{`${i + 1}) `}</Label>
+                <GenerateButton
+                  collapsedIcon={faDownload}
+                  windowWidth={windowSize.width}
+                  label={attachment.form_type}
+                  onClick={() => handleSelect(attachment, i + 1)}
+                />
+              </li>
+            ))}
+          </Attachments>
+        </TableCell>
+      </TableRow>
+      {selectedPetition && (
+        <GeneratePetitionModal
+          petition={selectedPetition}
+          attachmentNumber={attachmentNumber}
+          petitionerData={petitionerData}
+          attorney={attorney}
+          agencies={agencies}
+          setAgencies={setAgencies}
+          onClose={() => {
+            setSelectedPetition();
+            setAttachmentNumber();
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
   return (
     <PetitionTable numColumns={4}>
       <TableHeader>
@@ -79,43 +109,15 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
       </TableHeader>
       <TableBody>
         {petitions.map(petition => (
-          <TableRow key={petition.pk}>
-            <TableCell>{petition.county}</TableCell>
-            <TableCell>{petition.jurisdiction}</TableCell>
-            <TableCell>
-              <GenerateButton
-                collapsedIcon={faDownload}
-                windowWidth={windowSize.width}
-                label={petition.form_type}
-                onClick={() => handleSelect(petition)}
-              />
-            </TableCell>
-            <TableCell>
-              <Attachments>
-                {petition.attachments.map((attachment, i) => (
-                  <li key={attachment.pk}>
-                    <Label>{`${i + 1}) `}</Label>
-                    <GenerateButton
-                      collapsedIcon={faDownload}
-                      windowWidth={windowSize.width}
-                      label={attachment.form_type}
-                      onClick={() => handleSelect(attachment)}
-                    />
-                  </li>
-                ))}
-              </Attachments>
-            </TableCell>
-          </TableRow>
+          <PetitionRow
+            key={petition.pk}
+            petition={petition}
+            petitionerData={petitionerData}
+            attorney={attorney}
+            validateInput={validateInput}
+          />
         ))}
       </TableBody>
-      {selectedPetition && (
-        <GeneratePetitionModal
-          petition={selectedPetition}
-          petitionerData={petitionerData}
-          attorney={attorney}
-          onClose={() => setSelectedPetition()}
-        />
-      )}
     </PetitionTable>
   );
 }

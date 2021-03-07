@@ -18,6 +18,17 @@ import PetitionList from './PetitionList';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
+const REQUIRED_FIELDS = [
+  'name',
+  'ssn',
+  'licenseNumber',
+  'licenseState',
+  'address1',
+  'city',
+  'state',
+  'zipCode'
+];
+
 const GenerationSection = styled.div`
   margin-bottom: 2rem;
 
@@ -36,6 +47,7 @@ function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
+  const [attorney, setAttorney] = useState('');
   const [petitionerData, setPetitionerData] = useState({
     name: '',
     ssn: '',
@@ -47,7 +59,6 @@ function GenerationPage() {
     state: DEFAULT_STATE_LABEL,
     zipCode: '',
   });
-  const [attorney, setAttorney] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
@@ -63,6 +74,21 @@ function GenerationPage() {
         setLoading(false);
       });
   }, [batchId]);
+
+  const validateInput = () => {
+    let hasErrors = false;
+    if (!attorney) {
+      setFormErrors((oldErrors) => ({ ...oldErrors, attorney: ['Please select an attorney from the list'] }));
+      hasErrors = true;
+    }
+    REQUIRED_FIELDS.forEach(key => {
+      if (!petitionerData[key]) {
+        setFormErrors((oldErrors) => ({ ...oldErrors, [key]: ['This field is required'] }));
+        hasErrors = true;
+      }
+    });
+    return !hasErrors;
+  };
 
   const clearError = (key) => {
     formErrors[key] && setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
@@ -97,8 +123,8 @@ function GenerationPage() {
             <PetitionList
               petitions={batch?.petitions || []}
               attorney={attorney}
-              petitionerData = {petitionerData}
-              onError={(errorObj) => setFormErrors((oldErrors) => ({ ...oldErrors, ...errorObj }))}
+              petitionerData={petitionerData}
+              validateInput={validateInput}
             />
           </GenerationSection>
         </GenerationContentStyled>
