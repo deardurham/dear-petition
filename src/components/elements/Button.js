@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { keyAndAmbientShadows } from '../../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution } from '../../../styles/colors';
-import { fontPrimary } from '../../../styles/fonts';
+import { keyAndAmbientShadows } from '../../styles/shadows';
+import { colorPrimary, colorWhite, colorCaution } from '../../styles/colors';
+import { fontPrimary } from '../../styles/fonts';
 
 export const Button = styled.button`
   cursor: pointer;

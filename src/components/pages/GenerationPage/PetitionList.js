@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '../../elements/Button/Button.styled';
+import { Button } from '../../elements/Button';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';

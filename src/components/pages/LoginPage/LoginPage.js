@@ -10,7 +10,7 @@ import {
   ForgotPassword,
   PasswordWrapper
 } from './LoginPage.styled';
-import { Button } from '../../elements/Button/Button.styled';
+import { Button } from '../../elements/Button';
 
 // Assets
 import DEAR_logo from '../../../assets/img/DEAR_logo.png';

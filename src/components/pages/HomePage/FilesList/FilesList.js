@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 // Children
-import { Button, CloseButton } from '../../../elements/Button/Button.styled';
+import { Button, CloseButton } from '../../../elements/Button';
 
 function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }) {
   return (
