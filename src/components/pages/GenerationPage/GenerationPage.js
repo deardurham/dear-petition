@@ -18,33 +18,6 @@ import PetitionList from './PetitionList';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
-function formPetitionData(petitions) {
-  const structuredData = {};
-  const attachments = [];
-  for (const petition of petitions) {
-    if (petition.parent) {
-      attachments.push(petition);
-      continue;
-    }
-    structuredData[petition.pk] = {
-      pk: petition.pk,
-      county: petition.county,
-      jurisdiction: petition.jurisdiction,
-      form_type: petition.form_type,
-      attachments: [],
-    };
-  }
-  for (const attachment of attachments) {
-    structuredData[attachment.parent].attachments.push({
-      pk: attachment.pk,
-      county: attachment.county,
-      jurisdiction: attachment.jurisdiction,
-      form_type: attachment.form_type,
-    });
-  }
-  return structuredData;
-}
-
 const GenerationSection = styled.div`
   margin-bottom: 2rem;
 
@@ -91,10 +64,6 @@ function GenerationPage() {
       });
   }, [batchId]);
 
-  const structuredData = formPetitionData(batch?.petitions || []);
-  const sortedPetitions = Object.values(structuredData).sort((a, b) => {
-    return a.county.localeCompare(b.county) || a.jurisdiction.localeCompare(b.jurisdiction);
-  })
   const clearError = (key) => {
     formErrors[key] && setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
   };
@@ -126,7 +95,7 @@ function GenerationPage() {
           <GenerationSection>
             <h2>Petition List</h2>
             <PetitionList
-              petitions={sortedPetitions}
+              petitions={batch?.petitions || []}
               attorney={attorney}
               petitionerData = {petitionerData}
               onError={(errorObj) => setFormErrors((oldErrors) => ({ ...oldErrors, ...errorObj }))}

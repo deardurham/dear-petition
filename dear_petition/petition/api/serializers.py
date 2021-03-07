@@ -81,7 +81,6 @@ class PetitionSerializer(serializers.ModelSerializer):
         model = Petition
         fields = [
             "pk",
-            "parent",
             "form_type",
             "county",
             "jurisdiction",
@@ -89,9 +88,19 @@ class PetitionSerializer(serializers.ModelSerializer):
         ]
 
 
+class ParentPetitionSerializer(PetitionSerializer):
+    attachments = serializers.SerializerMethodField()
+
+    class Meta(PetitionSerializer.Meta):
+        fields = PetitionSerializer.Meta.fields + ['attachments']
+
+    def get_attachments(self, instance):
+        return PetitionSerializer(instance.attachments.all().order_by('pk'), many=True).data
+
+
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
-    petitions = PetitionSerializer(many=True, read_only=True)
+    petitions = serializers.SerializerMethodField()
 
     class Meta:
         model = Batch
@@ -104,6 +113,12 @@ class BatchSerializer(serializers.ModelSerializer):
             "petitions",
         ]
         read_only_fields = ["user"]
+
+    def get_petitions(self, instance):
+        if not instance:
+            return None
+        parent_petitions = Petition.objects.filter(batch=instance.pk, parent__isnull=True).order_by('county', 'jurisdiction')
+        return ParentPetitionSerializer(parent_petitions, many=True).data
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
