@@ -29,6 +29,7 @@ const TableStyle = styled.table`
     text-align: left;
     font-weight: bold;
     color: white;
+    user-select: none;
   }
 
   th:last-child {
