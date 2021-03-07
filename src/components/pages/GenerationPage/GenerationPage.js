@@ -14,8 +14,7 @@ import Axios from '../../../service/axios';
 // Children
 import { AddressInput, AttorneyInput } from './GenerationInputs';
 import { GenerationInput, GenerationSelect, FlexWrapper, SSN } from './GenerationInputs.styled';
-import { PetitionListStyled } from './PetitionList.styled'
-import { PetitionListItem } from './PetitionList';
+import PetitionList from './PetitionList';
 import US_STATES from '../../../constants/US_STATES';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
@@ -54,7 +53,6 @@ function formPetitionData(petitions) {
       form_type: attachment.form_type,
     });
   }
-  console.log(structuredData);
   return structuredData;
 }
 
@@ -101,6 +99,9 @@ function GenerationPage() {
   const sortedPetitions = Object.values(structuredData).sort((a, b) => {
     return a.county.localeCompare(b.county) || a.jurisdiction.localeCompare(b.jurisdiction);
   })
+  const clearError = (key) => {
+    formErrors[key] && setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
+  };
 
   return (
     <GenerationPageStyled>
@@ -109,21 +110,32 @@ function GenerationPage() {
       ) : (
         <GenerationContentStyled>
           <GenerationSection label='Attorney Information'>
-            <AttorneyInput attorney={attorney} setAttorney={setAttorney} errors={formErrors} />
+            <AttorneyInput
+              attorney={attorney}
+              setAttorney={setAttorney}
+              errors={formErrors}
+              onClearError={clearError}
+            />
           </GenerationSection>
           <GenerationSection label='Petitioner Information'>
             <FlexWrapper>
               <GenerationInput
                 label='Petitioner Name'
                 value={petitionerName}
-                onChange={e => setPetitionerName(e.target.value)}
+                onChange={e => {
+                  setPetitionerName(e.target.value);
+                  clearError('petitionerName');
+                }}
                 errors={formErrors.petitionerName}
               />
               <SSN
                 label='SSN'
                 value={ssn}
                 maxLength={11}
-                onChange={e => setSSN(e.target.value.replace(/[^0-9-]/g, ''))}
+                onChange={e => {
+                  setSSN(e.target.value.replace(/[^0-9-]/g, ''));
+                  clearError('ssn');
+                }}
                 errors={formErrors.ssn}
               />
             </FlexWrapper>
@@ -131,37 +143,43 @@ function GenerationPage() {
               <GenerationInput
                 label="License #"
                 value={licenseNumber}
-                onChange={e => setLicenseNumber(e.target.value)}
+                onChange={e => {
+                  setLicenseNumber(e.target.value);
+                  clearError('licenseNumber');
+                }}
                 errors={formErrors.licenseNumber}
               />
               <GenerationSelect
                 label="License state"
                 value={licenseState}
-                onChange={val => setLicenseState(val)}
+                onChange={val => {
+                  setLicenseState(val);
+                  clearError('licenseState');
+                }}
                 options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
                 errors={formErrors.licenseState}
               />
             </FlexWrapper>
-            <AddressInput address={address} setAddress={setAddress} errors={formErrors} />
+            <AddressInput
+              address={address}
+              setAddress={setAddress}
+              errors={formErrors}
+              onClearError={clearError}
+            />
           </GenerationSection>
           <GenerationSection label='Petition List'>
-            <PetitionListStyled>
-              {sortedPetitions.map(petition =>
-                <PetitionListItem
-                  key={petition.pk}
-                  petition={petition}
-                  attorney={attorney}
-                  petitionerData = {{
-                    petitionerName,
-                    ssn,
-                    address,
-                    licenseNumber,
-                    licenseState,
-                  }}
-                  onError={(errors) => setFormErrors(errors)}
-                />
-              )}
-            </PetitionListStyled>
+            <PetitionList
+              petitions={sortedPetitions}
+              attorney={attorney}
+              petitionerData = {{
+                petitionerName,
+                ssn,
+                address,
+                licenseNumber,
+                licenseState,
+              }}
+              onError={(errorObj) => setFormErrors((oldErrors) => ({ ...oldErrors, ...errorObj }))}
+            />
           </GenerationSection>
         </GenerationContentStyled>
       )}

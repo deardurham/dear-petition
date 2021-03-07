@@ -19,7 +19,7 @@ const AddAgencySelect = ({ agency, setAgencies, disabled, errors }) => (
   />
 );
 
-export function AddressInput({ address, setAddress, disabled, errors }) {
+export function AddressInput({ address, setAddress, disabled, errors, onClearError }) {
   const { address1, address2, city, state, zipCode } = address;
 
   return (
@@ -31,8 +31,9 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
         onChange={e => {
           const val = e.target.value;
           setAddress((prev) => ({ ...prev, address1: val }));
+          !disabled && onClearError('address1');
         }}
-        errors={!disabled && errors.address}
+        errors={!disabled && errors.address1}
       />
       <AddressLine
         label="Address Line 2"
@@ -51,6 +52,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           onChange={e => {
             const val = e.target.value;
             setAddress((prev) => ({ ...prev, city: val }));
+            !disabled && onClearError('city');
           }}
           errors={!disabled && errors.city}
         />
@@ -60,8 +62,9 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           value={state}
           onChange={val => {
             setAddress((prev) => ({ ...prev, state: val }));
+            !disabled && onClearError('state');
           }}
-          options={US_STATES.map(state => ({ value: state[0], label: state[1] }))}
+          options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
           errors={!disabled && errors.state}
         />
         <ZipCode
@@ -72,6 +75,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
           onChange={e => {
             const val = e.target.value;
             setAddress((prev) => ({ ...prev, zipCode: val }));
+            !disabled && onClearError('zipCode');
           }}
           errors={!disabled && errors.zipCode}
         />
@@ -80,7 +84,7 @@ export function AddressInput({ address, setAddress, disabled, errors }) {
   );
 }
 
-export function AttorneyInput({ attorney, setAttorney, errors }) {
+export function AttorneyInput({ attorney, setAttorney, errors, onClearError }) {
   const [attornies, setAttornies] = useState([]);
 
   useEffect(() => {
@@ -103,7 +107,10 @@ export function AttorneyInput({ attorney, setAttorney, errors }) {
       <GenerationSelect
         label="Attorney Name"
         value={attorney}
-        onChange={val => setAttorney(val)}
+        onChange={val => {
+          setAttorney(val);
+          onClearError('attorney');
+        }}
         options={attornies.map(att => ({
           value: att.pk,
           label: att.name,
