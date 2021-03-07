@@ -9,7 +9,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 const GenerateButtonStyled = styled(Button)`
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+`;
+
+const PetitionTable = styled(Table)`
+  font-size: 1.7rem;
+  font-family: Arial, Helvetica, sans-serif;
 `;
 
 function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
@@ -27,11 +32,13 @@ const Attachments = styled.ul`
   }
 `;
 
+const COLUMN_SIZES = ['1fr', '1fr', '1fr', '1fr'];
+
 export default function PetitionList({ petitions, attorney, petitionerData, onError }) {
   const [selectedPetition, setSelectedPetition] = useState();
   const windowSize = useWindowSize();
 
-  const handleSelect = (petition) => {
+  const handleSelect = petition => {
     let hasErrors = false;
     if (!attorney) {
       onError({ attorney: ['Please select an attorney from the list'] });
@@ -52,36 +59,36 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
     if (!hasErrors) {
       setSelectedPetition(petition);
     }
-  }
+  };
 
   return (
-    <Table numColumns={4} headers={['County', 'Jurisdiction', 'Primary Form', 'Attachments']}>
+    <PetitionTable numColumns={4} columnSizes={COLUMN_SIZES} headers={['County', 'Jurisdiction', 'Primary Form', 'Attachments']}>
       {petitions.map(petition => (
         <TableRow key={petition.pk}>
-          <TableCell>{`${petition.county} County`}</TableCell>
+          <TableCell>{petition.county}</TableCell>
           <TableCell>{petition.jurisdiction}</TableCell>
           <TableCell>
             <GenerateButton
               collapsedIcon={faDownload}
               windowWidth={windowSize.width}
-              label={petition.form_type} 
+              label={petition.form_type}
               onClick={() => handleSelect(petition)}
             />
           </TableCell>
           <TableCell>
-              <Attachments>
-                {petition.attachments.map((attachment, i) => (
-                  <li key={attachment.pk}>
-                    <span>{`${i+1}) `}</span>
-                    <GenerateButton
-                      collapsedIcon={faDownload}
-                      windowWidth={windowSize.width}
-                      label={attachment.form_type}
-                      onClick={() => handleSelect(attachment)}
-                    />
-                  </li>
-                ))}
-              </Attachments>
+            <Attachments>
+              {petition.attachments.map((attachment, i) => (
+                <li key={attachment.pk}>
+                  <span>{`${i + 1}) `}</span>
+                  <GenerateButton
+                    collapsedIcon={faDownload}
+                    windowWidth={windowSize.width}
+                    label={attachment.form_type}
+                    onClick={() => handleSelect(attachment)}
+                  />
+                </li>
+              ))}
+            </Attachments>
           </TableCell>
         </TableRow>
       ))}
@@ -93,6 +100,6 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
           onClose={() => setSelectedPetition()}
         />
       )}
-    </Table>
+    </PetitionTable>
   );
 }

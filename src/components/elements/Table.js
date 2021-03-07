@@ -8,11 +8,14 @@ const TableStyle = styled.table`
   min-width: 100%;
   grid-template-columns: ${props => props.columnSize};
 
-  thead, tbody, tr {
+  thead,
+  tbody,
+  tr {
     display: contents;
   }
 
-  th, td {
+  th,
+  td {
     padding: 1rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -31,14 +34,14 @@ const TableStyle = styled.table`
   th:last-child {
     border: 0;
   }
-  
+
   td {
     padding-top: 10px;
     padding-bottom: 10px;
   }
-  
+
   tr:nth-child(even) td {
-    background-color: ${greyScale(8)};
+    background-color: ${greyScale(8.5)};
   }
 `;
 
@@ -48,28 +51,24 @@ export const TableCell = ({ children, header }) => (
 
 const TableHeader = ({ children }) => (
   <thead>
-    <tr>
-      {children}
-    </tr>
+    <tr>{children}</tr>
   </thead>
 );
 
-export const TableRow = ({ children }) => (
-  <tr>
-    {children}
-  </tr>
-);
+export const TableRow = ({ children }) => <tr>{children}</tr>;
 
-export const Table = ({ children, columnSizes, headers, numColumns }) => {
+export const Table = ({ children, className, columnSizes, headers, numColumns }) => {
   const size = columnSizes ? `${columnSizes.join(' ')}` : `repeat(${numColumns}, minmax(150px, 1fr))`;
   return (
-    <TableStyle columnSize={size}>
+    <TableStyle className={className} columnSize={size}>
       <TableHeader>
-        {headers.map((h, i) => <TableCell key={i} header>{h}</TableCell>)}
+        {headers.map((h, i) => (
+          <TableCell key={i} header>
+            {h}
+          </TableCell>
+        ))}
       </TableHeader>
-      <tbody>
-        {children}
-      </tbody>
+      <tbody>{children}</tbody>
     </TableStyle>
   );
 }

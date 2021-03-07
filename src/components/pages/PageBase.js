@@ -36,7 +36,7 @@ const LogoutLink = styled(Link)`
   cursor: pointer;
 `;
 
-function PageBase({ children, ...props }) {
+function PageBase({ children, className, ...props }) {
   const [adminUrl, setAdminUrl] = useState('');
   const history = useHistory();
   const handleLogout = () => {
@@ -64,7 +64,7 @@ function PageBase({ children, ...props }) {
             <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
           </LinksGroup>
       </PageHeader>
-      <PageContentWrapper>{children}</PageContentWrapper>
+      <PageContentWrapper className={className}>{children}</PageContentWrapper>
     </PageBaseStyled>
   );
 }

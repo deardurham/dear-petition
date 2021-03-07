@@ -21,9 +21,6 @@ const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
 const SectionDiv = styled.div`
   margin-bottom: 1rem;
-  min-width: 400px;
-  max-width: 1000px;
-  width: 80%;
 `;
 
 const SectionHeader = styled.h3`

@@ -23,6 +23,7 @@ export const ActualInputStyled = styled.input`
 
 export const InputErrors = styled(motion.div)`
   margin: 1rem 0;
+  user-select: none;
   p {
     color: ${colorRed};
   }
