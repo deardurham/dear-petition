@@ -46,7 +46,7 @@ function formPetitionData(petitions) {
 }
 
 const GenerationSection = styled.div`
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 
   & h2 {
     margin-bottom: 2rem;

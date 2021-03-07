@@ -18,7 +18,7 @@ const PetitionTable = styled(Table)`
 `;
 
 function GenerateButton({ label, windowWidth, onClick, collapsedIcon }) {
-  const isCollapsed = windowWidth < TABLET_LANDSCAPE_SIZE;
+  const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
   return (
     <GenerateButtonStyled onClick={onClick}>
       {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
