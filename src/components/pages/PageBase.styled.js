@@ -52,4 +52,7 @@ export const Link = styled.a`
 export const PageContentWrapper = styled.section`
   padding: 2rem 4rem;
   flex: 1;
+  @media (${smallerThanTabletLandscape}) {
+    padding: 2rem;
+  }
 `;

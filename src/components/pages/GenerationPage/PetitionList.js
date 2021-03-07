@@ -33,6 +33,7 @@ const Attachments = styled.ul`
 `;
 
 const COLUMN_SIZES = ['1fr', '1fr', '1fr', '1fr'];
+const REQUIRED_FIELDS = ['name', 'ssn', 'licenseNumber', 'licenseState', 'address1', 'city', 'state', 'zipCode'];
 
 export default function PetitionList({ petitions, attorney, petitionerData, onError }) {
   const [selectedPetition, setSelectedPetition] = useState();
@@ -44,18 +45,12 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
       onError({ attorney: ['Please select an attorney from the list'] });
       hasErrors = true;
     }
-    for (const key of ['petitionerName', 'ssn', 'licenseNumber', 'licenseState']) {
+    REQUIRED_FIELDS.forEach(key => {
       if (!petitionerData[key]) {
         onError({ [key]: ['This field is required'] });
         hasErrors = true;
       }
-    }
-    for (const key of ['address1', 'city', 'state', 'zipCode']) {
-      if (!petitionerData.address[key]) {
-        onError({ [key]: ['This field is required'] });
-        hasErrors = true;
-      }
-    }
+    });
     if (!hasErrors) {
       setSelectedPetition(petition);
     }

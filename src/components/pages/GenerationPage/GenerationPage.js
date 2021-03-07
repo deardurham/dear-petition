@@ -12,21 +12,11 @@ import { useParams } from 'react-router-dom';
 import Axios from '../../../service/axios';
 
 // Children
-import { AddressInput, AttorneyInput } from './GenerationInputs';
-import { GenerationInput, GenerationSelect, FlexWrapper, SSN } from './GenerationInputs.styled';
+import AttorneyInput from './GenerationInput/AttorneyInput';
+import PetitionerInput from './GenerationInput/PetitionerInput';
 import PetitionList from './PetitionList';
-import US_STATES from '../../../constants/US_STATES';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
-
-const SectionDiv = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const SectionHeader = styled.h3`
-  margin-bottom: 2rem;
-  user-select: none;
-`;
 
 function formPetitionData(petitions) {
   const structuredData = {};
@@ -47,34 +37,43 @@ function formPetitionData(petitions) {
   for (const attachment of attachments) {
     structuredData[attachment.parent].attachments.push({
       pk: attachment.pk,
+      county: attachment.county,
+      jurisdiction: attachment.jurisdiction,
       form_type: attachment.form_type,
     });
   }
   return structuredData;
 }
 
-const GenerationSection = ({ label, children }) => (
-  <SectionDiv>
-    <SectionHeader>{label}</SectionHeader>
-    {children}
-  </SectionDiv>
-);
+const GenerationSection = styled.div`
+  margin-bottom: 1rem;
+
+  & h2 {
+    margin-bottom: 2rem;
+    user-select: none;
+  }
+`;
+
+const InputSection = styled(GenerationSection)`
+  width: 80%;
+  min-width: 400px;
+`;
 
 function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
-  const [petitionerName, setPetitionerName] = useState('');
-  const [ssn, setSSN] = useState('');
-  const [address, setAddress] = useState({
+  const [petitionerData, setPetitionerData] = useState({
+    name: '',
+    ssn: '',
+    licenseNumber: '',
+    licenseState: DEFAULT_STATE_LABEL,
     address1: '',
     address2: '',
     city: '',
     state: DEFAULT_STATE_LABEL,
     zipCode: '',
   });
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseState, setLicenseState] = useState(DEFAULT_STATE_LABEL);
   const [attorney, setAttorney] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
@@ -83,7 +82,7 @@ function GenerationPage() {
     Axios.get(`/batch/${batchId}/`)
       .then(({ data }) => {
         setBatch(data);
-        setPetitionerName(data?.label);
+        setPetitionerData(prev => ({ ...prev, name: data?.label }));
         setLoading(false);
       })
       .catch(error => {
@@ -106,75 +105,30 @@ function GenerationPage() {
         <h3>Loading...</h3>
       ) : (
         <GenerationContentStyled>
-          <GenerationSection label='Attorney Information'>
+          <InputSection>
+            <h2>Attorney Information</h2>
             <AttorneyInput
               attorney={attorney}
               setAttorney={setAttorney}
               errors={formErrors}
               onClearError={clearError}
             />
-          </GenerationSection>
-          <GenerationSection label='Petitioner Information'>
-            <FlexWrapper>
-              <GenerationInput
-                label='Petitioner Name'
-                value={petitionerName}
-                onChange={e => {
-                  setPetitionerName(e.target.value);
-                  clearError('petitionerName');
-                }}
-                errors={formErrors.petitionerName}
-              />
-              <SSN
-                label='SSN'
-                value={ssn}
-                maxLength={11}
-                onChange={e => {
-                  setSSN(e.target.value.replace(/[^0-9-]/g, ''));
-                  clearError('ssn');
-                }}
-                errors={formErrors.ssn}
-              />
-            </FlexWrapper>
-            <FlexWrapper>
-              <GenerationInput
-                label="License #"
-                value={licenseNumber}
-                onChange={e => {
-                  setLicenseNumber(e.target.value);
-                  clearError('licenseNumber');
-                }}
-                errors={formErrors.licenseNumber}
-              />
-              <GenerationSelect
-                label="License state"
-                value={licenseState}
-                onChange={val => {
-                  setLicenseState(val);
-                  clearError('licenseState');
-                }}
-                options={US_STATES.map(state => ({ value: state[0], label: state[0] }))}
-                errors={formErrors.licenseState}
-              />
-            </FlexWrapper>
-            <AddressInput
-              address={address}
-              setAddress={setAddress}
+          </InputSection>
+          <InputSection>
+            <h2>Petitioner Information</h2>
+            <PetitionerInput
+              petitionerData={petitionerData}
+              setPetitionerData={setPetitionerData}
               errors={formErrors}
               onClearError={clearError}
             />
-          </GenerationSection>
-          <GenerationSection label='Petition List'>
+          </InputSection>
+          <GenerationSection>
+            <h2>Petition List</h2>
             <PetitionList
               petitions={sortedPetitions}
               attorney={attorney}
-              petitionerData = {{
-                petitionerName,
-                ssn,
-                address,
-                licenseNumber,
-                licenseState,
-              }}
+              petitionerData = {petitionerData}
               onError={(errorObj) => setFormErrors((oldErrors) => ({ ...oldErrors, ...errorObj }))}
             />
           </GenerationSection>
