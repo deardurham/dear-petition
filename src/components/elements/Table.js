@@ -46,29 +46,24 @@ const TableStyle = styled.table`
 `;
 
 export const TableCell = ({ children, header }) => (
-  header ? <th>{children}</th> : <td>{children}</td>
+  <>{header ? <th>{children}</th> : <td>{children}</td>}</>
 );
 
-const TableHeader = ({ children }) => (
+export const TableBody = styled.tbody``;
+
+export const TableHeader = ({ children }) => (
   <thead>
     <tr>{children}</tr>
   </thead>
 );
 
-export const TableRow = ({ children }) => <tr>{children}</tr>;
+export const TableRow = styled.tr``;
 
-export const Table = ({ children, className, columnSizes, headers, numColumns }) => {
-  const size = columnSizes ? `${columnSizes.join(' ')}` : `repeat(${numColumns}, minmax(150px, 1fr))`;
+export const Table = ({ children, className, columnSizes, numColumns }) => {
+  const defaultSize = `repeat(${numColumns}, 1fr)`;
   return (
-    <TableStyle className={className} columnSize={size}>
-      <TableHeader>
-        {headers.map((h, i) => (
-          <TableCell key={i} header>
-            {h}
-          </TableCell>
-        ))}
-      </TableHeader>
-      <tbody>{children}</tbody>
+    <TableStyle className={className} columnSize={columnSizes || defaultSize}>
+      {children}
     </TableStyle>
   );
-}
+};

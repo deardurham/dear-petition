@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button } from '../../elements/Button/Button.styled';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
-import { Table, TableRow, TableCell } from '../../elements/Table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import useWindowSize from '../../../hooks/useWindowSize';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -32,8 +32,16 @@ const Attachments = styled.ul`
   }
 `;
 
-const COLUMN_SIZES = ['1fr', '1fr', '1fr', '1fr'];
-const REQUIRED_FIELDS = ['name', 'ssn', 'licenseNumber', 'licenseState', 'address1', 'city', 'state', 'zipCode'];
+const REQUIRED_FIELDS = [
+  'name',
+  'ssn',
+  'licenseNumber',
+  'licenseState',
+  'address1',
+  'city',
+  'state',
+  'zipCode'
+];
 
 export default function PetitionList({ petitions, attorney, petitionerData, onError }) {
   const [selectedPetition, setSelectedPetition] = useState();
@@ -57,36 +65,44 @@ export default function PetitionList({ petitions, attorney, petitionerData, onEr
   };
 
   return (
-    <PetitionTable numColumns={4} columnSizes={COLUMN_SIZES} headers={['County', 'Jurisdiction', 'Primary Form', 'Attachments']}>
-      {petitions.map(petition => (
-        <TableRow key={petition.pk}>
-          <TableCell>{petition.county}</TableCell>
-          <TableCell>{petition.jurisdiction}</TableCell>
-          <TableCell>
-            <GenerateButton
-              collapsedIcon={faDownload}
-              windowWidth={windowSize.width}
-              label={petition.form_type}
-              onClick={() => handleSelect(petition)}
-            />
-          </TableCell>
-          <TableCell>
-            <Attachments>
-              {petition.attachments.map((attachment, i) => (
-                <li key={attachment.pk}>
-                  <span>{`${i + 1}) `}</span>
-                  <GenerateButton
-                    collapsedIcon={faDownload}
-                    windowWidth={windowSize.width}
-                    label={attachment.form_type}
-                    onClick={() => handleSelect(attachment)}
-                  />
-                </li>
-              ))}
-            </Attachments>
-          </TableCell>
-        </TableRow>
-      ))}
+    <PetitionTable numColumns={4}>
+      <TableHeader>
+        <TableCell header>County</TableCell>
+        <TableCell header>Jurisdiction</TableCell>
+        <TableCell header>Primary Form</TableCell>
+        <TableCell header>Attachments</TableCell>
+      </TableHeader>
+      <TableBody>
+        {petitions.map(petition => (
+          <TableRow key={petition.pk}>
+            <TableCell>{petition.county}</TableCell>
+            <TableCell>{petition.jurisdiction}</TableCell>
+            <TableCell>
+              <GenerateButton
+                collapsedIcon={faDownload}
+                windowWidth={windowSize.width}
+                label={petition.form_type}
+                onClick={() => handleSelect(petition)}
+              />
+            </TableCell>
+            <TableCell>
+              <Attachments>
+                {petition.attachments.map((attachment, i) => (
+                  <li key={attachment.pk}>
+                    <span>{`${i + 1}) `}</span>
+                    <GenerateButton
+                      collapsedIcon={faDownload}
+                      windowWidth={windowSize.width}
+                      label={attachment.form_type}
+                      onClick={() => handleSelect(attachment)}
+                    />
+                  </li>
+                ))}
+              </Attachments>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
       {selectedPetition && (
         <GeneratePetitionModal
           petition={selectedPetition}
