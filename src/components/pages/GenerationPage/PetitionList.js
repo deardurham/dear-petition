@@ -104,7 +104,7 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
-        <TableCell header>Primary Form</TableCell>
+        <TableCell header>Petition</TableCell>
         <TableCell header>Attachments</TableCell>
       </TableHeader>
       <TableBody>

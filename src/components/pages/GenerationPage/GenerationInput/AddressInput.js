@@ -31,7 +31,7 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
         errors={!disabled && errors.address1}
       />
       <Input
-        label="Address Line 2"
+        label={disabled ? 'Address Line 2' : 'Address Line 2 (Optional)'}
         disabled={disabled}
         value={address2}
         onChange={e => handleChange('address2', e.target.value)}

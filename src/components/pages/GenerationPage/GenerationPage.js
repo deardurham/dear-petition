@@ -4,6 +4,8 @@ import {
   GenerationPageStyled,
   GenerationContentStyled
 } from './GenerationPage.styled';
+import { colorGrey } from '../../../styles/colors';
+import { smallerThanTabletLandscape } from '../../../styles/media';
 
 // Router
 import { useParams } from 'react-router-dom';
@@ -30,18 +32,52 @@ const REQUIRED_FIELDS = [
 ];
 
 const GenerationSection = styled.div`
+  padding: 2rem 0;
   margin-bottom: 2rem;
 
   & h2 {
-    margin-bottom: 2rem;
     user-select: none;
+    margin-bottom: 2rem;
+  }
+
+  & h3 {
+    user-select: none;
+    margin-bottom: 1rem;
+  }
+
+  & p {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
   }
 `;
 
-const InputSection = styled(GenerationSection)`
-  width: 80%;
-  min-width: 400px;
+const InputSectionStyled = styled(GenerationSection)`
+  display: flex;
+  border-bottom: 1px solid ${colorGrey};
+
+  & > div:first-child {
+    flex: 1 0 33%;
+  }
+
+  & > div:last-child {
+    flex: 1 0 66%;
+  }
+
+  @media (${smallerThanTabletLandscape}) {
+    flex-flow: column;
+  }
 `;
+
+const InputSection = ({ children, label }) => (
+  <InputSectionStyled>
+    <div>
+      <h3>{label}</h3>
+    </div>
+    <div>
+      {children}
+    </div>
+  </InputSectionStyled>
+);
 
 function GenerationPage() {
   const { batchId } = useParams();
@@ -100,8 +136,7 @@ function GenerationPage() {
         <h3>Loading...</h3>
       ) : (
         <GenerationContentStyled>
-          <InputSection>
-            <h2>Attorney Information</h2>
+          <InputSection label='Attorney Information'>
             <AttorneyInput
               attorney={attorney}
               setAttorney={setAttorney}
@@ -109,8 +144,7 @@ function GenerationPage() {
               onClearError={clearError}
             />
           </InputSection>
-          <InputSection>
-            <h2>Petitioner Information</h2>
+          <InputSection label='Petitioner Information'>
             <PetitionerInput
               petitionerData={petitionerData}
               setPetitionerData={setPetitionerData}
@@ -120,6 +154,7 @@ function GenerationPage() {
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
+            <p>Click on the buttons below to generate the Expunction Petition form and its attachments.</p>
             <PetitionList
               petitions={batch?.petitions || []}
               attorney={attorney}

@@ -18,7 +18,7 @@ export const PageHeader = styled.header`
   justify-content: space-between;
   align-items: center;
   @media (${smallerThanTabletLandscape}) {
-    padding: 2rem 0rem;
+    padding-top: 2rem;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;

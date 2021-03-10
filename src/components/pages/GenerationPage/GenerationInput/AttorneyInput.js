@@ -24,7 +24,7 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
   return (
     <>
       <Select
-        label="Attorney Name"
+        label="Attorney"
         value={attorney}
         onChange={val => {
           setAttorney(val);
