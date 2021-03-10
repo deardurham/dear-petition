@@ -8,40 +8,39 @@ const TableStyle = styled.table`
   min-width: 100%;
   grid-template-columns: ${props => props.columnSize};
 
-  thead,
-  tbody,
-  tr {
+  & thead,
+  & tbody,
+  & tr {
     display: contents;
   }
 
-  th,
-  td {
+  & th,
+  & td {
     padding: 1rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  th {
+  & th {
     position: sticky;
     top: 0;
     background: ${colorPrimary};
     text-align: left;
-    font-weight: bold;
     color: white;
     user-select: none;
   }
 
-  th:last-child {
+  & th:last-child {
     border: 0;
   }
 
-  td {
+  & td {
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
-  tr:nth-child(even) td {
+  & tr:nth-child(even) td {
     background-color: ${greyScale(9)};
   }
 `;

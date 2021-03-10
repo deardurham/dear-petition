@@ -35,19 +35,19 @@ const GenerationSection = styled.div`
   padding: 2rem 0;
   margin-bottom: 2rem;
 
-  & h2 {
+  & >  h2 {
     user-select: none;
     margin-bottom: 2rem;
   }
 
-  & h3 {
-    user-select: none;
-    margin-bottom: 1rem;
-  }
-
-  & p {
+  & > p {
     font-size: 1.6rem;
     margin-bottom: 2rem;
+  }
+
+  & > div > h3 {
+    user-select: none;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -154,7 +154,7 @@ function GenerationPage() {
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
-            <p>Click on the buttons below to generate the Expunction Petition form and its attachments.</p>
+            <p>Click on the buttons below to generate the petition forms and their attachments.</p>
             <PetitionList
               petitions={batch?.petitions || []}
               attorney={attorney}

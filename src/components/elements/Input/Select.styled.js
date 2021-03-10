@@ -16,7 +16,7 @@ export const ActualSelectStyled = styled(Select)`
 export const InputErrors = styled(motion.div)`
   margin: 1rem 0;
   user-select: none;
-  p {
+  & p {
     color: ${colorRed};
   }
 `;

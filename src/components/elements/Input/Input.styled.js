@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { colorGrey, colorRed, colorFontPrimary } from '../../../styles/colors';
 import { motion } from 'framer-motion';
 import { fontPrimary } from '../../../styles/fonts';
+import { smallerThanTabletLandscape } from '../../../styles/media';
 
 export const InputWrapper = styled.div``;
 
@@ -26,5 +27,8 @@ export const InputErrors = styled(motion.div)`
   user-select: none;
   p {
     color: ${colorRed};
+    @media (${smallerThanTabletLandscape}) {
+      font-size: 1.4rem;
+    }
   }
 `;
