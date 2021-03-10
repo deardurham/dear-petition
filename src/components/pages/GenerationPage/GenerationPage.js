@@ -154,7 +154,7 @@ function GenerationPage() {
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
-            <p>Click on the buttons below to generate the petition forms and their attachments.</p>
+            <p>Click on the buttons below to generate petition forms and their attachments.</p>
             <PetitionList
               petitions={batch?.petitions || []}
               attorney={attorney}
