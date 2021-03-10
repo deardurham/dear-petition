@@ -59,9 +59,14 @@ class BatchViewSet(viewsets.ModelViewSet):
     queryset = petition.Batch.objects.prefetch_related(
         "petitions", "records__offenses__offense_records"
     )
-    serializer_class = serializers.BatchSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_serializer_class(self):
+        """Use a custom serializer when accessing a specific batch"""
+        if self.detail:
+            return serializers.BatchDetailSerializer
+        return serializers.BatchSerializer
 
     def get_queryset(self):
         """ Filter queryset so that user's only have read access on objects they have created

@@ -100,6 +100,23 @@ class ParentPetitionSerializer(PetitionSerializer):
 
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
+    petitions = PetitionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Batch
+        fields = [
+            "pk",
+            "label",
+            "date_uploaded",
+            "user",
+            "records",
+            "petitions",
+        ]
+        read_only_fields = ["user"]
+
+
+class BatchDetailSerializer(serializers.ModelSerializer):
+    records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = serializers.SerializerMethodField()
 
     class Meta:
@@ -115,8 +132,7 @@ class BatchSerializer(serializers.ModelSerializer):
         read_only_fields = ["user"]
 
     def get_petitions(self, instance):
-        if not instance:
-            return None
+        """Return sorted and structured petitions with associated attachments"""
         parent_petitions = Petition.objects.filter(batch=instance.pk, parent__isnull=True).order_by('county', 'jurisdiction')
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
