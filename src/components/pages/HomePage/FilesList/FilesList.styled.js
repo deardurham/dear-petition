@@ -2,17 +2,16 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 export const FilesListWrapper = styled.div`
-  height: 420px;
   width: 350px;
   overflow-y: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin: 2rem 0rem;
 `;
 
 export const FilesListStyled = styled.ul`
-  overflow-y: scroll;
+  margin-top: 1rem;
 `;
 
 export const FilesListItem = styled(motion.li)`
@@ -27,9 +26,5 @@ export const FilesListItem = styled(motion.li)`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  span {
-    cursor: pointer;
   }
 `;

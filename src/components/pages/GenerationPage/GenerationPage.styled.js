@@ -1,17 +1,14 @@
 import styled from 'styled-components';
 import PageBase from '../PageBase';
 
-export const GenerationPageStyled = styled(PageBase)``;
-
-export const GenerationContentStyled = styled.div`
-  padding: 0 4rem;
-  width: 100%;
+export const GenerationPageStyled = styled(PageBase)`
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
-export const PetitionsList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+export const GenerationContentStyled = styled.div`
+  width: 75%;
+  max-width: 1200px;
+  min-width: 400px;
 `;

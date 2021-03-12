@@ -1,9 +1,11 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
   GenerationPageStyled,
-  PetitionsList,
   GenerationContentStyled
 } from './GenerationPage.styled';
+import { colorGrey } from '../../../styles/colors';
+import { smallerThanTabletLandscape } from '../../../styles/media';
 
 // Router
 import { useParams } from 'react-router-dom';
@@ -12,25 +14,87 @@ import { useParams } from 'react-router-dom';
 import Axios from '../../../service/axios';
 
 // Children
-import GenerationInputs from './GenerationInputs';
-import PetitionListItem from './PetitionListItem';
-
-export const GenerationContext = createContext(null);
+import AttorneyInput from './GenerationInput/AttorneyInput';
+import PetitionerInput from './GenerationInput/PetitionerInput';
+import PetitionList from './PetitionList';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
+
+const REQUIRED_FIELDS = [
+  'name',
+  'ssn',
+  'licenseNumber',
+  'licenseState',
+  'address1',
+  'city',
+  'state',
+  'zipCode'
+];
+
+const GenerationSection = styled.div`
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+
+  & >  h2 {
+    user-select: none;
+    margin-bottom: 2rem;
+  }
+
+  & > p {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  & > div > h3 {
+    user-select: none;
+    margin-bottom: 1rem;
+  }
+`;
+
+const InputSectionStyled = styled(GenerationSection)`
+  display: flex;
+  border-bottom: 1px solid ${colorGrey};
+
+  & > div:first-child {
+    flex: 1 0 33%;
+  }
+
+  & > div:last-child {
+    flex: 1 0 66%;
+  }
+
+  @media (${smallerThanTabletLandscape}) {
+    flex-flow: column;
+  }
+`;
+
+const InputSection = ({ children, label }) => (
+  <InputSectionStyled>
+    <div>
+      <h3>{label}</h3>
+    </div>
+    <div>
+      {children}
+    </div>
+  </InputSectionStyled>
+);
 
 function GenerationPage() {
   const { batchId } = useParams();
   const [loading, setLoading] = useState();
   const [batch, setBatch] = useState();
-  const [selectedPetition, setSelectedPetition] = useState();
-  const [petitionerName, setPetitionerName] = useState('');
-  const [address, setAddress] = useState({ state: DEFAULT_STATE_LABEL });
-  const [ssn, setSSN] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseState, setLicenseState] = useState(DEFAULT_STATE_LABEL);
   const [attorney, setAttorney] = useState('');
-  const [selectedAgencies, setSelectedAgencies] = useState([]);
+  const [petitionerData, setPetitionerData] = useState({
+    name: '',
+    ssn: '',
+    licenseNumber: '',
+    licenseState: DEFAULT_STATE_LABEL,
+    address1: '',
+    address2: '',
+    city: '',
+    state: DEFAULT_STATE_LABEL,
+    zipCode: '',
+  });
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
@@ -38,7 +102,7 @@ function GenerationPage() {
     Axios.get(`/batch/${batchId}/`)
       .then(({ data }) => {
         setBatch(data);
-        setPetitionerName(data?.label);
+        setPetitionerData(prev => ({ ...prev, name: data?.label }));
         setLoading(false);
       })
       .catch(error => {
@@ -47,102 +111,60 @@ function GenerationPage() {
       });
   }, [batchId]);
 
-  const _petitionDataIsValid = () => {
-    let isValid = true;
-    const errors = {};
-    if (!petitionerName) {
-      errors.petitionerName = ['This field is required'];
-      isValid = false;
-    }
-    if (!ssn) {
-      errors.ssn = ['This field is required'];
-      isValid = false;
-    }
-    if (!licenseNumber) {
-      errors.licenseNumber = ['This field is required'];
-      isValid = false;
-    }
-    if (!licenseState) {
-      errors.licenseState = ['This field is required'];
-      isValid = false;
-    }
+  const validateInput = () => {
+    let hasErrors = false;
     if (!attorney) {
-      errors.attorney = ['This field is required'];
-      isValid = false;
+      setFormErrors((oldErrors) => ({ ...oldErrors, attorney: ['Please select an attorney from the list'] }));
+      hasErrors = true;
     }
-    if (!address?.address1) {
-      errors.address = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.city) {
-      errors.city = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.state) {
-      errors.state = ['This field is required'];
-      isValid = false;
-    }
-    if (!address?.zipCode) {
-      errors.zipCode = ['This field is required'];
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-
-    return isValid;
+    REQUIRED_FIELDS.forEach(key => {
+      if (!petitionerData[key]) {
+        setFormErrors((oldErrors) => ({ ...oldErrors, [key]: ['This field is required'] }));
+        hasErrors = true;
+      }
+    });
+    return !hasErrors;
   };
 
-  const validatePetitionSelect = (petition) => {
-    setFormErrors({});
-    if (_petitionDataIsValid()) {
-      setSelectedPetition(petition);
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const context = {
-    batch,
-    petition: selectedPetition,
-    address,
-    setAddress,
-    ssn,
-    setSSN,
-    licenseNumber,
-    setLicenseNumber,
-    licenseState,
-    setLicenseState,
-    attorney,
-    setAttorney,
-    selectedAgencies,
-    setSelectedAgencies,
-    petitionerName,
-    setPetitionerName,
-    formErrors,
-    setFormErrors,
+  const clearError = (key) => {
+    formErrors[key] && setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
   };
 
   return (
-    <GenerationContext.Provider value={context}>
-      <GenerationPageStyled>
-        {loading ? (
-          <h2>Loading...</h2>
-        ) : (
-          <GenerationContentStyled>
-            <GenerationInputs />
-            <PetitionsList>
-              {batch?.petitions?.map(petition =>
-                <PetitionListItem
-                  key={petition.pk}
-                  petition={petition}
-                  validatePetitionSelect={validatePetitionSelect} />
-              )}
-            </PetitionsList>
-          </GenerationContentStyled>
-        )}
-      </GenerationPageStyled>
-    </GenerationContext.Provider>
+    <GenerationPageStyled>
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : (
+        <GenerationContentStyled>
+          <InputSection label='Attorney Information'>
+            <AttorneyInput
+              attorney={attorney}
+              setAttorney={setAttorney}
+              errors={formErrors}
+              onClearError={clearError}
+            />
+          </InputSection>
+          <InputSection label='Petitioner Information'>
+            <PetitionerInput
+              petitionerData={petitionerData}
+              setPetitionerData={setPetitionerData}
+              errors={formErrors}
+              onClearError={clearError}
+            />
+          </InputSection>
+          <GenerationSection>
+            <h2>Petition List</h2>
+            <p>Click on the buttons below to generate petition forms and their attachments.</p>
+            <PetitionList
+              petitions={batch?.petitions || []}
+              attorney={attorney}
+              petitionerData={petitionerData}
+              validateInput={validateInput}
+            />
+          </GenerationSection>
+        </GenerationContentStyled>
+      )}
+    </GenerationPageStyled>
   );
 }
 

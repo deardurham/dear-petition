@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
+  Link,
+  LinksGroup,
   PageBaseStyled,
   PageHeader,
   PageLogo,
-  AdminButton,
-  LogoutButton,
   PageContentWrapper
 } from './PageBase.styled';
 import DEAR_Logo from '../../assets/img/DEAR_logo.png';
+import { smallerThanTabletLandscape } from '../../styles/media';
 
 // Ajax
 import Axios from '../../service/axios';
@@ -18,7 +20,23 @@ import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 // Router
 import { useHistory } from 'react-router-dom';
 
-function PageBase({ children, ...props }) {
+const LogoLink = styled(Link)`
+  border: none;
+  padding: 0;
+  height: 80px;
+  width: 300px;
+  margin: 0;
+  @media (${smallerThanTabletLandscape}) {
+    width: 400px;
+    height: auto;
+  }
+`;
+
+const LogoutLink = styled(Link)`
+  cursor: pointer;
+`;
+
+function PageBase({ children, className, ...props }) {
   const [adminUrl, setAdminUrl] = useState('');
   const history = useHistory();
   const handleLogout = () => {
@@ -37,13 +55,16 @@ function PageBase({ children, ...props }) {
   return (
     <PageBaseStyled {...props}>
       <PageHeader>
-        <PageLogo>
-          <img src={DEAR_Logo} alt="DEAR logo" />
-        </PageLogo>
-        {adminUrl ? <AdminButton href={adminUrl}>Admin</AdminButton> : null}
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+          <LogoLink href='/'>
+            <PageLogo src={DEAR_Logo} alt="DEAR logo" />
+          </LogoLink>
+          <LinksGroup>
+            {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
+            {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
+            <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
+          </LinksGroup>
       </PageHeader>
-      <PageContentWrapper>{children}</PageContentWrapper>
+      <PageContentWrapper className={className}>{children}</PageContentWrapper>
     </PageBaseStyled>
   );
 }

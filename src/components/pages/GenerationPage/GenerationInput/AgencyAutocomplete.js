@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
 // Ajax
 import Axios from '../../../../service/axios';
@@ -7,16 +8,31 @@ import Axios from '../../../../service/axios';
 import Autosuggest from 'react-autosuggest';
 
 // Components
-import {
-  AgencyAutocompleteStyled,
-  BadgesListStyled,
-  AgencyAutoSuggestInputStyled,
-  SuggestionStyled
-} from './AgencyAutocomplete.styled';
 import { Badge, AutoCompleteBadge } from '../../../elements/Badge/Badge';
 import AutoSuggestInput from '../../../elements/AutoSuggest/AutoSuggestInput';
 import AutoSuggestionContainer from '../../../elements/AutoSuggest/AutoSuggestionContainer';
-import { GenerationContext } from '../GenerationPage';
+
+const AgencyAutocompleteStyled = styled.div`
+  width: 100%;
+  padding: 1rem 0rem 2rem 0rem;
+`;
+
+const BadgesListStyled = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  user-select: none;
+`;
+
+const AgencyAutoSuggestInputStyled = styled.div`
+  display: flex;
+  width: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const SuggestionStyled = styled.div``;
 
 const renderSuggestion = (suggestion, { isHighlighted }) => {
   return (
@@ -34,10 +50,9 @@ const AgencyAutoSuggestInput = inputProps => {
   );
 };
 
-const AgencyAutocomplete = ({ ...props }) => {
+const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
-  const { selectedAgencies, setSelectedAgencies } = useContext(GenerationContext);
 
   const handleHotKeyPressed = e => {
     e.stopPropagation();
@@ -52,7 +67,7 @@ const AgencyAutocomplete = ({ ...props }) => {
     (async function () {
       try {
         const { data } = await Axios.get(`/contact/?category=agency&search=${value}`);
-        const selectedAgencyNames = selectedAgencies.map((agency) => agency.name);
+        const selectedAgencyNames = agencies.map((agency) => agency.name);
         setSuggestions(data?.results.filter((agency) => !selectedAgencyNames.includes(agency.name)) || []);
       } catch (error) {
         console.error(error);
@@ -70,19 +85,21 @@ const AgencyAutocomplete = ({ ...props }) => {
 
   const addAgency = thisAgency => {
     setSuggestionValue('');
-    setSelectedAgencies([...selectedAgencies, thisAgency]);
+    setAgencies(prev => ([...prev, thisAgency]));
   };
 
   const removeAgency = thisAgency => {
-    const theseAgencies = selectedAgencies.slice();
-    if (thisAgency) {
-      const { name } = thisAgency;
-      const agencyLoc = selectedAgencies.map(innerAgency => innerAgency.name).indexOf(name);
-      theseAgencies.splice(agencyLoc, 1);
-    } else {
-      theseAgencies.pop();
-    }
-    setSelectedAgencies(theseAgencies);
+    setAgencies(prev => {
+      const theseAgencies = prev.slice();
+      if (thisAgency) {
+        const { name } = thisAgency;
+        const agencyLoc = theseAgencies.map(innerAgency => innerAgency.name).indexOf(name);
+        theseAgencies.splice(agencyLoc, 1);
+      } else {
+        theseAgencies.pop();
+      }
+      return theseAgencies;
+    });
   };
 
   const inputProps = {
@@ -106,7 +123,7 @@ const AgencyAutocomplete = ({ ...props }) => {
         renderSuggestionsContainer={AutoSuggestionContainer}
       />
       <BadgesListStyled data-cy="label_list">
-        {selectedAgencies.map((thisAgency, i) => (
+        {agencies.map((thisAgency, i) => (
           <Badge
             {...thisAgency}
             key={`${i}_${thisAgency.name}`}
