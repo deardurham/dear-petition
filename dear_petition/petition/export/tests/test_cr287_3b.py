@@ -16,11 +16,9 @@ pytestmark = pytest.mark.django_db
 
 
 def create_record(batch, jurisdiction, county):
+    now = timezone.now()
     record = CIPRSRecordFactory(
-        batch=batch,
-        label=batch.label,
-        jurisdiction=jurisdiction,
-        county=county,
+        batch=batch, label=batch.label, jurisdiction=jurisdiction, county=county,
     )
     guilty_offense = OffenseRecordFactory(
         action="CONVICTED",
@@ -29,7 +27,7 @@ def create_record(batch, jurisdiction, county):
         offense=OffenseFactory(
             verdict="GUILTY",
             disposition_method="DISPOSED BY JUDGE",
-            disposed_on=timezone.now(),
+            disposed_on=now,
             ciprs_record=record,
             jurisdiction=jurisdiction,
         ),
@@ -39,7 +37,7 @@ def create_record(batch, jurisdiction, county):
         description="MISDEMEANOR LARCENY",
         severity="MISDEMEANOR",
         offense=OffenseFactory(
-            disposed_on=timezone.now(),
+            disposed_on=now,
             disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
             ciprs_record=record,
             jurisdiction=jurisdiction,
@@ -50,7 +48,7 @@ def create_record(batch, jurisdiction, county):
         description="POSS STOLEN GOODS/PROP",
         severity="MISDEMEANOR",
         offense=OffenseFactory(
-            disposed_on=timezone.now(),
+            disposed_on=now,
             disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
             ciprs_record=record,
             jurisdiction=jurisdiction,
