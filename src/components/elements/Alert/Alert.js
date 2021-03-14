@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertStyled, IconStyled } from './Alert.styled';
-import CloseIcon from '../CloseIcon/CloseIcon';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 
 function Alert({ options, message, close }) {
@@ -22,7 +22,7 @@ function Alert({ options, message, close }) {
     <AlertStyled type={options.type}>
       <IconStyled icon={getIconFromType(options.type)} type={options.type} />
       <p>{message}</p>
-      <CloseIcon onClose={close} />
+      <FontAwesomeIcon icon={faTimes} onClose={close} />
     </AlertStyled>
   );
 }

@@ -1,38 +1,45 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
-import { ModalContent, CloseButton } from './GeneratePetitionModal.styled';
+import { ModalContent } from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
 
 // Children/Components
-import AgencyAutocomplete from './AgencyAutocomplete';
-import { GenerationContext } from '../GenerationPage';
-import Button from '../../../elements/Button/Button';
-import CloseIcon from '../../../elements/CloseIcon/CloseIcon';
+import AgencyAutocomplete from '../GenerationInput/AgencyAutocomplete';
+import { Button, CloseButton } from '../../../elements/Button';
 import Axios from '../../../../service/axios';
 
-const GeneratePetitionModal = ({ closeModal, isVisible }) => {
-  const { petition, petitionerName, address, ssn, licenseNumber, licenseState, attorney, selectedAgencies } = useContext(
-    GenerationContext
-  );
-  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null});
+const ModalCloseButton = styled(CloseButton)`
+  position: absolute;
+  top: 0;
+  right: 0;
+`;
+
+const Content = styled.ul`
+  font-size: 1.6rem;
+`;
+
+const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition, petitionerData, onClose, setAgencies }) => {
+  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
 
   const _buildPetition = () => {
     return {
       petition: petition.pk,
-      name_petitioner: petitionerName,
-      address1: address.address1,
-      address2: address.address2,
-      city: address.city,
-      state: address.state.value,
-      zip_code: address.zipCode,
-      ssn,
-      drivers_license: licenseNumber,
-      drivers_license_state: licenseState.value,
+      name_petitioner: petitionerData.name,
+      address1: petitionerData.address1,
+      address2: petitionerData.address2,
+      city: petitionerData.city,
+      state: petitionerData.state.value,
+      zip_code: petitionerData.zipCode,
+      ssn: petitionerData.ssn,
+      drivers_license: petitionerData.licenseNumber,
+      drivers_license_state: petitionerData.licenseState.value,
       attorney: attorney.value,
-      agencies: selectedAgencies.map(agency => agency.pk)
+      agencies: agencies.map(agency => agency.pk)
     };
   };
 
@@ -63,7 +70,7 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
       handle.close();
 
     setPdfWindow({ handle: null, url: null });
-    closeModal();
+    onClose();
   };
 
   useKeyPress('Escape', closePdf);
@@ -82,19 +89,20 @@ const GeneratePetitionModal = ({ closeModal, isVisible }) => {
   };
 
   return (
-    <GeneratePetitionModalStyled isVisible={isVisible}>
+    <GeneratePetitionModalStyled isVisible>
       <ModalContent>
-        <CloseButton onClick={closePdf}>
-          <CloseIcon />
-        </CloseButton>
+        <ModalCloseButton onClick={closePdf}>
+          <FontAwesomeIcon icon={faTimes} />
+        </ModalCloseButton>
         {petition && (
           <>
             <h2>{petition.form_type}</h2>
-            <ul>
-              <li>Jurisdiction: {petition.jurisdiction}</li>
+            <Content>
+              {attachmentNumber && <li>Attachment #: {attachmentNumber}</li>}
               <li>County: {petition.county} County</li>
-            </ul>
-            <AgencyAutocomplete />
+              <li>Jurisdiction: {petition.jurisdiction}</li>
+            </Content>
+            <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
             <Button onClick={handleGenerate}>Generate</Button>
           </>
         )}

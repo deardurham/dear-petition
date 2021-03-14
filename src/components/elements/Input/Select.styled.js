@@ -5,16 +5,18 @@ import { colorRed } from '../../../styles/colors';
 
 export const SelectWrapper = styled.div``;
 
-export const SelectStyled = styled.label``;
+export const SelectStyled = styled.label`
+  user-select: none;
+`;
 
 export const ActualSelectStyled = styled(Select)`
-  width: 100%;
-  min-width: 300px;
+  min-width: 150px;
 `;
 
 export const InputErrors = styled(motion.div)`
   margin: 1rem 0;
-  p {
+  user-select: none;
+  & p {
     color: ${colorRed};
   }
 `;

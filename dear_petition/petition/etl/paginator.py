@@ -1,3 +1,5 @@
+from dear_petition.petition.constants import DISMISSED, ATTACHMENT
+
 INITIAL_PAGE_SIZE = 10
 ATTACHMENT_PAGE_SIZE = 20
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   LoginPageStyled,
   LoginSplash,
@@ -10,7 +10,7 @@ import {
   ForgotPassword,
   PasswordWrapper
 } from './LoginPage.styled';
-import Button from '../../elements/Button/Button';
+import { Button } from '../../elements/Button';
 
 // Assets
 import DEAR_logo from '../../../assets/img/DEAR_logo.png';

@@ -45,6 +45,8 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+launch.json
+tasks.json
 
 # Translations
 *.mo
@@ -69,7 +71,9 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+.envrc
 .direnv
+.nvmrc
 
 # Rope project settings
 .ropeproject

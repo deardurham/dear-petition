@@ -6,24 +6,14 @@ import { colorWhite, colorWarning, colorCaution } from '../../../styles/colors';
 import PageBase from '../PageBase';
 import Modal from '../../elements/Modal/Modal';
 
-export const HomePageStyled = styled(PageBase)`
-  section {
-    justify-content: center;
-  }
-`;
+export const HomePageStyled = styled(PageBase)``;
 
 export const HomeContent = styled.div`
+  margin-top: 4rem;
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: flex-start;
-  flex: 1;
-  margin-top: calc(5rem + 0.5vw);
-
-  @media (${smallerThanTabletLandscape}) {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   }
 `;
 
@@ -55,7 +45,7 @@ export const DragErrors = styled.div`
 `;
 
 export const ModalStyled = styled(Modal)`
-  position: absolute;
+  position: fixed;
   bottom: 50%;
   left: 50%;
   transform: translate(-50%, 50%);

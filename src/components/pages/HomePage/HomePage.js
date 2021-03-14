@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
+import { colorRed } from '../../../styles/colors';
+import { fontError } from '../../../styles/fonts';
 import {
   HomePageStyled,
   HomeContent,
@@ -18,6 +21,16 @@ import Axios from '../../../service/axios';
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
 const MAX_FILE_SIZE = 30_000;
+const LONG_WAIT_TIMEOUT = 5; // seconds
+const MAX_TIMEOUT = 30; // seconds
+
+const ModalError = styled.p`
+  margin-top: 2rem;
+  color: ${colorRed};
+  font-family: ${fontError};
+  font-size: 1.5rem;
+  font-weight: bold;
+`;
 
 function HomePage(props) {
   const fileInputRef = React.createRef();
@@ -25,6 +38,7 @@ function HomePage(props) {
   const [dragErrors, setDragErrors] = useState();
   const [files, setFiles] = useState(new Set());
   const [showModal, setShowModal] = useState(false);
+  const [modalError, setModalError] = useState();
   const history = useHistory();
 
   const _mergeFileSets = newFiles => {
@@ -40,7 +54,6 @@ function HomePage(props) {
       setDragErrors(['Maximum file limit exceeded']);
       return;
     }
-    // TODO: Reject files with duplicate file.name
 
     let hasDups = false;
     files.forEach(file => {
@@ -67,16 +80,23 @@ function HomePage(props) {
 
   const handlePreparePetitions = async () => {
     setShowModal(true);
+    let timer = null;
     try {
       const filesFormData = new FormData();
       files.forEach(file => filesFormData.append('files', file));
-      const { data, status } = await Axios.post('/batch/', filesFormData);
+      const request = Axios.post('/batch/', filesFormData, { timeout: MAX_TIMEOUT * 1000 });
+      timer = setTimeout(() => {
+        setModalError('It is taking longer than expected to process the uploaded records. Please wait...');
+      }, LONG_WAIT_TIMEOUT * 1000);
+
+      const { data, status } = await request;
       if (status === 201) {
         history.push(`/generate/${data.id}`);
       }
     } catch (error) {
+      timer && clearTimeout(timer);
       console.error(error);
-      setShowModal(false);
+      setModalError('ERROR: Could not process the records.');
     }
   };
 
@@ -84,13 +104,6 @@ function HomePage(props) {
     <>
       <HomePageStyled>
         <HomeContent>
-          {files && files.size > 0 && (
-            <FilesList
-              files={files}
-              handleRemoveFile={handleRemoveFile}
-              handlePreparePetitions={handlePreparePetitions}
-            />
-          )}
           <DragNDrop
             ref={fileInputRef}
             mimeTypes={ALLOWED_MIME_TYPES}
@@ -121,11 +134,19 @@ function HomePage(props) {
               </div>
             </DnDContent>
           </DragNDrop>
+          {files && files.size > 0 && (
+            <FilesList
+              files={files}
+              handleRemoveFile={handleRemoveFile}
+              handlePreparePetitions={handlePreparePetitions}
+            />
+          )}
         </HomeContent>
       </HomePageStyled>
-      <ModalStyled isVisible={showModal} closeModal={() => setShowModal(false)}>
+      <ModalStyled isVisible={showModal} closeModal={() => { setShowModal(false); setModalError(); }}>
         <ModalContent>
           <h2>Preparing petitions...</h2>
+          {modalError && <ModalError>{modalError}</ModalError>}
         </ModalContent>
       </ModalStyled>
     </>

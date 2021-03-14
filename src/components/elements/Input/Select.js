@@ -3,12 +3,17 @@ import PropTypes from 'prop-types';
 import { SelectWrapper, SelectStyled, ActualSelectStyled, InputErrors } from './Select.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Select({ value, onChange, label, errors, options }) {
+function Select({ value, onChange, label, errors, options, disabled, className }) {
   return (
-    <SelectWrapper>
+    <SelectWrapper className={className}>
       <SelectStyled>
         {label}
-        <ActualSelectStyled value={value} options={options} onChange={onChange} />
+        <ActualSelectStyled
+          value={value}
+          options={options}
+          onChange={onChange}
+          isDisabled={disabled}
+        />
       </SelectStyled>
       <AnimatePresence>
         <InputErrors
