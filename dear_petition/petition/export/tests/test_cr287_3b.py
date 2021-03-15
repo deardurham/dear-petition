@@ -1,6 +1,6 @@
-import pytest
+import datetime as dt
 
-from django.utils import timezone
+import pytest
 
 from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
@@ -15,71 +15,149 @@ from dear_petition.petition.export.forms import AOCFormCR287
 pytestmark = pytest.mark.django_db
 
 
-def create_record(batch, jurisdiction, county):
-    now = timezone.now()
-    record = CIPRSRecordFactory(
-        batch=batch, label=batch.label, jurisdiction=jurisdiction, county=county,
-    )
-    guilty_offense = OffenseRecordFactory(
-        action="CONVICTED",
-        description="BREAK OR ENTER A MOTOR VEHICLE",
-        severity="FELONY",
-        offense=OffenseFactory(
-            verdict="GUILTY",
-            disposition_method="DISPOSED BY JUDGE",
-            disposed_on=now,
-            ciprs_record=record,
-            jurisdiction=jurisdiction,
-        ),
-    )
-    OffenseRecordFactory(
-        action="CHARGED",
-        description="MISDEMEANOR LARCENY",
-        severity="MISDEMEANOR",
-        offense=OffenseFactory(
-            disposed_on=now,
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
-            ciprs_record=record,
-            jurisdiction=jurisdiction,
-        ),
-    )
-    OffenseRecordFactory(
-        action="CHARGED",
-        description="POSS STOLEN GOODS/PROP",
-        severity="MISDEMEANOR",
-        offense=OffenseFactory(
-            disposed_on=now,
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
-            ciprs_record=record,
-            jurisdiction=jurisdiction,
-        ),
-    )
-    return guilty_offense
+@pytest.fixture
+def aug1():
+    return dt.date(2010, 8, 1)
 
 
 @pytest.fixture
-def durham_petition(batch):
+def nov1():
+    return dt.date(2006, 11, 1)
+
+
+@pytest.fixture
+def petition(batch):
     return PetitionFactory(
         batch=batch, county="DURHAM", jurisdiction=constants.DISTRICT_COURT
     )
 
 
 @pytest.fixture
-def durham_offense(durham_petition):
-    return create_record(
-        durham_petition.batch,
-        jurisdiction=durham_petition.jurisdiction,
-        county=durham_petition.county,
+def all_offenses(petition):
+    return petition.get_all_offense_records()
+
+
+@pytest.fixture
+def cr1(batch, petition):
+    return CIPRSRecordFactory(
+        batch=batch,
+        label=batch.label,
+        jurisdiction=petition.jurisdiction,
+        county=petition.county,
     )
 
 
-def test_same_day_convictions(durham_offense, durham_petition):
-    offenses = dismissed.same_day_convictions(durham_petition.get_all_offense_records())
-    assert durham_offense in offenses
+@pytest.fixture
+def cr2(batch, petition):
+    return CIPRSRecordFactory(
+        batch=batch, jurisdiction=petition.jurisdiction, county=petition.county,
+    )
 
 
-def test_cr287_same_day_convictions(durham_offense, durham_petition):
-    form = AOCFormCR287(durham_petition)
+@pytest.fixture
+def cr1_dismissed(cr1, aug1):
+    return OffenseRecordFactory(
+        action="CHARGED",
+        description="MISDEMEANOR LARCENY",
+        severity="MISDEMEANOR",
+        offense=OffenseFactory(
+            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposed_on=aug1,
+            ciprs_record=cr1,
+            jurisdiction=cr1.jurisdiction,
+        ),
+    )
+
+
+@pytest.fixture
+def cr1_guilty(cr1, aug1):
+    return OffenseRecordFactory(
+        action="CONVICTED",
+        description="BREAK OR ENTER A MOTOR VEHICLE",
+        severity="FELONY",
+        offense=OffenseFactory(
+            verdict="GUILTY",
+            disposition_method="DISPOSED BY JUDGE",
+            disposed_on=aug1,
+            ciprs_record=cr1,
+            jurisdiction=cr1.jurisdiction,
+        ),
+    )
+
+
+def test_only_dismissed(all_offenses, cr1_dismissed):
+    assert not dismissed.same_day_convictions(all_offenses)
+
+
+def test_only_convictions(all_offenses, cr1_guilty):
+    assert not dismissed.same_day_convictions(all_offenses)
+
+
+def test_same_day_conviction(all_offenses, cr1_dismissed, cr1_guilty):
+    assert cr1_guilty in dismissed.same_day_convictions(all_offenses)
+
+
+def test_different_day_conviction(all_offenses, cr1_dismissed, cr1_guilty, cr1, nov1):
+    OffenseRecordFactory(
+        action="CONVICTED",
+        offense__verdict="GUILTY",
+        offense__disposed_on=nov1,
+        offense__ciprs_record=cr1,
+        offense__jurisdiction=cr1.jurisdiction,
+    )
+    assert [cr1_guilty] == dismissed.same_day_convictions(all_offenses)
+
+
+def test_different_record(all_offenses, cr1_dismissed, cr1_guilty, cr2, aug1):
+    OffenseRecordFactory(
+        action="CONVICTED",
+        offense__verdict="GUILTY",
+        offense__disposed_on=aug1,
+        offense__ciprs_record=cr2,
+        offense__jurisdiction=cr2.jurisdiction,
+    )
+    assert [cr1_guilty] == dismissed.same_day_convictions(all_offenses)
+
+
+def test_multi_same_day_convictions__same_record(
+    all_offenses, cr1_dismissed, cr1_guilty, cr1, aug1
+):
+    other_guilty = OffenseRecordFactory(
+        action="CONVICTED",
+        offense__verdict="GUILTY",
+        offense__disposed_on=aug1,
+        offense__ciprs_record=cr1,
+        offense__jurisdiction=cr1.jurisdiction,
+    )
+    assert [cr1_guilty, other_guilty] == dismissed.same_day_convictions(all_offenses)
+
+
+def test_multi_same_day_convictions__two_records(
+    all_offenses, cr1_dismissed, cr1_guilty, cr2, aug1
+):
+    OffenseRecordFactory(
+        action="CHARGED",
+        offense__disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+        offense__disposed_on=aug1,
+        offense__ciprs_record=cr2,
+        offense__jurisdiction=cr2.jurisdiction,
+    )
+    other_guilty = OffenseRecordFactory(
+        action="CONVICTED",
+        offense__verdict="GUILTY",
+        offense__disposed_on=aug1,
+        offense__ciprs_record=cr2,
+        offense__jurisdiction=cr2.jurisdiction,
+    )
+    assert {cr1_guilty, other_guilty} == set(
+        dismissed.same_day_convictions(all_offenses)
+    )
+
+
+def test_cr287_same_day_convictions(petition, cr1_dismissed, cr1_guilty):
+    form = AOCFormCR287(petition)
     form.map_same_day_offenses()
-    expected = f"{durham_offense.offense.ciprs_record.file_no} {durham_offense.description.title()}"
+    expected = (
+        f"{cr1_guilty.offense.ciprs_record.file_no} {cr1_guilty.description.title()}"
+    )
     assert form.data["ChargedDesc"] == expected
