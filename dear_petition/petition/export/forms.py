@@ -58,6 +58,7 @@ class AOCFormCR287(PetitionForm):
         self.map_attorney()
         self.map_agencies()
         self.map_offenses()
+        self.map_additional_forms()
 
     def map_header(self):
         self.data["County"] = self.petition.county
@@ -137,6 +138,10 @@ class AOCFormCR287(PetitionForm):
             self.data[f"Description:{i}"] = offense_record.description
             self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
             self.data[f"DismissalDate:{i}"] = self.format_date(offense.disposed_on)
+
+    def map_additional_forms(self):
+        if self.petition.has_attachments():
+            self.data[f"CkBox_Attchmt"] = Checkbox("Yes")
 
 
 class AOCFormCR285(AOCFormCR287):

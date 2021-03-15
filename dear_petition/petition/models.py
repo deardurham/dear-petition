@@ -270,6 +270,9 @@ class Petition(models.Model):
             "pk",
         )
 
+    def has_attachments(self):
+        return self.attachments.count() > 0
+
 
 # Look-alike Petition object used to support JSON data-driven petitions
 DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[True])
