@@ -3,6 +3,7 @@ import datetime as dt
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.annotate import Checkbox
+from dear_petition.petition.types import dismissed
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
@@ -58,6 +59,7 @@ class AOCFormCR287(PetitionForm):
         self.map_attorney()
         self.map_agencies()
         self.map_offenses()
+        self.map_same_day_offenses()
 
     def map_header(self):
         self.data["County"] = self.petition.county
@@ -81,8 +83,8 @@ class AOCFormCR287(PetitionForm):
                 ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
-        self.data["PetitionerName"] = self.extra.get("name_petitioner") #AOC-288
-        self.data["NamePetitioner"] = self.extra.get("name_petitioner") #AOC-287
+        self.data["PetitionerName"] = self.extra.get("name_petitioner")  # AOC-288
+        self.data["NamePetitioner"] = self.extra.get("name_petitioner")  # AOC-287
         self.data["StreetAddr"] = self.extra.get("address1")
         self.data["MailAddr"] = self.extra.get("address2")
         self.data["City"] = self.extra.get("city")
@@ -137,6 +139,22 @@ class AOCFormCR287(PetitionForm):
             self.data[f"Description:{i}"] = offense_record.description
             self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
             self.data[f"DismissalDate:{i}"] = self.format_date(offense.disposed_on)
+
+    def map_same_day_offenses(self):
+        dismissed_records = self.petition.get_all_offense_records()
+        charges = dismissed.same_day_convictions(dismissed_records)
+        line = []
+        for charge in charges[:1]:
+            line.append(
+                f"{charge.offense.ciprs_record.file_no} {charge.description.title()}"
+            )
+        self.data["ChargedDesc"] = " ".join(line)
+        line = []
+        for charge in charges[1:]:
+            line.append(
+                f"{charge.offense.ciprs_record.file_no} {charge.description.title()}"
+            )
+        self.data["ChargedDescCont"] = " ".join(line)
 
 
 class AOCFormCR285(AOCFormCR287):

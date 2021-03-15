@@ -28,3 +28,35 @@ def build_guilty_to_lesser_query():
     plea = Q(offense__plea="GUILTY TO LESSER")
     query = action & method & plea
     return query
+
+
+def same_day_convictions(dismissed_records):
+    """
+    To support field 3(b) on the AOC-CR-287 form, return a list of guilty
+    OffenseRecords that also had dismissals on the same day.
+
+    Petition language:
+        I was charged with multiple offenses, and while the charges
+        listed above were dismissed, the following charges resulted in a
+        conviction on the day of the dismissal or had not yet reached final
+        disposition.
+    """
+    dismissed_record_ids = dismissed_records.values_list("id", flat=True)
+    qs = (
+        OffenseRecord.objects.filter(pk__in=list(dismissed_record_ids))
+        .values_list("offense__ciprs_record", "offense__disposed_on")
+        .distinct()
+    )
+    records = []
+    for ciprs_record_id, disposed_on in qs:
+        guilty_records = OffenseRecord.objects.filter(
+            offense__verdict="GUILTY",
+            offense__ciprs_record__id=ciprs_record_id,
+            offense__disposed_on=disposed_on,
+            action="CONVICTED",
+        )
+        if guilty_records.exists():
+            records.extend(
+                guilty_records.select_related("offense__ciprs_record__batch")
+            )
+    return records
