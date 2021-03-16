@@ -141,7 +141,7 @@ class AOCFormCR287(PetitionForm):
 
     def map_additional_forms(self):
         if self.petition.has_attachments():
-            self.data[f"CkBox_Attchmt"] = Checkbox("Yes")
+            self.data["CkBox_Attchmt"] = Checkbox("Yes")
 
 
 class AOCFormCR285(AOCFormCR287):
