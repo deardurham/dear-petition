@@ -192,74 +192,69 @@ def test_map_attorney__petition_not_filed_sign_date(form, contact1):
 
 def test_map_agencies__name(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    names = [contact.name for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_names = []
-    for key, value in form.data.items():
-        if "NameAgency" in key:
-            data_names.append(value)
-    for n in data_names:
-        assert n in names
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'NameAgency{i}'
+        if key in form.data:
+            assert contact.name in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
 
 
 def test_map_agencies__street_address(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    addresses = [contact.address1 for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_addresses = []
-    for key, value in form.data.items():
-        if "AddrAgency" in key:
-            data_addresses.append(value)
-    for a in data_addresses:
-        assert a in addresses
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'AddrAgency{i}'
+        if key in form.data:
+            assert contact.address1 in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
 
 
 def test_map_agencies__mail_address(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    addresses = [contact.address2 for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_mail_addresses = []
-    for key, value in form.data.items():
-        if "MailAgency" in key:
-            data_mail_addresses.append(value)
-    for m in data_mail_addresses:
-        assert m in addresses
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'MailAgency{i}'
+        if key in form.data:
+            assert contact.address2 in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
+
 
 
 def test_map_agencies__city(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    cities = [contact.city for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_cities = []
-    for key, value in form.data.items():
-        if "CityAgency" in key:
-            data_cities.append(value)
-    for c in data_cities:
-        assert c in cities
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'CityAgency{i}'
+        if key in form.data:
+            assert contact.city in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
 
 
 def test_map_agencies__state(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    states = [contact.state for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_states = []
-    for key, value in form.data.items():
-        if "StateAgency" in key:
-            data_states.append(value)
-    for s in data_states:
-        assert s in states
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'StateAgency{i}'
+        if key in form.data:
+            assert contact.state in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
 
 
 def test_map_agencies__zipcode(form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
-    zipcodes = [contact.zipcode for contact in form.extra["agencies"]]
     form.map_agencies()
-    data_zipcodes = []
-    for key, value in form.data.items():
-        if "ZipAgency" in key:
-            data_zipcodes.append(value)
-    for z in data_zipcodes:
-        assert z in zipcodes
+    for i, contact in enumerate(form.extra["agencies"], start=1):
+        key = f'ZipAgency{i}'
+        if key in form.data:
+            assert contact.zipcode in form.data[key]
+        else:
+            pytest.fail(f'Expected key \'{key}\' in form data')
 
 
 #

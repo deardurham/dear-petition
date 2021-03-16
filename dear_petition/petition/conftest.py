@@ -94,17 +94,38 @@ def petition(batch):
 
 @pytest.fixture
 def contact1():
-    return ContactFactory(name="George")
+    return ContactFactory(
+        name="George",
+        address1="111 Test Lane",
+        address2="Apt E",
+        city="Durham",
+        state="NC",
+        zipcode="27701"
+    )
 
 
 @pytest.fixture
 def contact2():
-    return ContactFactory(name="Colin")
+    return ContactFactory(
+        name="Colin",
+        address1="222 Also Test Ln",
+        address2="",
+        city="Durham",
+        state="NC",
+        zipcode="27702"
+    )
 
 
 @pytest.fixture
 def contact3():
-    return ContactFactory(name="Chris")
+    return ContactFactory(
+        name="Chris",
+        address1="333 Still A Test Parkway",
+        address2="#404",
+        city="Durham",
+        state="NC",
+        zipcode="27703"
+    )
 
 
 @pytest.fixture
