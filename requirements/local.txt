@@ -4,6 +4,7 @@ Werkzeug==0.15.2  # https://github.com/pallets/werkzeug
 ipdb==0.12  # https://github.com/gotcha/ipdb
 Sphinx==2.0.1  # https://github.com/sphinx-doc/sphinx
 psycopg2==2.8 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
+click==7.1.2  # https://github.com/pallets/click
 
 # Testing
 # ------------------------------------------------------------------------------
