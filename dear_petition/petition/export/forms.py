@@ -89,10 +89,6 @@ class AOCFormCR287(PetitionForm):
         self.data["City"] = self.extra.get("city")
         self.data["State"] = self.extra.get("state")
         self.data["ZipCode"] = self.extra.get("zip_code")
-        # note: SNN and not SSN due to bug in PDF field name
-        self.data["SNN"] = self.extra.get("ssn")
-        self.data["DLNo"] = self.extra.get("drivers_license")
-        self.data["DLState"] = self.extra.get("drivers_license_state")
         offense_record = self.get_most_recent_record()
         if offense_record:
             record = offense_record.offense.ciprs_record
