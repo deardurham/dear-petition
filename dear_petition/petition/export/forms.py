@@ -38,8 +38,10 @@ class PetitionForm(metaclass=abc.ABCMeta):
             )
         ).order_by(
             "file_number_year",
+            "offense__ciprs_record__file_no",
             "pk",            
         )
+
         return qs
 
     def get_most_recent_record(self):
