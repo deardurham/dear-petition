@@ -10,7 +10,10 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models import IntegerField, Case, When, Value
+from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
+from django.utils import timezone
 
 import ciprs_reader
 from localflavor.us import us_states
@@ -258,17 +261,30 @@ class Petition(models.Model):
 
         Post-ETL usage should just use the offense_records ManyToManyField.
         """
-        qs = self.batch.petition_offense_records(petition_type=self.form_type)
+        two_digit_current_year = timezone.now().year % 2000 #Returns 21 given 2021
+
+        qs = self.batch.petition_offense_records(petition_type=self.form_type).select_related("offense__ciprs_record")
         qs = qs.filter(
             offense__jurisdiction=self.jurisdiction,
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
-        return qs.order_by(
-            "offense__ciprs_record__offense_date__year",
+        qs = qs.annotate(
+            first_two_digits_file_number_chars = Substr("offense__ciprs_record__file_no", 1, 2)
+        ).annotate(
+            first_two_digits_file_number = Cast('first_two_digits_file_number_chars', output_field=IntegerField())
+        ).annotate(
+            file_number_year = Case(
+                When(first_two_digits_file_number__gt=two_digit_current_year, then=Concat(Value("19"),"first_two_digits_file_number_chars")),
+                When(first_two_digits_file_number__lte=two_digit_current_year, then=Concat(Value("20"),"first_two_digits_file_number_chars")),
+            )
+        ).order_by(
+            "file_number_year",
             "offense__ciprs_record__file_no",
-            "pk",
+            "pk",            
         )
+
+        return qs
 
     def has_attachments(self):
         return self.attachments.count() > 0
