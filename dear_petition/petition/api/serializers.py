@@ -150,9 +150,6 @@ class GeneratePetitionSerializer(serializers.Serializer):
     city = serializers.CharField(label="City")
     state = serializers.ChoiceField(choices=us_states.US_STATES)
     zip_code = serializers.CharField(label="Zip Code")
-    ssn = serializers.CharField(label="SSN")
-    drivers_license = serializers.CharField(label="Driver's License #")
-    drivers_license_state = serializers.ChoiceField(choices=us_states.US_STATES)
     attorney = serializers.ChoiceField(choices=[])
     agencies = serializers.MultipleChoiceField(choices=[])
 
