@@ -56,8 +56,6 @@ RUN chmod +x /start-jupyter
 # reduce image size by cleaning up the build packages
 RUN apk del build-base musl-dev python3-dev zeromq-dev postgresql-dev
 
-RUN echo python /app/manage.py clean_stale_data >> /etc/periodic/daily/clean_stale_data.sh
-
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint"]
