@@ -22,9 +22,6 @@ const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
 const REQUIRED_FIELDS = [
   'name',
-  'ssn',
-  'licenseNumber',
-  'licenseState',
   'address1',
   'city',
   'state',
@@ -86,9 +83,6 @@ function GenerationPage() {
   const [attorney, setAttorney] = useState('');
   const [petitionerData, setPetitionerData] = useState({
     name: '',
-    ssn: '',
-    licenseNumber: '',
-    licenseState: DEFAULT_STATE_LABEL,
     address1: '',
     address2: '',
     city: '',

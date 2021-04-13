@@ -106,24 +106,6 @@ def test_map_petitioner__zip_code(form):
     assert form.data["ZipCode"] == form.extra["zip_code"]
 
 
-def test_map_petitioner__ssn(form):
-    form.extra["ssn"] = "000-000-0000"
-    form.map_petitioner()
-    assert form.data["SNN"] == form.extra["ssn"]
-
-
-def test_map_petitioner__drivers_license(form):
-    form.extra["drivers_license"] = "3429043204D"
-    form.map_petitioner()
-    assert form.data["DLNo"] == form.extra["drivers_license"]
-
-
-def test_map_petitioner__drivers_license_state(form):
-    form.extra["drivers_license_state"] = constants.NORTH_CAROLINA
-    form.map_petitioner()
-    assert form.data["DLState"] == form.extra["drivers_license_state"]
-
-
 #
 # Attorney
 #

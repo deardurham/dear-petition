@@ -4,6 +4,7 @@ from dear_petition.petition.etl.load import link_offense_records_and_attachments
 from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
+from dear_petition.petition.export.forms import AOCFormCR287, AOCFormCR285
 from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory,
     OffenseFactory,
@@ -134,3 +135,41 @@ def test_paginator_same_record_number_order(petition, records_10):
     assert charge_1.pk in petition.offense_records.values_list("pk", flat=True)
     # the 2nd charge should always be on the attachment
     assert charge_2.pk in attachment.offense_records.values_list("pk", flat=True)
+
+
+def test_paginator_orders_records_correctly(batch, petition):
+    def create_new_ciprs_record(file_no):
+        ciprs_record = CIPRSRecordFactory(batch = batch, file_no = file_no, jurisdiction=constants.DISTRICT_COURT, county="DURHAM")
+        offense = OffenseFactory(ciprs_record = ciprs_record, jurisdiction=constants.DISTRICT_COURT, disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],)
+        offense_record = OffenseRecordFactory(offense = offense)
+        return offense_record.id
+
+    # 11 records total
+    id1 = create_new_ciprs_record("99CRAAAAAAAAAAAA")
+    id2 = create_new_ciprs_record("00CRBBBBBBBBBBBBB")
+    id3 = create_new_ciprs_record("99CRCCCCCCCCCCCC")
+    id4 = create_new_ciprs_record("99CRBBBBBBBBBBBB")
+    id5 = create_new_ciprs_record("90CRAAAAAAAAAAAA")
+    id6 = create_new_ciprs_record("20CRAAAAAAAAAAAA")
+    id7 = create_new_ciprs_record("98CRAAAAAAAAAAAA")
+    id8 = create_new_ciprs_record("99CRDDDDDDDDDDDD")
+    id9 = create_new_ciprs_record("99CRAAAAAAAAAAAA")
+    id10 = create_new_ciprs_record("00CRAAAAAAAAAAAA")
+    id11 = create_new_ciprs_record("98CRBBBBBBBBBBBB")
+
+    EXPECTED_ORDER_FIRST_FORM = [id5, id7, id11, id1, id9, id4, id3, id8, id10, id2,]
+    EXPECTED_ORDER_SECOND_FORM = [id6,]
+    EXPECTED_ORDER_ACROSS_FORMS = EXPECTED_ORDER_FIRST_FORM + EXPECTED_ORDER_SECOND_FORM
+
+    link_offense_records_and_attachments(petition)
+    attachment = petition.attachments.order_by("pk").first()
+    
+    main_petition_form = AOCFormCR287(petition)
+    attachment_petition_form = AOCFormCR285(attachment)
+
+    assert list(petition.get_all_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_ACROSS_FORMS
+    assert list(main_petition_form.get_ordered_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_FIRST_FORM
+    assert list(attachment_petition_form.get_ordered_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_SECOND_FORM
+
+
+

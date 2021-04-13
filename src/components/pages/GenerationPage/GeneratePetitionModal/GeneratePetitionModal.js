@@ -35,9 +35,6 @@ const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition,
       city: petitionerData.city,
       state: petitionerData.state.value,
       zip_code: petitionerData.zipCode,
-      ssn: petitionerData.ssn,
-      drivers_license: petitionerData.licenseNumber,
-      drivers_license_state: petitionerData.licenseState.value,
       attorney: attorney.value,
       agencies: agencies.map(agency => agency.pk)
     };

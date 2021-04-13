@@ -79,6 +79,7 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
         lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT])
     )
     county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
+    file_no = "99CRAAAAAAAAAAAA"
 
     class Meta:
         model = CIPRSRecord
