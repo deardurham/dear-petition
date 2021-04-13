@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse
+from model_utils.models import TimeStampedModel
 
 import ciprs_reader
 from localflavor.us import us_states
@@ -51,7 +52,7 @@ class CIPRSRecordManager(models.Manager):
 
 class CIPRSRecord(models.Model):
 
-    batch = models.ForeignKey("Batch", related_name="records", on_delete="CASCADE")
+    batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
@@ -101,7 +102,7 @@ class CIPRSRecord(models.Model):
 
 class Offense(models.Model):
     ciprs_record = models.ForeignKey(
-        "CIPRSRecord", related_name="offenses", on_delete="CASCADE"
+        "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
     jurisdiction = models.CharField(
         choices=JURISDICTION_CHOICES, max_length=255, default=DISTRICT_COURT
@@ -117,7 +118,7 @@ class Offense(models.Model):
 
 class OffenseRecord(models.Model):
     offense = models.ForeignKey(
-        "Offense", related_name="offense_records", on_delete="CASCADE"
+        "Offense", related_name="offense_records", on_delete=models.CASCADE
     )
     law = models.CharField(max_length=256, blank=True)
     code = models.IntegerField(blank=True, null=True)
@@ -148,7 +149,7 @@ class Batch(models.Model):
 
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, related_name="batches", on_delete="CASCADE")
+    user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "Batches"
@@ -194,7 +195,7 @@ class Batch(models.Model):
 
 
 class BatchFile(models.Model):
-    batch = models.ForeignKey(Batch, related_name="files", on_delete="CASCADE")
+    batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to="ciprs/")
 
@@ -227,7 +228,7 @@ class Comment(models.Model):
         super(Comment, self).save(*args, **kwargs)
 
 
-class Petition(models.Model):
+class Petition(TimeStampedModel):
 
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
