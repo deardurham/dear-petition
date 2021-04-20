@@ -6,6 +6,9 @@ import environ
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
+
+
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # (dear_petition/config/settings/base.py - 3 = dear_petition/)
@@ -92,10 +95,12 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
-}
+SIMPLE_JWT = (
+    {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+        "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+        "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
+    }
+)
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -260,6 +265,16 @@ CELERYD_TASK_TIME_LIMIT = 5 * 60
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-soft-time-limit
 # TODO: set to whatever value is adequate in your circumstances
 CELERYD_TASK_SOFT_TIME_LIMIT = 60
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERYBEAT_SCHEDULE = {
+    "clean_stale_data": {
+        "task": "dear_petition.petition.tasks.clean_stale_data.clean_stale_data_task",
+        "schedule": crontab(minute=0, hour="2"),  # 2 AM EST
+    }
+}
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
