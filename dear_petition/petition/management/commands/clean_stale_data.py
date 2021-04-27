@@ -1,12 +1,4 @@
-import logging
-from datetime import timedelta
-
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-
-from dear_petition.petition import models as pm
-
-logger = logging.getLogger(__name__)
+from dear_petition.petition.tasks.clean_stale_data import clean_stale_data
 
 
 class Command(BaseCommand):
@@ -16,10 +8,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        now = timezone.now()
-        stale_time = now - timedelta(hours=48)
-        stale_data = pm.Batch.objects.filter(
-            petitions__created__gt=stale_time
-        ).distinct()
-        num_deleted, _ = stale_data.delete()
-        logger.info(f"Deleted {num_deleted} batches.")
+        clean_stale_data()
