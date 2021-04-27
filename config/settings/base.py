@@ -64,6 +64,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
+    "django_celery_beat",
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -92,10 +93,12 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-SIMPLE_JWT = {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
-}
+SIMPLE_JWT = (
+    {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+        "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+        "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
+    }
+)
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
