@@ -65,6 +65,7 @@ DISMISSED_DISPOSITION_METHODS = (
     "Conditional Discharge",
     "No Probable Cause",
     "Never To Be Served",
+    "Deferred Proceeding or Deferred Prosecution Dismissal",
 )
 
 DISPOSITION_METHOD_CODE_MAP = {
@@ -75,4 +76,5 @@ DISPOSITION_METHOD_CODE_MAP = {
     "CONDITIONAL DISCHARGE": "DD",
     "NO PROBABLE CAUSE": "NPC",
     "NEVER TO BE SERVED": "NTBS",
+    "DEFERRED PROCEEDING OR DEFERRED PROSECUTION DISMISSAL": "DPD",
 }
