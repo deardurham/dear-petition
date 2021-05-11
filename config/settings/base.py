@@ -267,12 +267,12 @@ CELERYD_TASK_TIME_LIMIT = 5 * 60
 # TODO: set to whatever value is adequate in your circumstances
 CELERYD_TASK_SOFT_TIME_LIMIT = 60
 
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-CELERYBEAT_SCHEDULE = {
+CELERY_CELERYBEAT_SCHEDULE = {
     "clean_stale_data": {
         "task": "dear_petition.petition.tasks.clean_stale_data.clean_stale_data_task",
-        "schedule": crontab(minute=0, hour="2"),  # 2 AM EST
+        "schedule": crontab(minute=0),  # Every hour
     }
 }
 
