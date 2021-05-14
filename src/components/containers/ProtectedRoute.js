@@ -8,12 +8,13 @@ import { USER } from '../../constants/authConstants';
 function ProtectedRoute({ children, ...props }) {
   const user = localStorage.getItem(USER);
 
-  if (!user)
+  if (!user) {
     return (
       <Route {...props}>
         <LoginPage redirect />
       </Route>
     );
+  }
   return <Route {...props}>{children}</Route>;
 }
 

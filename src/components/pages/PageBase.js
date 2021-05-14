@@ -60,6 +60,7 @@ function PageBase({ children, className, ...props }) {
           </LogoLink>
           <LinksGroup>
             {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
+            <Link href="/help">Help</Link>
             {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
             <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
           </LinksGroup>
