@@ -7,9 +7,8 @@ export const Markdown = styled(ReactMarkdown)`
   & h2,
   & h3,
   & h6 {
-    user-select: none;
     font-weight: 600;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
   & p,
   & li,
@@ -18,11 +17,21 @@ export const Markdown = styled(ReactMarkdown)`
     margin-bottom: 1rem;
   }
   & section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.75rem;
+  }
+  & > section {
+    margin-bottom: 2.5rem;
   }
   & h1 {
+    margin-bottom: 1rem;
     font-size: 2.75rem;
-    margin-bottom: 1.5rem;
+    user-select: none;
+    display: block;
+    padding: 1rem 2rem;
+    width: 400px;
+    background-color: ${colorPrimary};
+    color: ${colorWhite};
+    border-radius: 0.75rem;
   }
   & h2 {
     font-size: 2rem;
@@ -41,14 +50,6 @@ export const Markdown = styled(ReactMarkdown)`
   & li {
     display: list-item;
     margin-left: 2rem;
-  }
-  & h1 a {
-    display: block;
-    padding: 1rem 2rem;
-    width: 30rem;
-    background-color: ${colorPrimary};
-    color: ${colorWhite};
-    border-radius: 0.75rem;
   }
 `;
 

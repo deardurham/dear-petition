@@ -4,6 +4,8 @@ Please reach out to [codefordurhamdearproject@googlegroups.com](mailto:codefordu
 
 Along with a description of the issue, include 3 files: the CIPRS record, the tool-generated petition, and the petition with the correct info.
 
+Anything worth having is worth fighting for. Feel free to also share your comments, thoughts, and suggestions.
+
 # Essential Info
 
 ## The Robot Intern Rule
@@ -43,7 +45,3 @@ You will need to enter something into the attorney/petitioner info fields, unles
 ###### Editing the Generated PDF
 
 Save the site-generated PDF to your computer and then edit. Edits within the browser may not carry over through download.
-
-###### Testing Phase
-
-Anything worth having is worth fighting for. Send along your comments, issues, thoughts, suggestions. As you use it, make note of what's good, what's useful, what's cumbersome, what could be better.

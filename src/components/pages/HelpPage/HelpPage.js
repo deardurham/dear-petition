@@ -19,19 +19,6 @@ const HelpPageContent = styled.div`
   min-width: 400px;
 `;
 
-const getHeaderAnchor = heading => {
-  let anchor = typeof heading === 'string' ? heading.toLowerCase() : '';
-  anchor = anchor.replace(/[^a-zA-Z0-9 ]/g, '');
-  anchor = anchor.replace(/ /g, '-');
-  return `${anchor}`;
-};
-
-const AnchorWrapper = ({ anchor, children }) => (
-  <a id={anchor} href={`#${anchor}`}>
-    <span>{children}</span>
-  </a>
-);
-
 const ExpandableSection = ({ children }) => {
   let expandable = false;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -67,13 +54,6 @@ export default function HelpPage() {
         <Markdown
           remarkPlugins={[sectionize]}
           components={{
-            h1: ({ node, children, ...props }) => (
-              <h1 {...props}>
-                <AnchorWrapper anchor={getHeaderAnchor(children.join(' '))}>
-                  <span>{children}</span>
-                </AnchorWrapper>
-              </h1>
-            ),
             section: ({ children }) => <ExpandableSection>{children}</ExpandableSection>
           }}
         >

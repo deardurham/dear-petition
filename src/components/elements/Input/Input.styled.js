@@ -8,16 +8,17 @@ export const InputWrapper = styled.div``;
 
 export const InputStyled = styled.label`
   user-select: none;
+  font-size: 1.4rem;
 `;
 
 export const ActualInputStyled = styled.input`
   display: block;
   border-radius: 5px;
-  padding: 1rem 2rem;
+  padding: 1rem;
 
   width: 100%;
   border: 1px solid ${colorGrey};
-  font-size: 16px;
+  font-size: 1.5rem;
   font-family: ${fontPrimary};
   color: ${colorFontPrimary};
 `;
