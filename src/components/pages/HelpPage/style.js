@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import styled from 'styled-components';
 import { colorPrimary, colorWhite } from '../../../styles/colors';
+import { smallerThanTabletLandscape } from '../../../styles/media';
 
 export const Markdown = styled(ReactMarkdown)`
   & h1,
@@ -62,5 +63,11 @@ export const ExpandableHeader = styled.div`
   & h6 {
     font-size: 2rem;
     user-select: none;
+  }
+  & svg {
+    font-size: 2rem;
+  }
+  @media (${smallerThanTabletLandscape}) {
+    justify-content: space-between;
   }
 `;
