@@ -5,4 +5,4 @@ set -o nounset
 
 
 rm -f './celerybeat.pid'
-celery -A dear_petition.taskapp beat -l INFO
+celery -A dear_petition.taskapp beat --loglevel=debug

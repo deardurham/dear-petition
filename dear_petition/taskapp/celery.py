@@ -10,13 +10,12 @@ if not settings.configured:
         "DJANGO_SETTINGS_MODULE", "config.settings.local"
     )  # pragma: no cover
 
-
 app = Celery("dear_petition")
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
-app.config_from_object("django.conf:settings", namespace="CELERY")
+app.config_from_object("django.conf:settings")
 
 
 class CeleryAppConfig(AppConfig):
