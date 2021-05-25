@@ -10,7 +10,7 @@ export const PageBaseStyled = styled(motion.main)`
 `;
 
 export const PageHeader = styled.header`
-  padding: 0 4rem;
+  padding: 1rem 4rem;
   font-size: 1.75rem;
   font-weight: bold;
   display: flex;
@@ -45,7 +45,7 @@ export const LinksGroup = styled.div`
 export const Link = styled.a`
   border: 1px solid ${colorBlack};
   border-radius: 5px;
-  padding: 2rem;
+  padding: 1.5rem 1.25rem;
   color: ${colorGrey};
 `;
 

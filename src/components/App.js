@@ -10,6 +10,7 @@ import ProtectedRoute from './containers/ProtectedRoute';
 // Pages
 import HomePage from './pages/HomePage/HomePage';
 import GenerationPage from './pages/GenerationPage/GenerationPage';
+import FAQPage from './pages/HelpPage/HelpPage';
 import Alert from './elements/Alert/Alert';
 
 const alertOptions = {
@@ -31,6 +32,9 @@ function App() {
               </ProtectedRoute>
               <ProtectedRoute exact path="/generate/:batchId">
                 <GenerationPage />
+              </ProtectedRoute>
+              <ProtectedRoute exact path="/help">
+                <FAQPage />
               </ProtectedRoute>
             </Switch>
           </AppStyled>
