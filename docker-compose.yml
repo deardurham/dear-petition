@@ -62,6 +62,14 @@ services:
   redis:
     image: redis:5-alpine
 
+  celery:
+    <<: *django
+    ports:
+      - "6379:6379"
+    environment:
+      - COLUMNS=80 #Necessary because of some annoying zero-width shell error
+    command: celery worker --app=dear_petition.taskapp --beat --loglevel=info
+
   jupyter:
     <<: *django
     image: dear_petition_local_jupyter
