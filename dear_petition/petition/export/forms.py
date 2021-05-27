@@ -26,20 +26,36 @@ class PetitionForm(metaclass=abc.ABCMeta):
 
     def get_ordered_offense_records(self):
         # When sorting these, need to interpret first 2 digits of file number as year and sort based on that
-        two_digit_current_year = timezone.now().year % 2000 #Returns 21 given 2021
-        qs = self.petition.offense_records.select_related("offense__ciprs_record").annotate(
-            first_two_digits_file_number_chars = Substr("offense__ciprs_record__file_no", 1, 2)
-        ).annotate(
-            first_two_digits_file_number = Cast('first_two_digits_file_number_chars', output_field=IntegerField())
-        ).annotate(
-            file_number_year = Case(
-                When(first_two_digits_file_number__gt=two_digit_current_year, then=Concat(Value("19"),"first_two_digits_file_number_chars")),
-                When(first_two_digits_file_number__lte=two_digit_current_year, then=Concat(Value("20"),"first_two_digits_file_number_chars")),
+        two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
+        qs = (
+            self.petition.offense_records.select_related("offense__ciprs_record")
+            .annotate(
+                first_two_digits_file_number_chars=Substr(
+                    "offense__ciprs_record__file_no", 1, 2
+                )
             )
-        ).order_by(
-            "file_number_year",
-            "offense__ciprs_record__file_no",
-            "pk",
+            .annotate(
+                first_two_digits_file_number=Cast(
+                    "first_two_digits_file_number_chars", output_field=IntegerField()
+                )
+            )
+            .annotate(
+                file_number_year=Case(
+                    When(
+                        first_two_digits_file_number__gt=two_digit_current_year,
+                        then=Concat(Value("19"), "first_two_digits_file_number_chars"),
+                    ),
+                    When(
+                        first_two_digits_file_number__lte=two_digit_current_year,
+                        then=Concat(Value("20"), "first_two_digits_file_number_chars"),
+                    ),
+                )
+            )
+            .order_by(
+                "file_number_year",
+                "offense__ciprs_record__file_no",
+                "pk",
+            )
         )
 
         return qs
@@ -98,8 +114,8 @@ class AOCFormCR287(PetitionForm):
                 ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
-        self.data["PetitionerName"] = self.extra.get("name_petitioner") #AOC-288
-        self.data["NamePetitioner"] = self.extra.get("name_petitioner") #AOC-287
+        self.data["PetitionerName"] = self.extra.get("name_petitioner")  # AOC-288
+        self.data["NamePetitioner"] = self.extra.get("name_petitioner")  # AOC-287
         self.data["StreetAddr"] = self.extra.get("address1")
         self.data["MailAddr"] = self.extra.get("address2")
         self.data["City"] = self.extra.get("city")
@@ -135,7 +151,7 @@ class AOCFormCR287(PetitionForm):
             self.data[f"AddrAgency{i}"] = agency.address1
             self.data[f"MailAgency{i}"] = agency.address2
             self.data[f"CityAgency{i}"] = agency.city
-            self.data[f"StateAgency{i}"] = agency.state
+            self.data[f"{'Stateagency' if i==2 else 'StateAgency'}{i}"] = agency.state
             self.data[f"ZipAgency{i}"] = agency.zipcode
 
     def map_offenses(self):
