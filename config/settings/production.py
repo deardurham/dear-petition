@@ -152,7 +152,7 @@ ADMIN_URL = env("DJANGO_ADMIN_URL")
 
 # Gunicorn
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ["gunicorn"]  # noqa F405
+# INSTALLED_APPS += ["gunicorn"]  # noqa F405
 
 # WhiteNoise
 # ------------------------------------------------------------------------------

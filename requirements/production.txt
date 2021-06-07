@@ -2,7 +2,7 @@
 
 -r ./base.txt
 
-gunicorn==19.9.0  # https://github.com/benoitc/gunicorn
+uWSGI==2.0.19.1  # https://uwsgi-docs.readthedocs.io/en/latest/
 psycopg2==2.8 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
 sentry-sdk==0.7.14  # https://github.com/getsentry/sentry-python
 

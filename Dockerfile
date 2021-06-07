@@ -68,7 +68,7 @@ ENV DJANGO_SETTINGS_MODULE=config.settings.production
 RUN touch /code/.env
 
 # Copy in node-built files
-COPY --from=static_files /code/build/static/ /code/build/static/
+COPY --from=static_files /code/build /code/build
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 RUN DATABASE_URL='' ENVIRONMENT='' DJANGO_SECRET_KEY='dummy' DOMAIN='' python manage.py collectstatic --noinput
@@ -92,4 +92,4 @@ USER ${APP_USER}:${APP_USER}
 ENTRYPOINT ["/code/docker-entrypoint.sh"]
 
 # Start uWSGI
-CMD ["uwsgi", "--show-config"]
+CMD ["uwsgi", "--http=0.0.0.0:$PORT", "--show-config"]

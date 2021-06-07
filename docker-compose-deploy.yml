@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  app:
+    environment:
+      DJANGO_MANAGEPY_MIGRATE: "on"
+    env_file:
+      - .envs/.production/.django
+    image: petition:latest
+    # command: ["uwsgi", "--http", "0.0.0.0:$PORT", "--show-config"]
+    links:
+      - db:db
+      - redis:redis
+    ports:
+      - "8000:8000"
+  db:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: dear_petition
+    image: postgres:12-alpine
+    # ports:
+    #   - "54320:5432"
+  redis:
+    image: redis:5-alpine
+  mailhog:
+    image: mailhog/mailhog:v1.0.0
+
