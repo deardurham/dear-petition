@@ -11,12 +11,12 @@ from dear_petition.petition.tasks.clean_stale_data import clean_stale_data
 pytestmark = pytest.mark.django_db
 
 
-def test_clean_stale_data(batch, petition):
+def test_clean_stale_data(batch):
     assert pm.Batch.objects.all().count() == 1
 
-    petition.created = petition.created - timedelta(hours=48, minutes=1)
-    petition.save()
-
+    batch.date_uploaded = batch.date_uploaded - timedelta(hours=48, minutes=1)
+    batch.save()
+    
     num_deleted = clean_stale_data()
-    assert num_deleted == 2  # 1 batch, 1 petition
+    assert num_deleted == 1
     assert pm.Batch.objects.all().count() == 0
