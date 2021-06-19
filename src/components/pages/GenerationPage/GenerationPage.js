@@ -78,7 +78,7 @@ const InputSection = ({ children, label }) => (
 
 function GenerationPage() {
   const { batchId } = useParams();
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
   const [batch, setBatch] = useState();
   const [attorney, setAttorney] = useState('');
   const [petitionerData, setPetitionerData] = useState({
@@ -92,17 +92,25 @@ function GenerationPage() {
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
-    setLoading(true);
-    Axios.get(`/batch/${batchId}/`)
-      .then(({ data }) => {
-        setBatch(data);
-        setPetitionerData(prev => ({ ...prev, name: data?.label }));
-        setLoading(false);
-      })
-      .catch(error => {
+    let isMounted = true;
+    (async function() {
+      try {
+        const { data } = await Axios.get(`/batch/${batchId}/`);
+        if (isMounted) {
+          setBatch(data);
+          setPetitionerData(prev => ({ ...prev, name: data?.label }));
+          setLoading(false);
+        }
+      } catch (error) {
         console.error(error);
-        setLoading(false);
-      });
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, [batchId]);
 
   const validateInput = () => {

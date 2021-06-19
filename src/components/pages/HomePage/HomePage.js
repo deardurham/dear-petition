@@ -91,6 +91,7 @@ function HomePage() {
 
       const { data, status } = await request;
       if (status === 201) {
+        clearTimeout(timer);
         history.push(`/generate/${data.id}`);
       }
     } catch (error) {
