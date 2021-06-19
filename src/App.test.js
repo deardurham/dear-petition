@@ -4,5 +4,5 @@ import App from './components/App';
 
 it('renders login page', () => {
   render(<App />);
-  expect(screen.getByText('Login')).toBeInTheDocument();
+  expect(screen.getByText('username')).toBeInTheDocument();
 });
