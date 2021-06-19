@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { colorGrey, colorBlack, greyScale } from '../../../styles/colors';
 
 const getBadgeColor = props => {
-  let baseColor = greyScale(9);
+  const baseColor = greyScale(9);
   return props.isHighlighted ? colorGrey : baseColor;
 };
 

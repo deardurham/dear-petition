@@ -13,7 +13,7 @@ function addRootElement(rootElem) {
 const usePortal = id => {
   const rootElemRef = useRef(null);
 
-  useEffect(function setupElement() {
+  useEffect(() => {
     const existingParent = document.querySelector(`#${id}`);
     const parentElem = existingParent || createRootElement(id);
 

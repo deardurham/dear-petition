@@ -26,8 +26,7 @@ const Content = styled.ul`
 const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition, petitionerData, onClose, setAgencies }) => {
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
 
-  const _buildPetition = () => {
-    return {
+  const _buildPetition = () => ({
       petition: petition.pk,
       name_petitioner: petitionerData.name,
       address1: petitionerData.address1,
@@ -37,8 +36,7 @@ const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition,
       zip_code: petitionerData.zipCode,
       attorney: attorney.value,
       agencies: agencies.map(agency => agency.pk)
-    };
-  };
+  });
 
   const _openPdf = pdf => {
     const pdfBlob = new Blob([pdf], { type: 'application/pdf' });

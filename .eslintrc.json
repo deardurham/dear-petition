@@ -29,6 +29,7 @@
     "no-use-before-define": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",
+    "no-continue": "off",
     "no-prototype-builtins": "off",
     "react/jsx-props-no-spreading": "off",
     "react/jsx-one-expression-per-line": "off",

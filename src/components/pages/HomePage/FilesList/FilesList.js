@@ -18,23 +18,21 @@ function FilesList({ files, handleRemoveFile, handlePreparePetitions, ...props }
     >
       <Button onClick={handlePreparePetitions}>Prepare petitions</Button>
       <FilesListStyled>
-        {[...files].map((file, i) => {
-          return (
-            <AnimatePresence key={file.name}>
-              <FilesListItem
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: '-50' }}
-                positionTransition
-              >
-                <p>{file.name}</p>
-                <CloseButton onClick={() => handleRemoveFile(file)}>
-                  <FontAwesomeIcon icon={faTimes} />
-                </CloseButton>
-              </FilesListItem>
-            </AnimatePresence>
-          );
-        })}
+        {[...files].map((file) => (
+          <AnimatePresence key={file.name}>
+            <FilesListItem
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: '-50' }}
+              positionTransition
+            >
+              <p>{file.name}</p>
+              <CloseButton onClick={() => handleRemoveFile(file)}>
+                <FontAwesomeIcon icon={faTimes} />
+              </CloseButton>
+            </FilesListItem>
+          </AnimatePresence>
+        ))}
       </FilesListStyled>
     </FilesListWrapper>
   );

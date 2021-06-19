@@ -121,7 +121,9 @@ function GenerationPage() {
   };
 
   const clearError = (key) => {
-    formErrors[key] && setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
+    if (formErrors[key]) {
+      setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }))
+    }
   };
 
   return (

@@ -33,9 +33,8 @@ const ExpandableSection = ({ children }) => {
               <FontAwesomeIcon icon={isExpanded ? faCaretRight : faCaretDown} />
             </ExpandableHeader>
           );
-        } else {
-          return !expandable || isExpanded ? child : null;
         }
+        return !expandable || isExpanded ? child : null;
       })}
     </section>
   );

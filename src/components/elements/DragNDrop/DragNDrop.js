@@ -6,7 +6,7 @@ const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
 const BAD_TYPE_MSG = 'One or more of your files is not the right type';
 
 const DragNDrop = React.forwardRef((props, ref) => {
-  const { children, mimeTypes, maxFiles, maxSize, onDrop, onDragEnter, onDragLeave } = props;
+  const { children, mimeTypes, maxFiles, onDrop, onDragEnter, onDragLeave } = props;
   const [draggedOver, setDraggedOver] = useState(false);
 
   useEffect(() => {
@@ -104,11 +104,15 @@ DragNDrop.propTypes = {
   onDrop: PropTypes.func.isRequired,
   mimeTypes: PropTypes.arrayOf(PropTypes.string),
   maxFiles: PropTypes.number,
-  maxSize: PropTypes.number,
   onDragEnter: PropTypes.func,
   onDragLeave: PropTypes.func
 };
 
-DragNDrop.defaultProps = {};
+DragNDrop.defaultProps = {
+  mimeTypes: [],
+  maxFiles: 8,
+  onDragEnter: undefined,
+  onDragLeave: undefined,
+};
 
 export default DragNDrop;
