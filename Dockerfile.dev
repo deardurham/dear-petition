@@ -9,6 +9,5 @@ COPY . ./
 
 # Dependencies will be persisted in /app/ volume under /app/node_modules
 RUN npm install
-RUN npm install react-scripts@3.4.1 -g
 
 CMD ["npm", "run", "start"]

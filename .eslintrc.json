@@ -1,8 +1,22 @@
 {
+  "env": {
+    "browser": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.js",
+        "**/*.test.jsx"
+      ],
+      "env": {
+        "jest": true
+      }
+    }
+  ],
   "extends": ["airbnb", "prettier"],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": ["error"],
+    "prettier/prettier": 0,
     "react/jsx-filename-extension": [
       1,
       {
@@ -15,6 +29,7 @@
     "no-use-before-define": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",
+    "no-continue": "off",
     "no-prototype-builtins": "off",
     "react/jsx-props-no-spreading": "off",
     "react/jsx-one-expression-per-line": "off",

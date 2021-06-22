@@ -51,7 +51,7 @@ When using `npm run start` to run the frontend, the `API_PROXY` environment vari
 You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 
 ```bash
-API_PROXY=http://localhost:8000 docker-compose up -d
+API_PROXY=http://localhost:8000 npm start
 ```
 
 

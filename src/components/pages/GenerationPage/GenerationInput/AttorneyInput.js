@@ -18,7 +18,9 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
         console.error(error);
       }
     })();
-    return () => isMounted = false;
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

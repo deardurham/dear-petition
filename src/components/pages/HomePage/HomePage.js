@@ -32,7 +32,7 @@ const ModalError = styled.p`
   font-weight: bold;
 `;
 
-function HomePage(props) {
+function HomePage() {
   const fileInputRef = React.createRef();
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
@@ -91,10 +91,13 @@ function HomePage(props) {
 
       const { data, status } = await request;
       if (status === 201) {
+        clearTimeout(timer);
         history.push(`/generate/${data.id}`);
       }
     } catch (error) {
-      timer && clearTimeout(timer);
+      if (timer) {
+        clearTimeout(timer);
+      }
       console.error(error);
       setModalError('ERROR: Could not process the records.');
     }

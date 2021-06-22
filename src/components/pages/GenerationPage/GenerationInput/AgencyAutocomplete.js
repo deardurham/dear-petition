@@ -34,21 +34,17 @@ const AgencyAutoSuggestInputStyled = styled.div`
 
 const SuggestionStyled = styled.div``;
 
-const renderSuggestion = (suggestion, { isHighlighted }) => {
-  return (
-    <SuggestionStyled>
-      <AutoCompleteBadge {...suggestion} isHighlighted={isHighlighted} />
-    </SuggestionStyled>
-  );
-};
+const renderSuggestion = (suggestion, { isHighlighted }) => (
+  <SuggestionStyled>
+    <AutoCompleteBadge {...suggestion} isHighlighted={isHighlighted} />
+  </SuggestionStyled>
+);
 
-const AgencyAutoSuggestInput = inputProps => {
-  return (
-    <AgencyAutoSuggestInputStyled>
-      <AutoSuggestInput label="Agencies" {...inputProps} />
-    </AgencyAutoSuggestInputStyled>
-  );
-};
+const AgencyAutoSuggestInput = inputProps => (
+  <AgencyAutoSuggestInputStyled>
+    <AutoSuggestInput label="Agencies" {...inputProps} />
+  </AgencyAutoSuggestInputStyled>
+);
 
 const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   const [suggestions, setSuggestions] = useState([]);

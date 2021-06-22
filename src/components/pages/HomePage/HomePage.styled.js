@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { smallerThanTabletLandscape } from '../../../styles/media';
 import { colorWhite, colorWarning, colorCaution } from '../../../styles/colors';
 
 // Base

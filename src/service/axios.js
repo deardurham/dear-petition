@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { USER } from '../constants/authConstants';
-import { CSRF_HEADER_KEY, CSRF_TOKEN_LS_KEY } from '../constants/authConstants';
+import { CSRF_HEADER_KEY, CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
@@ -42,7 +41,7 @@ Axios.interceptors.response.use(
 
 export default Axios;
 
-function handle403Response(error) {
+function handle403Response() {
   console.warn('user is logged out!');
   localStorage.removeItem(USER);
   localStorage.removeItem(CSRF_TOKEN_LS_KEY);
