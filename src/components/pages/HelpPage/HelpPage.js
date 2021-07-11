@@ -28,7 +28,7 @@ const ExpandableSection = ({ children }) => {
         if (child?.type === 'h6') {
           expandable = true;
           return (
-            <ExpandableHeader onClick={() => expandable && setIsExpanded(prev => !prev)}>
+            <ExpandableHeader onClick={() => expandable && setIsExpanded((prev) => !prev)}>
               {child}
               <FontAwesomeIcon icon={isExpanded ? faCaretRight : faCaretDown} />
             </ExpandableHeader>
@@ -44,8 +44,8 @@ export default function HelpPage() {
   const [source, setSource] = useState();
   useEffect(() => {
     fetch(markdownSource)
-      .then(res => res.text())
-      .then(text => setSource(text));
+      .then((res) => res.text())
+      .then((text) => setSource(text));
   }, [source]);
   return (
     <HelpPageStyled>
@@ -53,7 +53,7 @@ export default function HelpPage() {
         <Markdown
           remarkPlugins={[sectionize]}
           components={{
-            section: ({ children }) => <ExpandableSection>{children}</ExpandableSection>
+            section: ({ children }) => <ExpandableSection>{children}</ExpandableSection>,
           }}
         >
           {source}

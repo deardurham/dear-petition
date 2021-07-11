@@ -8,13 +8,13 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
 
   useEffect(() => {
     let isMounted = true;
-    (async function() {
+    (async () => {
       try {
         const { data } = await Axios.get('/contact/?category=attorney');
         // only update state when component is mounted
-        if (isMounted)
-        setAttornies(data?.results || []);
+        if (isMounted) setAttornies(data?.results || []);
       } catch (error) {
+        // TODO: Add error message
         console.error(error);
       }
     })();
@@ -28,11 +28,11 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
       <Select
         label="Attorney"
         value={attorney}
-        onChange={val => {
+        onChange={(val) => {
           setAttorney(val);
           onClearError('attorney');
         }}
-        options={attornies.map(att => ({
+        options={attornies.map((att) => ({
           value: att.pk,
           label: att.name,
           address: {
@@ -48,9 +48,7 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
         }))}
         errors={errors.attorney}
       />
-      {attorney && 
-        <AddressInput address={attorney.address} disabled />
-      }
+      {attorney && <AddressInput address={attorney.address} disabled />}
     </>
   );
 }

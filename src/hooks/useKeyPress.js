@@ -5,13 +5,13 @@ import { useEffect } from 'react';
  * @param {function} action - the action to perform on key press
  */
 const useKeyPress = (key, action) => {
-    useEffect(() => {
-        function handleKeyPress(e) {
-            if (e.key === key) action();
-        }
-        window.addEventListener('keyup', handleKeyPress);
-        return () => window.removeEventListener('keyup', handleKeyPress);
-    }, [key, action]);
+  useEffect(() => {
+    function handleKeyPress(e) {
+      if (e.key === key) action();
+    }
+    window.addEventListener('keyup', handleKeyPress);
+    return () => window.removeEventListener('keyup', handleKeyPress);
+  }, [key, action]);
 };
 
 export default useKeyPress;

@@ -10,7 +10,7 @@ function addRootElement(rootElem) {
   document.body.insertBefore(rootElem, document.body.lastElementChild.nextElementSibling);
 }
 
-const usePortal = id => {
+const usePortal = (id) => {
   const rootElemRef = useRef(null);
 
   useEffect(() => {

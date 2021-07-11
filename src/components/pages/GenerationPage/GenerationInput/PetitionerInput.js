@@ -6,11 +6,11 @@ export default function PetitionerInput({
   petitionerData,
   setPetitionerData,
   errors,
-  onClearError
+  onClearError,
 }) {
   const { name, ...address } = petitionerData;
   const handleChange = (key, value) => {
-    setPetitionerData(prev => ({ ...prev, [key]: value }));
+    setPetitionerData((prev) => ({ ...prev, [key]: value }));
     onClearError(key);
   };
   return (
@@ -18,7 +18,7 @@ export default function PetitionerInput({
       <Input
         label="Name"
         value={name}
-        onChange={e => handleChange('name', e.target.value)}
+        onChange={(e) => handleChange('name', e.target.value)}
         errors={errors.name}
       />
       <AddressInput

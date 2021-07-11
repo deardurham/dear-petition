@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ModalStyled } from '../../HomePage/HomePage.styled';
-import { ModalContent } from './GeneratePetitionModal.styled';
+import ModalContent from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
@@ -23,22 +23,30 @@ const Content = styled.ul`
   font-size: 1.6rem;
 `;
 
-const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition, petitionerData, onClose, setAgencies }) => {
+const GeneratePetitionModal = ({
+  agencies,
+  attachmentNumber,
+  attorney,
+  petition,
+  petitionerData,
+  onClose,
+  setAgencies,
+}) => {
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
 
   const _buildPetition = () => ({
-      petition: petition.pk,
-      name_petitioner: petitionerData.name,
-      address1: petitionerData.address1,
-      address2: petitionerData.address2,
-      city: petitionerData.city,
-      state: petitionerData.state.value,
-      zip_code: petitionerData.zipCode,
-      attorney: attorney.value,
-      agencies: agencies.map(agency => agency.pk)
+    petition: petition.pk,
+    name_petitioner: petitionerData.name,
+    address1: petitionerData.address1,
+    address2: petitionerData.address2,
+    city: petitionerData.city,
+    state: petitionerData.state.value,
+    zip_code: petitionerData.zipCode,
+    attorney: attorney.value,
+    agencies: agencies.map((agency) => agency.pk),
   });
 
-  const _openPdf = pdf => {
+  const _openPdf = (pdf) => {
     const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
 
     // IE doesn't allow using a blob object directly as link href
@@ -59,10 +67,8 @@ const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition,
 
   const closePdf = () => {
     const { url, handle } = pdfWindow;
-    if (url)
-      window.URL.revokeObjectURL(url);
-    if (handle)
-      handle.close();
+    if (url) window.URL.revokeObjectURL(url);
+    if (handle) handle.close();
 
     setPdfWindow({ handle: null, url: null });
     onClose();
@@ -74,10 +80,11 @@ const GeneratePetitionModal = ({ agencies, attachmentNumber, attorney, petition,
     const derivedPetition = _buildPetition();
     try {
       const { data } = await Axios.post('/generate-petition/', derivedPetition, {
-        responseType: 'arraybuffer'
+        responseType: 'arraybuffer',
       });
       _openPdf(data);
     } catch (error) {
+      // TODO: add error message
       console.error(error);
       console.log(error?.response);
     }

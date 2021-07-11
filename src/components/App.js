@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppStyled } from './App.styled';
+import AppStyled from './App.styled';
 import GlobalStyle from '../styles/GlobalStyle';
 
 // Routing

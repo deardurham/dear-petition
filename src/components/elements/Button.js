@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { keyAndAmbientShadows } from '../../styles/shadows';
+import keyAndAmbientShadows from '../../styles/shadows';
 import { colorPrimary, colorWhite, colorCaution } from '../../styles/colors';
 import { fontPrimary } from '../../styles/fonts';
 
@@ -87,9 +87,9 @@ Button.propTypes = {
   /** Reflects the state of the button */
   type: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
   /** What happens when the button is clicked */
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 };
 
 Button.defaultProps = {
-  type: POSITIVE
+  type: POSITIVE,
 };

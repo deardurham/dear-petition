@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { colorGrey, colorBlack, greyScale } from '../../../styles/colors';
 
-const getBadgeColor = props => {
+const getBadgeColor = (props) => {
   const baseColor = greyScale(9);
   return props.isHighlighted ? colorGrey : baseColor;
 };
@@ -27,7 +27,7 @@ const AutoCompleteBadgeStyled = styled.div`
     font-weight: bold;
   }
 
-  background-color: ${props => getBadgeColor(props)};
+  background-color: ${(props) => getBadgeColor(props)};
 `;
 
 const BadgeStyled = styled.div`
@@ -41,7 +41,7 @@ const BadgeStyled = styled.div`
   margin: 0 2px 2px 0;
   border-radius: 1px;
   padding: 10px 0px;
-   box-sizing: content-box;
+  box-sizing: content-box;
   p:first-of-type {
     white-space: nowrap;
     overflow: hidden;

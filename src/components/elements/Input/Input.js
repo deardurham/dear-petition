@@ -23,7 +23,7 @@ function Input({ value, onChange, label, type, errors, maxLength, disabled, ...p
           exit={{ opacity: 0, y: '-50' }}
           positionTransition
         >
-          {errors && errors.map(errMsg => <p key={errMsg}>{errMsg}</p>)}
+          {errors && errors.map((errMsg) => <p key={errMsg}>{errMsg}</p>)}
         </InputErrors>
       </AnimatePresence>
     </InputWrapper>
@@ -33,11 +33,11 @@ function Input({ value, onChange, label, type, errors, maxLength, disabled, ...p
 Input.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  label: PropTypes.string
+  label: PropTypes.string,
 };
 
 Input.defaultProps = {
-  label: "",
+  label: '',
 };
 
 export default Input;

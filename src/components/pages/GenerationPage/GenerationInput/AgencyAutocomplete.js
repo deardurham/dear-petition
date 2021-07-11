@@ -40,7 +40,7 @@ const renderSuggestion = (suggestion, { isHighlighted }) => (
   </SuggestionStyled>
 );
 
-const AgencyAutoSuggestInput = inputProps => (
+const AgencyAutoSuggestInput = (inputProps) => (
   <AgencyAutoSuggestInputStyled>
     <AutoSuggestInput label="Agencies" {...inputProps} />
   </AgencyAutoSuggestInputStyled>
@@ -50,7 +50,7 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
 
-  const handleHotKeyPressed = e => {
+  const handleHotKeyPressed = (e) => {
     e.stopPropagation();
     if (e.key === 'Backspace' && e.shiftKey) removeAgency();
   };
@@ -60,12 +60,15 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   };
 
   const handleSuggestionsFetchRequested = ({ value }) => {
-    (async function () {
+    (async () => {
       try {
         const { data } = await Axios.get(`/contact/?category=agency&search=${value}`);
         const selectedAgencyNames = agencies.map((agency) => agency.name);
-        setSuggestions(data?.results.filter((agency) => !selectedAgencyNames.includes(agency.name)) || []);
+        setSuggestions(
+          data?.results.filter((agency) => !selectedAgencyNames.includes(agency.name)) || []
+        );
       } catch (error) {
+        // TODO: add error message
         console.error(error);
       }
     })();
@@ -79,17 +82,17 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
     addAgency(suggestion);
   };
 
-  const addAgency = thisAgency => {
+  const addAgency = (thisAgency) => {
     setSuggestionValue('');
-    setAgencies(prev => ([...prev, thisAgency]));
+    setAgencies((prev) => [...prev, thisAgency]);
   };
 
-  const removeAgency = thisAgency => {
-    setAgencies(prev => {
+  const removeAgency = (thisAgency) => {
+    setAgencies((prev) => {
       const theseAgencies = prev.slice();
       if (thisAgency) {
         const { name } = thisAgency;
-        const agencyLoc = theseAgencies.map(innerAgency => innerAgency.name).indexOf(name);
+        const agencyLoc = theseAgencies.map((innerAgency) => innerAgency.name).indexOf(name);
         theseAgencies.splice(agencyLoc, 1);
       } else {
         theseAgencies.pop();
@@ -101,7 +104,7 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   const inputProps = {
     value: suggestionValue,
     onChange: handleSuggestionChange,
-    onKeyUp: handleHotKeyPressed
+    onKeyUp: handleHotKeyPressed,
   };
 
   return (
@@ -110,7 +113,7 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
         suggestions={suggestions}
         onSuggestionsFetchRequested={handleSuggestionsFetchRequested}
         onSuggestionsClearRequested={handleSuggestionsClearRequested}
-        getSuggestionValue={suggestion => suggestion.name}
+        getSuggestionValue={(suggestion) => suggestion.name}
         renderSuggestion={renderSuggestion}
         inputProps={inputProps}
         onSuggestionSelected={handleSuggestionSelected}

@@ -22,19 +22,19 @@ const DragNDrop = React.forwardRef((props, ref) => {
     };
   }, []);
 
-  const handleDragEnter = e => {
+  const handleDragEnter = (e) => {
     e.preventDefault();
     setDraggedOver(true);
     if (onDragEnter) onDragEnter(e);
   };
 
-  const handleDragLeave = e => {
+  const handleDragLeave = (e) => {
     e.preventDefault();
     setDraggedOver(false);
     if (onDragLeave) onDragLeave(e);
   };
 
-  const handleDrop = e => {
+  const handleDrop = (e) => {
     e.preventDefault();
 
     const { dropEffect, files } = e.dataTransfer;
@@ -43,15 +43,15 @@ const DragNDrop = React.forwardRef((props, ref) => {
     _handleFiles(files);
   };
 
-  const handleManualUpload = e => {
+  const handleManualUpload = (e) => {
     _handleFiles(e.target.files);
   };
 
-  const _handleFiles = files => {
+  const _handleFiles = (files) => {
     const drop = {
       warnings: [],
       errors: [],
-      files: []
+      files: [],
     };
 
     if (files.length > maxFiles) {
@@ -86,7 +86,7 @@ const DragNDrop = React.forwardRef((props, ref) => {
       />
       <DragNDropStyled
         htmlFor="ciprs_file"
-        onDragOver={e => e.preventDefault()}
+        onDragOver={(e) => e.preventDefault()}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -105,7 +105,7 @@ DragNDrop.propTypes = {
   mimeTypes: PropTypes.arrayOf(PropTypes.string),
   maxFiles: PropTypes.number,
   onDragEnter: PropTypes.func,
-  onDragLeave: PropTypes.func
+  onDragLeave: PropTypes.func,
 };
 
 DragNDrop.defaultProps = {
