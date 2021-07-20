@@ -22,7 +22,7 @@ function Modal({ children, isVisible, closeModal, ...props }) {
         <ModalUnderlay key="shade" onClick={closeModal} />,
         <ModalStyled key="modal" {...props}>
           {children}
-        </ModalStyled>
+        </ModalStyled>,
       ]}
     </>,
     modalPortal

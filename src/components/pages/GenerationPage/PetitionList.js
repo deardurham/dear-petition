@@ -108,7 +108,7 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
         <TableCell header>Attachments</TableCell>
       </TableHeader>
       <TableBody>
-        {petitions.map(petition => (
+        {petitions.map((petition) => (
           <PetitionRow
             key={petition.pk}
             petition={petition}

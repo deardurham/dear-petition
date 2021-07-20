@@ -9,7 +9,7 @@ import {
   DragErrors,
   DragWarnings,
   ModalStyled,
-  ModalContent
+  ModalContent,
 } from './HomePage.styled';
 
 // Children
@@ -20,7 +20,7 @@ import Axios from '../../../service/axios';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
-const MAX_FILE_SIZE = 30_000;
+const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
 const MAX_TIMEOUT = 30; // seconds
 
@@ -41,13 +41,13 @@ function HomePage() {
   const [modalError, setModalError] = useState();
   const history = useHistory();
 
-  const _mergeFileSets = newFiles => {
+  const _mergeFileSets = (newFiles) => {
     const mergedFiles = new Set(files);
-    newFiles.forEach(file => mergedFiles.add(file));
+    newFiles.forEach((file) => mergedFiles.add(file));
     return mergedFiles;
   };
 
-  const handleDrop = drop => {
+  const handleDrop = (drop) => {
     setDragErrors(drop.errors);
     setDragWarnings(drop.warnings);
     if (files.size + drop.files.length > MAX_FILES) {
@@ -56,8 +56,8 @@ function HomePage() {
     }
 
     let hasDups = false;
-    files.forEach(file => {
-      const dup = drop.files.find(newFile => newFile.name === file.name);
+    files.forEach((file) => {
+      const dup = drop.files.find((newFile) => newFile.name === file.name);
       if (dup) {
         setDragErrors([`Cannot upload duplicate file "${dup.name}"`]);
         hasDups = true;
@@ -66,7 +66,7 @@ function HomePage() {
     if (!hasDups) setFiles(_mergeFileSets(drop.files));
   };
 
-  const handleRemoveFile = file => {
+  const handleRemoveFile = (file) => {
     // browser stores a "path" to the last file uploaded on the input.
     // It's necessary to "clear" the inputs value here, but not on drop--
     // the browser just replaces previous files in the case of a drop.
@@ -83,10 +83,12 @@ function HomePage() {
     let timer = null;
     try {
       const filesFormData = new FormData();
-      files.forEach(file => filesFormData.append('files', file));
+      files.forEach((file) => filesFormData.append('files', file));
       const request = Axios.post('/batch/', filesFormData, { timeout: MAX_TIMEOUT * 1000 });
       timer = setTimeout(() => {
-        setModalError('It is taking longer than expected to process the uploaded records. Please wait...');
+        setModalError(
+          'It is taking longer than expected to process the uploaded records. Please wait...'
+        );
       }, LONG_WAIT_TIMEOUT * 1000);
 
       const { data, status } = await request;
@@ -98,7 +100,6 @@ function HomePage() {
       if (timer) {
         clearTimeout(timer);
       }
-      console.error(error);
       setModalError('ERROR: Could not process the records.');
     }
   };
@@ -122,14 +123,14 @@ function HomePage() {
               <div>
                 {dragWarnings && (
                   <DragWarnings>
-                    {dragWarnings.map(warning => (
+                    {dragWarnings.map((warning) => (
                       <p key={warning}>{warning}</p>
                     ))}
                   </DragWarnings>
                 )}
                 {dragErrors && (
                   <DragErrors>
-                    {dragErrors.map(error => (
+                    {dragErrors.map((error) => (
                       <p key={error}>{error}</p>
                     ))}
                   </DragErrors>
@@ -146,7 +147,13 @@ function HomePage() {
           )}
         </HomeContent>
       </HomePageStyled>
-      <ModalStyled isVisible={showModal} closeModal={() => { setShowModal(false); setModalError(); }}>
+      <ModalStyled
+        isVisible={showModal}
+        closeModal={() => {
+          setShowModal(false);
+          setModalError();
+        }}
+      >
         <ModalContent>
           <h2>Preparing petitions...</h2>
           {modalError && <ModalError>{modalError}</ModalError>}

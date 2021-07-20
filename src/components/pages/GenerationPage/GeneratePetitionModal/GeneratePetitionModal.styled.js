@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { colorWhite } from '../../../../styles/colors';
 
-export const ModalContent = styled.div`
+export default styled.div`
   position: relative;
   background-color: ${colorWhite};
   width: 500px;

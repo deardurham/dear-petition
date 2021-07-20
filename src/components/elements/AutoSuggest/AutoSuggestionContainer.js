@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorWhite, colorBlack } from '../../../styles/colors'
-import { keyAndAmbientShadows } from '../../../styles/shadows'
+import { colorWhite, colorBlack } from '../../../styles/colors';
+import keyAndAmbientShadows from '../../../styles/shadows';
 
 const AutoSuggestionContainer = ({ containerProps, children }) => (
   <AutoSuggestionContainerStyled {...containerProps}>{children}</AutoSuggestionContainerStyled>
@@ -16,7 +16,7 @@ const AutoSuggestionContainerStyled = styled.div`
 
   border-radius: 10px;
   background-color: ${colorWhite};
-  box-shadow: ${keyAndAmbientShadows['dp6']};
+  box-shadow: ${keyAndAmbientShadows.dp6};
 
   & p {
     margin: 1rem 0;

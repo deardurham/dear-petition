@@ -6,9 +6,9 @@ import {
   PageBaseStyled,
   PageHeader,
   PageLogo,
-  PageContentWrapper
+  PageContentWrapper,
 } from './PageBase.styled';
-import DEAR_Logo from '../../assets/img/DEAR_logo.png';
+import dearLogo from '../../assets/img/DEAR_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 
 // Ajax
@@ -55,15 +55,15 @@ function PageBase({ children, className, ...props }) {
   return (
     <PageBaseStyled {...props}>
       <PageHeader>
-          <LogoLink href='/'>
-            <PageLogo src={DEAR_Logo} alt="DEAR logo" />
-          </LogoLink>
-          <LinksGroup>
-            {localStorage.getItem(USER) && <Link href='/'>New Petition</Link>}
-            <Link href="/help">Help</Link>
-            {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
-            <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
-          </LinksGroup>
+        <LogoLink href="/">
+          <PageLogo src={dearLogo} alt="DEAR logo" />
+        </LogoLink>
+        <LinksGroup>
+          {localStorage.getItem(USER) && <Link href="/">New Petition</Link>}
+          <Link href="/help">Help</Link>
+          {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
+          <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
+        </LinksGroup>
       </PageHeader>
       <PageContentWrapper className={className}>{children}</PageContentWrapper>
     </PageBaseStyled>

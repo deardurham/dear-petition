@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import {
-  GenerationPageStyled,
-  GenerationContentStyled
-} from './GenerationPage.styled';
+import { GenerationPageStyled, GenerationContentStyled } from './GenerationPage.styled';
 import { colorGrey } from '../../../styles/colors';
 import { smallerThanTabletLandscape } from '../../../styles/media';
 
@@ -20,19 +17,13 @@ import PetitionList from './PetitionList';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
-const REQUIRED_FIELDS = [
-  'name',
-  'address1',
-  'city',
-  'state',
-  'zipCode'
-];
+const REQUIRED_FIELDS = ['name', 'address1', 'city', 'state', 'zipCode'];
 
 const GenerationSection = styled.div`
   padding: 2rem 0;
   margin-bottom: 2rem;
 
-  & >  h2 {
+  & > h2 {
     user-select: none;
     margin-bottom: 2rem;
   }
@@ -70,9 +61,7 @@ const InputSection = ({ children, label }) => (
     <div>
       <h3>{label}</h3>
     </div>
-    <div>
-      {children}
-    </div>
+    <div>{children}</div>
   </InputSectionStyled>
 );
 
@@ -93,15 +82,16 @@ function GenerationPage() {
 
   useEffect(() => {
     let isMounted = true;
-    (async function() {
+    (async () => {
       try {
         const { data } = await Axios.get(`/batch/${batchId}/`);
         if (isMounted) {
           setBatch(data);
-          setPetitionerData(prev => ({ ...prev, name: data?.label }));
+          setPetitionerData((prev) => ({ ...prev, name: data?.label }));
           setLoading(false);
         }
       } catch (error) {
+        // TODO: Add error message
         console.error(error);
         if (isMounted) {
           setLoading(false);
@@ -116,10 +106,13 @@ function GenerationPage() {
   const validateInput = () => {
     let hasErrors = false;
     if (!attorney) {
-      setFormErrors((oldErrors) => ({ ...oldErrors, attorney: ['Please select an attorney from the list'] }));
+      setFormErrors((oldErrors) => ({
+        ...oldErrors,
+        attorney: ['Please select an attorney from the list'],
+      }));
       hasErrors = true;
     }
-    REQUIRED_FIELDS.forEach(key => {
+    REQUIRED_FIELDS.forEach((key) => {
       if (!petitionerData[key]) {
         setFormErrors((oldErrors) => ({ ...oldErrors, [key]: ['This field is required'] }));
         hasErrors = true;
@@ -130,7 +123,7 @@ function GenerationPage() {
 
   const clearError = (key) => {
     if (formErrors[key]) {
-      setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }))
+      setFormErrors((oldErrors) => ({ ...oldErrors, [key]: [] }));
     }
   };
 
@@ -140,7 +133,7 @@ function GenerationPage() {
         <h3>Loading...</h3>
       ) : (
         <GenerationContentStyled>
-          <InputSection label='Attorney Information'>
+          <InputSection label="Attorney Information">
             <AttorneyInput
               attorney={attorney}
               setAttorney={setAttorney}
@@ -148,7 +141,7 @@ function GenerationPage() {
               onClearError={clearError}
             />
           </InputSection>
-          <InputSection label='Petitioner Information'>
+          <InputSection label="Petitioner Information">
             <PetitionerInput
               petitionerData={petitionerData}
               setPetitionerData={setPetitionerData}

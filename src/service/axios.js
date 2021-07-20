@@ -4,7 +4,7 @@ import { CSRF_HEADER_KEY, CSRF_TOKEN_LS_KEY, USER } from '../constants/authConst
 const Axios = axios.create({
   baseURL: `/petition/api/`,
   timeout: 5000,
-  withCredentials: true // allow setting/passing cookies
+  withCredentials: true, // allow setting/passing cookies
 });
 
 /**
@@ -13,12 +13,12 @@ const Axios = axios.create({
  * second callback handles errors, so pass through
  */
 Axios.interceptors.request.use(
-  request => {
+  (request) => {
     const csrfToken = localStorage.getItem(CSRF_TOKEN_LS_KEY);
     if (csrfToken) request.headers[CSRF_HEADER_KEY] = csrfToken;
     return request;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 );
 
 /**
@@ -27,8 +27,8 @@ Axios.interceptors.request.use(
  * second callback handles errors
  */
 Axios.interceptors.response.use(
-  success => success,
-  error => {
+  (success) => success,
+  (error) => {
     if (error?.response) {
       const { status } = error.response;
       // Only care about 403s so far, so pass through
@@ -42,7 +42,6 @@ Axios.interceptors.response.use(
 export default Axios;
 
 function handle403Response() {
-  console.warn('user is logged out!');
   localStorage.removeItem(USER);
   localStorage.removeItem(CSRF_TOKEN_LS_KEY);
   window.location = '/';

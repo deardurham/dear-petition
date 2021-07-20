@@ -6,7 +6,7 @@ const TableStyle = styled.table`
   display: grid;
   border-collapse: collapse;
   min-width: 100%;
-  grid-template-columns: ${props => props.columnSize};
+  grid-template-columns: ${(props) => props.columnSize};
 
   & thead,
   & tbody,

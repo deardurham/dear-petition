@@ -1,4 +1,7 @@
 {
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "env": {
     "browser": true
   },
@@ -16,7 +19,7 @@
   "extends": ["airbnb", "prettier"],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": 0,
+    "prettier/prettier": ["error"],
     "react/jsx-filename-extension": [
       1,
       {
@@ -25,7 +28,6 @@
     ],
     "prefer-template": "off",
     "react/prop-types": "off",
-    "dot-notation": "off",
     "no-use-before-define": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",
@@ -39,6 +41,9 @@
     "import/no-cycle": "off",
     "import/order": "off",
     "import/prefer-default-export": "warn",
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": ["src/setupTests.js", "**/*.test.js", "**/*.test.jsx"]
+    }],
     "camelcase": "warn",
     "consistent-return": "warn"
   }
