@@ -21,7 +21,7 @@ import { Redirect, useHistory } from 'react-router-dom';
 // AJAX
 import Axios from '../../../service/axios';
 import { AnimatePresence } from 'framer-motion';
-import { USER, CSRF_TOKEN_LS_KEY } from '../../../constants/authConstants';
+import { USER } from '../../../constants/authConstants';
 
 function Login() {
   const history = useHistory();
@@ -43,7 +43,6 @@ function Login() {
       const { data, status } = await Axios.post('token/', { username, password });
       if (status === 200 && data.detail === 'success') {
         localStorage.setItem(USER, JSON.stringify(data.user));
-        localStorage.setItem(CSRF_TOKEN_LS_KEY, data.csrftoken);
 
         // TODO: remove CSRF token on logout
         history.replace('/');

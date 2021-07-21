@@ -15,7 +15,7 @@ import { smallerThanTabletLandscape } from '../../styles/media';
 import Axios from '../../service/axios';
 
 // Constants
-import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
+import { USER } from '../../constants/authConstants';
 
 // Router
 import { Link, useHistory } from 'react-router-dom';
@@ -41,7 +41,6 @@ function PageBase({ children, className, ...props }) {
   const history = useHistory();
   const handleLogout = () => {
     Axios.delete('token/');
-    localStorage.removeItem(CSRF_TOKEN_LS_KEY);
     localStorage.removeItem(USER);
     history.replace('/');
   };

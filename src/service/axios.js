@@ -1,25 +1,13 @@
 import axios from 'axios';
-import { CSRF_HEADER_KEY, CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_KEY, USER } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
   timeout: 5000,
   withCredentials: true, // allow setting/passing cookies
+  xsrfCookieName: CSRF_COOKIE_NAME,
+  xsrfHeaderName: CSRF_HEADER_KEY,
 });
-
-/**
- * A Request interceptor.
- * first callback intercepts successfully formed requests
- * second callback handles errors, so pass through
- */
-Axios.interceptors.request.use(
-  (request) => {
-    const csrfToken = localStorage.getItem(CSRF_TOKEN_LS_KEY);
-    if (csrfToken) request.headers[CSRF_HEADER_KEY] = csrfToken;
-    return request;
-  },
-  (error) => Promise.reject(error)
-);
 
 /**
  * A Response interceptor.
@@ -43,6 +31,5 @@ export default Axios;
 
 function handle403Response() {
   localStorage.removeItem(USER);
-  localStorage.removeItem(CSRF_TOKEN_LS_KEY);
   window.location = '/';
 }

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
 
 from dear_petition.users.models import User
-from dear_petition.petition import models as petition
+from dear_petition.petition import models as petition, utils
 from dear_petition.petition.api import serializers
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
@@ -177,6 +177,12 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         response = Response({})
         response.delete_cookie(
             settings.AUTH_COOKIE_KEY,
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+        )
+        # https://docs.djangoproject.com/en/3.2/ref/settings/#csrf-header-name
+        response.delete_cookie(
+            utils.remove_prefix(settings.CSRF_COOKIE_NAME, 'HTTP_'),
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
         )

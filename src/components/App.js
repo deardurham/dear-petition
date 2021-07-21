@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import AppStyled from './App.styled';
 import GlobalStyle from '../styles/GlobalStyle';
@@ -12,8 +12,9 @@ import HomePage from './pages/HomePage/HomePage';
 import GenerationPage from './pages/GenerationPage/GenerationPage';
 import FAQPage from './pages/HelpPage/HelpPage';
 import LoginPage from './pages/LoginPage/LoginPage';
-import useBrowserWarning from '../hooks/useBrowserWarning';
 import { ModalStyled, ModalContent } from './pages/HomePage/HomePage.styled';
+import { CSRF_TOKEN_LS_KEY } from '../constants/authConstants';
+import useBrowserWarning from '../hooks/useBrowserWarning';
 
 const WarningContent = styled.div`
   display: flex;
@@ -41,6 +42,12 @@ const BrowserWarning = ({ hideModal, showWarning }) => (
 
 function App() {
   const [showWarning, hideModal] = useBrowserWarning();
+  useEffect(() => {
+    if (localStorage.getItem(CSRF_TOKEN_LS_KEY)) {
+      localStorage.removeItem(CSRF_TOKEN_LS_KEY);
+    }
+  }, []);
+
   return (
     <>
       <GlobalStyle />
