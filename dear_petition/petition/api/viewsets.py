@@ -150,16 +150,24 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             serializer.validated_data[
                 "access"
             ],  # pull access token out of validated_data
-            expires=datetime.now()
-            + settings.SIMPLE_JWT[
-                "REFRESH_TOKEN_LIFETIME"
-            ],  # expire access token when refresh token expires
+            expires=datetime.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
             path=self.cookie_path,
             secure=settings.DEBUG
             == False,  # browsers should only send the cookie using HTTPS
+            httponly=True,  # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE,
+        )
+
+        response.set_cookie(
+            settings.REFRESH_COOKIE_KEY,
+            serializer.validated_data["refresh"],
+            expires=datetime.now() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+            secure=settings.DEBUG == False,  # browsers should only send the cookie using HTTPS
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
@@ -177,6 +185,11 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         response = Response({})
         response.delete_cookie(
             settings.AUTH_COOKIE_KEY,
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+        )
+        response.delete_cookie(
+            settings.REFRESH_COOKIE_KEY,
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
         )

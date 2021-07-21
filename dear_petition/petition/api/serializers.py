@@ -22,9 +22,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ["pk", "username", "email", "admin_url"]
 
-    def get_admin_url(self, obj):
+    def get_admin_url(self, user_obj):
         url = ""
-        if "request" in self.context and self.context["request"].user.is_staff:
+        if user_obj and user_obj.is_staff:
             url = reverse("admin:index")
         return url
 

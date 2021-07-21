@@ -295,6 +295,7 @@ CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)
 CIPRS_SAVE_PDF = env.bool("CIPRS_SAVE_PDF", False)
 
 AUTH_COOKIE_KEY = "Authorization"
+REFRESH_COOKIE_KEY = "Refresh"
 # Set SAMESITE setting below to 'Strict' to ask recieving browsers not to send this cookie
 # across origins. This should work in this case, as long as we serve the API and Client from
 # the same domain.
