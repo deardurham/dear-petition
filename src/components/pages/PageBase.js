@@ -46,9 +46,13 @@ function PageBase({ children, className, ...props }) {
   };
 
   useEffect(() => {
-    if (localStorage.getItem(USER)) {
-      Axios.get('/users/').then(({ data }) => setAdminUrl(data?.results[0].admin_url || ''));
-    }
+    const checkUserData = () => {
+      if (localStorage.getItem(USER)) {
+        Axios.get('/users/').then(({ data }) => setAdminUrl(data?.results[0].admin_url || ''));
+      }
+    };
+    window.addEventListener('storage', checkUserData);
+    return () => window.removeEventListener('storage', checkUserData);
   }, []);
 
   return (

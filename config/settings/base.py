@@ -299,3 +299,4 @@ AUTH_COOKIE_KEY = "Authorization"
 # across origins. This should work in this case, as long as we serve the API and Client from
 # the same domain.
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
+CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
