@@ -28,6 +28,12 @@
     ],
     "prefer-template": "off",
     "react/prop-types": "off",
+    "no-param-reassign": [
+      "error", {
+        "props": true,
+        "ignorePropertyModificationsFor": ["state"]
+      }
+    ],
     "no-use-before-define": "off",
     "no-underscore-dangle": "off",
     "no-plusplus": "off",

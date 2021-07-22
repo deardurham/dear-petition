@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   LinkWrapper,
@@ -11,14 +12,8 @@ import {
 import dearLogo from '../../assets/img/DEAR_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 
-// Ajax
-import Axios from '../../service/axios';
-
-// Constants
-import { USER } from '../../constants/authConstants';
-
-// Router
-import { Link, useHistory } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import { useLogoutMutation } from '../../service/api';
 
 const LogoLink = styled(LinkWrapper)`
   border: none;
@@ -37,23 +32,9 @@ const LogoutLink = styled(LinkWrapper)`
 `;
 
 function PageBase({ children, className, ...props }) {
-  const [adminUrl, setAdminUrl] = useState('');
   const history = useHistory();
-  const handleLogout = () => {
-    Axios.delete('token/');
-    localStorage.removeItem(USER);
-    history.replace('/');
-  };
-
-  useEffect(() => {
-    const checkUserData = () => {
-      if (localStorage.getItem(USER)) {
-        Axios.get('/users/').then(({ data }) => setAdminUrl(data?.results[0].admin_url || ''));
-      }
-    };
-    window.addEventListener('storage', checkUserData);
-    return () => window.removeEventListener('storage', checkUserData);
-  }, []);
+  const { user } = useAuth();
+  const [logout] = useLogoutMutation();
 
   return (
     <PageBaseStyled {...props}>
@@ -64,7 +45,7 @@ function PageBase({ children, className, ...props }) {
           </Link>
         </LogoLink>
         <LinksGroup>
-          {localStorage.getItem(USER) && (
+          {user && (
             <LinkWrapper>
               <Link to="/">New Petition</Link>
             </LinkWrapper>
@@ -72,12 +53,14 @@ function PageBase({ children, className, ...props }) {
           <LinkWrapper>
             <Link to="/help">Help</Link>
           </LinkWrapper>
-          {adminUrl ? (
+          {user?.admin_url ? (
             <LinkWrapper>
-              <a href={adminUrl}>Admin</a>
+              <a href={user.admin_url}>Admin</a>
             </LinkWrapper>
           ) : null}
-          <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
+          <LogoutLink to="/" onClick={() => logout().then(() => history.replace('/login'))}>
+            Logout
+          </LogoutLink>
         </LinksGroup>
       </PageHeader>
       <PageContentWrapper className={className}>{children}</PageContentWrapper>

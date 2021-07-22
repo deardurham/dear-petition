@@ -18,13 +18,12 @@ import dearLogo from '../../../assets/img/DEAR_logo.png';
 // Routing
 import { Redirect, useHistory } from 'react-router-dom';
 
-// AJAX
-import Axios from '../../../service/axios';
 import { AnimatePresence } from 'framer-motion';
-import { USER } from '../../../constants/authConstants';
+import { useLoginMutation } from '../../../service/api';
 
 function Login() {
   const history = useHistory();
+  const [login] = useLoginMutation();
 
   // State
   const [username, setUsername] = useState('');
@@ -40,18 +39,13 @@ function Login() {
     e.preventDefault();
     setErrors({});
     try {
-      const { data, status } = await Axios.post('token/', { username, password });
-      if (status === 200 && data.detail === 'success') {
-        localStorage.setItem(USER, JSON.stringify(data.user));
-
-        // TODO: remove CSRF token on logout
-        history.replace('/');
-      }
+      await login({ username, password }).unwrap();
+      history.replace('/');
     } catch (error) {
-      if (error.response?.data) {
+      if (error?.data) {
         setErrors({
           ...errors,
-          ...error.response.data,
+          ...error.data,
         });
       }
     }

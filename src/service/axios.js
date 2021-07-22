@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CSRF_COOKIE_NAME, CSRF_HEADER_KEY, USER } from '../constants/authConstants';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_KEY } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
@@ -9,27 +9,27 @@ const Axios = axios.create({
   xsrfHeaderName: CSRF_HEADER_KEY,
 });
 
-/**
- * A Response interceptor.
- * first callback handles success, so pass through
- * second callback handles errors
- */
-Axios.interceptors.response.use(
-  (success) => success,
-  (error) => {
-    if (error?.response) {
-      const { status } = error.response;
-      // Only care about 403s so far, so pass through
-      if (status !== 403) return Promise.reject(error);
-      return handle403Response(error);
-    }
-    return Promise.reject(error);
-  }
-);
-
 export default Axios;
 
-function handle403Response() {
-  localStorage.removeItem(USER);
-  window.location = '/';
-}
+export const axiosBaseQuery =
+  () =>
+  async ({ url, method, data }) => {
+    try {
+      const result = await Axios({ url, method, data });
+      console.log(result);
+      return { data: result.data };
+    } catch (axiosError) {
+      console.log(axiosError);
+      if (axiosError?.response?.status === 403) {
+        // TODO
+        Axios({ url: 'refresh/token/', method: 'post' }).then((refreshData) => {
+          console.log(refreshData);
+        });
+        // handle403Response();
+        console.log('403 ERROR');
+      }
+      return {
+        error: { status: axiosError.response?.status, data: axiosError.response?.data },
+      };
+    }
+  };
