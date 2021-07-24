@@ -140,7 +140,10 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         if access_token is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
+        try:
+            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
+        except:
+            validated_user = None
         if validated_user is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
