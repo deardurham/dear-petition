@@ -138,14 +138,14 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     def get(self, request):
         access_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
         if access_token is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
         if validated_user is None:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         user_serializer = serializers.UserSerializer(validated_user)
-        return Response(data={ "user": user_serializer.data }, status=status.HTTP_200_OK)
+        return Response({ "user": user_serializer.data }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
