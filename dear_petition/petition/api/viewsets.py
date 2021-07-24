@@ -10,6 +10,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition, utils
 from dear_petition.petition.api import serializers
+from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
@@ -133,6 +134,18 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     cookie_path = "/"
 
     serializer_class = serializers.TokenObtainPairCookieSerializer
+
+    def get(self, request):
+        access_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
+        if access_token is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
+        if validated_user is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        user_serializer = serializers.UserSerializer(validated_user)
+        return Response(data={ "user": user_serializer.data }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
