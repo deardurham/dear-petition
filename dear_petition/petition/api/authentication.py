@@ -28,10 +28,15 @@ class JWTHttpOnlyCookieAuthentication(JWTAuthentication):
         raw_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
         if raw_token is None:
             return None
-        validated_user, validated_token = self._validate_token(raw_token)
-        if not validated_user and validated_token:
-            return None
+        validated_user, validated_token = self.authenticate_token(raw_token)
 
         enforce_csrf(request)
+
+        return validated_user, validated_token
+
+    def authenticate_token(self, token):
+        validated_user, validated_token = self._validate_token(token)
+        if not validated_user and validated_token:
+            return None
 
         return validated_user, validated_token

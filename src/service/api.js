@@ -11,7 +11,14 @@ export const api = createApi({
     logout: builder.mutation({
       query: () => ({ url: 'token/', method: 'delete' }),
     }),
+    getBatch: builder.query({
+      query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
+    }),
+    createBatch: builder.mutation({
+      query: ({ data }) => ({ url: 'batch/', method: 'post', data }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation } = api;
+export const { useCreateBatchMutation, useGetBatchQuery, useLoginMutation, useLogoutMutation } =
+  api;

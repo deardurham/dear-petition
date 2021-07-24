@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   LoginPageStyled,
   LoginSplash,
@@ -19,11 +20,13 @@ import dearLogo from '../../../assets/img/DEAR_logo.png';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { AnimatePresence } from 'framer-motion';
+import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
 
 function Login() {
   const history = useHistory();
   const [login] = useLoginMutation();
+  const dispatch = useDispatch();
 
   // State
   const [username, setUsername] = useState('');
@@ -39,7 +42,8 @@ function Login() {
     e.preventDefault();
     setErrors({});
     try {
-      await login({ username, password }).unwrap();
+      const { user } = await login({ username, password }).unwrap();
+      dispatch(loggedIn(user));
       history.replace('/');
     } catch (error) {
       if (error?.data) {

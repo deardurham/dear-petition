@@ -1,11 +1,11 @@
 from datetime import datetime
 from django.conf import settings
 from django.http import FileResponse
-from django.middleware import csrf
 
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from dear_petition.users.models import User
 from dear_petition.petition import models as petition, utils
@@ -142,8 +142,9 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         except exceptions.TokenError as e:
             raise exceptions.InvalidToken(e.args[0])
 
-        response = Response(serializer.validated_data, status=status.HTTP_200_OK)
-        csrf_token = csrf.get_token(self.request)
+        # We don't want 'access' in response body
+        response_data = { "detail": "success", "user": serializer.validated_data["user"] }
+        response = Response(response_data, status=status.HTTP_200_OK)
 
         response.set_cookie(
             settings.AUTH_COOKIE_KEY,  # get cookie key from settings
@@ -172,13 +173,6 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
 
-        # We don't want 'access' or 'refresh' in response body
-        response.data = {
-            "detail": "success",
-            "user": response.data["user"],
-            "csrftoken": csrf_token,
-        }
-
         return response
 
     def delete(self, request, *args, **kwargs):
@@ -201,5 +195,45 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         )
 
         response.data = {"detail": "success"}
+
+        return response
+
+
+class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
+    cookie_path = "/"
+    serializer_class = TokenRefreshSerializer
+
+    def post(self, request, *args, **kwargs):
+        refresh_key = request.COOKIES.get(settings.REFRESH_COOKIE_KEY)
+        if refresh_key is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data={ 'refresh': refresh_key })
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except exceptions.TokenError as e:
+            raise exceptions.InvalidToken(e.args[0])
+
+        # We don't want 'access' in response body
+        response_data = {
+            "detail": "success",
+        }
+        response = Response(response_data, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            settings.AUTH_COOKIE_KEY,  # get cookie key from settings
+            serializer.validated_data[
+                "access"
+            ],  # pull access token out of validated_data
+            expires=datetime.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            domain=getattr(
+                settings, "AUTH_COOKIE_DOMAIN", None
+            ),  # we can tie the cookie to a specific domain for added security
+            path=self.cookie_path,
+            secure=settings.DEBUG
+            == False,  # browsers should only send the cookie using HTTPS
+            httponly=True,  # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE,
+        )
 
         return response

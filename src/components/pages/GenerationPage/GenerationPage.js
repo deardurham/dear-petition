@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { GenerationPageStyled, GenerationContentStyled } from './GenerationPage.styled';
 import { colorGrey } from '../../../styles/colors';
@@ -7,8 +7,7 @@ import { smallerThanTabletLandscape } from '../../../styles/media';
 // Router
 import { useParams } from 'react-router-dom';
 
-// AJAX
-import Axios from '../../../service/axios';
+import { useGetBatchQuery } from '../../../service/api';
 
 // Children
 import AttorneyInput from './GenerationInput/AttorneyInput';
@@ -67,8 +66,6 @@ const InputSection = ({ children, label }) => (
 
 function GenerationPage() {
   const { batchId } = useParams();
-  const [loading, setLoading] = useState(true);
-  const [batch, setBatch] = useState();
   const [attorney, setAttorney] = useState('');
   const [petitionerData, setPetitionerData] = useState({
     name: '',
@@ -79,29 +76,7 @@ function GenerationPage() {
     zipCode: '',
   });
   const [formErrors, setFormErrors] = useState({});
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const { data } = await Axios.get(`/batch/${batchId}/`);
-        if (isMounted) {
-          setBatch(data);
-          setPetitionerData((prev) => ({ ...prev, name: data?.label }));
-          setLoading(false);
-        }
-      } catch (error) {
-        // TODO: Add error message
-        console.error(error);
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, [batchId]);
+  const { data, isLoading } = useGetBatchQuery({ id: batchId });
 
   const validateInput = () => {
     let hasErrors = false;
@@ -129,7 +104,7 @@ function GenerationPage() {
 
   return (
     <GenerationPageStyled>
-      {loading ? (
+      {isLoading ? (
         <h3>Loading...</h3>
       ) : (
         <GenerationContentStyled>
@@ -152,12 +127,14 @@ function GenerationPage() {
           <GenerationSection>
             <h2>Petition List</h2>
             <p>Click on the buttons below to generate petition forms and their attachments.</p>
-            <PetitionList
-              petitions={batch?.petitions || []}
-              attorney={attorney}
-              petitionerData={petitionerData}
-              validateInput={validateInput}
-            />
+            {data && (
+              <PetitionList
+                petitions={data?.petitions || []}
+                attorney={attorney}
+                petitionerData={petitionerData}
+                validateInput={validateInput}
+              />
+            )}
           </GenerationSection>
         </GenerationContentStyled>
       )}

@@ -98,8 +98,8 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = (
     {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-        "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-        "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
+        "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+        "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
     }
 )
 
