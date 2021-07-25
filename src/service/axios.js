@@ -4,7 +4,7 @@ import { CSRF_COOKIE_NAME, CSRF_HEADER_KEY } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
-  timeout: 25 * 1000,
+  timeout: 5 * 1000,
   withCredentials: true, // allow setting/passing cookies
   xsrfCookieName: CSRF_COOKIE_NAME,
   xsrfHeaderName: CSRF_HEADER_KEY,
