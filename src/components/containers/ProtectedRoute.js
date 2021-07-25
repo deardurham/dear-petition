@@ -1,35 +1,36 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Route, Redirect } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
 import useAuth from '../../hooks/useAuth';
-import { useCheckLoginMutation } from '../../service/api';
+import { useLazyCheckLoginQuery } from '../../service/api';
 import { loggedIn } from '../../slices/auth';
 
 function ProtectedRoute({ children, ...props }) {
   const { user } = useAuth();
-  const [checkLogin, { isLoading, isSuccess, isUninitialized }] = useCheckLoginMutation();
   const dispatch = useDispatch();
+  const [checkLogin, { data, isFetching, isSuccess, isUninitialized }] = useLazyCheckLoginQuery();
+  const isWaiting = isUninitialized || isFetching;
 
   useEffect(() => {
     if (!user && isUninitialized) {
-      checkLogin()
-        .unwrap()
-        .then((data) => {
-          dispatch(loggedIn(data.user));
-        });
+      checkLogin();
     }
   }, [user, isUninitialized]);
 
-  // make decision to redirect after checking login information
-  // note: don't redirect on success because it's handled in useEffect
-  if (!user && (isUninitialized || isLoading || isSuccess)) {
+  useEffect(() => {
+    if (data?.user) {
+      dispatch(loggedIn(data.user));
+    }
+  }, [data]);
+
+  // Spin until user information provided or we are redirected
+  // Note: on success, we need to wait for user information to be dispatched
+  if (!user && (isWaiting || isSuccess)) {
     return null;
   }
 
-  return (
-    <Route {...props} render={() => (user ? children : <Redirect to={{ pathname: '/login' }} />)} />
-  );
+  return <Route {...props}>{user ? children : <Redirect to={{ pathname: '/login' }} />}</Route>;
 }
 
 export default ProtectedRoute;
