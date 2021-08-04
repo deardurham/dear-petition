@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import {
-  Link,
+  LinkWrapper,
   LinksGroup,
   PageBaseStyled,
   PageHeader,
@@ -18,9 +18,9 @@ import Axios from '../../service/axios';
 import { USER, CSRF_TOKEN_LS_KEY } from '../../constants/authConstants';
 
 // Router
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
-const LogoLink = styled(Link)`
+const LogoLink = styled(LinkWrapper)`
   border: none;
   padding: 0;
   height: 80px;
@@ -32,7 +32,7 @@ const LogoLink = styled(Link)`
   }
 `;
 
-const LogoutLink = styled(Link)`
+const LogoutLink = styled(LinkWrapper)`
   cursor: pointer;
 `;
 
@@ -55,13 +55,25 @@ function PageBase({ children, className, ...props }) {
   return (
     <PageBaseStyled {...props}>
       <PageHeader>
-        <LogoLink href="/">
-          <PageLogo src={dearLogo} alt="DEAR logo" />
+        <LogoLink>
+          <Link to="/">
+            <PageLogo src={dearLogo} alt="DEAR logo" />
+          </Link>
         </LogoLink>
         <LinksGroup>
-          {localStorage.getItem(USER) && <Link href="/">New Petition</Link>}
-          <Link href="/help">Help</Link>
-          {adminUrl ? <Link href={adminUrl}>Admin</Link> : null}
+          {localStorage.getItem(USER) && (
+            <LinkWrapper>
+              <Link to="/">New Petition</Link>
+            </LinkWrapper>
+          )}
+          <LinkWrapper>
+            <Link to="/help">Help</Link>
+          </LinkWrapper>
+          {adminUrl ? (
+            <LinkWrapper>
+              <a href={adminUrl}>Admin</a>
+            </LinkWrapper>
+          ) : null}
           <LogoutLink onClick={handleLogout}>Logout</LogoutLink>
         </LinksGroup>
       </PageHeader>
