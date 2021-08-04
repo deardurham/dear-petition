@@ -17,10 +17,10 @@ import { ModalStyled, ModalContent } from './pages/HomePage/HomePage.styled';
 const BrowserWarning = ({ hideModal, showWarning }) => (
   <ModalStyled isVisible={showWarning} closeModal={hideModal}>
     <ModalContent>
-      <h2>Warning</h2>
+      <h3>WARNING</h3>
       <p>
-        It appears you are not using Chrome. Non-Chrome browsers may generate petitions with missing
-        data. Please use Chrome to ensure best results.
+        It appears you are not using Chrome. Non-Chrome browsers are not supported for this
+        application. Please use Chrome to ensure best results.
       </p>
     </ModalContent>
   </ModalStyled>
