@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import AppStyled from './App.styled';
 import GlobalStyle from '../styles/GlobalStyle';
 
@@ -14,14 +15,26 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import useBrowserWarning from '../hooks/useBrowserWarning';
 import { ModalStyled, ModalContent } from './pages/HomePage/HomePage.styled';
 
+const WarningContent = styled.div`
+  display: flex;
+  flex-flow: column;
+  gap: 1rem;
+  & > h3 {
+    font-weight: 700;
+    align-self: center;
+  }
+`;
+
 const BrowserWarning = ({ hideModal, showWarning }) => (
   <ModalStyled isVisible={showWarning} closeModal={hideModal}>
     <ModalContent>
-      <h3>WARNING</h3>
-      <p>
-        It appears you are not using Chrome. Non-Chrome browsers are not supported for this
-        application. Please use Chrome to ensure best results.
-      </p>
+      <WarningContent>
+        <h3>WARNING</h3>
+        <p>
+          It appears you are not using Chrome. This may cause issues while using the application.
+        </p>
+        <p>Please use Chrome to ensure best results.</p>
+      </WarningContent>
     </ModalContent>
   </ModalStyled>
 );
