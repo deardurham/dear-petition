@@ -6,11 +6,13 @@ from django.middleware import csrf
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
+from rest_framework.decorators import action
 
 from dear_petition.users.models import User
+from dear_petition.petition import constants
 from dear_petition.petition import models as petition
 from dear_petition.petition.api import serializers
-from dear_petition.petition.etl import import_ciprs_records
+from dear_petition.petition.etl import import_ciprs_records, recalculate_petitions
 from dear_petition.petition.export import generate_petition_pdf
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -44,6 +46,33 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.OffenseRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @action(
+        detail=False,
+        methods=[
+            "get",
+        ],
+    )
+    def get_petition_records(self, request):
+        petition_id = request.GET.get("petition")
+        if not petition_id:
+            return Response([])
+
+        try:
+            pet = petition.Petition.objects.get(id=petition_id)
+        except petition.Petition.DoesNotExist:
+            return Response([])
+
+        offense_records = pet.get_all_offense_records(filter_active=False)
+        active_records = list(
+            offense_records.filter(active=True).values_list("id", flat=True)
+        )
+        serialized_data = {
+            "offense_records": self.get_serializer(offense_records, many=True).data,
+            "active_records": active_records,
+        }
+
+        return Response(serialized_data)
+
 
 class ContactViewSet(viewsets.ModelViewSet):
 
@@ -69,8 +98,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         return serializers.BatchSerializer
 
     def get_queryset(self):
-        """ Filter queryset so that user's only have read access on objects they have created
-        """
+        """Filter queryset so that user's only have read access on objects they have created"""
         qs = super().get_queryset()
         if not self.request.user.is_superuser:
             qs = qs.filter(user=self.request.user)
@@ -90,6 +118,31 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class PetitionViewSet(viewsets.ModelViewSet):
+    queryset = petition.Petition.objects.all()
+    serializer_class = serializers.ParentPetitionSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(response, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def recalculate_petitions(self, request, pk=None):
+        data = request.data
+        offense_record_ids = data["offense_record_ids"]
+        new_petition = recalculate_petitions(pk, offense_record_ids)
+        new_petition = self.get_serializer(new_petition)
+        return Response(new_petition.data, status=200)
 
 
 class GeneratePetitionView(viewsets.GenericViewSet):

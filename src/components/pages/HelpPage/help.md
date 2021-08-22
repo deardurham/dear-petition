@@ -17,6 +17,7 @@ This website is a tool, and not a substitute for legal analysis by a trained hum
 * AOC-CR-287 - Charges Dismissed
 * AOC-CR-288 - Not Guilty
 * AOC-CR-285 - Expunction Petition Attachment
+* AOC-CR-293 - Underaged Convictions
 
 ## Supported Browser
 

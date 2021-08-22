@@ -2,7 +2,12 @@ import logging
 
 from django.conf import settings
 
-from dear_petition.petition.constants import ATTACHMENT, DISMISSED, NOT_GUILTY
+from dear_petition.petition.constants import (
+    ATTACHMENT,
+    DISMISSED,
+    NOT_GUILTY,
+    UNDERAGED_CONVICTIONS,
+)
 from dear_petition.petition.models import Batch, CIPRSRecord
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
@@ -36,6 +41,8 @@ def import_ciprs_records(files, user):
                 batch.label = record.label
                 batch.save()
     create_batch_petitions(batch)
+    underaged_convictions = batch.underaged_conviction_records()
+    underaged_convictions.update(active=False)
     return batch
 
 
@@ -44,6 +51,8 @@ def create_batch_petitions(batch):
     create_petitions_from_records(batch, DISMISSED)
     # Not guilty
     create_petitions_from_records(batch, NOT_GUILTY)
+    # Convictions
+    create_petitions_from_records(batch, UNDERAGED_CONVICTIONS)
     # TODO: Misdemeanor
 
 

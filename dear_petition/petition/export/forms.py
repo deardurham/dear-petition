@@ -10,7 +10,10 @@ from dear_petition.petition.export.annotate import Checkbox
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
-    def __init__(self, petition, extra={}):
+    def __init__(self, petition=None, extra={}):
+        assert (
+            petition or offense_records
+        ), "One of petition object or offense_records queryset needs to be provided."
         self.data = {}
         self.petition = petition
         self.extra = extra
@@ -28,7 +31,7 @@ class PetitionForm(metaclass=abc.ABCMeta):
         # When sorting these, need to interpret first 2 digits of file number as year and sort based on that
         two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
         qs = (
-            self.petition.offense_records.select_related("offense__ciprs_record")
+            self.petition.offense_records.filter(active=True)
             .annotate(
                 first_two_digits_file_number_chars=Substr(
                     "offense__ciprs_record__file_no", 1, 2
@@ -245,3 +248,7 @@ class AOCFormCR288(AOCFormCR287):
             self.data[f"DOOF:{i}"] = self.format_date(ciprs_record.offense_date)
             self.data[f"Disposition:{i}"] = "NOT GUILTY"
             self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
+
+
+class AOCFormCR293(AOCFormCR287):
+    pass
