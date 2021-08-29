@@ -52,7 +52,6 @@
       }
     }
   },
-  "scripts": {
-  },
-  "stack": "heroku-18"
+  "scripts": {},
+  "stack": "container"
 }
