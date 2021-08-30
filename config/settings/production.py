@@ -150,10 +150,6 @@ EMAIL_USE_TLS = True
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
-# Gunicorn
-# ------------------------------------------------------------------------------
-# INSTALLED_APPS += ["gunicorn"]  # noqa F405
-
 # WhiteNoise
 # ------------------------------------------------------------------------------
 # http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
