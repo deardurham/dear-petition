@@ -32,6 +32,7 @@ class PetitionForm(metaclass=abc.ABCMeta):
         two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
         qs = (
             self.petition.offense_records.filter(active=True)
+            .select_related("offense__ciprs_record")
             .annotate(
                 first_two_digits_file_number_chars=Substr(
                     "offense__ciprs_record__file_no", 1, 2

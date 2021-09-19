@@ -55,12 +55,17 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
     def get_petition_records(self, request):
         petition_id = request.GET.get("petition")
         if not petition_id:
-            return Response([])
+            return Response(
+                "No petition id provided.", status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             pet = petition.Petition.objects.get(id=petition_id)
         except petition.Petition.DoesNotExist:
-            return Response([])
+            return Response(
+                "Petition with this id does not exist.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         offense_records = pet.get_all_offense_records(filter_active=False)
         active_records = list(
@@ -139,9 +144,25 @@ class PetitionViewSet(viewsets.ModelViewSet):
     )
     def recalculate_petitions(self, request, pk=None):
         data = request.data
+
         offense_record_ids = data["offense_record_ids"]
-        new_petition = recalculate_petitions(pk, offense_record_ids)
+
+        if not isinstance(offense_record_ids, list):
+            return Response(
+                "Provided offense record ids should be a list.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            new_petition = recalculate_petitions(pk, offense_record_ids)
+        except AssertionError:
+            return Response(
+                "Can not recalculate an attachment petition (only parent petitions should be recalculated).",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         new_petition = self.get_serializer(new_petition)
+
         return Response(new_petition.data, status=200)
 
 

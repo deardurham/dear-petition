@@ -5,7 +5,7 @@ import { colorGrey } from '../../../styles/colors';
 import { smallerThanTabletLandscape } from '../../../styles/media';
 
 // Router
-import { useParams, } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 // AJAX
 import Axios from '../../../service/axios';
@@ -151,7 +151,11 @@ function GenerationPage() {
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
-            <p>Click on the buttons below to generate petition forms and their attachments. Click on the detail arrow to reveal a list of offense records. Click on the offense records to customize the records that populate the generated petition.</p>
+            <p>
+              Click on the buttons below to generate petition forms and their attachments. Click on
+              the detail arrow to reveal a list of offense records. Click on the offense records to
+              customize the records that populate the generated petition.
+            </p>
             <PetitionList
               petitions={batch?.petitions || []}
               attorney={attorney}

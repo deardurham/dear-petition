@@ -1,47 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TableBody, TableCell, TableHeader, TableRow } from '../Table';
+import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../Table';
 import { colorPrimary } from '../../../styles/colors';
 
-const TableStyle = styled.table`
-  display: grid;
-  border-collapse: collapse;
-  min-width: 100%;
-  grid-template-columns: ${props => props.columnSize};
-
-  & thead,
-  & tbody,
-  & tr {
-    display: contents;
-  }
-
-  & th,
-  & td {
-    padding: 1rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  & th {
-    position: sticky;
-    top: 0;
-    background: ${colorPrimary};
-    text-align: left;
-    color: white;
-    user-select: none;
-  }
-
-  & th:last-child {
-    border: 0;
-  }
-
-  & td {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-`;
 
 const StyledTable = ({ children, className, columnSizes, numColumns }) => {
     const defaultSize = `repeat(${numColumns}, 1fr)`;
@@ -79,7 +40,7 @@ function HighlightRow({ offenseRecord, highlightRow, unhighlightRow, highlighted
 
 function HighlightTable({ offenseRecords, highlightRow, highlightedRows, unhighlightRow, setIsModified }) {
     return (
-        <StyledTable numColumns={8} columnSizes='.1fr .4fr .4fr 1.2fr .8fr .4fr .4fr .6fr'>
+        <StyledTable numColumns={8} columnSizes='1fr 4fr 4fr 12fr 8fr 4fr 4fr 6fr'>
             <TableHeader>
                 <TableCell header></TableCell>
                 <TableCell header>DOB</TableCell>

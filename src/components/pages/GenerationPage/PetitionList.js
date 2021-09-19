@@ -5,16 +5,23 @@ import { greyScale } from '../../../styles/colors';
 import Axios from '../../../service/axios';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
-import { Table, TableBody, TableCell, TableSpanCell, TableHeader, TableRow } from '../../elements/Table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableSpanCell,
+  TableHeader,
+  TableRow,
+} from '../../elements/Table';
 import useWindowSize from '../../../hooks/useWindowSize';
-import HighlightTable from '../../elements/HighlightTable/HighlightTable'
-import {PETITION_FORM_NAMES} from '../../../constants/petitionConstants'
+import HighlightTable from '../../elements/HighlightTable/HighlightTable';
+import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const GenerateButtonStyled = styled(Button)`
   font-size: 1.5rem;
-  opacity: ${(props) => (props.disabled ? .3 : 1)};
+  opacity: ${(props) => (props.disabled ? 0.3 : 1)};
 `;
 
 const PetitionTable = styled(Table)`
@@ -32,9 +39,23 @@ const Label = styled.span`
   font-size: 1.75rem;
 `;
 
+const FlexColumnDiv = styled.div`
+  display: flex;
+  flex-flow: column;
+`;
 
+const AlignSelfEndGenerateButton  = styled(GenerateButton)`
+  align-self: end;
+`;
 
-function GenerateButton({ label, windowWidth, onClick, collapsedIcon, title="", isDisabled = false }) {
+function GenerateButton({
+  label,
+  windowWidth,
+  onClick,
+  collapsedIcon,
+  title = '',
+  isDisabled = false,
+}) {
   const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
   return (
     <GenerateButtonStyled onClick={onClick} disabled={isDisabled} title={title}>
@@ -43,19 +64,19 @@ function GenerateButton({ label, windowWidth, onClick, collapsedIcon, title="", 
   );
 }
 
-function PetitionRow({ attorney, petitionData, petitionerData, validateInput, backgroundColor, }) {
+function PetitionRow({ attorney, petitionData, petitionerData, validateInput, backgroundColor }) {
   const [agencies, setAgencies] = useState([]);
   const [attachmentNumber, setAttachmentNumber] = useState();
   const [selectedPetition, setSelectedPetition] = useState();
   const windowSize = useWindowSize();
   const [isDetailed, setIsDetailed] = useState();
-  
+
   const [offenseRecords, setOffenseRecords] = useState();
   const [offenseRecordsLoading, setOffenseRecordsLoading] = useState(false);
   const [petition, setPetition] = useState(petitionData);
-  const [ highlightedRows, setHighlightedRows ] = useState();
-  const [ isDisabled, setIsDisabled ] = useState(petition.form_type === "AOC-CR-293");
-  const [ isModified, setIsModified ] = useState(false);
+  const [highlightedRows, setHighlightedRows] = useState();
+  const [isDisabled, setIsDisabled] = useState(petition.form_type === 'AOC-CR-293');
+  const [isModified, setIsModified] = useState(false);
   const petitionId = petition.pk;
 
   const handleSelect = (newPetition, num) => {
@@ -71,39 +92,39 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     setIsDetailed(!isDetailed);
     if (!offenseRecords) {
       setOffenseRecordsLoading(true);
-      Axios.get(`/offenserecord/get_petition_records/?petition=${petitionId}`)
-        .then(
-          ({ data }) => {
-            setOffenseRecords(data.offense_records);
-            setHighlightedRows(data.active_records)
-            setOffenseRecordsLoading(false); 
-        }
-      )
+      Axios.get(`/offenserecord/get_petition_records/?petition=${petitionId}`).then(({ data }) => {
+        setOffenseRecords(data.offense_records);
+        setHighlightedRows(data.active_records);
+        setOffenseRecordsLoading(false);
+      });
     }
-  }
+  };
 
-  const highlightRow = ( offenseRecordId ) => {
-    setHighlightedRows([ ...highlightedRows, offenseRecordId ]);
-  }
+  const highlightRow = (offenseRecordId) => {
+    setHighlightedRows([...highlightedRows, offenseRecordId]);
+  };
 
-  const unhighlightRow = ( offenseRecordId ) => {
-    setHighlightedRows(highlightedRows.filter((value, index, arr) => {return value !== offenseRecordId}));
-  }
+  const unhighlightRow = (offenseRecordId) => {
+    setHighlightedRows(
+      highlightedRows.filter((value, index, arr) => {
+        return value !== offenseRecordId;
+      })
+    );
+  };
 
   const recalculatePetitions = () => {
-    Axios.post(`/petitions/${petitionId}/recalculate_petitions/`, {"offense_record_ids": highlightedRows}).then(
-      ({ data }) => {
-        console.log(data);
-        setPetition(data);
-        setIsDetailed(false);
-        setIsDisabled(false);
-      }
-    )
-  }
+    Axios.post(`/petitions/${petitionId}/recalculate_petitions/`, {
+      offense_record_ids: highlightedRows,
+    }).then(({ data }) => {
+      setPetition(data);
+      setIsDetailed(false);
+      setIsDisabled(false);
+    });
+  };
 
   return (
     <>
-      <TableRow key={petition.pk} backgroundColor={backgroundColor}> 
+      <TableRow key={petition.pk} backgroundColor={backgroundColor}>
         <TableCell>{petition.county}</TableCell>
         <TableCell>{petition.jurisdiction}</TableCell>
         <TableCell>
@@ -132,37 +153,50 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
           </Attachments>
         </TableCell>
         <TableCell>
-          <GenerateButton 
-            label={isDetailed ? <FontAwesomeIcon icon={faChevronDown}/> : <FontAwesomeIcon icon={faChevronRight}/>}
-            isCollapsed=<FontAwesomeIcon icon={faChevronDown}/>
+          <GenerateButton
+            label={
+              isDetailed ? (
+                <FontAwesomeIcon icon={faChevronDown} />
+              ) : (
+                <FontAwesomeIcon icon={faChevronRight} />
+              )
+            }
+            isCollapsed=<FontAwesomeIcon icon={faChevronDown} />
             onClick={() => handlePress()}
             title="Reveal offense records"
           />
         </TableCell>
       </TableRow>
       {isDetailed && (
-        <TableRow key={petition.pk + 'offenses'} backgroundColor={backgroundColor}>
-          <TableSpanCell className='spanCell'>
-            { offenseRecordsLoading ? <h5>Loading...</h5> : (
-              <Table >
+        <TableRow backgroundColor={backgroundColor}>
+          <TableSpanCell>
+            {offenseRecordsLoading ? (
+              <h5>Loading...</h5>
+            ) : (
+              <Table>
                 <TableBody>
-                  <TableRow key={petition.pk + '_offenses'}>
+                  <TableRow>
                     <TableCell>
-                        <HighlightTable 
-                          offenseRecords={offenseRecords}
-                          highlightRow={highlightRow}
-                          highlightedRows={highlightedRows}
-                          unhighlightRow={unhighlightRow}
-                          setIsModified={setIsModified}
-                        />
+                      <HighlightTable
+                        offenseRecords={offenseRecords}
+                        highlightRow={highlightRow}
+                        highlightedRows={highlightedRows}
+                        unhighlightRow={unhighlightRow}
+                        setIsModified={setIsModified}
+                      />
                     </TableCell>
                   </TableRow>
-                  <TableRow key={petition.pk + '_recalculate'}>
+                  <TableRow>
                     <TableCell>
-                      <GenerateButton label="Update Petitions" onClick={recalculatePetitions} title="Update the petitions on the main petition row with your changes." isDisabled={!isModified}/>
+                      <GenerateButton
+                        label="Update Petitions"
+                        onClick={recalculatePetitions}
+                        title="Update the petitions on the main petition row with your changes."
+                        isDisabled={!isModified}
+                      />
                     </TableCell>
                   </TableRow>
-                </TableBody>      
+                </TableBody>
               </Table>
             )}
           </TableSpanCell>
@@ -184,10 +218,9 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
       )}
     </>
   );
-};
+}
 
-export default function PetitionList({ attorney, petitions, petitionerData, validateInput, }) {
-  
+export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
   return (
     <PetitionTable numColumns={5}>
       <TableHeader>

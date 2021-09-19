@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colorPrimary } from '../../styles/colors';
 
-const TableStyle = styled.table`
+export const TableStyle = styled.table`
   display: grid;
   border-collapse: collapse;
   min-width: 100%;
@@ -39,25 +39,22 @@ const TableStyle = styled.table`
     padding-top: 10px;
     padding-bottom: 10px;
   }
-
 `;
 
-export const TableCell = ({ children, header, }) => (
+export const TableCell = ({ children, header }) => (
   <>{header ? <th>{children}</th> : <td>{children}</td>}</>
 );
 
 export const TableSpanCell = styled.td`
   grid-column: 1 / span 5;
-`
+`;
 
 export const TableRightAlignCell = styled.td`
   text-align: right;
   margin-right: 50px;
-`
+`;
 
-export const TableBody = ({children}) => (
-  <tbody>{children}</tbody>
-);
+export const TableBody = ({ children }) => <tbody>{children}</tbody>;
 
 export const TableHeader = ({ children }) => (
   <thead>
@@ -66,14 +63,17 @@ export const TableHeader = ({ children }) => (
 );
 
 export const TableRow = styled.tr`
-  &>td {
-  ${props => props.highlighted ? `
+  & > td {
+    ${(props) =>
+      props.highlighted
+        ? `
   background-color: rgb(255, 245, 217);
-  ` : `background-color: ${props.backgroundColor}`}
+  `
+        : `background-color: ${props.backgroundColor}`}
   }
   cursor: pointer;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     cursor: pointer;
   }
 `;
