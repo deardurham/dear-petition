@@ -101,10 +101,6 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class PetitionSerializer(serializers.ModelSerializer):
     jurisdiction = serializers.CharField(source="get_jurisdiction_display")
-    offense_records = serializers.SerializerMethodField()
-
-    def get_offense_records(self, petition):
-        return petition.offense_records.filter(active=True).values_list("id", flat=True)
 
     class Meta:
         model = Petition
@@ -120,9 +116,10 @@ class PetitionSerializer(serializers.ModelSerializer):
 class ParentPetitionSerializer(PetitionSerializer):
     attachments = serializers.SerializerMethodField()
     offense_records = serializers.SerializerMethodField()
+    active_records = serializers.SerializerMethodField()
 
     class Meta(PetitionSerializer.Meta):
-        fields = PetitionSerializer.Meta.fields + ["attachments"]
+        fields = PetitionSerializer.Meta.fields + ["attachments", "active_records"]
 
     def get_attachments(self, instance):
         return PetitionSerializer(
@@ -130,11 +127,15 @@ class ParentPetitionSerializer(PetitionSerializer):
         ).data
 
     def get_offense_records(self, petition):
-        return list(
-            petition.get_all_offense_records(filter_active=False).values_list(
-                "id", flat=True
-            )
+        offense_records = petition.get_all_offense_records(
+            filter_active=False, include_annotations=False
         )
+        return OffenseRecordSerializer(offense_records, many=True).data
+
+    def get_active_records(self, petition):
+        return petition.get_all_offense_records(
+            filter_active=True, include_annotations=False
+        ).values_list("id", flat=True)
 
 
 class BatchSerializer(serializers.ModelSerializer):

@@ -46,12 +46,7 @@ export const TableCell = ({ children, header }) => (
 );
 
 export const TableSpanCell = styled.td`
-  grid-column: 1 / span 5;
-`;
-
-export const TableRightAlignCell = styled.td`
-  text-align: right;
-  margin-right: 50px;
+  grid-column: 1 / span ${(props) => (props.spanLength)};
 `;
 
 export const TableBody = ({ children }) => <tbody>{children}</tbody>;

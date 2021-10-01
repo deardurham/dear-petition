@@ -61,7 +61,7 @@ function DetailRecordPage() {
   useEffect(() => {
       setLoading(true);
       console.log("Calling the API again")
-      Axios.get(`/offenserecord/get_petition_records/?petition=${petitionId}`)
+      Axios.get(`/petitions/${petitionId}/`)
           .then(
               ({ data }) => {
                   setOffenseRecords(data.offense_records);

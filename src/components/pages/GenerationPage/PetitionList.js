@@ -39,15 +39,6 @@ const Label = styled.span`
   font-size: 1.75rem;
 `;
 
-const FlexColumnDiv = styled.div`
-  display: flex;
-  flex-flow: column;
-`;
-
-const AlignSelfEndGenerateButton  = styled(GenerateButton)`
-  align-self: end;
-`;
-
 function GenerateButton({
   label,
   windowWidth,
@@ -92,7 +83,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     setIsDetailed(!isDetailed);
     if (!offenseRecords) {
       setOffenseRecordsLoading(true);
-      Axios.get(`/offenserecord/get_petition_records/?petition=${petitionId}`).then(({ data }) => {
+      Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
         setOffenseRecords(data.offense_records);
         setHighlightedRows(data.active_records);
         setOffenseRecordsLoading(false);
@@ -169,7 +160,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
       </TableRow>
       {isDetailed && (
         <TableRow backgroundColor={backgroundColor}>
-          <TableSpanCell>
+          <TableSpanCell spanLength={5}>
             {offenseRecordsLoading ? (
               <h5>Loading...</h5>
             ) : (
