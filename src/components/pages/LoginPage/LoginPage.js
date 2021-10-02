@@ -20,10 +20,12 @@ import dearLogo from '../../../assets/img/DEAR_logo.png';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { AnimatePresence } from 'framer-motion';
+import useAuth from '../../../hooks/useAuth';
 import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
 
 function Login() {
+  const authenticatedUser = useAuth();
   const history = useHistory();
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
@@ -32,9 +34,8 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const user = localStorage.getItem(USER);
 
-  if (user) {
+  if (authenticatedUser) {
     return <Redirect to="/" />;
   }
 
