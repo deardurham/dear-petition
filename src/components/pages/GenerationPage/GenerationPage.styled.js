@@ -3,8 +3,6 @@ import PageBase from '../PageBase';
 
 export const GenerationPageStyled = styled(PageBase)`
   display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 export const GenerationContentStyled = styled.div`

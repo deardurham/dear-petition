@@ -9,25 +9,20 @@ export const Button = styled.button`
   ${({ type }) => mapTypeToStartingState(type)}
 
   border-radius: 3px;
-  font-size: 1rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.25rem;
   outline: none;
 
-  font-size: calc(1.5rem + 0.5vw);
+  font-size: inherit;
   font-family: ${fontPrimary};
-
-  transition: all 0.1s ease-in;
 
   ${keyAndAmbientShadows.dp2};
 
   &:hover {
-    ${keyAndAmbientShadows.dp6};
-    transform: translateY(-1px);
+    ${keyAndAmbientShadows.dp2};
   }
 
   &:active {
     ${keyAndAmbientShadows.dp2};
-    transform: translateY(1px);
   }
 `;
 
@@ -37,11 +32,11 @@ export const CloseButton = styled(Button)`
   transition: none;
   transform: none;
   font-size: 1.25rem;
-  box-shadow: none;
+  ${keyAndAmbientShadows.dp1};
 
   &:hover {
-    ${keyAndAmbientShadows.dp2};
     transform: none;
+    ${keyAndAmbientShadows.dp1};
   }
 
   &:active {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Redirect, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import PageBase from '../PageBase';
@@ -13,8 +13,36 @@ import Select from '../../elements/Input/Select';
 
 const FlexColumn = styled.div`
   display: flex;
+  flex-flow: column;
+  gap: 15px;
+`;
+
+const FlexRow = styled.div`
+  display: flex;
   align-items: center;
   gap: 15px;
+`;
+
+const TableFlexRow = styled(FlexRow)`
+  justify-content: space-between;
+`;
+
+const UsersTable = styled(Table)`
+  grid-template-columns: 1fr 3fr 3fr 2fr 3fr;
+`;
+
+const ActionsRow = styled(FlexRow)`
+  height: 100%;
+  gap: 10px;
+`;
+
+const ActionButton = styled(Button)`
+  padding: 0.25rem;
+`;
+
+const SubmitButton = styled(Button)`
+  padding: 0.75rem;
+  font-weight: 600;
 `;
 
 const userRoles = [
@@ -22,12 +50,20 @@ const userRoles = [
   { label: 'Administrator', value: 'admin' },
 ];
 
+const limitSizes = [
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+];
+
 const UsersPage = () => {
   const { user: authenticatedUser } = useAuth();
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState(userRoles[0]);
-  const { data } = useUsersQuery();
+  const [limit, setLimit] = useState(limitSizes[0]);
+  const [offset, setOffset] = useState(0);
+  const { data } = useUsersQuery({ limit: limit.value, offset });
   const [triggerCreateUser, { error }] = useCreateUserMutation();
   if (authenticatedUser?.is_admin === false) {
     return <Route render={() => <Redirect to="/" />} />;
@@ -35,8 +71,8 @@ const UsersPage = () => {
   return (
     <PageBase>
       <div>
-        <h1>Actions</h1>
-        <FlexColumn>
+        <h2>Actions</h2>
+        <FlexRow>
           <Input
             label="Username"
             value={newUsername}
@@ -56,7 +92,7 @@ const UsersPage = () => {
             options={userRoles}
           />
           <div>
-            <Button
+            <SubmitButton
               onClick={() =>
                 triggerCreateUser({
                   username: newUsername,
@@ -66,30 +102,80 @@ const UsersPage = () => {
               }
             >
               Submit
-            </Button>
+            </SubmitButton>
           </div>
-        </FlexColumn>
+        </FlexRow>
       </div>
-      <h1>Users</h1>
-      <Table numColumns={3}>
-        <TableHeader>
-          <TableCell header>Username</TableCell>
-          <TableCell header>Email</TableCell>
-          <TableCell header>Admin?</TableCell>
-        </TableHeader>
-        <TableBody>
-          {data?.results &&
-            data.results.map((user) => (
-              <TableRow key={user.pk}>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
-                </TableCell>
-              </TableRow>
+      <h2>Users</h2>
+      <FlexColumn>
+        <TableFlexRow>
+          <Select
+            label="# of Users to Display"
+            value={limit}
+            options={limitSizes}
+            onChange={(selectObj) => {
+              setOffset(0);
+              setLimit(selectObj);
+            }}
+          />
+          <TableFlexRow>
+            <button
+              type="button"
+              onClick={() => setOffset((prev) => prev - limit.value)}
+              disabled={!data?.previous}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            {[...Array(Math.floor(+(data?.count ?? 0) / limit.value) + 1).keys()].map((idx) => (
+              <button
+                type="button"
+                key={idx}
+                onClick={() => setOffset(idx * limit.value)}
+                disabled={idx === offset / limit.value}
+              >
+                {idx + 1}
+              </button>
             ))}
-        </TableBody>
-      </Table>
+            <button
+              type="button"
+              onClick={() => setOffset((prev) => prev + limit.value)}
+              disabled={!data?.next}
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </TableFlexRow>
+        </TableFlexRow>
+        <UsersTable numColumns={5}>
+          <TableHeader>
+            <TableCell header />
+            <TableCell header>Username</TableCell>
+            <TableCell header>Email</TableCell>
+            <TableCell header>Admin?</TableCell>
+            <TableCell header>Actions</TableCell>
+          </TableHeader>
+          <TableBody>
+            {data?.results &&
+              data.results.map((user) => (
+                <TableRow key={user.pk}>
+                  <TableCell>
+                    <Input type="checkbox" />
+                  </TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
+                  </TableCell>
+                  <TableCell>
+                    <ActionsRow>
+                      <ActionButton type="neutral">Edit</ActionButton>
+                      <ActionButton type="caution">Delete</ActionButton>
+                    </ActionsRow>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </UsersTable>
+      </FlexColumn>
     </PageBase>
   );
 };

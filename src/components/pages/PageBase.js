@@ -33,6 +33,11 @@ const LogoutLink = styled(LinkWrapper)`
   cursor: pointer;
 `;
 
+const PageBaseCentered = styled.div`
+  max-width: 1200px;
+  width: 100%;
+`;
+
 function PageBase({ children, className, ...props }) {
   const history = useHistory();
   const { user } = useAuth();
@@ -41,45 +46,47 @@ function PageBase({ children, className, ...props }) {
 
   return (
     <PageBaseStyled {...props}>
-      <PageHeader>
-        <LogoLink>
-          <Link to="/">
-            <PageLogo src={dearLogo} alt="DEAR logo" />
-          </Link>
-        </LogoLink>
-        <LinksGroup>
-          {user && (
+      <PageBaseCentered>
+        <PageHeader>
+          <LogoLink>
+            <Link to="/">
+              <PageLogo src={dearLogo} alt="DEAR logo" />
+            </Link>
+          </LogoLink>
+          <LinksGroup>
+            {user && (
+              <LinkWrapper>
+                <Link to="/">New Petition</Link>
+              </LinkWrapper>
+            )}
             <LinkWrapper>
-              <Link to="/">New Petition</Link>
+              <Link to="/help">Help</Link>
             </LinkWrapper>
-          )}
-          <LinkWrapper>
-            <Link to="/help">Help</Link>
-          </LinkWrapper>
-          {user?.is_admin ? (
-            <LinkWrapper>
-              <Link to="/users">Users</Link>
-            </LinkWrapper>
-          ) : null}
-          {user?.is_admin ? (
-            <LinkWrapper>
-              <a href={user.admin_url}>Admin</a>
-            </LinkWrapper>
-          ) : null}
-          <LogoutLink
-            to="/"
-            onClick={() =>
-              logout().then(() => {
-                dispatch(loggedOut());
-                history.replace('/login');
-              })
-            }
-          >
-            Logout
-          </LogoutLink>
-        </LinksGroup>
-      </PageHeader>
-      <PageContentWrapper className={className}>{children}</PageContentWrapper>
+            {user?.is_admin ? (
+              <LinkWrapper>
+                <Link to="/users">Users</Link>
+              </LinkWrapper>
+            ) : null}
+            {user?.is_admin ? (
+              <LinkWrapper>
+                <a href={user.admin_url}>Admin</a>
+              </LinkWrapper>
+            ) : null}
+            <LogoutLink
+              to="/"
+              onClick={() =>
+                logout().then(() => {
+                  dispatch(loggedOut());
+                  history.replace('/login');
+                })
+              }
+            >
+              Logout
+            </LogoutLink>
+          </LinksGroup>
+        </PageHeader>
+        <PageContentWrapper className={className}>{children}</PageContentWrapper>
+      </PageBaseCentered>
     </PageBaseStyled>
   );
 }

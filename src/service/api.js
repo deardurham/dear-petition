@@ -22,7 +22,22 @@ export const api = createApi({
       query: () => ({ url: 'token/', method: 'delete' }),
     }),
     users: builder.query({
-      query: (params) => ({ url: `users/${params?.id ? params.id + '/' : ''}`, method: 'get' }),
+      query: (args) => {
+        let url = '';
+        if (args?.id) {
+          url = `users/${args.id}/`;
+        } else {
+          const params = [];
+          if (args?.limit) {
+            params.push(`limit=${args.limit}`);
+          }
+          if (args?.offset) {
+            params.push(`offset=${args.offset}`);
+          }
+          url = `users/${params.length > 0 ? '?' + params.join('&') : ''}`;
+        }
+        return { url, method: 'get' };
+      },
       providesTags: ['User'],
     }),
     createUser: builder.mutation({
