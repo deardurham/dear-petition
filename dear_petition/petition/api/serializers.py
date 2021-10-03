@@ -17,7 +17,7 @@ from localflavor.us import us_states
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     admin_url = serializers.SerializerMethodField()
-    is_admin = serializers.SerializerMethodField()
+    is_admin = serializers.BooleanField(source='is_staff', default=False)
 
     class Meta:
         model = User
@@ -29,8 +29,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             url = reverse("admin:index")
         return url
 
-    def get_is_admin(self, user):
-        return user.is_staff
+    def create(self, validated_data):
+        random_pw = User.objects.make_random_password()
+        is_admin = validated_data.get('is_staff', False)
+        return User.objects.create_user(password=random_pw, is_superuser=is_admin, **validated_data)
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):

@@ -36,7 +36,6 @@ function Login() {
   const [errors, setErrors] = useState({});
 
   if (authenticatedUser) {
-    console.log(authenticatedUser);
     return <Redirect to="/" />;
   }
 

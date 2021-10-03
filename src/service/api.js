@@ -23,6 +23,9 @@ export const api = createApi({
     users: builder.query({
       query: (params) => ({ url: `users/${params?.id ? params.id + '/' : ''}`, method: 'get' }),
     }),
+    createUser: builder.mutation({
+      query: (params) => ({ url: `users/`, method: 'post', data: { ...params } }),
+    }),
   }),
 });
 
@@ -32,5 +35,6 @@ export const {
   useGetBatchQuery,
   useLoginMutation,
   useLogoutMutation,
+  useCreateUserMutation,
   useUsersQuery,
 } = api;
