@@ -19,7 +19,7 @@ export const axiosBaseQuery =
       const result = await Axios({ url, method, data });
       return { data: result.data };
     } catch (axiosError) {
-      if (axiosError?.response?.status !== 403) {
+      if (axiosError?.response?.status !== 401) {
         return {
           error: { status: axiosError.response?.status, data: axiosError.response?.data },
         };

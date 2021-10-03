@@ -19,12 +19,16 @@ const FlexColumn = styled.div`
 
 const FlexRow = styled.div`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 15px;
 `;
 
 const TableFlexRow = styled(FlexRow)`
   justify-content: space-between;
+`;
+
+const PaginationFlexRow = styled(FlexRow)`
+  align-self: flex-end;
 `;
 
 const UsersTable = styled(Table)`
@@ -40,9 +44,12 @@ const ActionButton = styled(Button)`
   padding: 0.25rem;
 `;
 
-const SubmitButton = styled(Button)`
-  padding: 0.75rem;
-  font-weight: 600;
+const SubmitButtonWrapper = styled.div`
+  align-self: center;
+  & > button {
+    padding: 0.75rem;
+    font-weight: 600;
+  }
 `;
 
 const userRoles = [
@@ -68,6 +75,8 @@ const UsersPage = () => {
   if (authenticatedUser?.is_admin === false) {
     return <Route render={() => <Redirect to="/" />} />;
   }
+  const numUsers = data?.count ?? 0;
+  const numPages = Math.floor(numUsers / limit.value) + (numUsers % limit.value > 0 ? 1 : 0);
   return (
     <PageBase>
       <div>
@@ -91,8 +100,8 @@ const UsersPage = () => {
             onChange={(selectObj) => setNewRole(selectObj)}
             options={userRoles}
           />
-          <div>
-            <SubmitButton
+          <SubmitButtonWrapper>
+            <Button
               onClick={() =>
                 triggerCreateUser({
                   username: newUsername,
@@ -102,8 +111,8 @@ const UsersPage = () => {
               }
             >
               Submit
-            </SubmitButton>
-          </div>
+            </Button>
+          </SubmitButtonWrapper>
         </FlexRow>
       </div>
       <h2>Users</h2>
@@ -118,7 +127,7 @@ const UsersPage = () => {
               setLimit(selectObj);
             }}
           />
-          <TableFlexRow>
+          <PaginationFlexRow>
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - limit.value)}
@@ -126,7 +135,7 @@ const UsersPage = () => {
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
-            {[...Array(Math.floor(+(data?.count ?? 0) / limit.value) + 1).keys()].map((idx) => (
+            {[...Array(numPages).keys()].map((idx) => (
               <button
                 type="button"
                 key={idx}
@@ -143,7 +152,7 @@ const UsersPage = () => {
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
-          </TableFlexRow>
+          </PaginationFlexRow>
         </TableFlexRow>
         <UsersTable numColumns={5}>
           <TableHeader>

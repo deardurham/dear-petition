@@ -9,7 +9,7 @@ import { loggedIn } from '../../slices/auth';
 function ProtectedRoute({ children, ...props }) {
   const { user } = useAuth();
   const dispatch = useDispatch();
-  const [checkLogin, { data, isFetching, isSuccess, isUninitialized }] = useLazyCheckLoginQuery();
+  const [checkLogin, { data, isFetching, isUninitialized }] = useLazyCheckLoginQuery();
   const isWaiting = isUninitialized || isFetching;
 
   useEffect(() => {
@@ -25,8 +25,7 @@ function ProtectedRoute({ children, ...props }) {
   }, [data]);
 
   // Spin until user information provided or we are redirected
-  // Note: on success, we need to wait for user information to be dispatched
-  if (!user && (isWaiting || isSuccess)) {
+  if (!user && isWaiting) {
     return null;
   }
 
