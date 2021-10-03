@@ -21,10 +21,17 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return super().get_queryset().filter(pk=self.request.user.pk)
+    def get_permissions(self):
+        permission_classes = [permissions.IsAuthenticated]
+        if self.action == 'list':
+            permission_classes.append(permissions.IsAdminUser)
+        return [permission() for permission in permission_classes]
+
+    def retrieve(self, request, pk=None):
+        if (request.user != self.get_object()):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super().retrieve(request, pk=pk)
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):

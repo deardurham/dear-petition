@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -14,6 +15,7 @@ import { smallerThanTabletLandscape } from '../../styles/media';
 
 import useAuth from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../service/api';
+import { loggedOut } from '../../slices/auth';
 
 const LogoLink = styled(LinkWrapper)`
   border: none;
@@ -34,6 +36,7 @@ const LogoutLink = styled(LinkWrapper)`
 function PageBase({ children, className, ...props }) {
   const history = useHistory();
   const { user } = useAuth();
+  const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
   return (
@@ -53,12 +56,25 @@ function PageBase({ children, className, ...props }) {
           <LinkWrapper>
             <Link to="/help">Help</Link>
           </LinkWrapper>
-          {user?.admin_url ? (
+          {user?.is_admin ? (
+            <LinkWrapper>
+              <Link to="/users">Users</Link>
+            </LinkWrapper>
+          ) : null}
+          {user?.is_admin ? (
             <LinkWrapper>
               <a href={user.admin_url}>Admin</a>
             </LinkWrapper>
           ) : null}
-          <LogoutLink to="/" onClick={() => logout().then(() => history.replace('/login'))}>
+          <LogoutLink
+            to="/"
+            onClick={() =>
+              logout().then(() => {
+                dispatch(loggedOut());
+                history.replace('/login');
+              })
+            }
+          >
             Logout
           </LogoutLink>
         </LinksGroup>

@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import { ModalStyled, ModalContent } from './pages/HomePage/HomePage.styled';
 import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
+import UsersPage from './pages/UsersPage/UsersPage';
 
 const WarningContent = styled.div`
   display: flex;
@@ -72,6 +73,9 @@ function App() {
             </ProtectedRoute>
             <ProtectedRoute exact path="/generate/:batchId">
               <GenerationPage />
+            </ProtectedRoute>
+            <ProtectedRoute exact path="/users">
+              <UsersPage />
             </ProtectedRoute>
             <ProtectedRoute exact path="/help">
               <FAQPage />

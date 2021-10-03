@@ -25,7 +25,7 @@ import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
 
 function Login() {
-  const authenticatedUser = useAuth();
+  const { user: authenticatedUser } = useAuth();
   const history = useHistory();
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
@@ -36,6 +36,7 @@ function Login() {
   const [errors, setErrors] = useState({});
 
   if (authenticatedUser) {
+    console.log(authenticatedUser);
     return <Redirect to="/" />;
   }
 
