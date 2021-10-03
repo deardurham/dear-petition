@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Redirect, Route } from 'react-router-dom';
+import styled from 'styled-components';
 import PageBase from '../PageBase';
 import useAuth from '../../../hooks/useAuth';
 import { useCreateUserMutation, useUsersQuery } from '../../../service/api';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
+import { Button } from '../../elements/Button';
 import Input from '../../elements/Input/Input';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
-import styled from 'styled-components';
+import Select from '../../elements/Input/Select';
 
 const FlexColumn = styled.div`
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 15px;
 `;
+
+const userRoles = [
+  { label: 'Default User', value: '' },
+  { label: 'Administrator', value: 'admin' },
+];
 
 const UsersPage = () => {
   const { user: authenticatedUser } = useAuth();
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
-  const [newIsAdmin, setNewIsAdmin] = useState(false);
+  const [newRole, setNewRole] = useState(userRoles[0]);
   const { data } = useUsersQuery();
-  const [triggerCreateUser] = useCreateUserMutation();
+  const [triggerCreateUser, { error }] = useCreateUserMutation();
   if (authenticatedUser?.is_admin === false) {
     return <Route render={() => <Redirect to="/" />} />;
   }
@@ -33,22 +41,32 @@ const UsersPage = () => {
             label="Username"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
+            errors={error?.data?.username ?? ''}
           />
-          <Input label="Email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
-          <input
-            type="checkbox"
-            checked={newIsAdmin}
-            onChange={() => setNewIsAdmin((prev) => !prev)}
+          <Input
+            label="Email"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            errors={error?.data?.email ?? ''}
+          />
+          <Select
+            label="User Role"
+            value={newRole}
+            onChange={(selectObj) => setNewRole(selectObj)}
+            options={userRoles}
           />
           <div>
-            <button
-              type="button"
+            <Button
               onClick={() =>
-                triggerCreateUser({ username: newUsername, email: newEmail, is_admin: newIsAdmin })
+                triggerCreateUser({
+                  username: newUsername,
+                  email: newEmail,
+                  is_admin: newRole.value === 'admin',
+                })
               }
             >
               Submit
-            </button>
+            </Button>
           </div>
         </FlexColumn>
       </div>

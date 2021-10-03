@@ -22,6 +22,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ["pk", "username", "email", "is_admin", "admin_url"]
+        extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
 
     def get_admin_url(self, user_obj):
         url = ""
