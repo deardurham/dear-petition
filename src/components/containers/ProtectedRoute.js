@@ -25,7 +25,8 @@ function ProtectedRoute({ children, ...props }) {
   }, [data]);
 
   // Spin until user information provided or we are redirected
-  if (!user && isWaiting) {
+  // Note: extra render needed before loggedIn dispatch is propogated to useAuth()
+  if (!user && (isWaiting || data?.user)) {
     return null;
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   LoginPageStyled,
@@ -17,7 +17,7 @@ import { Button } from '../../elements/Button';
 import dearLogo from '../../../assets/img/DEAR_logo.png';
 
 // Routing
-import { Redirect, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { AnimatePresence } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
@@ -35,9 +35,11 @@ function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  if (authenticatedUser) {
-    return <Redirect to="/" />;
-  }
+  useEffect(() => {
+    if (authenticatedUser) {
+      history.replace('/');
+    }
+  }, [authenticatedUser]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

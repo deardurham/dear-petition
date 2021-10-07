@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Redirect, Route } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import PageBase from '../PageBase';
 import useAuth from '../../../hooks/useAuth';
@@ -64,6 +64,7 @@ const limitSizes = [
 ];
 
 const UsersPage = () => {
+  const history = useHistory();
   const { user: authenticatedUser } = useAuth();
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
@@ -72,9 +73,13 @@ const UsersPage = () => {
   const [offset, setOffset] = useState(0);
   const { data } = useUsersQuery({ limit: limit.value, offset });
   const [triggerCreateUser, { error }] = useCreateUserMutation();
-  if (authenticatedUser?.is_admin === false) {
-    return <Route render={() => <Redirect to="/" />} />;
-  }
+
+  useEffect(() => {
+    if (authenticatedUser?.is_admin !== true) {
+      history.replace('/');
+    }
+  }, [authenticatedUser]);
+
   const numUsers = data?.count ?? 0;
   const numPages = Math.floor(numUsers / limit.value) + (numUsers % limit.value > 0 ? 1 : 0);
   return (
