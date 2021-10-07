@@ -31,13 +31,15 @@ function Input({ value, onChange, label, type, errors, maxLength, disabled, ...p
 }
 
 Input.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
   label: PropTypes.string,
 };
 
 Input.defaultProps = {
+  value: '',
   label: '',
+  onChange: () => {},
 };
 
 export default Input;
