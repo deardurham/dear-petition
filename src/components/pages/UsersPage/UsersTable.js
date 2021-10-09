@@ -2,22 +2,30 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useForm } from 'react-hook-form';
 import { Button } from '../../elements/Button';
-import Input from '../../elements/Input/Input';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 
+const PassthroughForm = styled.form`
+  display: contents;
+`;
+
+const PassthroughTD = styled.td`
+  display: contents;
+`;
+
 const UsersTableStyled = styled(Table)`
-  grid-template-columns: 2fr 2fr 1fr 1fr;
+  grid-template-columns: minmax(150px, 2fr) minmax(150px, 2fr) minmax(50px, 1fr) minmax(50px, 1fr);
   align-items: center;
   & td {
     height: 100%;
   }
-`;
-
-const FlexRow = styled.div`
-  display: flex;
-  align-items: center;
-  height: 100%;
+  & td > input {
+    width: 100%;
+  }
+  & td > * {
+    height: 100%;
+  }
 `;
 
 const ActionsRow = styled.div`
@@ -32,62 +40,74 @@ const ActionButton = styled(Button)`
   padding: 0.25rem;
 `;
 
-const ToggableInputDisplay = ({ children, checked, isInput, label, value, type, onChange }) => {
-  if (!isInput) {
-    return children || value;
-  }
+const DisplayCells = ({ user, onStartEdit }) => (
+  <>
+    <TableCell>{user.username}</TableCell>
+    <TableCell>{user.email}</TableCell>
+    <TableCell>
+      <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
+    </TableCell>
+    <TableCell>
+      <ActionsRow>
+        <ActionButton type="neutral" onClick={() => onStartEdit()}>
+          Edit
+        </ActionButton>
+        <ActionButton type="caution">Delete</ActionButton>
+      </ActionsRow>
+    </TableCell>
+  </>
+);
+
+const InputCells = ({ user, onStopEdit }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = (data) => {
+    if (['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
+      onStopEdit();
+      return;
+    }
+    console.log(data);
+    onStopEdit();
+  };
   return (
-    <Input
-      label={label}
-      value={value}
-      checked={checked}
-      onChange={(e) => onChange(e.target.value)}
-      type={type}
-    />
+    <PassthroughTD>
+      <PassthroughForm onSubmit={handleSubmit(onSubmit)}>
+        <TableCell>
+          <input defaultValue={user.username} {...register('username')} />
+        </TableCell>
+        <TableCell>
+          <input defaultValue={user.email} {...register('email')} />
+        </TableCell>
+        <TableCell>
+          <div>
+            <input type="checkbox" defaultChecked={user.is_admin} {...register('is_admin')} />
+          </div>
+        </TableCell>
+        <TableCell>
+          <ActionsRow>
+            <ActionButton type="submit">Save</ActionButton>
+            <ActionButton type="neutral" onClick={() => onStopEdit()}>
+              Cancel
+            </ActionButton>
+          </ActionsRow>
+        </TableCell>
+      </PassthroughForm>
+    </PassthroughTD>
   );
 };
 
 const UserRow = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
-  const [newUsername, setNewUsername] = useState();
-  const [newEmail, setNewEmail] = useState();
-  const [newRole, setNewRole] = useState(user.is_admin);
   return (
     <TableRow key={user.pk}>
-      <TableCell>
-        <ToggableInputDisplay
-          isInput={isEditing}
-          value={newUsername || user.username}
-          onChange={(newValue) => setNewUsername(newValue)}
-        />
-      </TableCell>
-      <TableCell>
-        <ToggableInputDisplay
-          isInput={isEditing}
-          value={newEmail || user.email}
-          onChange={(newValue) => setNewEmail(newValue)}
-        />
-      </TableCell>
-      <TableCell>
-        <FlexRow>
-          <ToggableInputDisplay
-            isInput={isEditing}
-            type="checkbox"
-            checked={newRole}
-            onChange={() => setNewRole((prev) => !prev)}
-          >
-            <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
-          </ToggableInputDisplay>
-        </FlexRow>
-      </TableCell>
-      <TableCell>
-        <ActionsRow>
-          <ActionButton type="neutral" onClick={() => setEditing((prev) => !prev)}>
-            {isEditing ? 'Save' : 'Edit'}
-          </ActionButton>
-          <ActionButton type="caution">Delete</ActionButton>
-        </ActionsRow>
-      </TableCell>
+      {!isEditing ? (
+        <DisplayCells user={user} onStartEdit={() => setEditing(true)} />
+      ) : (
+        <InputCells user={user} onStopEdit={() => setEditing(false)} />
+      )}
     </TableRow>
   );
 };
