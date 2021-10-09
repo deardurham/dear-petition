@@ -31,14 +31,14 @@ function Select({ value, onChange, label, errors, options, disabled, className }
 
 Select.propTypes = {
   value: PropTypes.shape({
-    value: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     label: PropTypes.string,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   label: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
-      value: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       label: PropTypes.string,
     })
   ).isRequired,

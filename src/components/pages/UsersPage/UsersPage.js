@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faChevronLeft, faChevronRight, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import UsersTable from './UsersTable';
 import PageBase from '../PageBase';
 import useAuth from '../../../hooks/useAuth';
 import { useCreateUserMutation, useUsersQuery } from '../../../service/api';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import { Button } from '../../elements/Button';
 import Input from '../../elements/Input/Input';
 import Select from '../../elements/Input/Select';
@@ -29,19 +29,6 @@ const TableFlexRow = styled(FlexRow)`
 
 const PaginationFlexRow = styled(FlexRow)`
   align-self: flex-end;
-`;
-
-const UsersTable = styled(Table)`
-  grid-template-columns: 1fr 3fr 3fr 2fr 3fr;
-`;
-
-const ActionsRow = styled(FlexRow)`
-  height: 100%;
-  gap: 10px;
-`;
-
-const ActionButton = styled(Button)`
-  padding: 0.25rem;
 `;
 
 const SubmitButtonWrapper = styled.div`
@@ -159,36 +146,7 @@ const UsersPage = () => {
             </button>
           </PaginationFlexRow>
         </TableFlexRow>
-        <UsersTable numColumns={5}>
-          <TableHeader>
-            <TableCell header />
-            <TableCell header>Username</TableCell>
-            <TableCell header>Email</TableCell>
-            <TableCell header>Admin?</TableCell>
-            <TableCell header>Actions</TableCell>
-          </TableHeader>
-          <TableBody>
-            {data?.results &&
-              data.results.map((user) => (
-                <TableRow key={user.pk}>
-                  <TableCell>
-                    <Input type="checkbox" />
-                  </TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
-                  </TableCell>
-                  <TableCell>
-                    <ActionsRow>
-                      <ActionButton type="neutral">Edit</ActionButton>
-                      <ActionButton type="caution">Delete</ActionButton>
-                    </ActionsRow>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </UsersTable>
+        <UsersTable users={data?.results || []} />
       </FlexColumn>
     </PageBase>
   );
