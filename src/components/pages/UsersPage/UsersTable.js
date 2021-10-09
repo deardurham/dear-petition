@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
+import { useModifyUserMutation } from '../../../service/api';
+import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 
@@ -64,12 +66,15 @@ const InputCells = ({ user, onStopEdit }) => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [triggerUpdate] = useModifyUserMutation();
+  const { user: myUser } = useAuth();
   const onSubmit = (data) => {
-    if (['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
-      onStopEdit();
-      return;
+    if (myUser.pk === user.pk && user.is_admin !== data.is_admin) {
+      console.log('WARNING');
+    } else if (!['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
+      console.log(data);
+      triggerUpdate({ id: user.pk, data });
     }
-    console.log(data);
     onStopEdit();
   };
   return (
