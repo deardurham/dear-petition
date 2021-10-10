@@ -42,23 +42,36 @@ const ActionButton = styled(Button)`
   padding: 0.25rem;
 `;
 
-const DisplayCells = ({ user, onStartEdit }) => (
-  <>
-    <TableCell>{user.username}</TableCell>
-    <TableCell>{user.email}</TableCell>
-    <TableCell>
-      <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
-    </TableCell>
-    <TableCell>
-      <ActionsRow>
-        <ActionButton type="neutral" onClick={() => onStartEdit()}>
-          Edit
-        </ActionButton>
-        <ActionButton type="caution">Delete</ActionButton>
-      </ActionsRow>
-    </TableCell>
-  </>
-);
+const DisplayCells = ({ user, onStartEdit }) => {
+  const { user: myUser } = useAuth();
+  const [triggerUpdate] = useModifyUserMutation();
+  return (
+    <>
+      <TableCell>{user.username}</TableCell>
+      <TableCell>{user.email}</TableCell>
+      <TableCell>
+        <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
+      </TableCell>
+      <TableCell>
+        <ActionsRow>
+          <ActionButton type="neutral" onClick={() => onStartEdit()}>
+            Edit
+          </ActionButton>
+          <ActionButton
+            type="caution"
+            onClick={() => {
+              if (myUser.pk !== user.pk) {
+                triggerUpdate({ id: user.pk, method: 'delete' });
+              }
+            }}
+          >
+            Delete
+          </ActionButton>
+        </ActionsRow>
+      </TableCell>
+    </>
+  );
+};
 
 const InputCells = ({ user, onStopEdit }) => {
   const {
@@ -72,7 +85,6 @@ const InputCells = ({ user, onStopEdit }) => {
     if (myUser.pk === user.pk && user.is_admin !== data.is_admin) {
       console.log('WARNING');
     } else if (!['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
-      console.log(data);
       triggerUpdate({ id: user.pk, data });
     }
     onStopEdit();

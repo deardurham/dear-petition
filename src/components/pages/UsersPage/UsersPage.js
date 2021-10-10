@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import UsersTable from './UsersTable';
@@ -53,13 +54,15 @@ const limitSizes = [
 const UsersPage = () => {
   const history = useHistory();
   const { user: authenticatedUser } = useAuth();
-  const [newUsername, setNewUsername] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  const [newRole, setNewRole] = useState(userRoles[0]);
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
   const { data } = useUsersQuery({ limit: limit.value, offset });
   const [triggerCreateUser, { error }] = useCreateUserMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     if (authenticatedUser?.is_admin !== true) {
@@ -68,13 +71,40 @@ const UsersPage = () => {
   }, [authenticatedUser]);
 
   const numUsers = data?.count ?? 0;
+  useEffect(() => {
+    if (offset >= numUsers) {
+      setOffset(0);
+    }
+  }, [offset, numUsers]);
+
+  const onSubmit = (submitData) => {
+    console.log(submitData);
+    triggerCreateUser({
+      username: submitData.username,
+      email: submitData.email,
+      is_admin: submitData.is_admin === 'admin',
+    });
+  };
+
   const numPages = Math.floor(numUsers / limit.value) + (numUsers % limit.value > 0 ? 1 : 0);
   return (
     <PageBase>
       <div>
         <h2>Actions</h2>
         <FlexRow>
-          <Input
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <input {...register('username')} />
+            <input {...register('email')} />
+            <select {...register('is_admin')}>
+              {Object.values(userRoles).map(({ label, value }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <Button type="submit">Create User</Button>
+          </form>
+          {/* <Input
             label="Username"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
@@ -104,7 +134,7 @@ const UsersPage = () => {
             >
               Submit
             </Button>
-          </SubmitButtonWrapper>
+          </SubmitButtonWrapper> */}
         </FlexRow>
       </div>
       <h2>Users</h2>

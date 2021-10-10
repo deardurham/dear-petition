@@ -45,7 +45,7 @@ export const api = createApi({
       invalidatesTags: ['User'],
     }),
     modifyUser: builder.mutation({
-      query: ({ id, data }) => ({ url: `users/${id}/`, method: 'put', data }),
+      query: ({ id, data, method = 'put' }) => ({ url: `users/${id}/`, method, data }),
       invalidatesTags: ['User'],
     }),
   }),

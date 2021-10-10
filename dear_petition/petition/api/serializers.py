@@ -31,7 +31,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         return url
 
     def create(self, validated_data):
-        print("TEST")
         random_pw = User.objects.make_random_password()
         is_admin = validated_data.get('is_staff', False)
         return User.objects.create_user(password=random_pw, is_superuser=is_admin, **validated_data)
