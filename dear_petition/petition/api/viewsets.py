@@ -21,6 +21,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["username"]
+    ordering = ['username']
+    # TODO: Search
+    # filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    # search_fields = ["username"]
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
