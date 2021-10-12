@@ -4,7 +4,6 @@ from dear_petition.petition import constants
 from dear_petition.petition.models import Batch
 from dear_petition.petition.etl.load import (
     create_batch_petitions,
-    create_petitions_from_records,
     import_ciprs_records,
 )
 
@@ -35,7 +34,7 @@ def test_import_ciprs_records_multi_files(fake_pdf, fake_pdf2, user, mock_ciprs_
 def test_created_petition(batch, record1, charged_dismissed_record, mock_ciprs_reader):
     """ETL should created identified generatable petitions."""
     create_batch_petitions(batch)
-    petition = batch.petitions.get()
+    petition = batch.petitions.first()
     assert petition.jurisdiction == record1.jurisdiction
     assert petition.county == record1.county
 

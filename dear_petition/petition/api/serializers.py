@@ -30,9 +30,34 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):
+    offense_date = serializers.SerializerMethodField()
+    dob = serializers.SerializerMethodField()
+    disposition_method = serializers.SerializerMethodField()
+
+    def get_offense_date(self, offense_record):
+        return offense_record.offense.ciprs_record.offense_date.date()
+
+    def get_dob(self, offense_record):
+        return offense_record.offense.ciprs_record.dob
+
+    def get_disposition_method(self, offense_record):
+        return offense_record.offense.disposition_method
+
     class Meta:
         model = OffenseRecord
-        fields = ["pk", "offense", "law", "code", "action", "severity", "description"]
+        fields = [
+            "pk",
+            "offense",
+            "law",
+            "code",
+            "action",
+            "severity",
+            "description",
+            "active",
+            "offense_date",
+            "dob",
+            "disposition_method",
+        ]
 
 
 class OffenseSerializer(serializers.ModelSerializer):
@@ -90,12 +115,27 @@ class PetitionSerializer(serializers.ModelSerializer):
 
 class ParentPetitionSerializer(PetitionSerializer):
     attachments = serializers.SerializerMethodField()
+    offense_records = serializers.SerializerMethodField()
+    active_records = serializers.SerializerMethodField()
 
     class Meta(PetitionSerializer.Meta):
-        fields = PetitionSerializer.Meta.fields + ['attachments']
+        fields = PetitionSerializer.Meta.fields + ["attachments", "active_records"]
 
     def get_attachments(self, instance):
-        return PetitionSerializer(instance.attachments.all().order_by('pk'), many=True).data
+        return PetitionSerializer(
+            instance.attachments.all().order_by("pk"), many=True
+        ).data
+
+    def get_offense_records(self, petition):
+        offense_records = petition.get_all_offense_records(
+            filter_active=False, include_annotations=False
+        )
+        return OffenseRecordSerializer(offense_records, many=True).data
+
+    def get_active_records(self, petition):
+        return petition.get_all_offense_records(
+            filter_active=True, include_annotations=False
+        ).values_list("id", flat=True)
 
 
 class BatchSerializer(serializers.ModelSerializer):
@@ -133,14 +173,17 @@ class BatchDetailSerializer(serializers.ModelSerializer):
 
     def get_petitions(self, instance):
         """Return sorted and structured petitions with associated attachments"""
-        parent_petitions = Petition.objects.filter(batch=instance.pk, parent__isnull=True).order_by('county', 'jurisdiction')
+        parent_petitions = Petition.objects.filter(
+            batch=instance.pk, parent__isnull=True
+        ).order_by("county", "jurisdiction")
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
 
     petition = serializers.ChoiceField(
-        choices=[], style={"base_template": "input.html"},
+        choices=[],
+        style={"base_template": "input.html"},
     )
     name_petitioner = serializers.CharField(label="Petitioner Name")
     address1 = serializers.CharField(label="Address Line 1")
