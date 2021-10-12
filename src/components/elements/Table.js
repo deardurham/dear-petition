@@ -46,7 +46,7 @@ export const TableCell = ({ children, header }) => (
 );
 
 export const TableSpanCell = styled.td`
-  grid-column: 1 / span ${(props) => (props.spanLength)};
+  grid-column: 1 / span ${(props) => props.spanLength};
 `;
 
 export const TableBody = ({ children }) => <tbody>{children}</tbody>;
