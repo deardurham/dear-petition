@@ -1,10 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../Table';
-import { colorPrimary } from '../../../styles/colors';
 
 
-const StyledTable = ({ children, className, columnSizes, numColumns }) => {
+function StyledTable({ children, className, columnSizes, numColumns }) {
     const defaultSize = `repeat(${numColumns}, 1fr)`;
     return (
       <TableStyle className={className} columnSize={columnSizes || defaultSize}>
