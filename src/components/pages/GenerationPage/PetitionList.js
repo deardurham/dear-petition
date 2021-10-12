@@ -96,7 +96,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   };
 
   const unhighlightRow = (offenseRecordId) => {
-    setHighlightedRows(highlightedRows.filter((value, index, arr) => value !== offenseRecordId));
+    setHighlightedRows(highlightedRows.filter((value) => value !== offenseRecordId));
   };
 
   const recalculatePetitions = () => {
@@ -148,7 +148,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
                 <FontAwesomeIcon icon={faChevronRight} />
               )
             }
-            isCollapsed=<FontAwesomeIcon icon={faChevronDown} />
+            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => handlePress()}
             title="Reveal offense records"
           />
