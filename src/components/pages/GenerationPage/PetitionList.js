@@ -96,11 +96,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   };
 
   const unhighlightRow = (offenseRecordId) => {
-    setHighlightedRows(
-      highlightedRows.filter((value, index, arr) => {
-        return value !== offenseRecordId;
-      })
-    );
+    setHighlightedRows(highlightedRows.filter((value, index, arr) => value !== offenseRecordId));
   };
 
   const recalculatePetitions = () => {

@@ -15,6 +15,7 @@ const Axios = axios.create({
 Axios.interceptors.request.use(
   (request) => {
     const csrfToken = localStorage.getItem(CSRF_TOKEN_LS_KEY);
+    // eslint-disable-next-line no-param-reassign
     if (csrfToken) request.headers[CSRF_HEADER_KEY] = csrfToken;
     return request;
   },
