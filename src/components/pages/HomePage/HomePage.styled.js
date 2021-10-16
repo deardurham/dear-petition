@@ -1,9 +1,8 @@
 import styled from 'styled-components';
-import { colorWhite, colorWarning, colorCaution } from '../../../styles/colors';
+import { colorWarning, colorCaution } from '../../../styles/colors';
 
 // Base
 import PageBase from '../PageBase';
-import Modal from '../../elements/Modal/Modal';
 
 export const HomePageStyled = styled(PageBase)``;
 
@@ -41,20 +40,4 @@ export const DragErrors = styled.div`
     color: ${colorCaution};
     padding: 1rem 1rem 0 1rem;
   }
-`;
-
-export const ModalStyled = styled(Modal)`
-  position: fixed;
-  bottom: 50%;
-  left: 50%;
-  transform: translate(-50%, 50%);
-`;
-
-export const ModalContent = styled.div`
-  background-color: ${colorWhite};
-  width: 500px;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;

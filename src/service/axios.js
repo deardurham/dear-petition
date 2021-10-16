@@ -14,9 +14,13 @@ export default Axios;
 
 export const axiosBaseQuery =
   () =>
-  async ({ url, method, data }, api) => {
+  async ({ url, method, timeout, data }, api) => {
     try {
-      const result = await Axios({ url, method, data });
+      const config = { url, method, data };
+      if (timeout) {
+        config.timeout = timeout;
+      }
+      const result = await Axios(config);
       return { data: result.data };
     } catch (axiosError) {
       if (axiosError?.response?.status !== 401) {

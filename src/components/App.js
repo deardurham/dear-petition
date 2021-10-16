@@ -7,38 +7,41 @@ import GlobalStyle from '../styles/GlobalStyle';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './containers/ProtectedRoute';
 
-// Pages
+import { Button } from './elements/Button';
+import Modal from './elements/Modal/Modal';
 import HomePage from './pages/HomePage/HomePage';
 import GenerationPage from './pages/GenerationPage/GenerationPage';
 import FAQPage from './pages/HelpPage/HelpPage';
 import LoginPage from './pages/LoginPage/LoginPage';
-import { ModalStyled, ModalContent } from './pages/HomePage/HomePage.styled';
 import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
 import UsersPage from './pages/UsersPage/UsersPage';
 
-const WarningContent = styled.div`
-  display: flex;
-  flex-flow: column;
-  gap: 1rem;
-  & > h3 {
-    font-weight: 700;
-    align-self: center;
+const WarningModal = styled(Modal)`
+  width: 500px;
+
+  & > div {
+    gap: 1rem;
+    padding: 2rem;
+    & > h3 {
+      font-weight: 700;
+      align-self: center;
+    }
+    & > button {
+      margin-top: 1rem;
+      align-self: center;
+      width: 100px;
+    }
   }
 `;
 
 const BrowserWarning = ({ hideModal, showWarning }) => (
-  <ModalStyled isVisible={showWarning} closeModal={hideModal}>
-    <ModalContent>
-      <WarningContent>
-        <h3>WARNING</h3>
-        <p>
-          It appears you are not using Chrome. This may cause issues while using the application.
-        </p>
-        <p>Please use Chrome to ensure best results.</p>
-      </WarningContent>
-    </ModalContent>
-  </ModalStyled>
+  <WarningModal isVisible={showWarning} closeModal={hideModal}>
+    <h3>WARNING</h3>
+    <p>It appears you are not using Chrome. This may cause issues while using the application.</p>
+    <p>Please use Chrome to ensure best results.</p>
+    <Button onClick={hideModal}>Close</Button>
+  </WarningModal>
 );
 
 function App() {

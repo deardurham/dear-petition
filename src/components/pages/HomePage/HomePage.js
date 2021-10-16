@@ -8,11 +8,9 @@ import {
   DnDContent,
   DragErrors,
   DragWarnings,
-  ModalStyled,
-  ModalContent,
 } from './HomePage.styled';
 
-// Children
+import Modal from '../../elements/Modal/Modal';
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
 import { useHistory } from 'react-router-dom';
@@ -26,12 +24,18 @@ const LONG_WAIT_TIMEOUT = 5; // seconds
 // TODO: Add timeout to axiosBaseQuery
 // const MAX_TIMEOUT = 30; // seconds
 
-const ModalError = styled.p`
-  margin-top: 2rem;
-  color: ${colorRed};
-  font-family: ${fontError};
-  font-size: 1.5rem;
-  font-weight: bold;
+const ModalStyled = styled(Modal)`
+  & > div {
+    width: 500px;
+    gap: 2rem;
+    padding: 4rem;
+    p {
+      color: ${colorRed};
+      font-family: ${fontError};
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
 `;
 
 function HomePage() {
@@ -170,10 +174,8 @@ function HomePage() {
           setModalError();
         }}
       >
-        <ModalContent>
-          <h2>Preparing petitions...</h2>
-          {modalError && <ModalError>{modalError}</ModalError>}
-        </ModalContent>
+        <h2>Preparing petitions...</h2>
+        {modalError && <p>{modalError}</p>}
       </ModalStyled>
     </>
   );

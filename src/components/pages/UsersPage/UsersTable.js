@@ -7,6 +7,8 @@ import { useModifyUserMutation } from '../../../service/api';
 import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
+import Modal from '../../elements/Modal/Modal';
+import { colorWhite } from '../../../styles/colors';
 
 const PassthroughForm = styled.form`
   display: contents;
@@ -42,8 +44,33 @@ const ActionButton = styled(Button)`
   padding: 0.25rem;
 `;
 
+const ModalStyled = styled(Modal)`
+  & > div {
+    width: 450px;
+    gap: 1rem;
+    & > h2 {
+      align-self: center;
+    }
+    & > p {
+      font-size: 1.6rem;
+      & > bold {
+        font-weight: 600;
+      }
+    }
+    button {
+      font-size: 1.6rem;
+      padding: 0.5rem;
+    }
+    & > div:last-child {
+      margin-top: 1rem;
+      align-self: center;
+    }
+  }
+`;
+
 const DisplayCells = ({ user, onStartEdit }) => {
   const { user: myUser } = useAuth();
+  const [isModalVisible, setModalVisible] = useState(false);
   const [triggerUpdate] = useModifyUserMutation();
   return (
     <>
@@ -61,12 +88,30 @@ const DisplayCells = ({ user, onStartEdit }) => {
             type="caution"
             onClick={() => {
               if (myUser.pk !== user.pk) {
-                triggerUpdate({ id: user.pk, method: 'delete' });
+                setModalVisible(true);
               }
             }}
           >
             Delete
           </ActionButton>
+          <ModalStyled isVisible={isModalVisible}>
+            <h2>Warning</h2>
+            <p>
+              Please confirm you want to <bold>permanently</bold> delete the following user:
+            </p>
+            <p>{user.username}</p>
+            <ActionsRow>
+              <Button
+                type="caution"
+                onClick={() => triggerUpdate({ id: user.pk, method: 'delete' })}
+              >
+                Confirm
+              </Button>
+              <Button onClick={() => setModalVisible(false)} type="neutral">
+                Cancel
+              </Button>
+            </ActionsRow>
+          </ModalStyled>
         </ActionsRow>
       </TableCell>
     </>
@@ -116,12 +161,16 @@ const InputCells = ({ user, onStopEdit }) => {
   );
 };
 
-const UserRow = ({ user }) => {
+const UserRow = ({ user, setModalVisible }) => {
   const [isEditing, setEditing] = useState(false);
   return (
     <TableRow key={user.pk}>
       {!isEditing ? (
-        <DisplayCells user={user} onStartEdit={() => setEditing(true)} />
+        <DisplayCells
+          user={user}
+          onStartEdit={() => setEditing(true)}
+          setModalVisible={setModalVisible}
+        />
       ) : (
         <InputCells user={user} onStopEdit={() => setEditing(false)} />
       )}

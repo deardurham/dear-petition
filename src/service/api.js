@@ -10,7 +10,7 @@ export const api = createApi({
       query: () => ({ url: 'token/', method: 'get' }),
     }),
     createBatch: builder.mutation({
-      query: ({ data }) => ({ url: 'batch/', method: 'post', data }),
+      query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
     }),
     getBatch: builder.query({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),

@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { ModalStyled } from '../../HomePage/HomePage.styled';
-import ModalContent from './GeneratePetitionModal.styled';
 
 // Hooks
 import useKeyPress from '../../../../hooks/useKeyPress';
 
-// Children/Components
+import Modal from '../../../elements/Modal/Modal';
 import AgencyAutocomplete from '../GenerationInput/AgencyAutocomplete';
 import { Button, CloseButton } from '../../../elements/Button';
 import Axios from '../../../../service/axios';
@@ -19,8 +17,30 @@ const ModalCloseButton = styled(CloseButton)`
   right: 0;
 `;
 
-const Content = styled.ul`
-  font-size: 1.6rem;
+const ModalStyled = styled(Modal)`
+  width: 500px;
+
+  & > div {
+    gap: 1.25rem;
+  }
+
+  ul {
+    & > li:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+    font-size: 1.6rem;
+  }
+  ul + div {
+    padding: 0;
+  }
+  button {
+    font-size: 1.6rem;
+  }
+  div + button {
+    align-self: center;
+    width: 100px;
+    padding: 1rem;
+  }
 `;
 
 const GeneratePetitionModal = ({
@@ -91,28 +111,24 @@ const GeneratePetitionModal = ({
   };
 
   return (
-    <GeneratePetitionModalStyled isVisible>
-      <ModalContent>
-        <ModalCloseButton onClick={closePdf}>
-          <FontAwesomeIcon icon={faTimes} />
-        </ModalCloseButton>
-        {petition && (
-          <>
-            <h2>{petition.form_type}</h2>
-            <Content>
-              {attachmentNumber && <li>Attachment #: {attachmentNumber}</li>}
-              <li>County: {petition.county} County</li>
-              <li>Jurisdiction: {petition.jurisdiction}</li>
-            </Content>
-            <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
-            <Button onClick={handleGenerate}>Generate</Button>
-          </>
-        )}
-      </ModalContent>
-    </GeneratePetitionModalStyled>
+    <ModalStyled isVisible>
+      <ModalCloseButton onClick={closePdf}>
+        <FontAwesomeIcon icon={faTimes} />
+      </ModalCloseButton>
+      {petition && (
+        <>
+          <h2>{petition.form_type}</h2>
+          <ul>
+            {attachmentNumber && <li>Attachment #: {attachmentNumber}</li>}
+            <li>County: {petition.county} County</li>
+            <li>Jurisdiction: {petition.jurisdiction}</li>
+          </ul>
+          <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
+          <Button onClick={handleGenerate}>Generate</Button>
+        </>
+      )}
+    </ModalStyled>
   );
 };
-
-const GeneratePetitionModalStyled = styled(ModalStyled)``;
 
 export default GeneratePetitionModal;

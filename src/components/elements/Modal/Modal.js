@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { ModalStyled, ModalUnderlay } from './Modal.styled';
+import { ModalContent, ModalStyled, ModalUnderlay } from './Modal.styled';
 
 // Hooks
 import usePortal from '../../../hooks/usePortal';
@@ -21,7 +21,7 @@ function Modal({ children, isVisible, closeModal, ...props }) {
       {isVisible && [
         <ModalUnderlay key="shade" onClick={closeModal} />,
         <ModalStyled key="modal" {...props}>
-          {children}
+          <ModalContent>{children}</ModalContent>
         </ModalStyled>,
       ]}
     </>,
