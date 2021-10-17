@@ -41,7 +41,7 @@ const TableStyle = styled.table`
   }
 
   & tr:nth-child(even) td {
-    background-color: ${greyScale(9)};
+    background-color: ${greyScale(9.25)};
   }
 `;
 

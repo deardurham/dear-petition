@@ -41,6 +41,9 @@ const ModalStyled = styled(Modal)`
     width: 100px;
     padding: 1rem;
   }
+  input {
+    padding: 1rem;
+  }
 `;
 
 const GeneratePetitionModal = ({

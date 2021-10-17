@@ -8,7 +8,7 @@ import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import Modal from '../../elements/Modal/Modal';
-import { colorWhite } from '../../../styles/colors';
+import Input from '../../elements/Input/Input';
 
 const PassthroughForm = styled.form`
   display: contents;
@@ -19,16 +19,14 @@ const PassthroughTD = styled.td`
 `;
 
 const UsersTableStyled = styled(Table)`
-  grid-template-columns: minmax(150px, 2fr) minmax(150px, 2fr) minmax(50px, 1fr) minmax(50px, 1fr);
+  grid-template-columns: minmax(150px, 3fr) minmax(150px, 3fr) minmax(50px, 1fr) minmax(50px, 2fr);
   align-items: center;
   & td {
     height: 100%;
   }
-  & td > input {
-    width: 100%;
-  }
-  & td > * {
-    height: 100%;
+  & form > td {
+    display: flex;
+    align-items: baseline;
   }
 `;
 
@@ -41,7 +39,7 @@ const ActionsRow = styled.div`
 `;
 
 const ActionButton = styled(Button)`
-  padding: 0.25rem;
+  padding: 0.5rem;
 `;
 
 const ModalStyled = styled(Modal)`
@@ -65,6 +63,14 @@ const ModalStyled = styled(Modal)`
       margin-top: 1rem;
       align-self: center;
     }
+  }
+`;
+
+const TextboxInput = styled(Input)`
+  width: 100%;
+  input {
+    width: 100%;
+    padding: 0.5rem;
   }
 `;
 
@@ -122,31 +128,48 @@ const InputCells = ({ user, onStopEdit }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors: formErrors },
   } = useForm();
-  const [triggerUpdate] = useModifyUserMutation();
+  const [triggerUpdate, { error }] = useModifyUserMutation();
   const { user: myUser } = useAuth();
   const onSubmit = (data) => {
     if (myUser.pk === user.pk && user.is_admin !== data.is_admin) {
       console.log('WARNING');
     } else if (!['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
-      triggerUpdate({ id: user.pk, data });
+      triggerUpdate({ id: user.pk, data })
+        .unwrap()
+        .then(() => onStopEdit())
+        .catch(() => console.error('Validation/network error'));
+    } else {
+      onStopEdit();
     }
-    onStopEdit();
   };
   return (
     <PassthroughTD>
       <PassthroughForm onSubmit={handleSubmit(onSubmit)}>
         <TableCell>
-          <input defaultValue={user.username} {...register('username')} />
+          <TextboxInput
+            defaultValue={user.username}
+            errors={error?.data?.username ?? ''}
+            register={register}
+            name="username"
+          />
         </TableCell>
         <TableCell>
-          <input defaultValue={user.email} {...register('email')} />
+          <TextboxInput
+            defaultValue={user.email}
+            errors={error?.data?.email ?? ''}
+            register={register}
+            name="email"
+          />
         </TableCell>
         <TableCell>
-          <div>
-            <input type="checkbox" defaultChecked={user.is_admin} {...register('is_admin')} />
-          </div>
+          <Input
+            type="checkbox"
+            defaultChecked={user.is_admin}
+            register={register}
+            name="is_admin"
+          />
         </TableCell>
         <TableCell>
           <ActionsRow>

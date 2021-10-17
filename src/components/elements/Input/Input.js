@@ -3,26 +3,18 @@ import PropTypes from 'prop-types';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ checked, value, onChange, label, type, errors, maxLength, disabled, ...props }) {
+function Input({ className, label, errors, register, name, ...inputProps }) {
+  const registerProps = register && name ? { ...register(name) } : {};
   return (
-    <InputWrapper {...props}>
-      <InputStyled>
-        {label}
-        <ActualInputStyled
-          type={type}
-          maxLength={maxLength}
-          value={value}
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-        />
-      </InputStyled>
+    <InputWrapper className={className}>
+      <InputStyled>{label}</InputStyled>
+      <ActualInputStyled {...inputProps} {...registerProps} />
       {errors && (
         <AnimatePresence>
           <InputErrors
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: -25 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '-50' }}
+            exit={{ opacity: 0, y: '50' }}
             positionTransition
           >
             {errors && errors.map((errMsg) => <p key={errMsg}>{errMsg}</p>)}
@@ -32,17 +24,5 @@ function Input({ checked, value, onChange, label, type, errors, maxLength, disab
     </InputWrapper>
   );
 }
-
-Input.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  onChange: PropTypes.func,
-  label: PropTypes.string,
-};
-
-Input.defaultProps = {
-  value: '',
-  label: '',
-  onChange: () => {},
-};
 
 export default Input;

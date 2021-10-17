@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { useCreateUserMutation } from '../../../service/api';
 import { Button } from '../../elements/Button';
 import Input from '../../elements/Input/Input';
+import Modal from '../../elements/Modal/Modal';
 
 const FlexRow = styled.div`
   display: flex;
@@ -13,6 +14,8 @@ const FlexRow = styled.div`
 `;
 
 const ActionFormRow = styled(FlexRow)`
+  margin-top: 1rem;
+  align-self: center;
   gap: 15px;
 `;
 
@@ -27,7 +30,33 @@ const FlexColumn = styled.div`
 
 const SubmitForm = styled.form`
   display: flex;
-  gap: 10px;
+  flex-flow: column;
+  gap: 15px;
+  input,
+  select,
+  button {
+    font-size: 1.5rem;
+    padding: 0.75rem;
+  }
+`;
+
+const ModalStyled = styled(Modal)`
+  height: 400px;
+  width: 450px;
+  & > div {
+    width: 325px;
+    gap: 20px;
+    h2 {
+      user-select: none;
+    }
+    input {
+      width: 100%;
+    }
+    span {
+      display: block;
+      user-select: none;
+    }
+  }
 `;
 
 const USER_ROLES = [
@@ -35,40 +64,7 @@ const USER_ROLES = [
   { label: 'Administrator', value: 'admin' },
 ];
 
-/* <Input
-  label="Username"
-  value={newUsername}
-  onChange={(e) => setNewUsername(e.target.value)}
-  errors={error?.data?.username ?? ''}
-/>
-<Input
-  label="Email"
-  value={newEmail}
-  onChange={(e) => setNewEmail(e.target.value)}
-  errors={error?.data?.email ?? ''}
-/>
-<Select
-  label="User Role"
-  value={newRole}
-  onChange={(selectObj) => setNewRole(selectObj)}
-  options={userRoles}
-/>
-<SubmitButtonWrapper>
-  <Button
-    onClick={() =>
-      triggerCreateUser({
-        username: newUsername,
-        email: newEmail,
-        is_admin: newRole.value === 'admin',
-      })
-    }
-  >
-    Submit
-  </Button>
-</SubmitButtonWrapper> */
-
-const CreateUserAction = () => {
-  const [isCreating, setIsCreating] = useState(false);
+const CreateUserAction = ({ onCloseModal }) => {
   const [triggerCreateUser, { error }] = useCreateUserMutation();
   const {
     register,
@@ -85,18 +81,18 @@ const CreateUserAction = () => {
   };
 
   return (
-    <ActionFormRow>
-      {!isCreating ? (
-        <Button onClick={() => setIsCreating(true)}>
-          <ButtonContentRow>
-            Create User
-            <FontAwesomeIcon icon={faPlus} />
-          </ButtonContentRow>
-        </Button>
-      ) : (
-        <SubmitForm onSubmit={handleSubmit(onSubmit)}>
-          <input {...register('username')} />
-          <input {...register('email')} />
+    <>
+      <h2>Add User</h2>
+      <SubmitForm onSubmit={handleSubmit(onSubmit)}>
+        <Input
+          label="Username"
+          register={register}
+          name="username"
+          errors={error?.data?.username ?? ''}
+        />
+        <Input label="Email" register={register} name="email" errors={error?.data?.email ?? ''} />
+        <div>
+          <span>User Role</span>
           <select {...register('is_admin')}>
             {Object.values(USER_ROLES).map(({ label, value }) => (
               <option key={value} value={value}>
@@ -104,20 +100,39 @@ const CreateUserAction = () => {
               </option>
             ))}
           </select>
-          <Button type="submit">Submit</Button>
-          <Button type="neutral" onClick={() => setIsCreating(false)}>
-            Cancel
-          </Button>
-        </SubmitForm>
-      )}
-    </ActionFormRow>
+        </div>
+        <ActionFormRow>
+          <div>
+            <Button type="submit">Submit</Button>
+          </div>
+          <div>
+            <Button type="neutral" onClick={() => onCloseModal()}>
+              Close
+            </Button>
+          </div>
+        </ActionFormRow>
+      </SubmitForm>
+    </>
   );
 };
 
-const UsersActions = () => (
-  <FlexColumn>
-    <CreateUserAction />
-  </FlexColumn>
-);
+const UsersActions = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  return (
+    <FlexColumn>
+      <div>
+        <Button onClick={() => setModalVisible(true)}>
+          <ButtonContentRow>
+            Add User
+            <FontAwesomeIcon icon={faPlus} />
+          </ButtonContentRow>
+        </Button>
+      </div>
+      <ModalStyled isVisible={isModalVisible}>
+        <CreateUserAction onCloseModal={() => setModalVisible(false)} />
+      </ModalStyled>
+    </FlexColumn>
+  );
+};
 
 export default UsersActions;
