@@ -39,6 +39,12 @@ CACHES = {
     }
 }
 
+# CELERY
+# ------------------------------------------------------------------------------
+REDIS_URL = env("REDIS_URL", default="")
+if REDIS_URL:
+    BROKER_URL = f"{REDIS_URL}/1"
+
 # SECURITY
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
