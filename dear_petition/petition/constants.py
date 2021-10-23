@@ -1,16 +1,18 @@
 from collections import defaultdict
 
+from model_utils import Choices
+
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"
 
-JURISDICTION_CHOICES = (
+JURISDICTION_CHOICES = Choices(
     (DISTRICT_COURT, "DISTRICT COURT"),
     (SUPERIOR_COURT, "SUPERIOR COURT"),
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
-OFFENSE_HEADERS = (
+OFFENSE_HEADERS = Choices(
     (DISTRICT_COURT, "District Court Offense Information"),
     (SUPERIOR_COURT, "Superior Court Offense Information"),
 )
@@ -18,14 +20,14 @@ OFFENSE_HEADERS = (
 MALE = "M"
 FEMALE = "F"
 UNKNOWN = "U"
-SEX_CHOICES = (
+SEX_CHOICES = Choices(
     (MALE, "Male"),
     (FEMALE, "Female"),
     (UNKNOWN, "Unknown"),
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
-CONTACT_CATEGORIES = (("agency", "Agency"), ("attorney", "Attorney"))
+CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"
@@ -45,11 +47,13 @@ MISDEMEANOR = "AOC-CR-281"
 ATTACHMENT = "AOC-CR-285"
 DISMISSED = "AOC-CR-287"
 NOT_GUILTY = "AOC-CR-288"
-FORM_TYPES = (
+UNDERAGED_CONVICTIONS = "AOC-CR-293"
+FORM_TYPES = Choices(
     (MISDEMEANOR, MISDEMEANOR),
     (ATTACHMENT, ATTACHMENT),
     (DISMISSED, DISMISSED),
     (NOT_GUILTY, NOT_GUILTY),
+    (UNDERAGED_CONVICTIONS, UNDERAGED_CONVICTIONS),
 )
 
 NORTH_CAROLINA = "NC"
