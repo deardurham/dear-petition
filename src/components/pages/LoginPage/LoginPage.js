@@ -23,6 +23,11 @@ import { AnimatePresence } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
+import styled from 'styled-components';
+
+const LoginButton = styled(Button)`
+  padding: 1rem 3rem;
+`;
 
 function Login() {
   const { user: authenticatedUser } = useAuth();
@@ -50,10 +55,10 @@ function Login() {
       history.replace('/');
     } catch (error) {
       if (error?.data) {
-        setErrors({
-          ...errors,
+        setErrors((prev) => ({
+          ...prev,
           ...error.data,
-        });
+        }));
       }
     }
   };
@@ -92,7 +97,7 @@ function Login() {
             </FormErrors>
           )}
         </AnimatePresence>
-        <Button onClick={handleLogin}>Log in</Button>
+        <LoginButton onClick={handleLogin}>Log in</LoginButton>
       </LoginForm>
     </LoginPageStyled>
   );

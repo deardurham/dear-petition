@@ -38,6 +38,9 @@ export const FormErrors = styled(motion.div)`
 
 export const InputStyled = styled(Input)`
   margin: 2rem 0;
+  input {
+    padding: 0.9rem;
+  }
 `;
 
 export const PasswordInputStyled = styled(InputStyled)`
