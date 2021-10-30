@@ -78,6 +78,7 @@ const DisplayCells = ({ user, onStartEdit }) => {
   const { user: myUser } = useAuth();
   const [isModalVisible, setModalVisible] = useState(false);
   const [triggerUpdate] = useModifyUserMutation();
+  const disabledDelete = myUser.pk === user.pk;
   return (
     <>
       <TableCell>{user.username}</TableCell>
@@ -91,7 +92,8 @@ const DisplayCells = ({ user, onStartEdit }) => {
             Edit
           </ActionButton>
           <ActionButton
-            type="caution"
+            type={disabledDelete ? 'disabled' : 'caution'}
+            disabled={disabledDelete}
             onClick={() => {
               if (myUser.pk !== user.pk) {
                 setModalVisible(true);
@@ -133,9 +135,10 @@ const InputCells = ({ user, onStopEdit }) => {
   const [triggerUpdate, { error }] = useModifyUserMutation();
   const { user: myUser } = useAuth();
   const onSubmit = (data) => {
-    if (myUser.pk === user.pk && user.is_admin !== data.is_admin) {
-      console.log('WARNING');
-    } else if (!['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
+    if (
+      myUser.pk !== user.pk &&
+      !['username', 'email', 'is_admin'].every((field) => user[field] === data[field])
+    ) {
       triggerUpdate({ id: user.pk, data })
         .unwrap()
         .then(() => onStopEdit())
@@ -166,6 +169,7 @@ const InputCells = ({ user, onStopEdit }) => {
         <TableCell>
           <Input
             type="checkbox"
+            disabled={myUser.pk === user.pk}
             defaultChecked={user.is_admin}
             register={register}
             name="is_admin"
