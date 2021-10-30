@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
 from django.http import FileResponse
 
 from rest_framework import filters, parsers, permissions, status, viewsets
@@ -38,6 +39,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if (request.user != self.get_object()):
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super().retrieve(request, pk=pk)
+
+        
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        form = PasswordResetForm({'email': instance.email})
+        assert form.is_valid()
+        form.save(request=self.request, use_https=True, from_email=settings.DEFAULT_FROM_EMAIL, email_template_name='accounts/password_setup_email.html')
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
