@@ -324,3 +324,11 @@ class Petition(TimeStampedModel):
 
 # Look-alike Petition object used to support JSON data-driven petitions
 DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[True])
+
+
+class GeneratedPetition(TimeStampedModel):
+    user = models.ForeignKey(
+        User, null=True, related_name="generated_petitions", on_delete=models.SET_NULL
+    )
+    form_type = models.CharField(choices=FORM_TYPES, max_length=255)
+    number_of_charges = models.IntegerField()

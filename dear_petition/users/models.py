@@ -1,19 +1,19 @@
 from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField
+from django.db.models import CharField, DateField, ForeignKey
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.urls import reverse
 from django.core.mail import send_mail
 
+
 from . import constants as uc
 
 
 class User(AbstractUser):
 
-    # First Name and Last Name do not cover name patterns
-    # around the globe.
     name = CharField(_("Name of User"), blank=True, max_length=255)
+    last_generated_petition_time = DateField(null=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})

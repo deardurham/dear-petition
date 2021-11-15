@@ -2,6 +2,7 @@ from datetime import datetime
 from django.conf import settings
 from django.http import FileResponse
 from django.middleware import csrf
+from django.utils import timezone
 
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
@@ -176,6 +177,14 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         generated_petition_pdf = generate_petition_pdf(
             serializer.data["petition"], serializer.data
         )
+        form = petition.Petition.objects.get(id=request.data["petition"])
+
+        petition.GeneratedPetition.objects.create(
+            user=request.user,
+            form_type=form.form_type,
+            number_of_charges=form.offense_records.count(),
+        )
+
         resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
