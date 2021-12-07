@@ -332,3 +332,4 @@ class GeneratedPetition(TimeStampedModel):
     )
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     number_of_charges = models.IntegerField()
+    batch = models.ForeignKey(Batch, on_delete=models.DO_NOTHING)
