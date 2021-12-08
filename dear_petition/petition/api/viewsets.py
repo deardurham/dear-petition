@@ -178,12 +178,18 @@ class GeneratePetitionView(viewsets.GenericViewSet):
             serializer.data["petition"], serializer.data
         )
         form = petition.Petition.objects.get(id=request.data["petition"])
+        batch = form.batch
+        user = request.user
 
         petition.GeneratedPetition.objects.create(
-            user=request.user,
+            username=user.username,
             form_type=form.form_type,
             number_of_charges=form.offense_records.count(),
+            batch_id=batch.id,
         )
+
+        user.last_generated_petition_time = timezone.now()
+        user.save()
 
         resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"

@@ -12,7 +12,7 @@ from . import constants as uc
 
 class User(AbstractUser):
 
-    name = CharField(_("Name of User"), blank=True, max_length=255)
+    name = CharField(_("Name of User"), blank=True, max_length=uc.NAME_MAX_LENGTH)
     last_generated_petition_time = DateField(null=True)
 
     def get_absolute_url(self):

@@ -19,6 +19,7 @@ from django.utils import timezone
 import ciprs_reader
 from localflavor.us import us_states
 from dear_petition.users.models import User
+from dear_petition.users import constants as uc
 from . import constants as pc
 
 from .constants import (
@@ -327,9 +328,7 @@ DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[
 
 
 class GeneratedPetition(TimeStampedModel):
-    user = models.ForeignKey(
-        User, null=True, related_name="generated_petitions", on_delete=models.SET_NULL
-    )
+    username = models.CharField(max_length=uc.NAME_MAX_LENGTH)
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     number_of_charges = models.IntegerField()
-    batch = models.ForeignKey(Batch, on_delete=models.DO_NOTHING)
+    batch_id = models.PositiveIntegerField()
