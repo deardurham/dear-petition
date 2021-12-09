@@ -188,7 +188,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             serializer.validated_data[
                 "access"
             ],  # pull access token out of validated_data
-            expires=datetime.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
@@ -202,7 +202,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         response.set_cookie(
             settings.REFRESH_COOKIE_KEY,
             serializer.validated_data["refresh"],
-            expires=datetime.now() + settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
             secure=settings.DEBUG == False,  # browsers should only send the cookie using HTTPS
