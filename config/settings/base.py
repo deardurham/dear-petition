@@ -96,12 +96,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-SIMPLE_JWT = (
-    {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-        "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-        "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
-    }
-)
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
