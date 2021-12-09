@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import Select from '../../../elements/Input/Select';
 import US_STATES from '../../../../constants/US_STATES';
+import { colorGrey } from '../../../../styles/colors';
 
 const Row = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const TextInput = styled(Input)`
   input {
     padding: 0.9rem;
     width: 100%;
+    background-color: ${(props) => props.disabled && 'hsl(0, 0%, 95%)'};
   }
   &:not(:last-child) {
     margin-bottom: 1rem;
