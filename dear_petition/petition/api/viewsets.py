@@ -2,6 +2,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.http import FileResponse
+import logging
 
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
@@ -16,6 +17,9 @@ from dear_petition.petition.etl import import_ciprs_records
 from dear_petition.petition.export import generate_petition_pdf
 
 from django_filters.rest_framework import DjangoFilterBackend
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -159,6 +163,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
     def get(self, request):
         access_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
         if access_token is None:
+            logger.warning("Access token not found in cookie")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         try:
