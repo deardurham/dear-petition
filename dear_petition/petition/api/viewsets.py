@@ -204,8 +204,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
             path=self.cookie_path,
-            secure=settings.DEBUG
-            == False,  # browsers should only send the cookie using HTTPS
+            secure=settings.DEBUG is False,
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
@@ -216,8 +215,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
-            secure=settings.DEBUG
-            == False,  # browsers should only send the cookie using HTTPS
+            secure=settings.DEBUG is False,
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
@@ -279,8 +277,7 @@ class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
             path=self.cookie_path,
-            secure=settings.DEBUG
-            == False,  # browsers should only send the cookie using HTTPS
+            secure=settings.DEBUG is False,
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
