@@ -69,7 +69,6 @@ Run the containers:
 
 Visit http://localhost:8000/petition/api/ in your browser.
 
-
 ### Initial Setup
 
 Create a superuser:
