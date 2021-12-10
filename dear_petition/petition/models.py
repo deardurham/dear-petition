@@ -128,6 +128,7 @@ class OffenseRecord(models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"offense record {self.pk}"
@@ -196,6 +197,9 @@ class Batch(models.Model):
     def not_guilty_offense_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.NOT_GUILTY, jurisdiction)
 
+    def underaged_conviction_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.UNDERAGED_CONVICTIONS, jurisdiction)
+
 
 class BatchFile(models.Model):
     batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
@@ -254,7 +258,7 @@ class Petition(TimeStampedModel):
 
         return OffenseRecordPaginator(self)
 
-    def get_all_offense_records(self):
+    def get_all_offense_records(self, filter_active=True, include_annotations=True):
         """
         Return all (nonpaginated) offenses for this petition type, jurisdiction, and
         county. This is typically only used at the end of the ETL process to divide
@@ -272,31 +276,45 @@ class Petition(TimeStampedModel):
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
-        qs = (
-            qs.annotate(
-                first_two_digits_file_number_chars=Substr(
-                    "offense__ciprs_record__file_no", 1, 2
+
+        if filter_active:
+            qs = qs.filter(active=True)
+
+        if include_annotations:
+            qs = (
+                qs.annotate(
+                    first_two_digits_file_number_chars=Substr(
+                        "offense__ciprs_record__file_no", 1, 2
+                    )
+                )
+                .annotate(
+                    first_two_digits_file_number=Cast(
+                        "first_two_digits_file_number_chars",
+                        output_field=IntegerField(),
+                    )
+                )
+                .annotate(
+                    file_number_year=Case(
+                        When(
+                            first_two_digits_file_number__gt=two_digit_current_year,
+                            then=Concat(
+                                Value("19"), "first_two_digits_file_number_chars"
+                            ),
+                        ),
+                        When(
+                            first_two_digits_file_number__lte=two_digit_current_year,
+                            then=Concat(
+                                Value("20"), "first_two_digits_file_number_chars"
+                            ),
+                        ),
+                    )
+                )
+                .order_by(
+                    "file_number_year",
+                    "offense__ciprs_record__file_no",
+                    "pk",
                 )
             )
-            .annotate(
-                first_two_digits_file_number=Cast(
-                    "first_two_digits_file_number_chars", output_field=IntegerField()
-                )
-            )
-            .annotate(
-                file_number_year=Case(
-                    When(
-                        first_two_digits_file_number__gt=two_digit_current_year,
-                        then=Concat(Value("19"), "first_two_digits_file_number_chars"),
-                    ),
-                    When(
-                        first_two_digits_file_number__lte=two_digit_current_year,
-                        then=Concat(Value("20"), "first_two_digits_file_number_chars"),
-                    ),
-                )
-            )
-            .order_by("file_number_year", "offense__ciprs_record__file_no", "pk",)
-        )
 
         return qs
 

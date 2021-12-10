@@ -1,5 +1,11 @@
 from .annotate import add_pdf_template_annotations
-from .forms import AOCFormCR287, AOCFormCR285, AOCFormCR288, DataPetitionForm
+from .forms import (
+    AOCFormCR287,
+    AOCFormCR285,
+    AOCFormCR288,
+    AOCFormCR293,
+    DataPetitionForm,
+)
 from .writer import write_pdf
 
 from dear_petition.petition import constants
@@ -13,6 +19,7 @@ FORM_TYPE_MAP = {
     constants.DISMISSED: AOCFormCR287,
     constants.ATTACHMENT: AOCFormCR285,
     constants.NOT_GUILTY: AOCFormCR288,
+    constants.UNDERAGED_CONVICTIONS: AOCFormCR293,
 }
 
 

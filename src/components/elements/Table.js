@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorPrimary, greyScale } from '../../styles/colors';
+import { colorPrimary } from '../../styles/colors';
 
-const TableStyle = styled.table`
+export const TableStyle = styled.table`
   display: grid;
   border-collapse: collapse;
   min-width: 100%;
@@ -49,7 +49,11 @@ export const TableCell = ({ children, header }) => (
   <>{header ? <th>{children}</th> : <td>{children}</td>}</>
 );
 
-export const TableBody = styled.tbody``;
+export const TableSpanCell = styled.td`
+  grid-column: 1 / span ${(props) => props.spanLength};
+`;
+
+export const TableBody = ({ children }) => <tbody>{children}</tbody>;
 
 export const TableHeader = ({ children }) => (
   <thead>
@@ -57,7 +61,21 @@ export const TableHeader = ({ children }) => (
   </thead>
 );
 
-export const TableRow = styled.tr``;
+export const TableRow = styled.tr`
+  & > td {
+    ${(props) =>
+      props.highlighted
+        ? `
+  background-color: rgb(255, 245, 217);
+  `
+        : `background-color: ${props.backgroundColor}`}
+  }
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    cursor: pointer;
+  }
+`;
 
 export const Table = ({ children, className, columnSizes, numColumns }) => {
   const defaultSize = `repeat(${numColumns}, 1fr)`;

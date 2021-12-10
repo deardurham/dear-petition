@@ -126,7 +126,11 @@ function GenerationPage() {
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
-            <p>Click on the buttons below to generate petition forms and their attachments.</p>
+            <p>
+              Click on the buttons below to generate petition forms and their attachments. Click on
+              the detail arrow to reveal a list of offense records. Click on the offense records to
+              customize the records that populate the generated petition.
+            </p>
             {data && (
               <PetitionList
                 petitions={data?.petitions || []}
