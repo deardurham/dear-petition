@@ -262,27 +262,40 @@ class Petition(TimeStampedModel):
 
         Post-ETL usage should just use the offense_records ManyToManyField.
         """
-        two_digit_current_year = timezone.now().year % 2000 #Returns 21 given 2021
+        two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
 
-        qs = self.batch.petition_offense_records(petition_type=self.form_type).select_related("offense__ciprs_record")
+        qs = self.batch.petition_offense_records(
+            petition_type=self.form_type
+        ).select_related("offense__ciprs_record")
         qs = qs.filter(
             offense__jurisdiction=self.jurisdiction,
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
-        qs = qs.annotate(
-            first_two_digits_file_number_chars = Substr("offense__ciprs_record__file_no", 1, 2)
-        ).annotate(
-            first_two_digits_file_number = Cast('first_two_digits_file_number_chars', output_field=IntegerField())
-        ).annotate(
-            file_number_year = Case(
-                When(first_two_digits_file_number__gt=two_digit_current_year, then=Concat(Value("19"),"first_two_digits_file_number_chars")),
-                When(first_two_digits_file_number__lte=two_digit_current_year, then=Concat(Value("20"),"first_two_digits_file_number_chars")),
+        qs = (
+            qs.annotate(
+                first_two_digits_file_number_chars=Substr(
+                    "offense__ciprs_record__file_no", 1, 2
+                )
             )
-        ).order_by(
-            "file_number_year",
-            "offense__ciprs_record__file_no",
-            "pk",            
+            .annotate(
+                first_two_digits_file_number=Cast(
+                    "first_two_digits_file_number_chars", output_field=IntegerField()
+                )
+            )
+            .annotate(
+                file_number_year=Case(
+                    When(
+                        first_two_digits_file_number__gt=two_digit_current_year,
+                        then=Concat(Value("19"), "first_two_digits_file_number_chars"),
+                    ),
+                    When(
+                        first_two_digits_file_number__lte=two_digit_current_year,
+                        then=Concat(Value("20"), "first_two_digits_file_number_chars"),
+                    ),
+                )
+            )
+            .order_by("file_number_year", "offense__ciprs_record__file_no", "pk",)
         )
 
         return qs

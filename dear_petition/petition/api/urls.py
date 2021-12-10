@@ -25,7 +25,13 @@ app_name = "api"
 urlpatterns = [
     path("", include(router.urls)),
     path(
-        "token/", ensure_csrf_cookie(viewsets.TokenObtainPairCookieView.as_view()), name="token_obtain_pair"
+        "token/",
+        ensure_csrf_cookie(viewsets.TokenObtainPairCookieView.as_view()),
+        name="token_obtain_pair",
     ),
-    path('token/refresh/', ensure_csrf_cookie(viewsets.TokenRefreshCookieView.as_view()), name='token_refresh'),
+    path(
+        "token/refresh/",
+        ensure_csrf_cookie(viewsets.TokenRefreshCookieView.as_view()),
+        name="token_refresh",
+    ),
 ]

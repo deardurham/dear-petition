@@ -3,6 +3,7 @@ from rest_framework.authentication import CSRFCheck
 from rest_framework.exceptions import PermissionDenied
 from django.conf import settings
 
+
 def enforce_csrf(request):
     """
     Enforce CSRF validation. From drf source, authentication.py
@@ -12,7 +13,8 @@ def enforce_csrf(request):
     reason = check.process_view(request, None, (), {})
     if reason:
         # CSRF failed, bail with explicit error message
-        raise PermissionDenied('CSRF validation failed: %s' % reason)
+        raise PermissionDenied("CSRF validation failed: %s" % reason)
+
 
 class JWTHttpOnlyCookieAuthentication(JWTAuthentication):
     # override simplejwt's authenticate method to add cookie support.

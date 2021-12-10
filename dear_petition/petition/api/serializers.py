@@ -17,12 +17,12 @@ from localflavor.us import us_states
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     admin_url = serializers.SerializerMethodField()
-    is_admin = serializers.BooleanField(source='is_staff', default=False)
+    is_admin = serializers.BooleanField(source="is_staff", default=False)
 
     class Meta:
         model = User
         fields = ["pk", "username", "email", "is_admin", "is_staff", "admin_url"]
-        extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
+        extra_kwargs = {"email": {"required": True, "allow_blank": False}}
 
     def get_admin_url(self, user_obj):
         url = ""
@@ -32,8 +32,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         random_pw = User.objects.make_random_password()
-        is_admin = validated_data.get('is_staff', False)
-        return User.objects.create_user(password=random_pw, is_superuser=is_admin, **validated_data)
+        is_admin = validated_data.get("is_staff", False)
+        return User.objects.create_user(
+            password=random_pw, is_superuser=is_admin, **validated_data
+        )
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):
@@ -99,10 +101,12 @@ class ParentPetitionSerializer(PetitionSerializer):
     attachments = serializers.SerializerMethodField()
 
     class Meta(PetitionSerializer.Meta):
-        fields = PetitionSerializer.Meta.fields + ['attachments']
+        fields = PetitionSerializer.Meta.fields + ["attachments"]
 
     def get_attachments(self, instance):
-        return PetitionSerializer(instance.attachments.all().order_by('pk'), many=True).data
+        return PetitionSerializer(
+            instance.attachments.all().order_by("pk"), many=True
+        ).data
 
 
 class BatchSerializer(serializers.ModelSerializer):
@@ -140,7 +144,9 @@ class BatchDetailSerializer(serializers.ModelSerializer):
 
     def get_petitions(self, instance):
         """Return sorted and structured petitions with associated attachments"""
-        parent_petitions = Petition.objects.filter(batch=instance.pk, parent__isnull=True).order_by('county', 'jurisdiction')
+        parent_petitions = Petition.objects.filter(
+            batch=instance.pk, parent__isnull=True
+        ).order_by("county", "jurisdiction")
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
 

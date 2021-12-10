@@ -67,5 +67,5 @@ def format_petition_date(date):
 # https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
 def remove_prefix(text, prefix):
     if text.startswith(prefix):
-        return text[len(prefix):]
+        return text[len(prefix) :]
     return text

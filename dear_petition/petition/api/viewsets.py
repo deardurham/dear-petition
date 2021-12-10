@@ -28,28 +28,32 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.UserSerializer
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["username"]
-    ordering = ['username']
+    ordering = ["username"]
     # TODO: Search
     # filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     # search_fields = ["username"]
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
-        if self.action == 'list':
+        if self.action == "list":
             permission_classes.append(permissions.IsAdminUser)
         return [permission() for permission in permission_classes]
 
     def retrieve(self, request, pk=None):
-        if (request.user != self.get_object()):
+        if request.user != self.get_object():
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super().retrieve(request, pk=pk)
 
-        
     def perform_create(self, serializer):
         instance = serializer.save()
-        form = PasswordResetForm({'email': instance.email})
+        form = PasswordResetForm({"email": instance.email})
         assert form.is_valid()
-        form.save(request=self.request, use_https=True, from_email=settings.DEFAULT_FROM_EMAIL, email_template_name='accounts/password_setup_email.html')
+        form.save(
+            request=self.request,
+            use_https=True,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            email_template_name="accounts/password_setup_email.html",
+        )
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
@@ -167,14 +171,16 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         try:
-            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
+            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(
+                access_token
+            )
         except:
             validated_user = None
         if validated_user is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         user_serializer = serializers.UserSerializer(validated_user)
-        return Response({ "user": user_serializer.data }, status=status.HTTP_200_OK)
+        return Response({"user": user_serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -185,7 +191,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             raise exceptions.InvalidToken(e.args[0])
 
         # We don't want 'access' in response body
-        response_data = { "detail": "success", "user": serializer.validated_data["user"] }
+        response_data = {"detail": "success", "user": serializer.validated_data["user"]}
         response = Response(response_data, status=status.HTTP_200_OK)
 
         response.set_cookie(
@@ -210,7 +216,8 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
-            secure=settings.DEBUG == False,  # browsers should only send the cookie using HTTPS
+            secure=settings.DEBUG
+            == False,  # browsers should only send the cookie using HTTPS
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
@@ -231,7 +238,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         )
         # https://docs.djangoproject.com/en/3.2/ref/settings/#csrf-header-name
         response.delete_cookie(
-            utils.remove_prefix(settings.CSRF_COOKIE_NAME, 'HTTP_'),
+            utils.remove_prefix(settings.CSRF_COOKIE_NAME, "HTTP_"),
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
         )
@@ -249,7 +256,7 @@ class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
         refresh_key = request.COOKIES.get(settings.REFRESH_COOKIE_KEY)
         if refresh_key is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data={ 'refresh': refresh_key })
+        serializer = self.get_serializer(data={"refresh": refresh_key})
 
         try:
             serializer.is_valid(raise_exception=True)
