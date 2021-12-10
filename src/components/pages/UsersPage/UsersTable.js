@@ -72,6 +72,9 @@ const TextboxInput = styled(Input)`
     width: 100%;
     padding: 0.5rem;
   }
+  p {
+    white-space: initial;
+  }
 `;
 
 const DisplayCells = ({ user, onStartEdit }) => {
