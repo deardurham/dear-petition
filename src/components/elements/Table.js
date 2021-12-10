@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorPrimary } from '../../styles/colors';
+import { colorPrimary, greyScale } from '../../styles/colors';
 
 export const TableStyle = styled.table`
   display: grid;
