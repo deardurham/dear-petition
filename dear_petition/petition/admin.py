@@ -94,7 +94,9 @@ class BatchAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_record_count=Count("records", distinct=True),)
+        queryset = queryset.annotate(
+            _record_count=Count("records", distinct=True),
+        )
         return queryset
 
     def record_count(self, obj):
@@ -140,3 +142,21 @@ class PetitionAdmin(admin.ModelAdmin):
     list_filter = ("form_type", "county", "jurisdiction")
     ordering = ("-batch__date_uploaded",)
     raw_id_fields = ("batch", "parent", "offense_records")
+
+
+@admin.register(models.GeneratedPetition)
+class GeneratedPetitionAdmin(admin.ModelAdmin):
+
+    date_hierarchy = "created"
+    list_display = (
+        "id",
+        "username",
+        "batch_id",
+        "form_type",
+        "number_of_charges",
+        "created",
+    )
+    list_filter = ("form_type", "created", "username")
+    ordering = ("-modified",)
+    readonly_fields = ("username", "batch_id", "form_type", "number_of_charges")
+    search_fields = ("username", "batch_id", "id")
