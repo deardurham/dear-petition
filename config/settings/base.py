@@ -96,12 +96,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-SIMPLE_JWT = (
-    {  # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-        "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-        "REFRESH_TOKEN_LIFETIME": timedelta(weeks=2),
-    }
-)
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -222,7 +221,7 @@ FIXTURE_DIRS = (str(APPS_DIR.path("fixtures")),)
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-httponly
 SESSION_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-httponly
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-browser-xss-filter
 SECURE_BROWSER_XSS_FILTER = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
@@ -295,7 +294,9 @@ CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)
 CIPRS_SAVE_PDF = env.bool("CIPRS_SAVE_PDF", False)
 
 AUTH_COOKIE_KEY = "Authorization"
+REFRESH_COOKIE_KEY = "Refresh"
 # Set SAMESITE setting below to 'Strict' to ask recieving browsers not to send this cookie
 # across origins. This should work in this case, as long as we serve the API and Client from
 # the same domain.
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
+CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None

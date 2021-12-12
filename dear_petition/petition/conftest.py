@@ -100,7 +100,7 @@ def contact1():
         address2="Apt E",
         city="Durham",
         state="NC",
-        zipcode="27701"
+        zipcode="27701",
     )
 
 
@@ -112,7 +112,7 @@ def contact2():
         address2="",
         city="Durham",
         state="NC",
-        zipcode="27702"
+        zipcode="27702",
     )
 
 
@@ -124,7 +124,7 @@ def contact3():
         address2="#404",
         city="Durham",
         state="NC",
-        zipcode="27703"
+        zipcode="27703",
     )
 
 

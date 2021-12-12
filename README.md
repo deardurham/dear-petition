@@ -54,7 +54,6 @@ You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 API_PROXY=http://localhost:8000 npm start
 ```
 
-
 ## Backend Development (with Docker)
 
 To run this on a Mac, use [Docker for
@@ -69,7 +68,6 @@ Run the containers:
     docker-compose up -d django
 
 Visit http://localhost:8000/petition/api/ in your browser.
-
 
 ### Initial Setup
 

@@ -17,16 +17,25 @@ from localflavor.us import us_states
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     admin_url = serializers.SerializerMethodField()
+    is_admin = serializers.BooleanField(source="is_staff", default=False)
 
     class Meta:
         model = User
-        fields = ["pk", "username", "email", "admin_url"]
+        fields = ["pk", "username", "email", "is_admin", "is_staff", "admin_url"]
+        extra_kwargs = {"email": {"required": True, "allow_blank": False}}
 
-    def get_admin_url(self, obj):
+    def get_admin_url(self, user_obj):
         url = ""
-        if "request" in self.context and self.context["request"].user.is_staff:
+        if user_obj and user_obj.is_staff:
             url = reverse("admin:index")
         return url
+
+    def create(self, validated_data):
+        random_pw = User.objects.make_random_password()
+        is_admin = validated_data.get("is_staff", False)
+        return User.objects.create_user(
+            password=random_pw, is_superuser=is_admin, **validated_data
+        )
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):

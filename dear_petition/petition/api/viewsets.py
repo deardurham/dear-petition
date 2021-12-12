@@ -1,5 +1,7 @@
+import logging
 from datetime import datetime
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
 from django.http import FileResponse
 from django.middleware import csrf
 from django.utils import timezone
@@ -8,25 +10,54 @@ from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions, views as simplejwt_views
 from rest_framework.decorators import action
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from dear_petition.users.models import User
 from dear_petition.petition import constants
-from dear_petition.petition import models as petition
+from dear_petition.petition import models as petition, utils
 from dear_petition.petition.api import serializers
+from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import import_ciprs_records, recalculate_petitions
 from dear_petition.petition.export import generate_petition_pdf
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 
+logger = logging.getLogger(__name__)
+
+
 class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["username"]
+    ordering = ["username"]
+    # TODO: Search
+    # filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    # search_fields = ["username"]
 
-    def get_queryset(self):
-        return super().get_queryset().filter(pk=self.request.user.pk)
+    def get_permissions(self):
+        permission_classes = [permissions.IsAuthenticated]
+        if self.action == "list":
+            permission_classes.append(permissions.IsAdminUser)
+        return [permission() for permission in permission_classes]
+
+    def retrieve(self, request, pk=None):
+        if request.user != self.get_object():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super().retrieve(request, pk=pk)
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        form = PasswordResetForm({"email": instance.email})
+        assert form.is_valid()
+        form.save(
+            request=self.request,
+            use_https=True,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            email_template_name="accounts/password_setup_email.html",
+        )
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
@@ -223,6 +254,24 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
 
     serializer_class = serializers.TokenObtainPairCookieSerializer
 
+    def get(self, request):
+        access_token = request.COOKIES.get(settings.AUTH_COOKIE_KEY)
+        if access_token is None:
+            logger.warning("Access token not found in cookie")
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(
+                access_token
+            )
+        except:
+            validated_user = None
+        if validated_user is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        user_serializer = serializers.UserSerializer(validated_user)
+        return Response({"user": user_serializer.data}, status=status.HTTP_200_OK)
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
@@ -231,34 +280,35 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         except exceptions.TokenError as e:
             raise exceptions.InvalidToken(e.args[0])
 
-        response = Response(serializer.validated_data, status=status.HTTP_200_OK)
-        csrf_token = csrf.get_token(self.request)
+        # We don't want 'access' in response body
+        response_data = {"detail": "success", "user": serializer.validated_data["user"]}
+        response = Response(response_data, status=status.HTTP_200_OK)
 
         response.set_cookie(
             settings.AUTH_COOKIE_KEY,  # get cookie key from settings
             serializer.validated_data[
                 "access"
             ],  # pull access token out of validated_data
-            expires=datetime.now()
-            + settings.SIMPLE_JWT[
-                "REFRESH_TOKEN_LIFETIME"
-            ],  # expire access token when refresh token expires
+            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
             path=self.cookie_path,
-            secure=settings.DEBUG
-            == False,  # browsers should only send the cookie using HTTPS
+            secure=settings.DEBUG is False,
             httponly=True,  # browsers should not allow javascript access to this cookie
             samesite=settings.AUTH_COOKIE_SAMESITE,
         )
 
-        # We don't want 'access' or 'refresh' in response body
-        response.data = {
-            "detail": "success",
-            "user": response.data["user"],
-            "csrftoken": csrf_token,
-        }
+        response.set_cookie(
+            settings.REFRESH_COOKIE_KEY,
+            serializer.validated_data["refresh"],
+            max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds(),
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+            secure=settings.DEBUG is False,
+            httponly=True,  # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE,
+        )
 
         return response
 
@@ -269,7 +319,57 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
             path=self.cookie_path,
         )
+        response.delete_cookie(
+            settings.REFRESH_COOKIE_KEY,
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+        )
+        # https://docs.djangoproject.com/en/3.2/ref/settings/#csrf-header-name
+        response.delete_cookie(
+            utils.remove_prefix(settings.CSRF_COOKIE_NAME, "HTTP_"),
+            domain=getattr(settings, "AUTH_COOKIE_DOMAIN", None),
+            path=self.cookie_path,
+        )
 
         response.data = {"detail": "success"}
+
+        return response
+
+
+class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
+    cookie_path = "/"
+    serializer_class = TokenRefreshSerializer
+
+    def post(self, request, *args, **kwargs):
+        refresh_key = request.COOKIES.get(settings.REFRESH_COOKIE_KEY)
+        if refresh_key is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data={"refresh": refresh_key})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except exceptions.TokenError as e:
+            raise exceptions.InvalidToken(e.args[0])
+
+        # We don't want 'access' in response body
+        response_data = {
+            "detail": "success",
+        }
+        response = Response(response_data, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            settings.AUTH_COOKIE_KEY,  # get cookie key from settings
+            serializer.validated_data[
+                "access"
+            ],  # pull access token out of validated_data
+            expires=datetime.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            domain=getattr(
+                settings, "AUTH_COOKIE_DOMAIN", None
+            ),  # we can tie the cookie to a specific domain for added security
+            path=self.cookie_path,
+            secure=settings.DEBUG is False,
+            httponly=True,  # browsers should not allow javascript access to this cookie
+            samesite=settings.AUTH_COOKIE_SAMESITE,
+        )
 
         return response

@@ -34,10 +34,14 @@ export const FormErrors = styled(motion.div)`
   p {
     color: ${colorRed};
   }
+  margin-bottom: 1.5rem;
 `;
 
 export const InputStyled = styled(Input)`
   margin: 2rem 0;
+  input {
+    padding: 0.9rem;
+  }
 `;
 
 export const PasswordInputStyled = styled(InputStyled)`
@@ -49,5 +53,5 @@ export const ForgotPassword = styled.a`
 `;
 
 export const PasswordWrapper = styled.div`
-  margin: 2rem 0;
+  margin-bottom 2rem;
 `;

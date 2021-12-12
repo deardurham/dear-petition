@@ -30,11 +30,18 @@ function Select({ value, onChange, label, errors, options, disabled, className }
 }
 
 Select.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.shape({
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    label: PropTypes.string,
+  }).isRequired,
   onChange: PropTypes.func.isRequired,
   label: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.shape({ value: PropTypes.string, label: PropTypes.string }))
-    .isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      label: PropTypes.string,
+    })
+  ).isRequired,
 };
 
 Select.defaultProps = {

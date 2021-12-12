@@ -7,6 +7,7 @@ export const PageBaseStyled = styled(motion.main)`
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 
 export const PageHeader = styled.header`

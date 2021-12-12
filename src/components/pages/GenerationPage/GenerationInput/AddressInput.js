@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import Select from '../../../elements/Input/Select';
 import US_STATES from '../../../../constants/US_STATES';
+import { colorGrey } from '../../../../styles/colors';
 
 const Row = styled.div`
   display: flex;
@@ -11,6 +12,17 @@ const Row = styled.div`
   }
   & > div:not(:last-child) {
     margin-right: 1rem;
+  }
+`;
+
+const TextInput = styled(Input)`
+  input {
+    padding: 0.9rem;
+    width: 100%;
+    background-color: ${(props) => props.disabled && 'hsl(0, 0%, 95%)'};
+  }
+  &:not(:last-child) {
+    margin-bottom: 1rem;
   }
 `;
 
@@ -23,21 +35,21 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
   };
   return (
     <>
-      <Input
+      <TextInput
         label="Address Line 1"
         disabled={disabled}
         value={address1}
         onChange={(e) => handleChange('address1', e.target.value)}
         errors={!disabled && errors.address1}
       />
-      <Input
+      <TextInput
         label={disabled ? 'Address Line 2' : 'Address Line 2 (Optional)'}
         disabled={disabled}
         value={address2}
         onChange={(e) => handleChange('address2', e.target.value)}
       />
       <Row>
-        <Input
+        <TextInput
           label="City"
           disabled={disabled}
           value={city}
@@ -52,7 +64,7 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
           options={US_STATES.map((s) => ({ value: s[0], label: s[0] }))}
           errors={!disabled && errors.state}
         />
-        <Input
+        <TextInput
           label="Zip Code"
           disabled={disabled}
           value={zipCode}

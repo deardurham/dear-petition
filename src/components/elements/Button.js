@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import keyAndAmbientShadows from '../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution } from '../../styles/colors';
+import { colorPrimary, colorWhite, colorCaution, colorGrey } from '../../styles/colors';
 import { fontPrimary } from '../../styles/fonts';
 
 export const Button = styled.button`
@@ -9,25 +9,20 @@ export const Button = styled.button`
   ${({ type }) => mapTypeToStartingState(type)}
 
   border-radius: 3px;
-  font-size: 1rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.25rem;
   outline: none;
 
-  font-size: calc(1.5rem + 0.5vw);
+  font-size: inherit;
   font-family: ${fontPrimary};
-
-  transition: all 0.1s ease-in;
 
   ${keyAndAmbientShadows.dp2};
 
   &:hover {
-    ${keyAndAmbientShadows.dp6};
-    transform: translateY(-1px);
+    ${keyAndAmbientShadows.dp2};
   }
 
   &:active {
     ${keyAndAmbientShadows.dp2};
-    transform: translateY(1px);
   }
 `;
 
@@ -37,11 +32,11 @@ export const CloseButton = styled(Button)`
   transition: none;
   transform: none;
   font-size: 1.25rem;
-  box-shadow: none;
+  ${keyAndAmbientShadows.dp1};
 
   &:hover {
-    ${keyAndAmbientShadows.dp2};
     transform: none;
+    ${keyAndAmbientShadows.dp1};
   }
 
   &:active {
@@ -52,6 +47,7 @@ export const CloseButton = styled(Button)`
 export const POSITIVE = 'positive';
 export const CAUTION = 'caution';
 export const NEUTRAL = 'neutral';
+export const DISABLED = 'disabled';
 
 function mapTypeToStartingState(type) {
   switch (type) {
@@ -61,11 +57,18 @@ function mapTypeToStartingState(type) {
       return caution;
     case NEUTRAL:
       return neutral;
+    case DISABLED:
+      return disabled;
     default:
       return positive;
   }
 }
 
+const disabled = css`
+  background: ${colorGrey};
+  border: 1px solid ${colorGrey};
+  color: ${colorWhite};
+`;
 const positive = css`
   background: ${colorPrimary};
   border: 1px solid ${colorPrimary};

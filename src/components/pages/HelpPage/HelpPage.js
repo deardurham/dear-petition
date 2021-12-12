@@ -9,8 +9,6 @@ import { Markdown, ExpandableHeader } from './style';
 
 export const HelpPageStyled = styled(PageBase)`
   display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const HelpPageContent = styled.div`

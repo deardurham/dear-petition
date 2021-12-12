@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorPrimary } from '../../styles/colors';
+import { colorPrimary, greyScale } from '../../styles/colors';
 
 export const TableStyle = styled.table`
   display: grid;
@@ -38,6 +38,10 @@ export const TableStyle = styled.table`
   & td {
     padding-top: 10px;
     padding-bottom: 10px;
+  }
+
+  & tr:nth-child(even) td {
+    background-color: ${greyScale(9.25)};
   }
 `;
 
