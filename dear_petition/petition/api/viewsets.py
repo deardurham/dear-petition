@@ -1,8 +1,10 @@
+import logging
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.http import FileResponse
-import logging
+from django.middleware import csrf
+from django.utils import timezone
 
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.response import Response
@@ -206,6 +208,20 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         generated_petition_pdf = generate_petition_pdf(
             serializer.data["petition"], serializer.data
         )
+        form = petition.Petition.objects.get(id=request.data["petition"])
+        batch = form.batch
+        user = request.user
+
+        petition.GeneratedPetition.objects.create(
+            username=user.username,
+            form_type=form.form_type,
+            number_of_charges=form.offense_records.count(),
+            batch_id=batch.id,
+        )
+
+        user.last_generated_petition_time = timezone.now()
+        user.save()
+
         resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'

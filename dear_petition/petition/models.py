@@ -19,6 +19,7 @@ from django.utils import timezone
 import ciprs_reader
 from localflavor.us import us_states
 from dear_petition.users.models import User
+from dear_petition.users import constants as uc
 from . import constants as pc
 
 from .constants import (
@@ -324,3 +325,10 @@ class Petition(TimeStampedModel):
 
 # Look-alike Petition object used to support JSON data-driven petitions
 DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[True])
+
+
+class GeneratedPetition(TimeStampedModel):
+    username = models.CharField(max_length=uc.NAME_MAX_LENGTH)
+    form_type = models.CharField(choices=FORM_TYPES, max_length=255)
+    number_of_charges = models.IntegerField()
+    batch_id = models.PositiveIntegerField()
