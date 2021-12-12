@@ -157,6 +157,6 @@ class GeneratedPetitionAdmin(admin.ModelAdmin):
         "created",
     )
     list_filter = ("form_type", "created", "username")
-    ordering = ("-modified",)
+    ordering = ("-created",)
     readonly_fields = ("username", "batch_id", "form_type", "number_of_charges")
     search_fields = ("username", "batch_id", "id")
