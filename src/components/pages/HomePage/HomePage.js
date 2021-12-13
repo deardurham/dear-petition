@@ -38,8 +38,16 @@ const ModalStyled = styled(Modal)`
   }
 `;
 
+const ParserCheckboxWrapper = styled.div`
+  margin-top: 1.5rem;
+  input {
+    margin-left: 1rem;
+  }
+`;
+
 function HomePage() {
   const fileInputRef = React.createRef();
+  const [parserMode, setParserMode] = useState();
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [files, setFiles] = useState(new Set());
@@ -98,6 +106,7 @@ function HomePage() {
     let timer = null;
     const filesFormData = new FormData();
     files.forEach((file) => filesFormData.append('files', file));
+    filesFormData.append('parser_mode', JSON.stringify(parserMode ? 2 : 1));
     timer = setTimeout(() => {
       if (isMounted.current) {
         setModalError(
@@ -159,11 +168,21 @@ function HomePage() {
             </DnDContent>
           </DragNDrop>
           {files && files.size > 0 && (
-            <FilesList
-              files={files}
-              handleRemoveFile={handleRemoveFile}
-              handlePreparePetitions={handlePreparePetitions}
-            />
+            <>
+              <ParserCheckboxWrapper>
+                Use Experimental Parser?
+                <input
+                  type="checkbox"
+                  checked={!!parserMode}
+                  onChange={() => setParserMode((prev) => !prev)}
+                />
+              </ParserCheckboxWrapper>
+              <FilesList
+                files={files}
+                handleRemoveFile={handleRemoveFile}
+                handlePreparePetitions={handlePreparePetitions}
+              />
+            </>
           )}
         </HomeContent>
       </HomePageStyled>

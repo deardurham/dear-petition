@@ -150,6 +150,7 @@ class ParentPetitionSerializer(PetitionSerializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
+    parser_mode = serializers.IntegerField(default=1)
 
     class Meta:
         model = Batch
@@ -160,6 +161,7 @@ class BatchSerializer(serializers.ModelSerializer):
             "user",
             "records",
             "petitions",
+            "parser_mode",
         ]
         read_only_fields = ["user"]
 
