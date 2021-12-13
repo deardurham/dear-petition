@@ -9,9 +9,6 @@
     },
     {
       "url": "heroku/python"
-    },
-    {
-      "url": "https://github.com/carwow/heroku-buildpack-pdftotext.git"
     }
   ],
   "env": {
@@ -24,7 +21,7 @@
     },
     "IS_REVIEW": {
       "value": "True"
-    }
+    },
     "DJANGO_AWS_ACCESS_KEY_ID": {
       "value": "awsaccesskey"
     },
