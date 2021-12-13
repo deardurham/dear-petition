@@ -118,7 +118,8 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
-        batch = import_ciprs_records(files=files, user=self.request.user)
+        parser_mode = serializer.data["parser_mode"]
+        batch = import_ciprs_records(files=files, user=self.request.user, parser_mode=parser_mode)
         return {"id": batch.pk}
 
     def perform_update(self, serializer):
