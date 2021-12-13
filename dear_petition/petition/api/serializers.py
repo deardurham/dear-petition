@@ -35,6 +35,8 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
     disposition_method = serializers.SerializerMethodField()
 
     def get_offense_date(self, offense_record):
+        if offense_record.offense.ciprs_record.offense_date is None:
+            return None
         return offense_record.offense.ciprs_record.offense_date.date()
 
     def get_dob(self, offense_record):
