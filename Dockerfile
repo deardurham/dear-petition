@@ -11,6 +11,32 @@ RUN npm run build
 
 FROM python:3.8-slim as base
 
+RUN set -ex \
+    && BUILD_DEPS=" \
+    curl \
+    build-essential \
+    zlib1g-dev \
+    libpng-dev \
+    libjpeg-dev \
+    pkg-config \
+    libfontconfig1-dev \
+    " \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS
+
+# Install poppler pdftotext, based on xpdf3 (the old version)
+RUN set -ex \
+    && curl -k https://poppler.freedesktop.org/poppler-0.57.0.tar.xz | tar xJ \
+    && chmod -R 755 ./poppler-0.57.0 \
+    && cd ./poppler-0.57.0/ \
+	&&./configure \
+	  --prefix=/tmp/poppler \
+	  --disable-shared \
+	  --enable-build-type=release \
+	  --enable-libopenjpeg=none \
+    && make install \
+    && cp /tmp/poppler/bin/pdftotext /usr/local/bin/pdftotext
+
 # Install packages needed to run your application (not build deps):
 #   mime-support -- for mime types when serving static files
 #   postgresql-client -- for running database commands
@@ -35,7 +61,7 @@ RUN set -ex \
 RUN set -ex \
     && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
     && tar -xvf xpdf-tools-linux-4.03.tar.gz \
-    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin
+    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
 
 # Copy in your requirements file
 # ADD requirements.txt /requirements.txt

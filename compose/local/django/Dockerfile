@@ -17,12 +17,66 @@ RUN apk update \
   # ZeroMQ
   && apk add libzmq zeromq-dev \
   # Git
-  && apk add git \
-  # pdftotext
-  && apk add poppler-utils
+  && apk add git
 
-RUN ln -s /usr/bin/python3 /usr/local/bin/python
-RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
+FROM python:3.8-slim
+
+RUN set -ex \
+    && BUILD_DEPS=" \
+    curl \
+    build-essential \
+    zlib1g-dev \
+    libpng-dev \
+    libjpeg-dev \
+    pkg-config \
+    libfontconfig1-dev \
+    " \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS
+
+# Install poppler pdftotext, based on xpdf3 (the old version)
+RUN set -ex \
+    && curl -k https://poppler.freedesktop.org/poppler-0.57.0.tar.xz | tar xJ \
+    && chmod -R 755 ./poppler-0.57.0 \
+    && cd ./poppler-0.57.0/ \
+	&&./configure \
+	  --prefix=/tmp/poppler \
+	  --disable-shared \
+	  --enable-build-type=release \
+	  --enable-libopenjpeg=none \
+    && make install \
+    && cp /tmp/poppler/bin/pdftotext /usr/local/bin/pdftotext
+
+# Install packages needed to run your application (not build deps):
+#   mime-support -- for mime types when serving static files
+#   postgresql-client -- for running database commands
+#   libfontconfig -- required by pdftotext
+# We need to recreate the /usr/share/man/man{1..8} directories first because
+# they were clobbered by a parent image.
+RUN set -ex \
+    && RUN_DEPS=" \
+    libpcre3 \
+    libfontconfig \
+    mime-support \
+    postgresql-client \
+    vim \
+    wget \
+    curl \
+    git \
+    libpq-dev \
+    " \
+    && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
+    && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pdftotext
+RUN set -ex \
+    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
+    && tar -xvf xpdf-tools-linux-4.03.tar.gz \
+    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
+
+# RUN ln -s /usr/bin/python3 /usr/local/bin/python
+# RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
@@ -54,7 +108,7 @@ RUN sed -i 's/\r//' /start-jupyter
 RUN chmod +x /start-jupyter
 
 # reduce image size by cleaning up the build packages
-RUN apk del build-base musl-dev python3-dev zeromq-dev postgresql-dev
+# apk del build-base musl-dev python3-dev zeromq-dev postgresql-dev
 
 WORKDIR /app
 
