@@ -1,14 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ className, label, errors, register, name, ...inputProps }) {
+function Input({ className, label, errors, register, name, ...inputProps }, ref) {
   const registerProps = register && name ? { ...register(name) } : {};
   return (
     <InputWrapper className={className}>
       <InputStyled>{label}</InputStyled>
-      <ActualInputStyled {...inputProps} {...registerProps} />
+      <ActualInputStyled {...inputProps} {...registerProps} ref={ref} />
       {errors && (
         <AnimatePresence>
           <InputErrors
@@ -25,4 +24,4 @@ function Input({ className, label, errors, register, name, ...inputProps }) {
   );
 }
 
-export default Input;
+export default React.forwardRef(Input);
