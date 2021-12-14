@@ -91,11 +91,11 @@ const DisplayCells = ({ user, onStartEdit }) => {
       </TableCell>
       <TableCell>
         <ActionsRow>
-          <ActionButton type="neutral" onClick={() => onStartEdit()}>
+          <ActionButton colorClass="neutral" onClick={() => onStartEdit()}>
             Edit
           </ActionButton>
           <ActionButton
-            type={disabledDelete ? 'disabled' : 'caution'}
+            colorClass={disabledDelete ? 'disabled' : 'caution'}
             disabled={disabledDelete}
             onClick={() => {
               if (myUser.pk !== user.pk) {
@@ -113,12 +113,12 @@ const DisplayCells = ({ user, onStartEdit }) => {
             <p>{user.username}</p>
             <ActionsRow>
               <Button
-                type="caution"
+                colorClass="caution"
                 onClick={() => triggerUpdate({ id: user.pk, method: 'delete' })}
               >
                 Confirm
               </Button>
-              <Button onClick={() => setModalVisible(false)} type="neutral">
+              <Button onClick={() => setModalVisible(false)} colorClass="neutral">
                 Cancel
               </Button>
             </ActionsRow>
@@ -181,7 +181,7 @@ const InputCells = ({ user, onStopEdit }) => {
         <TableCell>
           <ActionsRow>
             <ActionButton type="submit">Save</ActionButton>
-            <ActionButton type="neutral" onClick={() => onStopEdit()}>
+            <ActionButton colorClass="neutral" onClick={() => onStopEdit()}>
               Cancel
             </ActionButton>
           </ActionsRow>

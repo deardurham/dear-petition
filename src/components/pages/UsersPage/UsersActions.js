@@ -106,7 +106,7 @@ const CreateUserAction = ({ onCloseModal }) => {
             <Button type="submit">Submit</Button>
           </div>
           <div>
-            <Button type="neutral" onClick={() => onCloseModal()}>
+            <Button colorClass="neutral" onClick={() => onCloseModal()}>
               Close
             </Button>
           </div>

@@ -6,7 +6,7 @@ import { fontPrimary } from '../../styles/fonts';
 
 export const Button = styled.button`
   cursor: pointer;
-  ${({ type }) => mapTypeToStartingState(type)}
+  ${({ colorClass }) => mapTypeToStartingState(colorClass)}
 
   border-radius: 3px;
   padding: 0.25rem;
@@ -49,8 +49,8 @@ export const CAUTION = 'caution';
 export const NEUTRAL = 'neutral';
 export const DISABLED = 'disabled';
 
-function mapTypeToStartingState(type) {
-  switch (type) {
+function mapTypeToStartingState(colorClass) {
+  switch (colorClass) {
     case POSITIVE:
       return positive;
     case CAUTION:
@@ -88,11 +88,11 @@ const neutral = css`
 
 Button.propTypes = {
   /** Reflects the state of the button */
-  type: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
+  colorClass: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
   /** What happens when the button is clicked */
   onClick: PropTypes.func.isRequired,
 };
 
 Button.defaultProps = {
-  type: POSITIVE,
+  colorClass: POSITIVE,
 };
