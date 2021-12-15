@@ -362,7 +362,7 @@ class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
             serializer.validated_data[
                 "access"
             ],  # pull access token out of validated_data
-            expires=datetime.now() + settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None
             ),  # we can tie the cookie to a specific domain for added security
