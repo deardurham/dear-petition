@@ -51,7 +51,11 @@ const UsersPage = () => {
   const { user: authenticatedUser } = useAuth();
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
-  const { data } = useUsersQuery({ limit: limit.value, offset });
+  const [ordering, setOrdering] = useState('username');
+  const { data } = useUsersQuery(
+    { params: { limit: limit.value, offset, ordering } },
+    { skip: !authenticatedUser?.is_admin }
+  );
 
   useEffect(() => {
     if (authenticatedUser?.is_admin !== true) {
@@ -113,7 +117,7 @@ const UsersPage = () => {
               </button>
             </PaginationFlexRow>
           </TableFlexRow>
-          <UsersTable users={data?.results || []} />
+          <UsersTable users={data?.results || []} ordering={ordering} setOrdering={setOrdering} />
         </FlexColumn>
       </UsersSection>
     </PageBase>

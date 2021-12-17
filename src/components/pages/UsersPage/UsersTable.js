@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretUp, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 import { useModifyUserMutation } from '../../../service/api';
 import useAuth from '../../../hooks/useAuth';
@@ -203,13 +203,51 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const UsersTable = ({ users }) => (
+const ClickableHeader = styled.div`
+  cursor: pointer;
+  display: flex;
+  gap: 1rem;
+`;
+
+const SortableHeader = ({ children, label, ordering, setOrdering }) => {
+  const handleClick = () => {
+    setOrdering((prev) => {
+      if (prev === label) {
+        setOrdering(`-${label}`);
+      } else {
+        setOrdering(label);
+      }
+    });
+  };
+  const isSorted = ordering === label || ordering === `-${label}`;
+  return (
+    <TableCell header>
+      <ClickableHeader
+        role="button"
+        tabIndex={0}
+        onKeyDown={() => handleClick()}
+        onClick={() => handleClick()}
+      >
+        {children}
+        {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretUp : faCaretDown} />}
+      </ClickableHeader>
+    </TableCell>
+  );
+};
+
+const UsersTable = ({ ordering, users, setOrdering }) => (
   <UsersTableStyled numColumns={5}>
     <TableHeader>
-      <TableCell header>Username</TableCell>
-      <TableCell header>Email</TableCell>
+      <SortableHeader label="username" ordering={ordering} setOrdering={setOrdering}>
+        Username
+      </SortableHeader>
+      <SortableHeader label="email" ordering={ordering} setOrdering={setOrdering}>
+        Email
+      </SortableHeader>
       <TableCell header>Admin?</TableCell>
-      <TableCell header>Last Login</TableCell>
+      <SortableHeader label="last_login" ordering={ordering} setOrdering={setOrdering}>
+        Last Login
+      </SortableHeader>
       <TableCell header>Actions</TableCell>
     </TableHeader>
     <TableBody>

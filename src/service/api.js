@@ -22,21 +22,12 @@ export const api = createApi({
       query: () => ({ url: 'token/', method: 'delete' }),
     }),
     users: builder.query({
-      query: (args) => {
-        let url = '';
-        if (args?.id) {
-          url = `users/${args.id}/`;
-        } else {
-          const params = [];
-          if (args?.limit) {
-            params.push(`limit=${args.limit}`);
-          }
-          if (args?.offset) {
-            params.push(`offset=${args.offset}`);
-          }
-          url = `users/${params.length > 0 ? '?' + params.join('&') : ''}`;
+      query: ({ params, id }) => {
+        let url = 'users/';
+        if (id) {
+          url = `${url}/${id}/`;
         }
-        return { url, method: 'get' };
+        return { url, method: 'get', params };
       },
       providesTags: ['User'],
     }),
