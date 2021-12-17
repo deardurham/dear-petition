@@ -229,7 +229,7 @@ const SortableHeader = ({ children, label, ordering, setOrdering }) => {
         onClick={() => handleClick()}
       >
         {children}
-        {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretUp : faCaretDown} />}
+        {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretDown : faCaretUp} />}
       </ClickableHeader>
     </TableCell>
   );
