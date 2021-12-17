@@ -19,7 +19,10 @@ const PassthroughTD = styled.td`
 `;
 
 const UsersTableStyled = styled(Table)`
-  grid-template-columns: minmax(150px, 3fr) minmax(150px, 3fr) minmax(50px, 1fr) minmax(50px, 2fr);
+  grid-template-columns: minmax(125px, 3fr) minmax(125px, 3fr) minmax(50px, 1fr) minmax(100px, 1fr) minmax(
+      50px,
+      2fr
+    );
   align-items: center;
   & td {
     height: 100%;
@@ -77,6 +80,8 @@ const TextboxInput = styled(FormInput)`
   }
 `;
 
+const formatLastLogin = (lastLogin) => (lastLogin ? new Date(lastLogin).toLocaleDateString() : '');
+
 const DisplayCells = ({ user, onStartEdit }) => {
   const { user: myUser } = useAuth();
   const [isModalVisible, setModalVisible] = useState(false);
@@ -89,6 +94,7 @@ const DisplayCells = ({ user, onStartEdit }) => {
       <TableCell>
         <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
       </TableCell>
+      <TableCell>{formatLastLogin(user.last_login)}</TableCell>
       <TableCell>
         <ActionsRow>
           <ActionButton colorClass="neutral" onClick={() => onStartEdit()}>
@@ -166,6 +172,7 @@ const InputCells = ({ user, onStopEdit }) => {
         <TableCell>
           <input type="checkbox" disabled={myUser.pk === user.pk} {...register('is_admin')} />
         </TableCell>
+        <TableCell>{formatLastLogin(user.last_login)}</TableCell>
         <TableCell>
           <ActionsRow>
             <ActionButton type="submit">Save</ActionButton>
@@ -197,11 +204,12 @@ const UserRow = ({ user, setModalVisible }) => {
 };
 
 const UsersTable = ({ users }) => (
-  <UsersTableStyled numColumns={4}>
+  <UsersTableStyled numColumns={5}>
     <TableHeader>
       <TableCell header>Username</TableCell>
       <TableCell header>Email</TableCell>
       <TableCell header>Admin?</TableCell>
+      <TableCell header>Last Login</TableCell>
       <TableCell header>Actions</TableCell>
     </TableHeader>
     <TableBody>
