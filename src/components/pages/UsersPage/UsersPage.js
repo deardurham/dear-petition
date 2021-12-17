@@ -32,12 +32,16 @@ const FlexRow = styled.div`
   gap: 15px;
 `;
 
-const TableFlexRow = styled(FlexRow)`
-  justify-content: space-between;
-`;
+const TableFlexRow = styled(FlexRow)``;
 
 const PaginationFlexRow = styled(FlexRow)`
+  margin-left: auto;
   align-self: flex-end;
+`;
+
+const SearchBox = styled.input`
+  margin-left: 3rem;
+  align-self: center;
 `;
 
 const limitSizes = [
@@ -52,8 +56,10 @@ const UsersPage = () => {
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
   const [ordering, setOrdering] = useState('username');
+  const [search, setSearch] = useState('');
+  const [formValue, setFormValue] = useState('');
   const { data } = useUsersQuery(
-    { params: { limit: limit.value, offset, ordering } },
+    { params: { limit: limit.value, offset, ordering, search } },
     { skip: !authenticatedUser?.is_admin }
   );
 
@@ -90,6 +96,33 @@ const UsersPage = () => {
                 setLimit(selectObj);
               }}
             />
+            <form
+              id="fname"
+              name="fname"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSearch(formValue);
+              }}
+            >
+              <SearchBox
+                type="text"
+                name="search"
+                value={formValue}
+                onChange={(e) => setFormValue(e.target.value)}
+              />
+              <input type="submit" value="Search" />
+            </form>
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFormValue('');
+                  setSearch('');
+                }}
+              >
+                Clear
+              </button>
+            )}
             <PaginationFlexRow>
               <button
                 type="button"
