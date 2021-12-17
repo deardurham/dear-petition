@@ -70,7 +70,6 @@ export const TableRow = styled.tr`
   `
         : `background-color: ${props.backgroundColor}`}
   }
-  cursor: pointer;
 
   input[type='checkbox'] {
     cursor: pointer;
