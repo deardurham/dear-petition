@@ -8,7 +8,7 @@ import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import Modal from '../../elements/Modal/Modal';
-import Input from '../../elements/Input/Input';
+import FormInput from '../../elements/Input/FormInput';
 
 const PassthroughForm = styled.form`
   display: contents;
@@ -66,7 +66,7 @@ const ModalStyled = styled(Modal)`
   }
 `;
 
-const TextboxInput = styled(Input)`
+const TextboxInput = styled(FormInput)`
   width: 100%;
   input {
     width: 100%;
@@ -131,23 +131,24 @@ const DisplayCells = ({ user, onStartEdit }) => {
 
 const InputCells = ({ user, onStopEdit }) => {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors: formErrors },
-  } = useForm();
+    register,
+  } = useForm({
+    defaultValues: { username: user.username, email: user.email, is_admin: user.is_admin },
+  });
   const [triggerUpdate, { error }] = useModifyUserMutation();
   const { user: myUser } = useAuth();
-  const onSubmit = (data) => {
-    if (
-      myUser.pk !== user.pk &&
-      !['username', 'email', 'is_admin'].every((field) => user[field] === data[field])
-    ) {
-      triggerUpdate({ id: user.pk, data })
-        .unwrap()
-        .then(() => onStopEdit())
-        .catch(() => console.error('Validation/network error'));
-    } else {
+  const onSubmit = async (data) => {
+    if (['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
       onStopEdit();
+    } else {
+      try {
+        await triggerUpdate({ id: user.pk, data });
+      } finally {
+        onStopEdit();
+      }
     }
   };
   return (
@@ -155,28 +156,15 @@ const InputCells = ({ user, onStopEdit }) => {
       <PassthroughForm onSubmit={handleSubmit(onSubmit)}>
         <TableCell>
           <TextboxInput
-            defaultValue={user.username}
+            inputProps={{ control, name: 'username' }}
             errors={error?.data?.username ?? ''}
-            register={register}
-            name="username"
           />
         </TableCell>
         <TableCell>
-          <TextboxInput
-            defaultValue={user.email}
-            errors={error?.data?.email ?? ''}
-            register={register}
-            name="email"
-          />
+          <TextboxInput inputProps={{ control, name: 'email' }} errors={error?.data?.email ?? ''} />
         </TableCell>
         <TableCell>
-          <Input
-            type="checkbox"
-            disabled={myUser.pk === user.pk}
-            defaultChecked={user.is_admin}
-            register={register}
-            name="is_admin"
-          />
+          <input type="checkbox" disabled={myUser.pk === user.pk} {...register('is_admin')} />
         </TableCell>
         <TableCell>
           <ActionsRow>

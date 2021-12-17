@@ -24,7 +24,7 @@ export const axiosBaseQuery =
       return { data: result.data };
     } catch (axiosError) {
       const isLoginAttempt =
-        url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'accent' }) === 0;
+        url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'base' }) === 0;
       if (axiosError?.response?.status !== 401 || isLoginAttempt) {
         return {
           error: { status: axiosError.response?.status, data: axiosError.response?.data },
