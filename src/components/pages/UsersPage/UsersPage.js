@@ -6,9 +6,11 @@ import styled from 'styled-components';
 import UsersTable from './UsersTable';
 import PageBase from '../PageBase';
 import useAuth from '../../../hooks/useAuth';
+import useDebounce from '../../../hooks/useDebounce';
 import { useUsersQuery } from '../../../service/api';
 import Select from '../../elements/Input/Select';
 import UsersActions from './UsersActions';
+import { colorGrey } from '../../../styles/colors';
 
 const UsersSection = styled.div`
   &:not(:last-child) {
@@ -34,6 +36,14 @@ const FlexRow = styled.div`
 
 const TableFlexRow = styled(FlexRow)``;
 
+const SearchRow = styled(FlexRow)`
+  align-self: center;
+  display: flex;
+  button {
+    padding: 0.75rem;
+  }
+`;
+
 const PaginationFlexRow = styled(FlexRow)`
   margin-left: auto;
   align-self: flex-end;
@@ -42,6 +52,10 @@ const PaginationFlexRow = styled(FlexRow)`
 const SearchBox = styled.input`
   margin-left: 3rem;
   align-self: center;
+  width: 20rem;
+  padding: 0.9rem;
+  border-radius: 3px;
+  border: 1px solid ${colorGrey};
 `;
 
 const limitSizes = [
@@ -58,6 +72,7 @@ const UsersPage = () => {
   const [ordering, setOrdering] = useState('username');
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
+  const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
   const { data } = useUsersQuery(
     { params: { limit: limit.value, offset, ordering, search } },
     { skip: !authenticatedUser?.is_admin }
@@ -96,33 +111,29 @@ const UsersPage = () => {
                 setLimit(selectObj);
               }}
             />
-            <form
-              id="fname"
-              name="fname"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSearch(formValue);
-              }}
-            >
+            <SearchRow>
               <SearchBox
                 type="text"
-                name="search"
+                placeholder="Search username or email"
                 value={formValue}
-                onChange={(e) => setFormValue(e.target.value)}
-              />
-              <input type="submit" value="Search" />
-            </form>
-            {search && (
-              <button
-                type="button"
-                onClick={() => {
-                  setFormValue('');
-                  setSearch('');
+                onChange={(e) => {
+                  const text = e.target.value;
+                  setFormValue(text);
+                  debounceSearch(text);
                 }}
-              >
-                Clear
-              </button>
-            )}
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormValue('');
+                    setSearch('');
+                  }}
+                >
+                  Clear
+                </button>
+              )}
+            </SearchRow>
             <PaginationFlexRow>
               <button
                 type="button"
