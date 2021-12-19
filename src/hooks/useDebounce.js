@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 const useDebounce = (callback, { timeout }) => {
   const timer = useRef();
 
-  useEffect(() => timer.current && clearTimeout(timer.current), [timer]);
+  useEffect(() => timer.current && clearTimeout(timer.current), []);
 
   return useCallback(
     (args) => {
