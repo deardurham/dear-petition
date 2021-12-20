@@ -47,6 +47,14 @@ const SearchRow = styled(FlexRow)`
 const PaginationFlexRow = styled(FlexRow)`
   margin-left: auto;
   align-self: flex-end;
+  max-width: 400px;
+  & > div {
+    justify-content: space-evenly;
+    flex: 1;
+  }
+  & button {
+    padding: 0.4rem;
+  }
 `;
 
 const SearchBox = styled.input`
@@ -58,11 +66,28 @@ const SearchBox = styled.input`
   border: 1px solid ${colorGrey};
 `;
 
+const VISIBLE_OFFSET = 2;
+const MAX_PAGES = 9;
+
 const limitSizes = [
   { label: '10', value: 10 },
   { label: '25', value: 25 },
   { label: '50', value: 50 },
 ];
+
+const calculatePageIndices = (current, numPages) => {
+  let startIndex = current - VISIBLE_OFFSET;
+  let endIndex = current + VISIBLE_OFFSET;
+  if (current < MAX_PAGES - 3) {
+    startIndex = 1;
+    endIndex = Math.max(MAX_PAGES - 2, current + VISIBLE_OFFSET);
+  }
+  if (current > numPages - MAX_PAGES + 4) {
+    startIndex = Math.min(numPages - MAX_PAGES + 3, current - VISIBLE_OFFSET);
+    endIndex = numPages;
+  }
+  return [Math.max(1, startIndex), Math.min(endIndex, numPages)];
+};
 
 const UsersPage = () => {
   const history = useHistory();
@@ -92,6 +117,8 @@ const UsersPage = () => {
   }, [offset, numUsers]);
 
   const numPages = Math.floor(numUsers / limit.value) + (numUsers % limit.value > 0 ? 1 : 0);
+  const currentPage = offset / limit.value + 1;
+  const [startPage, endPage] = calculatePageIndices(currentPage, numPages);
   return (
     <PageBase>
       <UsersSection>
@@ -142,16 +169,26 @@ const UsersPage = () => {
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
-              {[...Array(numPages).keys()].map((idx) => (
-                <button
-                  type="button"
-                  key={idx}
-                  onClick={() => setOffset(idx * limit.value)}
-                  disabled={idx === offset / limit.value}
-                >
-                  {idx + 1}
-                </button>
-              ))}
+              <FlexRow>
+                {[...Array(numPages).keys()].map((idx) => {
+                  const page = idx + 1;
+                  const withinLeft = page >= startPage && page <= currentPage;
+                  const withinRight = page >= currentPage && page <= endPage;
+                  if (page !== 1 && page !== numPages && !withinLeft && !withinRight) {
+                    return page === startPage - 1 || page === endPage + 1 ? '...' : null;
+                  }
+                  return (
+                    <button
+                      type="button"
+                      key={idx}
+                      onClick={() => setOffset(idx * limit.value)}
+                      disabled={idx === offset / limit.value}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </FlexRow>
               <button
                 type="button"
                 onClick={() => setOffset((prev) => prev + limit.value)}
