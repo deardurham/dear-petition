@@ -45,9 +45,12 @@ export const TableStyle = styled.table`
   }
 `;
 
-export const TableCell = ({ children, header }) => (
-  <>{header ? <th>{children}</th> : <td>{children}</td>}</>
-);
+export const TableCell = ({ children, header, tooltip }) => {
+  if (header) {
+    return <th title={tooltip ?? ''}>{children}</th>;
+  }
+  return <td title={tooltip ?? ''}>{children}</td>;
+};
 
 export const TableSpanCell = styled.td`
   grid-column: 1 / span ${(props) => props.spanLength};

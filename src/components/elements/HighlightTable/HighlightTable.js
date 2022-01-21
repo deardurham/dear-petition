@@ -25,13 +25,15 @@ function HighlightRow({ offenseRecord, highlightRow, unhighlightRow, highlighted
       <TableCell>
         <input type="checkbox" checked={!!highlighted} />
       </TableCell>
-      <TableCell>{offenseRecord.dob}</TableCell>
-      <TableCell>{offenseRecord.offense_date}</TableCell>
-      <TableCell>{offenseRecord.disposition_method}</TableCell>
-      <TableCell>{offenseRecord.description}</TableCell>
-      <TableCell>{offenseRecord.action}</TableCell>
-      <TableCell>{offenseRecord.severity}</TableCell>
-      <TableCell>{offenseRecord.law}</TableCell>
+      <TableCell tooltip={offenseRecord.dob}>{offenseRecord.dob}</TableCell>
+      <TableCell tooltip={offenseRecord.offense_date}>{offenseRecord.offense_date}</TableCell>
+      <TableCell tooltip={offenseRecord.disposition_method}>
+        {offenseRecord.disposition_method}
+      </TableCell>
+      <TableCell tooltip={offenseRecord.description}>{offenseRecord.description}</TableCell>
+      <TableCell tooltip={offenseRecord.action}>{offenseRecord.action}</TableCell>
+      <TableCell tooltip={offenseRecord.severity}>{offenseRecord.severity}</TableCell>
+      <TableCell tooltip={offenseRecord.law}>{offenseRecord.law}</TableCell>
     </TableRow>
   );
 }
