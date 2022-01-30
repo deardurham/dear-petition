@@ -119,6 +119,7 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
         onSuggestionSelected={handleSuggestionSelected}
         highlightFirstSuggestion
         renderInputComponent={AgencyAutoSuggestInput}
+        focusInputOnSuggestionClick={false}
         renderSuggestionsContainer={AutoSuggestionContainer}
       />
       <BadgesListStyled data-cy="label_list">
