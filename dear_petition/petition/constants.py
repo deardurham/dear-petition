@@ -82,3 +82,12 @@ DISPOSITION_METHOD_CODE_MAP = {
     "NEVER TO BE SERVED": "NTBS",
     "DEFERRED PROCEEDING OR DEFERRED PROSECUTION DISMISSAL": "DPD",
 }
+
+GENERATED_PETITION_ADMIN_FIELDS = (
+    "id",
+    "username",
+    "batch_id",
+    "form_type",
+    "number_of_charges",
+    "created",
+)
