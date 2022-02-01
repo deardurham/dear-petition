@@ -1,27 +1,29 @@
+import csv
 import logging
 from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.middleware import csrf
 from django.utils import timezone
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, parsers, permissions, status, viewsets
-from rest_framework.response import Response
-from rest_framework_simplejwt import exceptions, views as simplejwt_views
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework_simplejwt import exceptions
+from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from dear_petition.users.models import User
 from dear_petition.petition import constants
-from dear_petition.petition import models as petition, utils
+from dear_petition.petition import models as petition
+from dear_petition.petition import utils
+from dear_petition.petition.admin import GeneratedPetitionAdmin
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import import_ciprs_records, recalculate_petitions
 from dear_petition.petition.export import generate_petition_pdf
-
-from django_filters.rest_framework import DjangoFilterBackend
-
+from dear_petition.users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -228,7 +230,7 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         return resp
 
 
-class GenerateDataPetitionView(viewsets.GenericViewSet):
+class GenerateDataPetitionView(viewsets.ModelViewSet):
 
     serializer_class = serializers.DataPetitionSerializer
 
@@ -243,6 +245,43 @@ class GenerateDataPetitionView(viewsets.GenericViewSet):
         resp["Content-Type"] = "application/pdf"
         resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
         return resp
+
+
+class GeneratedPetitionViewSet(viewsets.GenericViewSet):
+
+    queryset = petition.GeneratedPetition.objects.all()
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    @action(
+        detail=False,
+        methods=[
+            "get",
+        ],
+    )
+    def download_as_csv(self, request):
+        model_fields = petition.GeneratedPetition._meta.fields
+        field_names = [
+            field.name
+            for field in model_fields
+            if field.name in constants.GENERATED_PETITION_ADMIN_FIELDS
+        ]
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="export.csv"'
+
+        writer = csv.writer(response, delimiter=";")
+
+        writer.writerow(field_names)
+
+        for row in self.queryset:
+            values = []
+            for field in field_names:
+                value = getattr(row, field)
+                if value is None:
+                    value = ""
+                values.append(value)
+            writer.writerow(values)
+        return response
 
 
 class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):

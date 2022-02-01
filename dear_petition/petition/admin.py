@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 
 from dear_petition.petition import models
+from dear_petition.petition import constants
 
 
 @admin.register(models.CIPRSRecord)
@@ -148,14 +149,7 @@ class PetitionAdmin(admin.ModelAdmin):
 class GeneratedPetitionAdmin(admin.ModelAdmin):
 
     date_hierarchy = "created"
-    list_display = (
-        "id",
-        "username",
-        "batch_id",
-        "form_type",
-        "number_of_charges",
-        "created",
-    )
+    list_display = constants.GENERATED_PETITION_ADMIN_FIELDS
     list_filter = ("form_type", "created", "username")
     ordering = ("-created",)
     readonly_fields = ("username", "batch_id", "form_type", "number_of_charges")
