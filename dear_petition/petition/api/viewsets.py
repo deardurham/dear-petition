@@ -247,25 +247,6 @@ class GenerateDataPetitionView(viewsets.ModelViewSet):
         return resp
 
 
-def download_csv(modeladmin, request, queryset):
-    if not request.user.is_staff:
-        raise PermissionDenied
-    opts = queryset.model._meta
-    model = queryset.model
-    response = FileResponse()
-    response["Content-Type"] = "text/csv"
-    response["Content-Disposition"] = "attachment;filename=export.csv"
-    # the csv writer
-    writer = csv.writer(response)
-    field_names = [field.name for field in opts.fields]
-    # Write a first row with header information
-    writer.writerow(field_names)
-    # Write data rows
-    for obj in queryset:
-        writer.writerow([getattr(obj, field) for field in field_names])
-    return response
-
-
 class GeneratedPetitionViewSet(viewsets.GenericViewSet):
 
     queryset = petition.GeneratedPetition.objects.all()
