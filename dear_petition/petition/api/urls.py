@@ -12,6 +12,7 @@ router.register(r"offenserecord", viewsets.OffenseRecordViewSet)
 router.register(r"contact", viewsets.ContactViewSet)
 router.register(r"batch", viewsets.BatchViewSet)
 router.register(r"petitions", viewsets.PetitionViewSet)
+router.register(r"generatedpetition", viewsets.GeneratedPetitionViewSet)
 router.register(
     r"generate-petition",
     viewsets.GeneratePetitionView,

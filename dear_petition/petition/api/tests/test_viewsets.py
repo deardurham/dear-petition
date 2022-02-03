@@ -9,7 +9,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from dear_petition.users.tests.factories import UserFactory
 
-from ....petition.tests.factories import BatchFactory, CIPRSRecordFactory
+from ....petition.tests.factories import (
+    BatchFactory,
+    CIPRSRecordFactory,
+    GeneratedPetitionFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -161,3 +165,18 @@ class TestBatchViewSet(APITestCase):
         with self.subTest("DELETE"):
             response = self.client.delete(self.detail_url)
             self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TestGeneratePetitionViewSet(APITestCase):
+    def setUp(self):
+        self.user = UserFactory(is_staff=True)
+        self.generated_petition = GeneratedPetitionFactory()
+
+    def test_export_as_csv(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(reverse("api:generatedpetition-download-as-csv"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        content = response.content.decode("utf8")
+        lines = content.split("\n")
+        self.assertTrue(lines[0].startswith("id"))
+        self.assertTrue(lines[1].startswith("1"))
