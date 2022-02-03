@@ -26,7 +26,6 @@ export const axiosBaseQuery =
       const isLoginAttempt =
         url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'base' }) === 0;
       if (axiosError?.response?.status !== 401 || isLoginAttempt) {
-        api.dispatch(loggedOut());
         return {
           error: { status: axiosError.response?.status, data: axiosError.response?.data },
         };

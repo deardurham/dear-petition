@@ -151,9 +151,10 @@ const InputCells = ({ user, onStopEdit }) => {
       onStopEdit();
     } else {
       try {
-        await triggerUpdate({ id: user.pk, data });
-      } finally {
+        await triggerUpdate({ id: user.pk, data }).unwrap();
         onStopEdit();
+      } catch (e) {
+        console.error(e);
       }
     }
   };
