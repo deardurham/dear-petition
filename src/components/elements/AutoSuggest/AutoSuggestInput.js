@@ -1,9 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import Input from '../Input/Input';
 
-const AutoSuggestInput = (inputProps) => <InputStyled {...inputProps} />;
+const AutoSuggestInput = (inputProps, ref) => <Input {...inputProps} ref={ref} />;
 
-const InputStyled = styled(Input)``;
-
-export default AutoSuggestInput;
+export default React.forwardRef(AutoSuggestInput);

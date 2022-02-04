@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretUp, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 import { useModifyUserMutation } from '../../../service/api';
 import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import Modal from '../../elements/Modal/Modal';
-import Input from '../../elements/Input/Input';
+import FormInput from '../../elements/Input/FormInput';
 
 const PassthroughForm = styled.form`
   display: contents;
@@ -19,7 +19,10 @@ const PassthroughTD = styled.td`
 `;
 
 const UsersTableStyled = styled(Table)`
-  grid-template-columns: minmax(150px, 3fr) minmax(150px, 3fr) minmax(50px, 1fr) minmax(50px, 2fr);
+  grid-template-columns: minmax(125px, 3fr) minmax(125px, 3fr) minmax(50px, 1fr) minmax(100px, 1fr) minmax(
+      50px,
+      2fr
+    );
   align-items: center;
   & td {
     height: 100%;
@@ -66,7 +69,7 @@ const ModalStyled = styled(Modal)`
   }
 `;
 
-const TextboxInput = styled(Input)`
+const TextboxInput = styled(FormInput)`
   width: 100%;
   input {
     width: 100%;
@@ -76,6 +79,8 @@ const TextboxInput = styled(Input)`
     white-space: initial;
   }
 `;
+
+const formatLastLogin = (lastLogin) => (lastLogin ? new Date(lastLogin).toLocaleDateString() : '');
 
 const DisplayCells = ({ user, onStartEdit }) => {
   const { user: myUser } = useAuth();
@@ -89,13 +94,14 @@ const DisplayCells = ({ user, onStartEdit }) => {
       <TableCell>
         <FontAwesomeIcon icon={user.is_admin ? faCheck : faTimes} />
       </TableCell>
+      <TableCell>{formatLastLogin(user.last_login)}</TableCell>
       <TableCell>
         <ActionsRow>
-          <ActionButton type="neutral" onClick={() => onStartEdit()}>
+          <ActionButton colorClass="neutral" onClick={() => onStartEdit()}>
             Edit
           </ActionButton>
           <ActionButton
-            type={disabledDelete ? 'disabled' : 'caution'}
+            colorClass={disabledDelete ? 'disabled' : 'caution'}
             disabled={disabledDelete}
             onClick={() => {
               if (myUser.pk !== user.pk) {
@@ -113,12 +119,12 @@ const DisplayCells = ({ user, onStartEdit }) => {
             <p>{user.username}</p>
             <ActionsRow>
               <Button
-                type="caution"
+                colorClass="caution"
                 onClick={() => triggerUpdate({ id: user.pk, method: 'delete' })}
               >
                 Confirm
               </Button>
-              <Button onClick={() => setModalVisible(false)} type="neutral">
+              <Button onClick={() => setModalVisible(false)} colorClass="neutral">
                 Cancel
               </Button>
             </ActionsRow>
@@ -131,23 +137,25 @@ const DisplayCells = ({ user, onStartEdit }) => {
 
 const InputCells = ({ user, onStopEdit }) => {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors: formErrors },
-  } = useForm();
+    register,
+  } = useForm({
+    defaultValues: { username: user.username, email: user.email, is_admin: user.is_admin },
+  });
   const [triggerUpdate, { error }] = useModifyUserMutation();
   const { user: myUser } = useAuth();
-  const onSubmit = (data) => {
-    if (
-      myUser.pk !== user.pk &&
-      !['username', 'email', 'is_admin'].every((field) => user[field] === data[field])
-    ) {
-      triggerUpdate({ id: user.pk, data })
-        .unwrap()
-        .then(() => onStopEdit())
-        .catch(() => console.error('Validation/network error'));
-    } else {
+  const onSubmit = async (data) => {
+    if (['username', 'email', 'is_admin'].every((field) => user[field] === data[field])) {
       onStopEdit();
+    } else {
+      try {
+        await triggerUpdate({ id: user.pk, data }).unwrap();
+        onStopEdit();
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
   return (
@@ -155,33 +163,21 @@ const InputCells = ({ user, onStopEdit }) => {
       <PassthroughForm onSubmit={handleSubmit(onSubmit)}>
         <TableCell>
           <TextboxInput
-            defaultValue={user.username}
+            inputProps={{ control, name: 'username' }}
             errors={error?.data?.username ?? ''}
-            register={register}
-            name="username"
           />
         </TableCell>
         <TableCell>
-          <TextboxInput
-            defaultValue={user.email}
-            errors={error?.data?.email ?? ''}
-            register={register}
-            name="email"
-          />
+          <TextboxInput inputProps={{ control, name: 'email' }} errors={error?.data?.email ?? ''} />
         </TableCell>
         <TableCell>
-          <Input
-            type="checkbox"
-            disabled={myUser.pk === user.pk}
-            defaultChecked={user.is_admin}
-            register={register}
-            name="is_admin"
-          />
+          <input type="checkbox" disabled={myUser.pk === user.pk} {...register('is_admin')} />
         </TableCell>
+        <TableCell>{formatLastLogin(user.last_login)}</TableCell>
         <TableCell>
           <ActionsRow>
             <ActionButton type="submit">Save</ActionButton>
-            <ActionButton type="neutral" onClick={() => onStopEdit()}>
+            <ActionButton colorClass="neutral" onClick={() => onStopEdit()}>
               Cancel
             </ActionButton>
           </ActionsRow>
@@ -208,12 +204,51 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const UsersTable = ({ users }) => (
-  <UsersTableStyled numColumns={4}>
+const ClickableHeader = styled.div`
+  cursor: pointer;
+  display: flex;
+  gap: 1rem;
+`;
+
+const SortableHeader = ({ children, label, ordering, setOrdering }) => {
+  const handleClick = () => {
+    setOrdering((prev) => {
+      if (prev === label) {
+        setOrdering(`-${label}`);
+      } else {
+        setOrdering(label);
+      }
+    });
+  };
+  const isSorted = ordering === label || ordering === `-${label}`;
+  return (
+    <TableCell header>
+      <ClickableHeader
+        role="button"
+        tabIndex={0}
+        onKeyDown={() => handleClick()}
+        onClick={() => handleClick()}
+      >
+        {children}
+        {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretDown : faCaretUp} />}
+      </ClickableHeader>
+    </TableCell>
+  );
+};
+
+const UsersTable = ({ ordering, users, setOrdering }) => (
+  <UsersTableStyled numColumns={5}>
     <TableHeader>
-      <TableCell header>Username</TableCell>
-      <TableCell header>Email</TableCell>
+      <SortableHeader label="username" ordering={ordering} setOrdering={setOrdering}>
+        Username
+      </SortableHeader>
+      <SortableHeader label="email" ordering={ordering} setOrdering={setOrdering}>
+        Email
+      </SortableHeader>
       <TableCell header>Admin?</TableCell>
+      <SortableHeader label="last_login" ordering={ordering} setOrdering={setOrdering}>
+        Last Login
+      </SortableHeader>
       <TableCell header>Actions</TableCell>
     </TableHeader>
     <TableBody>

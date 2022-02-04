@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { useCreateUserMutation } from '../../../service/api';
 import { Button } from '../../elements/Button';
-import Input from '../../elements/Input/Input';
+import FormInput from '../../elements/Input/FormInput';
 import Modal from '../../elements/Modal/Modal';
 
 const FlexRow = styled.div`
@@ -69,28 +69,37 @@ const CreateUserAction = ({ onCloseModal }) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (submitData) => {
-    triggerCreateUser({
-      username: submitData.username,
-      email: submitData.email,
-      is_admin: submitData.is_admin === 'admin',
-    });
+  const onSubmit = async (submitData) => {
+    try {
+      await triggerCreateUser({
+        username: submitData.username,
+        email: submitData.email,
+        is_admin: submitData.is_admin === 'admin',
+      }).unwrap();
+      onCloseModal();
+    } catch {
+      console.error('Unable to create user due to error');
+    }
   };
 
   return (
     <>
       <h2>Add User</h2>
       <SubmitForm onSubmit={handleSubmit(onSubmit)}>
-        <Input
+        <FormInput
           label="Username"
-          register={register}
-          name="username"
+          inputProps={{ name: 'username', control }}
           errors={error?.data?.username ?? ''}
         />
-        <Input label="Email" register={register} name="email" errors={error?.data?.email ?? ''} />
+        <FormInput
+          label="Email"
+          inputProps={{ name: 'email', control }}
+          errors={error?.data?.email ?? ''}
+        />
         <div>
           <span>User Role</span>
           <select {...register('is_admin')}>
@@ -106,7 +115,7 @@ const CreateUserAction = ({ onCloseModal }) => {
             <Button type="submit">Submit</Button>
           </div>
           <div>
-            <Button type="neutral" onClick={() => onCloseModal()}>
+            <Button colorClass="neutral" onClick={() => onCloseModal()}>
               Close
             </Button>
           </div>

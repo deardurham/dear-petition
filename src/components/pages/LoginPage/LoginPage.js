@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import {
   LoginPageStyled,
@@ -36,8 +37,6 @@ function Login() {
   const dispatch = useDispatch();
 
   // State
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -46,8 +45,15 @@ function Login() {
     }
   }, [authenticatedUser]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const handleLogin = async ({ username, password }) => {
+    // e.preventDefault();
     setErrors({});
     try {
       const { user } = await login({ username, password }).unwrap();
@@ -68,19 +74,17 @@ function Login() {
       <LoginSplash>
         <SplashLogo src={dearLogo} alt="DEAR logo" />
       </LoginSplash>
-      <LoginForm onSubmit={handleLogin}>
+      <LoginForm onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
           label="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          inputProps={{ name: 'username', control }}
           errors={errors.username}
         />
         <PasswordWrapper>
           <PasswordInputStyled
             label="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            inputProps={{ name: 'password', control }}
             errors={errors.password}
           />
           <ForgotPassword href="password_reset/">Forgot Password?</ForgotPassword>
@@ -97,7 +101,7 @@ function Login() {
             </FormErrors>
           )}
         </AnimatePresence>
-        <LoginButton onClick={handleLogin}>Log in</LoginButton>
+        <LoginButton type="submit">Log in</LoginButton>
       </LoginForm>
     </LoginPageStyled>
   );

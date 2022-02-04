@@ -1,13 +1,14 @@
 import React from 'react';
+import { useController } from 'react-hook-form';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ className, label, errors, register, name, ...inputProps }, ref) {
-  const registerProps = register && name ? { ...register(name) } : {};
+function FormInput({ className, label, errors, inputProps, ...restProps }) {
+  const { field } = useController(inputProps);
   return (
     <InputWrapper className={className}>
       <InputStyled>{label}</InputStyled>
-      <ActualInputStyled {...inputProps} {...registerProps} ref={ref} />
+      <ActualInputStyled {...field} {...restProps} />
       {errors && (
         <AnimatePresence>
           <InputErrors
@@ -24,4 +25,4 @@ function Input({ className, label, errors, register, name, ...inputProps }, ref)
   );
 }
 
-export default React.forwardRef(Input);
+export default FormInput;

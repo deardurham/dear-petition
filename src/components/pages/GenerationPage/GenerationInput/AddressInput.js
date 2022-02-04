@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import Select from '../../../elements/Input/Select';
 import US_STATES from '../../../../constants/US_STATES';
-import { colorGrey } from '../../../../styles/colors';
 
 const Row = styled.div`
   display: flex;

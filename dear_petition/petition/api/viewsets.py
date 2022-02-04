@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
 from django.middleware import csrf
 from django.utils import timezone
@@ -32,12 +33,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["username"]
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['username', 'email', 'last_login']
     ordering = ["username"]
-    # TODO: Search
-    # filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    # search_fields = ["username"]
+    search_fields = ['username', 'email']
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
@@ -308,6 +307,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
         if validated_user is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+        update_last_login(None, validated_user)
         user_serializer = serializers.UserSerializer(validated_user)
         return Response({"user": user_serializer.data}, status=status.HTTP_200_OK)
 
