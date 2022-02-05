@@ -211,7 +211,12 @@ class Batch(models.Model):
 
     @property
     def age(self):
-        dob = self.records.first().dob
+        for record in self.records.all():
+            dob = record.dob
+            if dob:
+                break
+        if not dob:
+            return
         today = timezone.now().date()
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
