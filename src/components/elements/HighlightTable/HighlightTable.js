@@ -21,9 +21,9 @@ function HighlightRow({ offenseRecord, highlightRow, unhighlightRow, highlighted
   };
 
   return (
-    <TableRow key={offenseRecord.pk} onClick={() => handleSelect()} highlighted={highlighted}>
+    <TableRow key={offenseRecord.pk} highlighted={highlighted}>
       <TableCell>
-        <input type="checkbox" checked={!!highlighted} />
+        <input type="checkbox" checked={!!highlighted} onChange={() => handleSelect()} />
       </TableCell>
       <TableCell tooltip={offenseRecord.dob}>{offenseRecord.dob}</TableCell>
       <TableCell tooltip={offenseRecord.offense_date}>{offenseRecord.offense_date}</TableCell>
