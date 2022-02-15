@@ -218,6 +218,11 @@ class GeneratePetitionView(viewsets.GenericViewSet):
             form_type=form.form_type,
             number_of_charges=form.offense_records.count(),
             batch_id=batch.id,
+            county=form.county,
+            jurisdiction=form.jurisdiction,
+            race=batch.race,
+            sex=batch.sex,
+            age=batch.age,
         )
 
         user.last_generated_petition_time = timezone.now()

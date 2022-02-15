@@ -201,6 +201,25 @@ class Batch(models.Model):
     def underaged_conviction_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.UNDERAGED_CONVICTIONS, jurisdiction)
 
+    @property
+    def race(self):
+        return self.records.first().race
+
+    @property
+    def sex(self):
+        return self.records.first().sex
+
+    @property
+    def age(self):
+        for record in self.records.all():
+            dob = record.dob
+            if dob:
+                break
+        if not dob:
+            return
+        today = timezone.now().date()
+        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
 
 class BatchFile(models.Model):
     batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
@@ -240,7 +259,7 @@ class Petition(TimeStampedModel):
 
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
-    county = models.CharField(max_length=255)
+    county = models.CharField(max_length=256, blank=True)
     jurisdiction = models.CharField(choices=JURISDICTION_CHOICES, max_length=255)
     parent = models.ForeignKey(
         "self",
@@ -332,3 +351,12 @@ class GeneratedPetition(TimeStampedModel):
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     number_of_charges = models.IntegerField()
     batch_id = models.PositiveIntegerField()
+    county = models.CharField(max_length=256, blank=True, null=True)
+    jurisdiction = models.CharField(
+        choices=JURISDICTION_CHOICES, max_length=255, null=True
+    )
+    race = models.CharField(max_length=256, null=True)
+    sex = models.CharField(
+        max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, null=True
+    )
+    age = models.PositiveIntegerField(null=True)
