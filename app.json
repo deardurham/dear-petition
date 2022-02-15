@@ -22,6 +22,9 @@
       "description": "Django's secret key",
       "generator": "secret"
     },
+    "IS_REVIEW": {
+      "value": "True"
+    }
     "DJANGO_AWS_ACCESS_KEY_ID": {
       "value": "awsaccesskey"
     },
@@ -45,14 +48,6 @@
     }
   },
   "name": "dear-petition",
-  "environments": {
-    "review": {
-      "scripts": {
-        "postdeploy": "./postdeploy.sh"
-      }
-    }
-  },
-  "scripts": {
-  },
-  "stack": "heroku-18"
+  "scripts": {},
+  "stack": "container"
 }

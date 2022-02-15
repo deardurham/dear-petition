@@ -1,0 +1,21 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+    - plan: heroku-redis
+  config:
+    S3_BUCKET: my-example-bucket
+build:
+  docker:
+    web:
+      dockerfile: Dockerfile
+      target: deploy
+release:
+  command:
+    - ./postdeploy.sh
+  image: web
+run:
+  web: uwsgi --http=0.0.0.0:$PORT --show-config
+  worker:
+    command:
+      - celery --app=dear_petition worker --beat -l info
+    image: web

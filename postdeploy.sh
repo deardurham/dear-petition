@@ -1,2 +1,8 @@
 #!/bin/sh
-echo "from django.contrib.auth import get_user_model; get_user_model().objects.create_superuser('qatester', 'qatester@example.com', 'qatester')" | python manage.py shell
+set -e
+
+>&2 echo "Running Migrations"
+python manage.py migrate --noinput
+
+>&2 echo "Running bootstrap-review-app"
+python manage.py bootstrap-review-app
