@@ -62,3 +62,10 @@ def format_petition_date(date):
     if isinstance(date, datetime):
         date = date.astimezone(pytz.timezone(settings.TIME_ZONE))
     return date.strftime(DATE_FORMAT) if date else ""
+
+
+# https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text

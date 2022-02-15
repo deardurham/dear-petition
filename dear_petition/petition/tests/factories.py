@@ -10,6 +10,7 @@ from dear_petition.petition.models import (
     OffenseRecord,
     Petition,
     Contact,
+    GeneratedPetition,
 )
 from dear_petition.users.tests.factories import UserFactory
 
@@ -119,3 +120,12 @@ class PetitionFactory(factory.DjangoModelFactory):
 class ContactFactory(factory.DjangoModelFactory):
     class Meta:
         model = Contact
+
+
+class GeneratedPetitionFactory(factory.DjangoModelFactory):
+    form_type = DISMISSED
+    number_of_charges = 1
+    batch_id = 1
+
+    class Meta:
+        model = GeneratedPetition

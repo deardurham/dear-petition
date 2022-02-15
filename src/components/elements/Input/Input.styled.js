@@ -14,9 +14,7 @@ export const InputStyled = styled.label`
 export const ActualInputStyled = styled.input`
   display: block;
   border-radius: 5px;
-  padding: 1rem;
 
-  width: 100%;
   border: 1px solid ${colorGrey};
   font-size: 1.5rem;
   font-family: ${fontPrimary};
@@ -24,8 +22,7 @@ export const ActualInputStyled = styled.input`
 `;
 
 export const InputErrors = styled(motion.div)`
-  margin: 1rem 0;
-  user-select: none;
+  margin-top: 0.5rem;
   p {
     color: ${colorRed};
     @media (${smallerThanTabletLandscape}) {

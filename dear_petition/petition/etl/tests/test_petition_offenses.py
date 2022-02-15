@@ -139,9 +139,18 @@ def test_paginator_same_record_number_order(petition, records_10):
 
 def test_paginator_orders_records_correctly(batch, petition):
     def create_new_ciprs_record(file_no):
-        ciprs_record = CIPRSRecordFactory(batch = batch, file_no = file_no, jurisdiction=constants.DISTRICT_COURT, county="DURHAM")
-        offense = OffenseFactory(ciprs_record = ciprs_record, jurisdiction=constants.DISTRICT_COURT, disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],)
-        offense_record = OffenseRecordFactory(offense = offense)
+        ciprs_record = CIPRSRecordFactory(
+            batch=batch,
+            file_no=file_no,
+            jurisdiction=constants.DISTRICT_COURT,
+            county="DURHAM",
+        )
+        offense = OffenseFactory(
+            ciprs_record=ciprs_record,
+            jurisdiction=constants.DISTRICT_COURT,
+            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+        )
+        offense_record = OffenseRecordFactory(offense=offense)
         return offense_record.id
 
     # 11 records total
@@ -157,19 +166,46 @@ def test_paginator_orders_records_correctly(batch, petition):
     id10 = create_new_ciprs_record("00CRAAAAAAAAAAAA")
     id11 = create_new_ciprs_record("98CRBBBBBBBBBBBB")
 
-    EXPECTED_ORDER_FIRST_FORM = [id5, id7, id11, id1, id9, id4, id3, id8, id10, id2,]
-    EXPECTED_ORDER_SECOND_FORM = [id6,]
+    EXPECTED_ORDER_FIRST_FORM = [
+        id5,
+        id7,
+        id11,
+        id1,
+        id9,
+        id4,
+        id3,
+        id8,
+        id10,
+        id2,
+    ]
+    EXPECTED_ORDER_SECOND_FORM = [
+        id6,
+    ]
     EXPECTED_ORDER_ACROSS_FORMS = EXPECTED_ORDER_FIRST_FORM + EXPECTED_ORDER_SECOND_FORM
 
     link_offense_records_and_attachments(petition)
     attachment = petition.attachments.order_by("pk").first()
-    
+
     main_petition_form = AOCFormCR287(petition)
     attachment_petition_form = AOCFormCR285(attachment)
 
-    assert list(petition.get_all_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_ACROSS_FORMS
-    assert list(main_petition_form.get_ordered_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_FIRST_FORM
-    assert list(attachment_petition_form.get_ordered_offense_records().values_list('id', flat=True)) == EXPECTED_ORDER_SECOND_FORM
-
-
-
+    assert (
+        list(petition.get_all_offense_records().values_list("id", flat=True))
+        == EXPECTED_ORDER_ACROSS_FORMS
+    )
+    assert (
+        list(
+            main_petition_form.get_ordered_offense_records().values_list(
+                "id", flat=True
+            )
+        )
+        == EXPECTED_ORDER_FIRST_FORM
+    )
+    assert (
+        list(
+            attachment_petition_form.get_ordered_offense_records().values_list(
+                "id", flat=True
+            )
+        )
+        == EXPECTED_ORDER_SECOND_FORM
+    )

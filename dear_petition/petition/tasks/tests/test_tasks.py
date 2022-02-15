@@ -16,7 +16,7 @@ def test_clean_stale_data(batch):
 
     batch.date_uploaded = batch.date_uploaded - timedelta(hours=48, minutes=1)
     batch.save()
-    
+
     num_deleted = clean_stale_data()
     assert num_deleted == 1
     assert pm.Batch.objects.all().count() == 0

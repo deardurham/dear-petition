@@ -27,8 +27,12 @@ def test_non_charged_offense_record(batch, not_guilty_offense):
 
 def test_infraction_severity_offense_record(batch, not_guilty_offense):
     """Offense records with severity INFRACTION should be excluded."""
-    infraction_record = OffenseRecordFactory(action="CHARGED", offense=not_guilty_offense, severity="INFRACTION")
-    traffic_record = OffenseRecordFactory(action="CHARGED", offense=not_guilty_offense, severity="TRAFFIC")
+    infraction_record = OffenseRecordFactory(
+        action="CHARGED", offense=not_guilty_offense, severity="INFRACTION"
+    )
+    traffic_record = OffenseRecordFactory(
+        action="CHARGED", offense=not_guilty_offense, severity="TRAFFIC"
+    )
     assert infraction_record not in batch.not_guilty_offense_records()
     assert traffic_record in batch.not_guilty_offense_records()
 

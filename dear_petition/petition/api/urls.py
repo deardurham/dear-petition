@@ -1,4 +1,5 @@
 from django.urls import include, path
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import routers
 from . import viewsets
 from dear_petition.petition.api import authentication
@@ -11,6 +12,7 @@ router.register(r"offenserecord", viewsets.OffenseRecordViewSet)
 router.register(r"contact", viewsets.ContactViewSet)
 router.register(r"batch", viewsets.BatchViewSet)
 router.register(r"petitions", viewsets.PetitionViewSet)
+router.register(r"generatedpetition", viewsets.GeneratedPetitionViewSet)
 router.register(
     r"generate-petition",
     viewsets.GeneratePetitionView,
@@ -27,6 +29,13 @@ app_name = "api"
 urlpatterns = [
     path("", include(router.urls)),
     path(
-        "token/", viewsets.TokenObtainPairCookieView.as_view(), name="token_obtain_pair"
+        "token/",
+        ensure_csrf_cookie(viewsets.TokenObtainPairCookieView.as_view()),
+        name="token_obtain_pair",
+    ),
+    path(
+        "token/refresh/",
+        ensure_csrf_cookie(viewsets.TokenRefreshCookieView.as_view()),
+        name="token_refresh",
     ),
 ]

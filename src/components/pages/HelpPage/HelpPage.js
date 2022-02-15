@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import PageBase from '../PageBase';
 import markdownSource from './help.md';
@@ -9,8 +9,6 @@ import { Markdown, ExpandableHeader } from './style';
 
 export const HelpPageStyled = styled(PageBase)`
   display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const HelpPageContent = styled.div`
@@ -24,11 +22,11 @@ const ExpandableSection = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   return (
     <section>
-      {children.map((child) => {
+      {children.map((child, i) => {
         if (child?.type === 'h6') {
           expandable = true;
           return (
-            <ExpandableHeader onClick={() => expandable && setIsExpanded((prev) => !prev)}>
+            <ExpandableHeader key={i} onClick={() => expandable && setIsExpanded((prev) => !prev)}>
               {child}
               <FontAwesomeIcon icon={isExpanded ? faCaretRight : faCaretDown} />
             </ExpandableHeader>
@@ -42,18 +40,23 @@ const ExpandableSection = ({ children }) => {
 
 export default function HelpPage() {
   const [source, setSource] = useState();
+  const sectionCount = useRef(0);
   useEffect(() => {
     fetch(markdownSource)
       .then((res) => res.text())
       .then((text) => setSource(text));
-  }, [source]);
+  }, [markdownSource]);
   return (
     <HelpPageStyled>
       <HelpPageContent>
         <Markdown
           remarkPlugins={[sectionize]}
           components={{
-            section: ({ children }) => <ExpandableSection>{children}</ExpandableSection>,
+            section: ({ children }) => {
+              const key = `${sectionCount.current}`;
+              sectionCount.current += 1;
+              return <ExpandableSection key={key}>{children}</ExpandableSection>;
+            },
           }}
         >
           {source}

@@ -1,8 +1,7 @@
 const proxyMiddleware = require('http-proxy-middleware'); // eslint-disable-line import/no-extraneous-dependencies
 
 // docker-compose will avoid using the fallback due to always having one of OVERRIDE_API_PROXY or API_PROXY set
-// Note: non-docker frontend needs to set one of the env vars to `http://localhost:8000` to proxy local backend
-const FALLBACK_PROXY = 'https://dear-petition-staging.herokuapp.com/';
+const FALLBACK_PROXY = 'http://localhost:8000';
 
 module.exports = (app) => {
   const proxyOptions = proxyMiddleware({

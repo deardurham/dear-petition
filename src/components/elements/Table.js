@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colorPrimary } from '../../styles/colors';
+import { colorPrimary, greyScale } from '../../styles/colors';
 
 export const TableStyle = styled.table`
   display: grid;
@@ -39,11 +39,18 @@ export const TableStyle = styled.table`
     padding-top: 10px;
     padding-bottom: 10px;
   }
+
+  & tr:nth-child(even) td {
+    background-color: ${greyScale(9.25)};
+  }
 `;
 
-export const TableCell = ({ children, header }) => (
-  <>{header ? <th>{children}</th> : <td>{children}</td>}</>
-);
+export const TableCell = ({ children, header, tooltip }) => {
+  if (header) {
+    return <th title={tooltip ?? ''}>{children}</th>;
+  }
+  return <td title={tooltip ?? ''}>{children}</td>;
+};
 
 export const TableSpanCell = styled.td`
   grid-column: 1 / span ${(props) => props.spanLength};
@@ -66,7 +73,6 @@ export const TableRow = styled.tr`
   `
         : `background-color: ${props.backgroundColor}`}
   }
-  cursor: pointer;
 
   input[type='checkbox'] {
     cursor: pointer;

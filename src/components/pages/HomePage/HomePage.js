@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { colorRed } from '../../../styles/colors';
 import { fontError } from '../../../styles/fonts';
@@ -8,28 +8,34 @@ import {
   DnDContent,
   DragErrors,
   DragWarnings,
-  ModalStyled,
-  ModalContent,
 } from './HomePage.styled';
 
-// Children
+import Modal from '../../elements/Modal/Modal';
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
 import { useHistory } from 'react-router-dom';
-import Axios from '../../../service/axios';
+
+import { useCreateBatchMutation } from '../../../service/api';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
 const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
-const MAX_TIMEOUT = 30; // seconds
+// TODO: Add timeout to axiosBaseQuery
+// const MAX_TIMEOUT = 30; // seconds
 
-const ModalError = styled.p`
-  margin-top: 2rem;
-  color: ${colorRed};
-  font-family: ${fontError};
-  font-size: 1.5rem;
-  font-weight: bold;
+const ModalStyled = styled(Modal)`
+  & > div {
+    width: 500px;
+    gap: 2rem;
+    padding: 4rem;
+    p {
+      color: ${colorRed};
+      font-family: ${fontError};
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
 `;
 
 function HomePage() {
@@ -40,6 +46,15 @@ function HomePage() {
   const [showModal, setShowModal] = useState(false);
   const [modalError, setModalError] = useState();
   const history = useHistory();
+  const [createBatch] = useCreateBatchMutation();
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  });
 
   const _mergeFileSets = (newFiles) => {
     const mergedFiles = new Set(files);
@@ -81,27 +96,32 @@ function HomePage() {
   const handlePreparePetitions = async () => {
     setShowModal(true);
     let timer = null;
-    try {
-      const filesFormData = new FormData();
-      files.forEach((file) => filesFormData.append('files', file));
-      const request = Axios.post('/batch/', filesFormData, { timeout: MAX_TIMEOUT * 1000 });
-      timer = setTimeout(() => {
+    const filesFormData = new FormData();
+    files.forEach((file) => filesFormData.append('files', file));
+    timer = setTimeout(() => {
+      if (isMounted.current) {
         setModalError(
           'It is taking longer than expected to process the uploaded records. Please wait...'
         );
-      }, LONG_WAIT_TIMEOUT * 1000);
+      }
+    }, LONG_WAIT_TIMEOUT * 1000);
 
-      const { data, status } = await request;
-      if (status === 201) {
-        clearTimeout(timer);
+    createBatch({ data: filesFormData })
+      .unwrap()
+      .then((data) => {
+        if (timer) {
+          clearTimeout(timer);
+        }
         history.push(`/generate/${data.id}`);
-      }
-    } catch (error) {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      setModalError('ERROR: Could not process the records.');
-    }
+      })
+      .catch(() => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        if (isMounted.current) {
+          setModalError('ERROR: Could not process the records.');
+        }
+      });
   };
 
   return (
@@ -154,10 +174,8 @@ function HomePage() {
           setModalError();
         }}
       >
-        <ModalContent>
-          <h2>Preparing petitions...</h2>
-          {modalError && <ModalError>{modalError}</ModalError>}
-        </ModalContent>
+        <h2>Preparing petitions...</h2>
+        {modalError && <p>{modalError}</p>}
       </ModalStyled>
     </>
   );

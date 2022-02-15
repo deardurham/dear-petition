@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import {
   LoginPageStyled,
   LoginSplash,
@@ -16,44 +18,53 @@ import { Button } from '../../elements/Button';
 import dearLogo from '../../../assets/img/DEAR_logo.png';
 
 // Routing
-import { Redirect, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-// AJAX
-import Axios from '../../../service/axios';
 import { AnimatePresence } from 'framer-motion';
-import { USER, CSRF_TOKEN_LS_KEY } from '../../../constants/authConstants';
+import useAuth from '../../../hooks/useAuth';
+import { loggedIn } from '../../../slices/auth';
+import { useLoginMutation } from '../../../service/api';
+import styled from 'styled-components';
+
+const LoginButton = styled(Button)`
+  padding: 1rem 3rem;
+`;
 
 function Login() {
+  const { user: authenticatedUser } = useAuth();
   const history = useHistory();
+  const [login] = useLoginMutation();
+  const dispatch = useDispatch();
 
   // State
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const user = localStorage.getItem(USER);
 
-  if (user) {
-    return <Redirect to="/" />;
-  }
+  useEffect(() => {
+    if (authenticatedUser) {
+      history.replace('/');
+    }
+  }, [authenticatedUser]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const handleLogin = async ({ username, password }) => {
+    // e.preventDefault();
     setErrors({});
     try {
-      const { data, status } = await Axios.post('token/', { username, password });
-      if (status === 200 && data.detail === 'success') {
-        localStorage.setItem(USER, JSON.stringify(data.user));
-        localStorage.setItem(CSRF_TOKEN_LS_KEY, data.csrftoken);
-
-        // TODO: remove CSRF token on logout
-        history.replace('/');
-      }
+      const { user } = await login({ username, password }).unwrap();
+      dispatch(loggedIn(user));
+      history.replace('/');
     } catch (error) {
-      if (error.response?.data) {
-        setErrors({
-          ...errors,
-          ...error.response.data,
-        });
+      if (error?.data) {
+        setErrors((prev) => ({
+          ...prev,
+          ...error.data,
+        }));
       }
     }
   };
@@ -63,19 +74,17 @@ function Login() {
       <LoginSplash>
         <SplashLogo src={dearLogo} alt="DEAR logo" />
       </LoginSplash>
-      <LoginForm onSubmit={handleLogin}>
+      <LoginForm onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
           label="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          inputProps={{ name: 'username', control }}
           errors={errors.username}
         />
         <PasswordWrapper>
           <PasswordInputStyled
             label="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            inputProps={{ name: 'password', control }}
             errors={errors.password}
           />
           <ForgotPassword href="password_reset/">Forgot Password?</ForgotPassword>
@@ -92,7 +101,7 @@ function Login() {
             </FormErrors>
           )}
         </AnimatePresence>
-        <Button onClick={handleLogin}>Log in</Button>
+        <LoginButton type="submit">Log in</LoginButton>
       </LoginForm>
     </LoginPageStyled>
   );

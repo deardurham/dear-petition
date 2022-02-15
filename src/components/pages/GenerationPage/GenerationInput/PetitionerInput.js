@@ -1,6 +1,17 @@
 import React from 'react';
+import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import AddressInput from './AddressInput';
+
+const TextInput = styled(Input)`
+  input {
+    padding: 0.9rem;
+    width: 100%;
+  }
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+`;
 
 export default function PetitionerInput({
   petitionerData,
@@ -15,7 +26,7 @@ export default function PetitionerInput({
   };
   return (
     <>
-      <Input
+      <TextInput
         label="Name"
         value={name}
         onChange={(e) => handleChange('name', e.target.value)}

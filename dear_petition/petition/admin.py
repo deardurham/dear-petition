@@ -3,6 +3,7 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 
 from dear_petition.petition import models
+from dear_petition.petition import constants
 
 
 @admin.register(models.CIPRSRecord)
@@ -94,7 +95,9 @@ class BatchAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_record_count=Count("records", distinct=True),)
+        queryset = queryset.annotate(
+            _record_count=Count("records", distinct=True),
+        )
         return queryset
 
     def record_count(self, obj):
@@ -140,3 +143,24 @@ class PetitionAdmin(admin.ModelAdmin):
     list_filter = ("form_type", "county", "jurisdiction")
     ordering = ("-batch__date_uploaded",)
     raw_id_fields = ("batch", "parent", "offense_records")
+
+
+@admin.register(models.GeneratedPetition)
+class GeneratedPetitionAdmin(admin.ModelAdmin):
+
+    date_hierarchy = "created"
+    list_display = constants.GENERATED_PETITION_ADMIN_FIELDS
+    list_filter = ("form_type", "created", "username")
+    ordering = ("-created",)
+    readonly_fields = (
+        "username",
+        "batch_id",
+        "form_type",
+        "number_of_charges",
+        "county",
+        "jurisdiction",
+        "race",
+        "sex",
+        "age",
+    )
+    search_fields = ("username", "batch_id", "id")

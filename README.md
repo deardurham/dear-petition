@@ -19,7 +19,7 @@ docker-compose run --rm django python manage.py createsuperuser
 
 ## Frontend Development
 
-The user facing side of the DEAR Petition Generator is a React single page app (SPA).
+The user facing side of the DEAR Petition Generator is a React single page app (SPA). It is common to run the frontend locally while running the backend on docker.
 
 
 ### 🚀 Quick Setup
@@ -41,19 +41,18 @@ When the frontend is run using docker, the `API_PROXY` environment variable is s
 You can override the this proxy url by setting `OVERRIDE_API_PROXY`:
 
 ```bash
-OVERRIDE_API_PROXY=https://dear-petition-staging.herokuapp.com/ docker-compose up -d
+OVERRIDE_API_PROXY=http://localhost:8888 docker-compose up -d
 ```
 
 #### Local Frontend
 
-When using `npm run start` to run the frontend, the `API_PROXY` environment variable is unset. The fallback proxy is set to the staging backend url.
+When using `npm run start` to run the frontend, the `API_PROXY` environment variable is unset. The fallback proxy is set to the `http://localhost:8000`.
 
 You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 
 ```bash
-API_PROXY=http://localhost:8000 npm start
+API_PROXY=http://localhost:8888 npm start
 ```
-
 
 ## Backend Development (with Docker)
 
@@ -66,10 +65,9 @@ Build the project containers:
 
 Run the containers:
 
-    docker-compose up -d django
+    docker-compose up django
 
 Visit http://localhost:8000/petition/api/ in your browser.
-
 
 ### Initial Setup
 
