@@ -25,6 +25,10 @@ RUN set -ex \
     postgresql-client \
     build-essential \
     xz-utils  \
+    zlib1g-dev \
+    libpng-dev \
+    pkg-config \
+    libfontconfig1-dev \
     vim \
     wget \
     curl \
