@@ -23,6 +23,7 @@ RUN set -ex \
     libfontconfig \
     mime-support \
     postgresql-client \
+    xz-utils  \
     vim \
     wget \
     curl \
@@ -33,8 +34,7 @@ RUN set -ex \
 
 # Install poppler pdftotext, based on xpdf3 (for parser mode V1)
 RUN set -ex \
-    && wget --no-check-certificate https://poppler.freedesktop.org/poppler-0.57.0.tar.xz \
-    && tar -xvf poppler-0.57.0.tar.xz \
+    && curl -k https://poppler.freedesktop.org/poppler-0.57.0.tar.xz | tar xJ \
     && chmod -R 755 ./poppler-0.57.0 \
     && cd ./poppler-0.57.0/ \
     && ./configure \
