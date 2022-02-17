@@ -6,6 +6,7 @@ RUN set -ex \
     build-essential \
     zlib1g-dev \
     libpng-dev \
+    # libjpeg-dev \
     pkg-config \
     libfontconfig1-dev \
     " \
