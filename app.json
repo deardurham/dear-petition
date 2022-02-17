@@ -24,7 +24,7 @@
     },
     "IS_REVIEW": {
       "value": "True"
-    }
+    },
     "DJANGO_AWS_ACCESS_KEY_ID": {
       "value": "awsaccesskey"
     },
