@@ -23,6 +23,7 @@ RUN set -ex \
     libfontconfig \
     mime-support \
     postgresql-client \
+    build-essential \
     xz-utils  \
     vim \
     wget \
