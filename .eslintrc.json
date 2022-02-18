@@ -47,7 +47,7 @@
     "react/no-danger": "off",
     "import/no-cycle": "off",
     "import/order": "off",
-    "import/prefer-default-export": "warn",
+    "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": ["error", {
       "devDependencies": ["src/setupTests.js", "**/*.test.js", "**/*.test.jsx"]
     }],

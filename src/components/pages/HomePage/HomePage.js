@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { colorRed } from '../../../styles/colors';
 import { fontError } from '../../../styles/fonts';
 import {
@@ -10,6 +12,7 @@ import {
   DragWarnings,
 } from './HomePage.styled';
 
+import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import Modal from '../../elements/Modal/Modal';
 import DragNDrop from '../../elements/DragNDrop/DragNDrop';
 import FilesList from './FilesList/FilesList';
@@ -38,10 +41,36 @@ const ModalStyled = styled(Modal)`
   }
 `;
 
+const FilesInputContainer = styled.div`
+  display: flex;
+  gap: 2rem;
+  flex-flow: column;
+  align-items: center;
+  width: 350px;
+`;
+
 const ParserCheckboxWrapper = styled.div`
-  margin-top: 1.5rem;
+  align-self: flex-start;
+  display: flex;
+  gap: 0.5rem;
   input {
     margin-left: 1rem;
+  }
+  font-size: 1.75rem;
+  color: rgb(68 64 60);
+`;
+
+const ExperimentalMessage = styled.div`
+  display: flex;
+  flex-flow: column;
+  gap: 0.5rem;
+
+  padding: 2rem 1.25rem;
+  width: 500px;
+
+  p {
+    color: rgb(68 64 60);
+    font-size: 1.7rem;
   }
 `;
 
@@ -133,57 +162,75 @@ function HomePage() {
       });
   };
 
+  const experimentalParserMessage = (
+    <ExperimentalMessage>
+      <p>
+        Experimental CIPRS Record Reader that can handle records with multi-line offense
+        descriptions.
+      </p>
+      <p>
+        Please try this mode if you are having issue with a CIPRS record that has a long offense
+        description.
+      </p>
+    </ExperimentalMessage>
+  );
+
   return (
     <>
       <HomePageStyled>
         <HomeContent>
-          <DragNDrop
-            ref={fileInputRef}
-            mimeTypes={ALLOWED_MIME_TYPES}
-            maxFiles={MAX_FILES}
-            maxSize={MAX_FILE_SIZE}
-            onDrop={handleDrop}
-          >
-            <DnDContent>
-              <div>
-                <h2>Upload CIPRS Records</h2>
-                <p>up to {MAX_FILES} records</p>
-              </div>
-              <div>
-                {dragWarnings && (
-                  <DragWarnings>
-                    {dragWarnings.map((warning) => (
-                      <p key={warning}>{warning}</p>
-                    ))}
-                  </DragWarnings>
-                )}
-                {dragErrors && (
-                  <DragErrors>
-                    {dragErrors.map((error) => (
-                      <p key={error}>{error}</p>
-                    ))}
-                  </DragErrors>
-                )}
-              </div>
-            </DnDContent>
-          </DragNDrop>
-          {files && files.size > 0 && (
-            <>
-              <ParserCheckboxWrapper>
-                Use Experimental Parser?
-                <input
-                  type="checkbox"
-                  checked={!!parserMode}
-                  onChange={() => setParserMode((prev) => !prev)}
+          <FilesInputContainer>
+            <DragNDrop
+              ref={fileInputRef}
+              mimeTypes={ALLOWED_MIME_TYPES}
+              maxFiles={MAX_FILES}
+              maxSize={MAX_FILE_SIZE}
+              onDrop={handleDrop}
+            >
+              <DnDContent>
+                <div>
+                  <h2>Upload CIPRS Records</h2>
+                  <p>up to {MAX_FILES} records</p>
+                </div>
+                <div>
+                  {dragWarnings && (
+                    <DragWarnings>
+                      {dragWarnings.map((warning) => (
+                        <p key={warning}>{warning}</p>
+                      ))}
+                    </DragWarnings>
+                  )}
+                  {dragErrors && (
+                    <DragErrors>
+                      {dragErrors.map((error) => (
+                        <p key={error}>{error}</p>
+                      ))}
+                    </DragErrors>
+                  )}
+                </div>
+              </DnDContent>
+            </DragNDrop>
+            {files && files.size > 0 && (
+              <>
+                <ParserCheckboxWrapper>
+                  (Beta) Multi-Line Reader Mode
+                  <Tooltip tooltipContent={experimentalParserMessage}>
+                    <FontAwesomeIcon icon={faQuestionCircle} />
+                  </Tooltip>
+                  <input
+                    type="checkbox"
+                    checked={!!parserMode}
+                    onChange={() => setParserMode((prev) => !prev)}
+                  />
+                </ParserCheckboxWrapper>
+                <FilesList
+                  files={files}
+                  handleRemoveFile={handleRemoveFile}
+                  handlePreparePetitions={handlePreparePetitions}
                 />
-              </ParserCheckboxWrapper>
-              <FilesList
-                files={files}
-                handleRemoveFile={handleRemoveFile}
-                handlePreparePetitions={handlePreparePetitions}
-              />
-            </>
-          )}
+              </>
+            )}
+          </FilesInputContainer>
         </HomeContent>
       </HomePageStyled>
       <ModalStyled
