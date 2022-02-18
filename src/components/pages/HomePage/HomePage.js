@@ -52,6 +52,7 @@ const FilesInputContainer = styled.div`
 const ParserCheckboxWrapper = styled.div`
   align-self: flex-start;
   display: flex;
+  align-items: baseline;
   gap: 0.5rem;
   input {
     margin-left: 1rem;

@@ -11,6 +11,7 @@ const TooltipContentWrapper = styled.div`
   filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
   border: 1px solid rgb(75 85 99);
   border-radius: 0.5rem;
+  padding: 1rem 0.5rem;
 `;
 
 export const Tooltip = ({ children, tooltipContent }) => {
