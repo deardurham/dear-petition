@@ -220,8 +220,8 @@ const SortableHeader = ({ children, label, ordering, setOrdering }) => {
     <TableCell header>
       <div
         className={cx(
-          'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-2 focus:underline-offset-4',
-          { 'underline decoration-2 underline-offset-4': isSorted }
+          'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-1 focus:underline-offset-4',
+          { 'underline decoration-1 underline-offset-4': isSorted }
         )}
         role="button"
         tabIndex={0}
