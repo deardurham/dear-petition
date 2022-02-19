@@ -152,6 +152,7 @@ const UsersPage = () => {
               {search && (
                 <button
                   type="button"
+                  className="border border-gray-700 rounded-md"
                   onClick={() => {
                     setFormValue('');
                     setSearch('');
@@ -180,6 +181,10 @@ const UsersPage = () => {
                   return (
                     <button
                       type="button"
+                      className={`${
+                        idx === offset / limit.value ||
+                        'border hover:text-blue-600 hover:border-blue-400'
+                      } border-gray-700 px-2 rounded`}
                       key={idx}
                       onClick={() => setOffset(idx * limit.value)}
                       disabled={idx === offset / limit.value}
