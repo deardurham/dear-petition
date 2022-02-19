@@ -70,7 +70,7 @@ const CreateUserAction = ({ onCloseModal }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors: _ },
   } = useForm();
 
   const onSubmit = async (submitData) => {

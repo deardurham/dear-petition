@@ -33,9 +33,9 @@ function DetailRecordPage() {
   const [loading, setLoading] = useState();
   const [offenseRecords, setOffenseRecords] = useState();
   const [highlightedRows, setHighlightedRows] = useState([]);
-  const [generatePetition, setGeneratePetition] = useState();
+  const [_generatePetition, setGeneratePetition] = useState();
   const [attorney, setAttorney] = useState('');
-  const [petitionsCalculated, setPetitionsCalculated] = useState();
+  const [_petitionsCalculated, _setPetitionsCalculated] = useState();
   const [petitions, setPetitions] = useState();
   const [petitionerData, setPetitionerData] = useState({
     name: '',
@@ -52,7 +52,6 @@ function DetailRecordPage() {
 
   useEffect(() => {
     setLoading(true);
-    console.log('Calling the API again');
     Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
       setOffenseRecords(data.offense_records);
       setCounty(data.county);
@@ -67,7 +66,7 @@ function DetailRecordPage() {
   };
 
   const unhighlightRow = (offenseRecordId) => {
-    setHighlightedRows(highlightedRows.filter((value, index, arr) => value !== offenseRecordId));
+    setHighlightedRows(highlightedRows.filter((value) => value !== offenseRecordId));
   };
 
   const recalculatePetitions = () => {

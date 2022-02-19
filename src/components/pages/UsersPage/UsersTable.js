@@ -139,7 +139,7 @@ const InputCells = ({ user, onStopEdit }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors: formErrors },
+    formState: { errors: _formErrors },
     register,
   } = useForm({
     defaultValues: { username: user.username, email: user.email, is_admin: user.is_admin },
