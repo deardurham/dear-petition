@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import UsersTable from './UsersTable';
@@ -178,13 +179,15 @@ const UsersPage = () => {
                   if (page !== 1 && page !== numPages && !withinLeft && !withinRight) {
                     return page === startPage - 1 || page === endPage + 1 ? '...' : null;
                   }
+                  const isCurrentPage = page === currentPage;
                   return (
                     <button
                       type="button"
-                      className={`${
-                        idx === offset / limit.value ||
-                        'border hover:text-blue-600 hover:border-blue-400'
-                      } border-gray-700 px-2 rounded`}
+                      className={cx('border-gray-700 px-2 py-0.5 rounded', {
+                        border: isCurrentPage,
+                        'hover:border hover:text-blue-600 hover:border-blue-400': !isCurrentPage,
+                        'focus:border focus:text-blue-600 focus:border-blue-400': !isCurrentPage,
+                      })}
                       key={idx}
                       onClick={() => setOffset(idx * limit.value)}
                       disabled={idx === offset / limit.value}

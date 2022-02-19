@@ -204,12 +204,6 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const ClickableHeader = styled.div`
-  cursor: pointer;
-  display: flex;
-  gap: 1rem;
-`;
-
 const SortableHeader = ({ children, label, ordering, setOrdering }) => {
   const handleClick = () => {
     setOrdering((prev) => {
@@ -223,15 +217,20 @@ const SortableHeader = ({ children, label, ordering, setOrdering }) => {
   const isSorted = ordering === label || ordering === `-${label}`;
   return (
     <TableCell header>
-      <ClickableHeader
+      <div
+        className="flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-2 focus:underline-offset-4"
         role="button"
         tabIndex={0}
-        onKeyDown={() => handleClick()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleClick();
+          }
+        }}
         onClick={() => handleClick()}
       >
         {children}
         {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretDown : faCaretUp} />}
-      </ClickableHeader>
+      </div>
     </TableCell>
   );
 };
