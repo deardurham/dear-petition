@@ -163,7 +163,7 @@ const UsersPage = () => {
                 </button>
               )}
             </SearchRow>
-            <PaginationFlexRow>
+            <div className="max-w-[400px] ml-auto self-end flex items-baseline gap-8">
               <button
                 type="button"
                 onClick={() => setOffset((prev) => prev - limit.value)}
@@ -171,7 +171,7 @@ const UsersPage = () => {
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
-              <FlexRow>
+              <div className="flex items-baseline gap-4">
                 {[...Array(numPages).keys()].map((idx) => {
                   const page = idx + 1;
                   const withinLeft = page >= startPage && page <= currentPage;
@@ -183,10 +183,10 @@ const UsersPage = () => {
                   return (
                     <button
                       type="button"
-                      className={cx('border-gray-700 px-2 py-0.5 rounded', {
-                        border: isCurrentPage,
-                        'hover:border hover:text-blue-600 hover:border-blue-400': !isCurrentPage,
-                        'focus:border focus:text-blue-600 focus:border-blue-400': !isCurrentPage,
+                      className={cx('px-2 py-0.5 outline-1', {
+                        'outline outline-gray-700': isCurrentPage,
+                        'hover:outline hover:text-blue-600 hover:outline-blue-400': !isCurrentPage,
+                        'focus:outline focus:text-blue-600 focus:outline-blue-400': !isCurrentPage,
                       })}
                       key={idx}
                       onClick={() => setOffset(idx * limit.value)}
@@ -196,7 +196,7 @@ const UsersPage = () => {
                     </button>
                   );
                 })}
-              </FlexRow>
+              </div>
               <button
                 type="button"
                 onClick={() => setOffset((prev) => prev + limit.value)}
@@ -204,7 +204,7 @@ const UsersPage = () => {
               >
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
-            </PaginationFlexRow>
+            </div>
           </TableFlexRow>
           <UsersTable users={data?.results || []} ordering={ordering} setOrdering={setOrdering} />
         </FlexColumn>

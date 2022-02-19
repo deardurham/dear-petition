@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import cx from 'classnames';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretUp, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -218,7 +219,10 @@ const SortableHeader = ({ children, label, ordering, setOrdering }) => {
   return (
     <TableCell header>
       <div
-        className="flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-2 focus:underline-offset-4"
+        className={cx(
+          'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-2 focus:underline-offset-4',
+          { 'underline decoration-2 underline-offset-4': isSorted }
+        )}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
