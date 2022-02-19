@@ -36,7 +36,7 @@
     ],
     "no-use-before-define": "off",
     "no-underscore-dangle": "off",
-    "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+    "no-unused-vars": ["warn", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
     "no-plusplus": "off",
     "no-continue": "off",
     "no-prototype-builtins": "off",
