@@ -23,6 +23,12 @@ RUN set -ex \
     libfontconfig \
     mime-support \
     postgresql-client \
+    build-essential \
+    xz-utils  \
+    zlib1g-dev \
+    libpng-dev \
+    pkg-config \
+    libfontconfig1-dev \
     vim \
     wget \
     curl \
@@ -31,11 +37,27 @@ RUN set -ex \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
+# Install poppler pdftotext, based on xpdf3 (for parser mode V1)
+RUN set -ex \
+    && curl -k https://poppler.freedesktop.org/poppler-0.57.0.tar.xz | tar xJ \
+    && chmod -R 755 ./poppler-0.57.0 \
+    && cd ./poppler-0.57.0/ \
+    && ./configure \
+        --prefix=/tmp/poppler \
+        --disable-shared \
+        --enable-static \
+        --enable-build-type=release \
+        --enable-libopenjpeg=none \
+        --enable-dctdecoder=none \
+        --enable-shared=no \
+    && make install \
+    && cp /tmp/poppler/bin/pdftotext /usr/local/bin/pdftotext
+
 # Install pdftotext
 RUN set -ex \
     && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
     && tar -xvf xpdf-tools-linux-4.03.tar.gz \
-    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin
+    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
 
 # Copy in your requirements file
 # ADD requirements.txt /requirements.txt
