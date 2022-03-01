@@ -11,21 +11,23 @@ from dear_petition.petition.etl.load import (
 pytestmark = pytest.mark.django_db
 
 
-def test_import_ciprs_records(fake_pdf, user, mock_ciprs_reader):
+@pytest.mark.parametrize("parser_mode", [1, 2])
+def test_import_ciprs_records(fake_pdf, user, mock_ciprs_reader, parser_mode):
     """Test basic import_ciprs_records() without testing full ETL."""
     record = {"Defendant": {"Name": "Jon Doe"}}
     mock_ciprs_reader.return_value = [record]
-    batch = import_ciprs_records([fake_pdf], user)
+    batch = import_ciprs_records([fake_pdf], user, parser_mode)
     assert Batch.objects.count() == 1
     assert batch.label == record["Defendant"]["Name"]
     assert batch.records.count() == 1
 
 
-def test_import_ciprs_records_multi_files(fake_pdf, fake_pdf2, user, mock_ciprs_reader):
+@pytest.mark.parametrize("parser_mode", [1, 2])
+def test_import_ciprs_records_multi_files(fake_pdf, fake_pdf2, user, mock_ciprs_reader, parser_mode):
     """Test basic import_ciprs_records() with multiple files without testing full ETL."""
     record = {"Defendant": {"Name": "Jon Doe"}}
     mock_ciprs_reader.return_value = [record]
-    batch = import_ciprs_records([fake_pdf, fake_pdf2], user)
+    batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
     assert Batch.objects.count() == 1
     assert batch.label == record["Defendant"]["Name"]
     assert batch.records.count() == 2
@@ -39,27 +41,30 @@ def test_created_petition(batch, record1, charged_dismissed_record, mock_ciprs_r
     assert petition.county == record1.county
 
 
-def test_dont_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document):
+@pytest.mark.parametrize("parser_mode", [1, 2])
+def test_dont_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parser_mode):
     settings.CIPRS_SAVE_PDF = False
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
-    batch = import_ciprs_records([fake_pdf], user)
+    batch = import_ciprs_records([fake_pdf], user, parser_mode)
     assert not batch.files.exists()
 
 
-def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document):
+@pytest.mark.parametrize("parser_mode", [1, 2])
+def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parser_mode):
     settings.CIPRS_SAVE_PDF = True
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
-    batch = import_ciprs_records([fake_pdf], user)
+    batch = import_ciprs_records([fake_pdf], user, parser_mode)
     assert batch.files.count() == 1
 
 
+@pytest.mark.parametrize("parser_mode", [1, 2])
 def test_save_pdf__multiple(
-    fake_pdf, fake_pdf2, user, settings, mock_transform_ciprs_document
+    fake_pdf, fake_pdf2, user, settings, mock_transform_ciprs_document, parser_mode
 ):
     settings.CIPRS_SAVE_PDF = True
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
-    batch = import_ciprs_records([fake_pdf, fake_pdf2], user)
+    batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
     assert batch.files.count() == 2

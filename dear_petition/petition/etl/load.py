@@ -21,7 +21,7 @@ __all__ = ("import_ciprs_records",)
 logger = logging.getLogger(__name__)
 
 
-def import_ciprs_records(files, user):
+def import_ciprs_records(files, user, parser_mode):
     """Import uploaded CIPRS records into models."""
     logger.info("Importing CIPRS records")
     batch = Batch.objects.create(user=user)
@@ -34,7 +34,7 @@ def import_ciprs_records(files, user):
             # closes file handle, so parse_ciprs_document below
             # fails
             file_ = batch_file.file
-        for record_data in parse_ciprs_document(file_):
+        for record_data in parse_ciprs_document(file_, parser_mode):
             record = CIPRSRecord(batch=batch, data=record_data)
             record.refresh_record_from_data()
             if record.label and idx == 0:
