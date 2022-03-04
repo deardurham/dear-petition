@@ -62,7 +62,7 @@ function Login() {
   };
 
   return (
-    <main className="flex-1 flex flex-col gap-20 items-center w-100 h-100 mt-20">
+    <main className="flex-1 flex flex-col gap-[10rem] items-center w-100 h-100 mt-20">
       <div className="max-w-[950px] p-2">
         <SplashLogo src={dearLogo} alt="DEAR logo" />
       </div>
