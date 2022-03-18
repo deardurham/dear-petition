@@ -3,8 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronRight,
   faChevronDown,
-  faExclamationCircle,
-  faFlag,
+  faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance, isBefore, isValid } from 'date-fns';
 import { TableBody, TableCell, TableHeader, TableRow, TableSpanCell, TableStyle } from '../Table';
@@ -61,7 +60,7 @@ function HighlightRow({
       </TableCell>
       <TableCell>
         {isValid(dob) && isBefore(new Date(offenseRecord.offense_date), dateAt18YearsOld) && (
-          <FontAwesomeIcon className="text-3xl text-red-600" icon={faExclamationCircle} />
+          <FontAwesomeIcon className="text-3xl text-red-600" icon={faExclamationTriangle} />
         )}
       </TableCell>
       <TableCell>
@@ -114,7 +113,7 @@ function HighlightTable({
         <TableCell header>Action</TableCell>
         <TableCell header>Severity</TableCell>
         <TableCell header>
-          <FontAwesomeIcon icon={faFlag} />
+          <FontAwesomeIcon icon={faExclamationTriangle} />
         </TableCell>
         <TableCell header />
       </TableHeader>
