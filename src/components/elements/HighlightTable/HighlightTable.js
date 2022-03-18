@@ -4,8 +4,9 @@ import {
   faChevronRight,
   faChevronDown,
   faExclamationCircle,
+  faFlag,
 } from '@fortawesome/free-solid-svg-icons';
-import { formatDistance, isBefore } from 'date-fns';
+import { formatDistance, isBefore, isValid } from 'date-fns';
 import { TableBody, TableCell, TableHeader, TableRow, TableSpanCell, TableStyle } from '../Table';
 
 function StyledTable({ children, className, columnSizes, numColumns }) {
@@ -42,7 +43,8 @@ function HighlightRow({
     setIsModified(true);
   };
 
-  const dateAt18YearsOld = !!dob && new Date(dob.getFullYear() + 18, dob.getMonth() + dob.getDay());
+  const dateAt18YearsOld =
+    isValid(dob) && new Date(dob.getFullYear() + 18, dob.getMonth() + dob.getDay());
 
   return (
     <TableRow key={offenseRecord.pk} highlighted={highlighted}>
@@ -58,7 +60,7 @@ function HighlightRow({
         {toNormalCaseEachWord(offenseRecord.severity)}
       </TableCell>
       <TableCell>
-        {!!dob && isBefore(new Date(offenseRecord.offense_date), dateAt18YearsOld) && (
+        {isValid(dob) && isBefore(new Date(offenseRecord.offense_date), dateAt18YearsOld) && (
           <FontAwesomeIcon className="text-3xl text-red-600" icon={faExclamationCircle} />
         )}
       </TableCell>
@@ -74,7 +76,7 @@ function HighlightRow({
       {showDetails && (
         <TableSpanCell className="col-span-7">
           <div className="grid grid-cols-[max-content_1fr] gap-2">
-            {!!dob && (
+            {isValid(dob) && offenseRecord?.offense_date && (
               <>
                 <b>Estimated Age:</b>
                 {formatDistance(dob, new Date(offenseRecord.offense_date))}
@@ -103,7 +105,7 @@ function HighlightTable({
     <StyledTable
       className="overflow-auto max-h-[500px] auto-rows-min"
       numColumns={8}
-      columnSizes="1fr 3fr 6fr 3fr 3fr 1fr 1fr"
+      columnSizes="1fr 3fr 7fr 4fr 4fr 2fr 1fr"
     >
       <TableHeader>
         <TableCell header />
@@ -111,7 +113,9 @@ function HighlightTable({
         <TableCell header>Description</TableCell>
         <TableCell header>Action</TableCell>
         <TableCell header>Severity</TableCell>
-        <TableCell header />
+        <TableCell header>
+          <FontAwesomeIcon icon={faFlag} />
+        </TableCell>
         <TableCell header />
       </TableHeader>
       <TableBody>
