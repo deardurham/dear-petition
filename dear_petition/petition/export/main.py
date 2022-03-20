@@ -23,19 +23,19 @@ FORM_TYPE_MAP = {
 }
 
 
-def build_pdf_template_context(petition, extra):
-    if hasattr(petition, "data_only") and petition.data_only:
+def build_pdf_template_context(petition_document, extra):
+    if hasattr(petition_document, "data_only") and petition_document.data_only:
         form_type = constants.DATA_PETITION
     else:
-        form_type = petition.form_type
+        form_type = petition_document.form_type
     Form = FORM_TYPE_MAP.get(form_type, AOCFormCR287)
-    form = Form(petition, extra=extra)
+    form = Form(petition_document, extra=extra)
     form.build_form_context()
     return form.data
 
 
-def generate_petition_pdf(petition, extra):
-    context = build_pdf_template_context(petition, extra)
+def generate_petition_pdf(petition_document, extra):
+    context = build_pdf_template_context(petition_document, extra)
     add_pdf_template_annotations(context)
-    generate_petition_pdf = write_pdf(context, form_type=petition.form_type)
+    generate_petition_pdf = write_pdf(context, form_type=petition_document.form_type)
     return generate_petition_pdf

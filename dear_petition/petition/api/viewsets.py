@@ -34,9 +34,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    ordering_fields = ['username', 'email', 'last_login']
+    ordering_fields = ["username", "email", "last_login"]
     ordering = ["username"]
-    search_fields = ['username', 'email']
+    search_fields = ["username", "email"]
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
@@ -102,7 +102,9 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
         offense_records = pet.get_all_offense_records(filter_active=False)
         active_records = list(
-            offense_records.filter(active=True).values_list("id", flat=True)
+            offense_records.filter(petitionoffenserecord__active=True).values_list(
+                "id", flat=True
+            )
         )
         serialized_data = {
             "offense_records": self.get_serializer(offense_records, many=True).data,
@@ -152,7 +154,9 @@ class BatchViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
         parser_mode = serializer.data["parser_mode"]
-        batch = import_ciprs_records(files=files, user=self.request.user, parser_mode=parser_mode)
+        batch = import_ciprs_records(
+            files=files, user=self.request.user, parser_mode=parser_mode
+        )
         return {"id": batch.pk}
 
     def perform_update(self, serializer):
@@ -210,17 +214,19 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         generated_petition_pdf = generate_petition_pdf(
             serializer.data["petition"], serializer.data
         )
-        form = petition.Petition.objects.get(id=request.data["petition"])
-        batch = form.batch
+        petition_document = petition.PetitionDocument.objects.get(
+            id=request.data["petition"]
+        )
+        batch = petition_document.petition.batch
         user = request.user
 
         petition.GeneratedPetition.objects.create(
             username=user.username,
-            form_type=form.form_type,
-            number_of_charges=form.offense_records.count(),
+            form_type=petition_document.form_type,
+            number_of_charges=petition_document.offense_records.count(),
             batch_id=batch.id,
-            county=form.county,
-            jurisdiction=form.jurisdiction,
+            county=petition_document.county,
+            jurisdiction=petition_document.jurisdiction,
             race=batch.race,
             sex=batch.sex,
             age=batch.age,

@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import IntegerField, Case, When, Value
+from django.db.models import Q, IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
@@ -129,7 +129,6 @@ class OffenseRecord(models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
-    active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"offense record {self.pk}"
@@ -268,17 +267,19 @@ class Petition(TimeStampedModel):
         blank=True,
         null=True,
     )
-    offense_records = models.ManyToManyField(OffenseRecord, related_name="petitions")
+    offense_records = models.ManyToManyField(
+        OffenseRecord, related_name="petitions", through="PetitionOffenseRecord"
+    )
 
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
 
-    def get_offense_record_paginator(self):
+    def get_offense_record_paginator(self, filter_active=True):
         from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 
-        return OffenseRecordPaginator(self)
+        return OffenseRecordPaginator(self, filter_active=filter_active)
 
-    def get_all_offense_records(self, filter_active=True, include_annotations=True):
+    def get_all_offense_records(self, include_annotations=True):
         """
         Return all (nonpaginated) offenses for this petition type, jurisdiction, and
         county. This is typically only used at the end of the ETL process to divide
@@ -296,9 +297,6 @@ class Petition(TimeStampedModel):
             offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
-
-        if filter_active:
-            qs = qs.filter(active=True)
 
         if include_annotations:
             qs = (
@@ -339,11 +337,49 @@ class Petition(TimeStampedModel):
         return qs
 
     def has_attachments(self):
-        return self.attachments.count() > 0
+        return self.documents.count() > 1
 
 
 # Look-alike Petition object used to support JSON data-driven petitions
 DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[True])
+
+
+class PetitionDocument(models.Model):
+    petition = models.ForeignKey(
+        Petition, on_delete=models.CASCADE, related_name="documents"
+    )
+    offense_records = models.ManyToManyField(OffenseRecord, related_name="documents")
+    previous_document = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, related_name="following_document"
+    )
+
+    def has_attachments(self):
+        return self.following_document is not None
+
+    @property
+    def is_attachment(self):
+        return self.previous_document is not None
+
+    @property
+    def form_type(self):
+        if self.previous_document_id:
+            return pc.ATTACHMENT
+        else:
+            return self.petition.form_type
+
+    @property
+    def jurisdiction(self):
+        return self.petition.jurisdiction
+
+    @property
+    def county(self):
+        return self.petition.county
+
+
+class PetitionOffenseRecord(models.Model):
+    petition = models.ForeignKey(Petition, on_delete=models.CASCADE)
+    offense_record = models.ForeignKey(OffenseRecord, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
 
 
 class GeneratedPetition(TimeStampedModel):

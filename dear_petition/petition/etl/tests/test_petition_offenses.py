@@ -1,6 +1,6 @@
 import pytest
 
-from dear_petition.petition.etl.load import link_offense_records_and_attachments
+from dear_petition.petition.etl.load import link_offense_records, create_documents
 from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
@@ -91,24 +91,26 @@ def test_paginator_attachment_records__25(paginator, records_35):
 
 
 def test_link_offense_records__10(petition, records_10):
-    link_offense_records_and_attachments(petition)
+    link_offense_records(petition)
     assert petition.offense_records.count() == 10
     assert not petition.attachments.exists()
 
 
 def test_link_offense_records__11(petition, records_11):
-    link_offense_records_and_attachments(petition)
+    link_offense_records(petition)
+    create_documents(petition)
     # one attachment
     assert petition.attachments.count() == 1
     # first attachment has 1 record
-    assert petition.attachments.first().offense_records.count() == 1
+    assert petition.documents.order_by("id").last().offense_records.count() == 1
 
 
 def test_link_offense_records__25(petition, records_35):
-    link_offense_records_and_attachments(petition)
+    link_offense_records(petition)
+    create_documents(petition)
     # two attachments
-    assert petition.attachments.count() == 2
-    attachments = petition.attachments.order_by("pk")
+    assert petition.documents.count() == 3
+    attachments = petition.documents.objects.filter(previous_document__is_null=False)
     # first attachment has 20 records
     assert attachments[0].offense_records.count() == 20
     # 2nd attachment has 5 records
@@ -129,7 +131,8 @@ def test_paginator_same_record_number_order(petition, records_10):
         ),
         action="CHARGED",
     )
-    link_offense_records_and_attachments(petition)
+    link_offense_records(petition)
+    create_documents(petition)
     attachment = petition.attachments.order_by("pk").first()
     # the 1st charge should always be on the first petition
     assert charge_1.pk in petition.offense_records.values_list("pk", flat=True)
