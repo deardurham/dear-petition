@@ -1,8 +1,9 @@
-FROM node:15-slim as static_files
+FROM ./Dockerfile.base as static_files
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
 COPY package.json package-lock.json /code/
+RUN npm install -D -f tailwindcss@^3.0.23
 RUN npm install --silent
 COPY ./public /code/public/
 COPY ./src /code/src/
