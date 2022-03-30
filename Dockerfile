@@ -1,4 +1,4 @@
-FROM ./Dockerfile.base as static_files
+FROM node:16-alpine3.14
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
