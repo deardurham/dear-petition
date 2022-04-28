@@ -1,16 +1,15 @@
-FROM node:16-alpine3.14 as static_files
+FROM node:16-slim as static_files
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
 COPY package.json package-lock.json /code/
-RUN npm install -D -f tailwindcss@^3.0.23
 RUN npm install --silent
 COPY ./public /code/public/
 COPY ./src /code/src/
-WORKDIR /code/src/
+WORKDIR /code/
 RUN npm run build
 
-FROM python:3.8-slim as base
+FROM python:3.8-slim-bullseye as base
 
 # Install packages needed to run your application (not build deps):
 #   mime-support -- for mime types when serving static files
@@ -56,9 +55,9 @@ RUN set -ex \
 
 # Install pdftotext
 RUN set -ex \
-    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
-    && tar -xvf xpdf-tools-linux-4.03.tar.gz \
-    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
+    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
+    && tar -xvf xpdf-tools-linux-4.04.tar.gz \
+    && cp xpdf-tools-linux-4.04/bin64/pdftotext /usr/local/bin/pdftotext-4.03
 
 # Copy in your requirements file
 # ADD requirements.txt /requirements.txt
