@@ -75,6 +75,8 @@ function HighlightRow({
       {showDetails && (
         <TableSpanCell className="col-span-7">
           <div className="grid grid-cols-[max-content_1fr] gap-2">
+            <b>File No:</b>
+            {offenseRecord.file_no}
             {isValid(dob) && offenseRecord?.offense_date && (
               <>
                 <b>Estimated Age:</b>
