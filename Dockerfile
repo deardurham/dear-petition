@@ -2,7 +2,7 @@ FROM node:16-slim as static_files
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
-COPY package.json package-lock.json /code/
+COPY package.json package-lock.json tailwind.config.js /code/
 RUN npm install --silent
 COPY ./public /code/public/
 COPY ./src /code/src/
