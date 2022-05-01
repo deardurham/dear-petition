@@ -83,7 +83,7 @@ RUN ln -s /usr/bin/python3 /usr/local/bin/python
 RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
 
 COPY --from=static_files /usr/local/bin/pdftotext /usr/local/bin/pdftotext
-COPY --from=static_files /usr/local/bin/pdftotext-4.03 /usr/local/bin/pdftotext-4.03
+COPY --from=static_files /usr/local/bin/pdftotext-4 /usr/local/bin/pdftotext-4
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
