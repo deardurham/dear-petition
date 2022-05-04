@@ -4,12 +4,11 @@ import { colorGrey } from '../../../styles/colors';
 
 import { smallerThanTabletLandscape } from '../../../styles/media';
 
-
 const GenerationSection = styled.div`
   padding: 2rem 0;
   margin-bottom: 2rem;
 
-  & >  h2 {
+  & > h2 {
     user-select: none;
     margin-bottom: 2rem;
   }
@@ -24,7 +23,6 @@ const GenerationSection = styled.div`
     margin-bottom: 1rem;
   }
 `;
-
 
 const InputSectionStyled = styled(GenerationSection)`
   display: flex;
@@ -48,9 +46,7 @@ const InputSection = ({ children, label }) => (
     <div>
       <h3>{label}</h3>
     </div>
-    <div>
-      {children}
-    </div>
+    <div>{children}</div>
   </InputSectionStyled>
 );
 

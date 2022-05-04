@@ -70,7 +70,7 @@ const CreateUserAction = ({ onCloseModal }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors: _ },
   } = useForm();
 
   const onSubmit = async (submitData) => {
@@ -102,7 +102,10 @@ const CreateUserAction = ({ onCloseModal }) => {
         />
         <div>
           <span>User Role</span>
-          <select {...register('is_admin')}>
+          <select
+            className="border border-gray-700 rounded-md bg-gray-200"
+            {...register('is_admin')}
+          >
             {Object.values(USER_ROLES).map(({ label, value }) => (
               <option key={value} value={value}>
                 {label}

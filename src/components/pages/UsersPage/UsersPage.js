@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import UsersTable from './UsersTable';
@@ -152,6 +153,7 @@ const UsersPage = () => {
               {search && (
                 <button
                   type="button"
+                  className="border border-gray-700 rounded-md"
                   onClick={() => {
                     setFormValue('');
                     setSearch('');
@@ -161,7 +163,7 @@ const UsersPage = () => {
                 </button>
               )}
             </SearchRow>
-            <PaginationFlexRow>
+            <div className="max-w-[400px] ml-auto self-end flex items-baseline gap-8">
               <button
                 type="button"
                 onClick={() => setOffset((prev) => prev - limit.value)}
@@ -169,7 +171,7 @@ const UsersPage = () => {
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
-              <FlexRow>
+              <div className="flex items-baseline gap-4">
                 {[...Array(numPages).keys()].map((idx) => {
                   const page = idx + 1;
                   const withinLeft = page >= startPage && page <= currentPage;
@@ -177,9 +179,15 @@ const UsersPage = () => {
                   if (page !== 1 && page !== numPages && !withinLeft && !withinRight) {
                     return page === startPage - 1 || page === endPage + 1 ? '...' : null;
                   }
+                  const isCurrentPage = page === currentPage;
                   return (
                     <button
                       type="button"
+                      className={cx('px-2 py-0.5 outline-1', {
+                        'outline outline-gray-700': isCurrentPage,
+                        'hover:outline hover:text-blue-600 hover:outline-blue-400': !isCurrentPage,
+                        'focus:outline focus:text-blue-600 focus:outline-blue-400': !isCurrentPage,
+                      })}
                       key={idx}
                       onClick={() => setOffset(idx * limit.value)}
                       disabled={idx === offset / limit.value}
@@ -188,7 +196,7 @@ const UsersPage = () => {
                     </button>
                   );
                 })}
-              </FlexRow>
+              </div>
               <button
                 type="button"
                 onClick={() => setOffset((prev) => prev + limit.value)}
@@ -196,7 +204,7 @@ const UsersPage = () => {
               >
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
-            </PaginationFlexRow>
+            </div>
           </TableFlexRow>
           <UsersTable users={data?.results || []} ordering={ordering} setOrdering={setOrdering} />
         </FlexColumn>

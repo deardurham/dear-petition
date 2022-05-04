@@ -5,19 +5,13 @@ import { greyScale } from '../../../styles/colors';
 import Axios from '../../../service/axios';
 import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableSpanCell,
-  TableHeader,
-  TableRow,
-} from '../../elements/Table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
+import StyledDialog from '../../elements/Modal/Dialog';
 import useWindowSize from '../../../hooks/useWindowSize';
 import HighlightTable from '../../elements/HighlightTable/HighlightTable';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const GenerateButtonStyled = styled(Button)`
   font-size: 1.5rem;
@@ -40,6 +34,7 @@ const Label = styled.span`
 `;
 
 function GenerateButton({
+  className,
   label,
   windowWidth,
   onClick,
@@ -49,7 +44,12 @@ function GenerateButton({
 }) {
   const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
   return (
-    <GenerateButtonStyled onClick={onClick} disabled={isDisabled} title={title}>
+    <GenerateButtonStyled
+      className={className}
+      onClick={onClick}
+      disabled={isDisabled}
+      title={title}
+    >
       {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
     </GenerateButtonStyled>
   );
@@ -109,6 +109,8 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     });
   };
 
+  const petitionerDOB = offenseRecords?.find((record) => !!record?.dob)?.dob;
+
   return (
     <>
       <TableRow key={petition.pk} backgroundColor={backgroundColor}>
@@ -141,13 +143,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         </TableCell>
         <TableCell>
           <GenerateButton
-            label={
-              isDetailed ? (
-                <FontAwesomeIcon icon={faChevronDown} />
-              ) : (
-                <FontAwesomeIcon icon={faChevronRight} />
-              )
-            }
+            label="View"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => handlePress()}
             title="Reveal offense records"
@@ -155,39 +151,45 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         </TableCell>
       </TableRow>
       {isDetailed && (
-        <TableRow backgroundColor={backgroundColor}>
-          <TableSpanCell spanLength={5}>
-            {offenseRecordsLoading ? (
-              <h5>Loading...</h5>
-            ) : (
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <HighlightTable
-                        offenseRecords={offenseRecords}
-                        highlightRow={highlightRow}
-                        highlightedRows={highlightedRows}
-                        unhighlightRow={unhighlightRow}
-                        setIsModified={setIsModified}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <GenerateButton
-                        label="Update Petitions"
-                        onClick={recalculatePetitions}
-                        title="Update the petitions on the main petition row with your changes."
-                        isDisabled={!isModified}
-                      />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            )}
-          </TableSpanCell>
-        </TableRow>
+        <StyledDialog isOpen={isDetailed} onClose={() => setIsDetailed(false)}>
+          {offenseRecordsLoading ? (
+            <h5>Loading...</h5>
+          ) : (
+            <div className="w-[900px] h-auto p-10 flex flex-col gap-8">
+              <h3>View / Modify Offenses</h3>
+              <p className="text-[1.6rem]">
+                Please select or de-select offenses here if you wish to include or exclude them from
+                the petition.
+              </p>
+              {petitionerDOB && (
+                <p className="flex gap-2">
+                  <b>Petitioner DOB:</b>
+                  <span>{petitionerDOB}</span>
+                </p>
+              )}
+              <HighlightTable
+                offenseRecords={offenseRecords}
+                highlightRow={highlightRow}
+                highlightedRows={highlightedRows}
+                unhighlightRow={unhighlightRow}
+                setIsModified={setIsModified}
+                dob={new Date(petitionerDOB)}
+              />
+              <div className="self-center flex gap-8">
+                <GenerateButton
+                  className="w-[15rem]"
+                  label="Update Petitions"
+                  onClick={recalculatePetitions}
+                  title="Update the petitions on the main petition row with your changes."
+                  isDisabled={!isModified}
+                />
+                <Button className="px-4" onClick={() => setIsDetailed(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </StyledDialog>
       )}
       {selectedPetition && (
         <GeneratePetitionModal
@@ -215,7 +217,7 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
         <TableCell header>Jurisdiction</TableCell>
         <TableCell header>Petition</TableCell>
         <TableCell header>Attachments</TableCell>
-        <TableCell header>Detail</TableCell>
+        <TableCell header>Offenses</TableCell>
       </TableHeader>
       <TableBody>
         {petitions.map((petition, index) => (

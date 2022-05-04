@@ -8,8 +8,10 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@headlessui/react": "^1.5.0",
     "@popperjs/core": "^2.11.2",
-    "@reduxjs/toolkit": "^1.6.1",
+    "@reduxjs/toolkit": "^1.7.2",
     "axios": "^0.21.2",
+    "classnames": "^2.3.1",
+    "date-fns": "^2.28.0",
     "framer-motion": "^4.1.17",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -20,7 +22,7 @@
     "react-popper": "^2.2.5",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
     "react-select": "^4.3.1",
     "remark-sectionize": "^1.1.1",
     "styled-components": "^5.3.0"
@@ -28,24 +30,23 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
-    "eslint": "^7.29.0",
+    "autoprefixer": "^10.4.2",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-react": "^7.24.0",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "prettier": "^2.3.1"
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "postcss": "^8.4.6",
+    "prettier": "^2.5.1",
+    "tailwindcss": "^3.0.23"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [

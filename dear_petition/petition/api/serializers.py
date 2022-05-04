@@ -42,6 +42,7 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
     offense_date = serializers.SerializerMethodField()
     dob = serializers.SerializerMethodField()
     disposition_method = serializers.SerializerMethodField()
+    file_no = serializers.SerializerMethodField()
 
     def get_offense_date(self, offense_record):
         return offense_record.offense.ciprs_record.offense_date.date()
@@ -51,6 +52,9 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
 
     def get_disposition_method(self, offense_record):
         return offense_record.offense.disposition_method
+
+    def get_file_no(self, offense_record):
+        return offense_record.offense.ciprs_record.file_no
 
     class Meta:
         model = OffenseRecord
@@ -66,6 +70,7 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
             "offense_date",
             "dob",
             "disposition_method",
+            "file_no",
         ]
 
 

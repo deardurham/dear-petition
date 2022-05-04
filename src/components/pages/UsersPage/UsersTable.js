@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import cx from 'classnames';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretUp, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -139,7 +140,7 @@ const InputCells = ({ user, onStopEdit }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors: formErrors },
+    formState: { errors: _formErrors },
     register,
   } = useForm({
     defaultValues: { username: user.username, email: user.email, is_admin: user.is_admin },
@@ -204,12 +205,6 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const ClickableHeader = styled.div`
-  cursor: pointer;
-  display: flex;
-  gap: 1rem;
-`;
-
 const SortableHeader = ({ children, label, ordering, setOrdering }) => {
   const handleClick = () => {
     setOrdering((prev) => {
@@ -223,15 +218,23 @@ const SortableHeader = ({ children, label, ordering, setOrdering }) => {
   const isSorted = ordering === label || ordering === `-${label}`;
   return (
     <TableCell header>
-      <ClickableHeader
+      <div
+        className={cx(
+          'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-1 focus:underline-offset-4',
+          { 'underline decoration-1 underline-offset-4': isSorted }
+        )}
         role="button"
         tabIndex={0}
-        onKeyDown={() => handleClick()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleClick();
+          }
+        }}
         onClick={() => handleClick()}
       >
         {children}
         {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretDown : faCaretUp} />}
-      </ClickableHeader>
+      </div>
     </TableCell>
   );
 };

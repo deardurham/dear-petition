@@ -65,15 +65,6 @@ export const TableHeader = ({ children }) => (
 );
 
 export const TableRow = styled.tr`
-  & > td {
-    ${(props) =>
-      props.highlighted
-        ? `
-  background-color: rgb(255, 245, 217);
-  `
-        : `background-color: ${props.backgroundColor}`}
-  }
-
   input[type='checkbox'] {
     cursor: pointer;
   }

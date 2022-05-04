@@ -47,12 +47,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /app/node_modules
       - ./:/app/
     env_file:
       - ./.envs/.local/.frontend
     environment:
       - OVERRIDE_API_PROXY
+      - NODE_PATH=/home/node_install/node_modules
 
   mailhog:
     image: mailhog/mailhog:v1.0.0

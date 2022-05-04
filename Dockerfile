@@ -1,15 +1,15 @@
-FROM node:15-slim as static_files
+FROM node:16-slim as static_files
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
-COPY package.json package-lock.json /code/
+COPY package.json package-lock.json tailwind.config.js /code/
 RUN npm install --silent
 COPY ./public /code/public/
 COPY ./src /code/src/
-WORKDIR /code/src/
+WORKDIR /code/
 RUN npm run build
 
-FROM python:3.8-slim as base
+FROM python:3.8-slim-bullseye as base
 
 # Install packages needed to run your application (not build deps):
 #   mime-support -- for mime types when serving static files
@@ -55,9 +55,9 @@ RUN set -ex \
 
 # Install pdftotext
 RUN set -ex \
-    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
-    && tar -xvf xpdf-tools-linux-4.03.tar.gz \
-    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
+    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
+    && tar -xvf xpdf-tools-linux-4.04.tar.gz \
+    && cp xpdf-tools-linux-4.04/bin64/pdftotext /usr/local/bin/pdftotext-4
 
 # Copy in your requirements file
 # ADD requirements.txt /requirements.txt
@@ -115,7 +115,7 @@ ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_AUTO_CHUNKED=1 UWSGI_HTTP_KEEPALI
 ENV UWSGI_WORKERS=2 UWSGI_THREADS=4
 
 # uWSGI static file serving configuration (customize or comment out if not needed):
-ENV UWSGI_STATIC_MAP="/static/=/code/static/" UWSGI_STATIC_EXPIRES_URI="/static/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
+ENV UWSGI_STATIC_MAP="/static/=/code/staticfiles/" UWSGI_STATIC_EXPIRES_URI="/static/.*\.[a-f0-9]{12,}\.(css|js|png|jpg|jpeg|gif|ico|woff|ttf|otf|svg|scss|map|txt) 315360000"
 
 # Change to a non-root user
 USER ${APP_USER}:${APP_USER}

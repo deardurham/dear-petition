@@ -52,9 +52,9 @@ RUN set -ex \
 
 # Install pdftotext
 RUN set -ex \
-    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.03.tar.gz \
-    && tar -xvf xpdf-tools-linux-4.03.tar.gz \
-    && cp xpdf-tools-linux-4.03/bin64/pdftotext /usr/local/bin/pdftotext-4.03
+    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
+    && tar -xvf xpdf-tools-linux-4.04.tar.gz \
+    && cp xpdf-tools-linux-4.04/bin64/pdftotext /usr/local/bin/pdftotext-4
 
 FROM alpine:3.12
 
@@ -83,7 +83,7 @@ RUN ln -s /usr/bin/python3 /usr/local/bin/python
 RUN ln -s /usr/bin/pip3 /usr/local/bin/pip
 
 COPY --from=static_files /usr/local/bin/pdftotext /usr/local/bin/pdftotext
-COPY --from=static_files /usr/local/bin/pdftotext-4.03 /usr/local/bin/pdftotext-4.03
+COPY --from=static_files /usr/local/bin/pdftotext-4 /usr/local/bin/pdftotext-4
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
