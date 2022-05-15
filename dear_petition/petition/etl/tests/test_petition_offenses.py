@@ -57,22 +57,26 @@ def test_paginator_initial_page_size(petition, initial_page_size, expected):
     "attachment_page_size,expected", [[10, 10], [0, 20], [-10, 20]]
 )
 def test_paginator_attachment_page_size(petition, attachment_page_size, expected):
+
     paginator = OffenseRecordPaginator(
         petition, attachment_page_size=attachment_page_size
     )
     assert paginator.attachment_page_size == expected
 
 
-def test_paginator_petition_offense_records(paginator, records_11):
+def test_paginator_petition_offense_records(petition, paginator, records_11):
+    link_offense_records(petition)
     assert paginator.petition_offense_records().count() == 10
 
 
-def test_paginator_attachment_records__10(paginator, records_10):
+def test_paginator_attachment_records__10(petition, paginator, records_10):
+    link_offense_records(petition)
     # no attachments
     assert not list(paginator.attachment_offense_records())
 
 
-def test_paginator_attachment_records__11(paginator, records_11):
+def test_paginator_attachment_records__11(petition, paginator, records_11):
+    link_offense_records(petition)
     records = list(paginator.attachment_offense_records())
     # one attachment
     assert len(records) == 1
@@ -80,7 +84,8 @@ def test_paginator_attachment_records__11(paginator, records_11):
     assert records[0].count() == 1
 
 
-def test_paginator_attachment_records__25(paginator, records_35):
+def test_paginator_attachment_records__25(petition, paginator, records_35):
+    link_offense_records(petition)
     records = list(paginator.attachment_offense_records())
     # two attachments
     assert len(records) == 2
@@ -93,14 +98,14 @@ def test_paginator_attachment_records__25(paginator, records_35):
 def test_link_offense_records__10(petition, records_10):
     link_offense_records(petition)
     assert petition.offense_records.count() == 10
-    assert not petition.attachments.exists()
+    assert not petition.has_attachments()
 
 
 def test_link_offense_records__11(petition, records_11):
     link_offense_records(petition)
     create_documents(petition)
     # one attachment
-    assert petition.attachments.count() == 1
+    assert petition.has_attachments()
     # first attachment has 1 record
     assert petition.documents.order_by("id").last().offense_records.count() == 1
 
@@ -110,7 +115,9 @@ def test_link_offense_records__25(petition, records_35):
     create_documents(petition)
     # two attachments
     assert petition.documents.count() == 3
-    attachments = petition.documents.objects.filter(previous_document__is_null=False)
+    attachments = petition.documents.filter(previous_document__isnull=False).order_by(
+        "id"
+    )
     # first attachment has 20 records
     assert attachments[0].offense_records.count() == 20
     # 2nd attachment has 5 records
@@ -133,7 +140,11 @@ def test_paginator_same_record_number_order(petition, records_10):
     )
     link_offense_records(petition)
     create_documents(petition)
-    attachment = petition.attachments.order_by("pk").first()
+    attachment = (
+        petition.documents.filter(previous_document__isnull=False)
+        .order_by("pk")
+        .first()
+    )
     # the 1st charge should always be on the first petition
     assert charge_1.pk in petition.offense_records.values_list("pk", flat=True)
     # the 2nd charge should always be on the attachment
@@ -186,16 +197,19 @@ def test_paginator_orders_records_correctly(batch, petition):
     ]
     EXPECTED_ORDER_ACROSS_FORMS = EXPECTED_ORDER_FIRST_FORM + EXPECTED_ORDER_SECOND_FORM
 
-    link_offense_records_and_attachments(petition)
-    attachment = petition.attachments.order_by("pk").first()
+    link_offense_records(petition)
+    create_documents(petition)
+    main_document = petition.base_document
+    attachment = petition.documents.filter(previous_document__isnull=False).first()
 
-    main_petition_form = AOCFormCR287(petition)
+    main_petition_form = AOCFormCR287(main_document)
     attachment_petition_form = AOCFormCR285(attachment)
 
     assert (
         list(petition.get_all_offense_records().values_list("id", flat=True))
         == EXPECTED_ORDER_ACROSS_FORMS
     )
+
     assert (
         list(
             main_petition_form.get_ordered_offense_records().values_list(

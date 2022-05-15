@@ -1,7 +1,7 @@
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.petition.models import DataPetition
+from dear_petition.petition.models import DataPetition, DataPetitionDocument
 from dear_petition.petition.export.forms import DataPetitionForm
 
 
@@ -11,8 +11,13 @@ def petition():
 
 
 @pytest.fixture
-def form(petition, extra):
-    return DataPetitionForm(petition, extra)
+def petition_document(petition):
+    return DataPetitionDocument(petition=petition)
+
+
+@pytest.fixture
+def form(petition_document, extra):
+    return DataPetitionForm(petition_document, extra)
 
 
 def test_context(form):

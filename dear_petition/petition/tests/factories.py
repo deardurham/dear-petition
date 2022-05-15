@@ -9,6 +9,8 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
     Petition,
+    PetitionOffenseRecord,
+    PetitionDocument,
     Contact,
     GeneratedPetition,
 )
@@ -115,6 +117,22 @@ class PetitionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Petition
+
+
+class PetitionOffenseRecordFactory(factory.DjangoModelFactory):
+    petition = factory.SubFactory(PetitionFactory)
+    offense_record = factory.SubFactory(OffenseRecordFactory)
+    active = True
+
+    class Meta:
+        model = PetitionOffenseRecord
+
+
+class PetitionDocumentFactory(factory.DjangoModelFactory):
+    petition = factory.SubFactory(PetitionFactory)
+
+    class Meta:
+        model = PetitionDocument
 
 
 class ContactFactory(factory.DjangoModelFactory):

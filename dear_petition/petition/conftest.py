@@ -7,6 +7,8 @@ from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     PetitionFactory,
+    PetitionOffenseRecordFactory,
+    PetitionDocumentFactory,
     ContactFactory,
     OffenseFactory,
     OffenseRecordFactory,
@@ -57,9 +59,10 @@ def offense1(record2):
 
 
 @pytest.fixture
-def offense_record1(offense1, petition):
+def offense_record1(offense1, petition, petition_document):
     record = OffenseRecordFactory(offense=offense1)
-    record.petitions.set([petition])
+    PetitionOffenseRecordFactory(petition=petition, offense_record=record)
+    record.documents.set([petition_document])
     yield record
 
 
@@ -90,6 +93,11 @@ def fake_pdf2():
 @pytest.fixture
 def petition(batch):
     return PetitionFactory(batch=batch)
+
+
+@pytest.fixture
+def petition_document(petition):
+    return PetitionDocumentFactory(petition=petition)
 
 
 @pytest.fixture

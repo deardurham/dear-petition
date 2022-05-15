@@ -34,9 +34,7 @@ class OffenseRecordPaginator:
             else ATTACHMENT_PAGE_SIZE
         )
         self.petition = petition
-        self.queryset = self.petition.offense_records.filter(
-            petitionoffenserecord__active=True
-        ).all()
+        self.queryset = self.petition.get_all_offense_records(filter_active=True)
 
     def query(self, start, size):
         """Slice query aginst petition offense records."""

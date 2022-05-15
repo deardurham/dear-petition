@@ -13,6 +13,7 @@ class PetitionForm(metaclass=abc.ABCMeta):
     def __init__(self, petition_document, extra={}):
         self.data = {}
         self.petition_document = petition_document
+        self.petition = self.petition_document.petition
         self.extra = extra
 
     def format_date(self, date):
@@ -96,12 +97,12 @@ class AOCFormCR287(PetitionForm):
         self.map_additional_forms()
 
     def map_header(self):
-        self.data["County"] = self.petition_document.county
-        if self.petition_document.jurisdiction == constants.DISTRICT_COURT:
+        self.data["County"] = self.petition.county
+        if self.petition.jurisdiction == constants.DISTRICT_COURT:
             self.data["District"] = Checkbox("Yes")
         else:
             self.data["District"] = Checkbox("")
-        if self.petition_document.jurisdiction == constants.SUPERIOR_COURT:
+        if self.petition.jurisdiction == constants.SUPERIOR_COURT:
             self.data["Superior"] = Checkbox("Yes")
         else:
             self.data["Superior"] = Checkbox("")
@@ -171,7 +172,7 @@ class AOCFormCR287(PetitionForm):
             self.data[f"DismissalDate:{i}"] = self.format_date(offense.disposed_on)
 
     def map_additional_forms(self):
-        if self.petition_document.has_attachments():
+        if self.petition.has_attachments():
             self.data["CkBox_Attchmt"] = Checkbox("Yes")
 
 

@@ -13,7 +13,7 @@ from dear_petition.petition.tests.factories import (
     PetitionFactory,
     CIPRSRecordFactory,
 )
-from dear_petition.petition.etl.load import link_offense_records
+from dear_petition.petition.etl.load import link_offense_records, create_documents
 from dear_petition.petition.etl.transform import recalculate_petitions
 
 pytestmark = pytest.mark.django_db
@@ -37,6 +37,7 @@ def test_recalculate_petitions(petition):
         if len(offense_record_ids) < 5:
             offense_record_ids.append(offense_record.id)
     link_offense_records(petition)
+    create_documents(petition)
 
     assert (
         petition.offense_records.filter(petitionoffenserecord__active=True).count()

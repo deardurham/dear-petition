@@ -191,13 +191,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            new_petition = recalculate_petitions(pk, offense_record_ids)
-        except AssertionError:
-            return Response(
-                "Can not recalculate an attachment petition (only parent petitions should be recalculated).",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        new_petition = recalculate_petitions(pk, offense_record_ids)
 
         new_petition = self.get_serializer(new_petition)
 
