@@ -56,6 +56,8 @@ const GeneratePetitionModal = ({
   setAgencies,
 }) => {
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
+  const [error, setError] = useState('');
+  // const [generatePetition, { error }] = useGeneratePetitionMutation();
 
   const _buildPetition = () => ({
     petition: petition.pk,
@@ -102,14 +104,16 @@ const GeneratePetitionModal = ({
   const handleGenerate = async () => {
     const derivedPetition = _buildPetition();
     try {
+      setError('');
       const { data } = await Axios.post('/generate-petition/', derivedPetition, {
         responseType: 'arraybuffer',
       });
+      // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
+      // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
+      // const data = await generatePetition(derivedPetition).unwrap();
       _openPdf(data);
-    } catch (error) {
-      // TODO: add error message
-      console.error(error);
-      console.log(error?.response);
+    } catch (e) {
+      setError(!e?.response && e?.message ? e?.message : 'An unexpected error occurred');
     }
   };
 
@@ -128,6 +132,7 @@ const GeneratePetitionModal = ({
           </ul>
           <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
           <Button onClick={handleGenerate}>Generate</Button>
+          {error && <span className="text-red">{`Error: ${error}`}</span>}
         </>
       )}
     </ModalStyled>

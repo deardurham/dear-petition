@@ -150,6 +150,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
           />
         </TableCell>
       </TableRow>
+      {/* TODO: Rename to isViewingOffense or something */}
       {isDetailed && (
         <StyledDialog isOpen={isDetailed} onClose={() => setIsDetailed(false)}>
           {offenseRecordsLoading ? (
