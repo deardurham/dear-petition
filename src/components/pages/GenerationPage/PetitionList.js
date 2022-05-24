@@ -15,11 +15,6 @@ import { usePetitionQuery } from '../../../service/api';
 import OffenseTableModal from '../../features/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 
-const GenerateButtonStyled = styled(Button)`
-  font-size: 1.5rem;
-  opacity: ${(props) => (props.disabled ? 0.3 : 1)};
-`;
-
 const PetitionTable = styled(Table)`
   font-size: 1.7rem;
   font-family: Arial, Helvetica, sans-serif;

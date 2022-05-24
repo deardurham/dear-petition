@@ -45,19 +45,6 @@ const SearchRow = styled(FlexRow)`
   }
 `;
 
-const PaginationFlexRow = styled(FlexRow)`
-  margin-left: auto;
-  align-self: flex-end;
-  max-width: 400px;
-  & > div {
-    justify-content: space-evenly;
-    flex: 1;
-  }
-  & button {
-    padding: 0.4rem;
-  }
-`;
-
 const SearchBox = styled.input`
   margin-left: 3rem;
   align-self: center;
