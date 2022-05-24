@@ -6,8 +6,8 @@ import {
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance, isBefore, isValid } from 'date-fns';
-import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../elements/Table';
-import { Tooltip } from '../elements/Tooltip/Tooltip';
+import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../../elements/Table';
+import { Tooltip } from '../../elements/Tooltip/Tooltip';
 
 function StyledTable({ children, className, columnSizes, numColumns }) {
   const defaultSize = `repeat(${numColumns}, 1fr)`;
