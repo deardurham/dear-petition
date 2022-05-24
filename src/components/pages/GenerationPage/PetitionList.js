@@ -82,7 +82,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     return null;
   }
 
-  const disabledMessageLines = [...DISABLED_MESSAGE];
+  const disabledMessageLines = [PETITION_FORM_NAMES[petition.form_type], ...DISABLED_MESSAGE];
   if (petition.form_type === 'AOC-CR-293') {
     disabledMessageLines.push(
       'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
