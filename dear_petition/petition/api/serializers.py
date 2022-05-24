@@ -8,6 +8,7 @@ from dear_petition.petition.models import (
     Offense,
     OffenseRecord,
     Petition,
+    PetitionDocument,
 )
 from dear_petition.petition.constants import ATTACHMENT, DISMISSED
 from rest_framework import serializers
@@ -21,7 +22,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ["pk", "username", "email", "is_admin", "is_staff", "admin_url", "last_login"]
+        fields = [
+            "pk",
+            "username",
+            "email",
+            "is_admin",
+            "is_staff",
+            "admin_url",
+            "last_login",
+        ]
         extra_kwargs = {"email": {"required": True, "allow_blank": False}}
 
     def get_admin_url(self, user_obj):
@@ -66,7 +75,6 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
             "action",
             "severity",
             "description",
-            "active",
             "offense_date",
             "dob",
             "disposition_method",
@@ -127,28 +135,57 @@ class PetitionSerializer(serializers.ModelSerializer):
         ]
 
 
+class PetitionDocumentSerializer(serializers.ModelSerializer):
+    form_type = serializers.CharField()
+    county = serializers.CharField()
+    jurisdiction = serializers.CharField()
+
+    class Meta:
+        model = PetitionDocument
+        fields = [
+            "pk",
+            "form_type",
+            "county",
+            "jurisdiction",
+            "offense_records",
+        ]
+
+
 class ParentPetitionSerializer(PetitionSerializer):
+    base_document = serializers.SerializerMethodField()
     attachments = serializers.SerializerMethodField()
     offense_records = serializers.SerializerMethodField()
     active_records = serializers.SerializerMethodField()
 
     class Meta(PetitionSerializer.Meta):
-        fields = PetitionSerializer.Meta.fields + ["attachments", "active_records"]
+        fields = PetitionSerializer.Meta.fields + [
+            "base_document",
+            "attachments",
+            "active_records",
+        ]
+
+    def get_base_document(self, instance):
+        return PetitionDocumentSerializer(
+            PetitionDocument.objects.get(
+                petition_id=instance.id, previous_document__isnull=True
+            )
+        ).data
 
     def get_attachments(self, instance):
-        return PetitionSerializer(
-            instance.attachments.all().order_by("pk"), many=True
+        return PetitionDocumentSerializer(
+            PetitionDocument.objects.filter(
+                petition_id=instance.id, previous_document__isnull=False
+            ).order_by("pk"),
+            many=True,
         ).data
 
     def get_offense_records(self, petition):
-        offense_records = petition.get_all_offense_records(
-            filter_active=False, include_annotations=False
-        )
+        offense_records = petition.offense_records.all()
         return OffenseRecordSerializer(offense_records, many=True).data
 
     def get_active_records(self, petition):
-        return petition.get_all_offense_records(
-            filter_active=True, include_annotations=False
+        return petition.offense_records.filter(
+            petitionoffenserecord__active=True
         ).values_list("id", flat=True)
 
 
@@ -190,7 +227,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     def get_petitions(self, instance):
         """Return sorted and structured petitions with associated attachments"""
         parent_petitions = Petition.objects.filter(
-            batch=instance.pk, parent__isnull=True
+            batch=instance.pk,
         ).order_by("county", "jurisdiction")
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
@@ -214,7 +251,9 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["petition"].choices = Petition.objects.values_list("pk", "pk")
+        self.fields["petition"].choices = PetitionDocument.objects.values_list(
+            "pk", "pk"
+        )
         self.fields["attorney"].choices = Contact.objects.filter(
             category="attorney"
         ).values_list("pk", "name")
@@ -223,7 +262,7 @@ class GeneratePetitionSerializer(serializers.Serializer):
         ).values_list("pk", "name")
 
     def validate_petition(self, value):
-        return Petition.objects.get(pk=value)
+        return PetitionDocument.objects.get(pk=value)
 
     def validate_attorney(self, value):
         return Contact.objects.get(pk=value)

@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from dear_petition.users.tests.factories import UserFactory
 
-from ....petition.tests.factories import (
+from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     GeneratedPetitionFactory,

@@ -10,12 +10,10 @@ from dear_petition.petition.export.annotate import Checkbox
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
-    def __init__(self, petition=None, extra={}):
-        assert (
-            petition or offense_records
-        ), "One of petition object or offense_records queryset needs to be provided."
+    def __init__(self, petition_document, extra={}):
         self.data = {}
-        self.petition = petition
+        self.petition_document = petition_document
+        self.petition = self.petition_document.petition
         self.extra = extra
 
     def format_date(self, date):
@@ -31,7 +29,9 @@ class PetitionForm(metaclass=abc.ABCMeta):
         # When sorting these, need to interpret first 2 digits of file number as year and sort based on that
         two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
         qs = (
-            self.petition.offense_records.filter(active=True)
+            self.petition_document.offense_records.filter(
+                petitionoffenserecord__active=True
+            )
             .select_related("offense__ciprs_record")
             .annotate(
                 first_two_digits_file_number_chars=Substr(
@@ -55,7 +55,11 @@ class PetitionForm(metaclass=abc.ABCMeta):
                     ),
                 )
             )
-            .order_by("file_number_year", "offense__ciprs_record__file_no", "pk",)
+            .order_by(
+                "file_number_year",
+                "offense__ciprs_record__file_no",
+                "pk",
+            )
         )
 
         return qs
@@ -104,7 +108,7 @@ class AOCFormCR287(PetitionForm):
             self.data["Superior"] = Checkbox("")
 
     def map_file_no(self):
-        if self.petition.offense_records.count() > 1:
+        if self.petition_document.offense_records.count() > 1:
             self.data["ConsJdgmntFileNum"] = self.MULTIPLE_FILE_NO_MSG
         else:
             offense_record = self.get_most_recent_record()
@@ -193,7 +197,7 @@ class AOCFormCR285(AOCFormCR287):
 
     def map_header(self):
         super().map_header()
-        self.data["CountyName"] = self.petition.county
+        self.data["CountyName"] = self.petition_document.county
 
     def map_petitioner(self):
         self.data["PetitionerName"] = self.extra.get("name_petitioner")
@@ -201,7 +205,9 @@ class AOCFormCR285(AOCFormCR287):
     def map_agencies(self):
         agencies = self.extra.get("agencies", [])
         if len(agencies) > 0:
-            self.data["FormNo1"] = self.petition.parent.form_type.split("-")[-1]
+            self.data["FormNo1"] = self.petition_document.petition.form_type.split("-")[
+                -1
+            ]
         for i, agency in enumerate(agencies, 1):
             body = ""
             for field_name in [
@@ -217,7 +223,7 @@ class AOCFormCR285(AOCFormCR287):
             self.data[f"NameAddress{i}"] = body
 
     def map_offenses(self):
-        self.data["FormNo2"] = self.petition.parent.form_type.split("-")[-1]
+        self.data["FormNo2"] = self.petition_document.petition.form_type.split("-")[-1]
         for i, offense_record in enumerate(self.get_ordered_offense_records(), 1):
             row = {}
             offense = offense_record.offense

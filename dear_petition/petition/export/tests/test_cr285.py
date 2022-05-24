@@ -2,16 +2,17 @@ import pytest
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.forms import AOCFormCR285
-from dear_petition.petition.tests.factories import PetitionFactory
+from dear_petition.petition.tests.factories import PetitionDocumentFactory
 
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def attachment(batch, petition, offense_record1):
-    attachment_petition = PetitionFactory(
-        batch=batch, parent=petition, form_type=constants.ATTACHMENT
+def attachment(batch, petition, petition_document, offense_record1):
+    attachment_petition = PetitionDocumentFactory(
+        petition=petition,
+        previous_document=petition_document,
     )
     attachment_petition.offense_records.add(offense_record1)
     return attachment_petition
@@ -19,7 +20,7 @@ def attachment(batch, petition, offense_record1):
 
 @pytest.fixture
 def form(attachment, extra):
-    return AOCFormCR285(petition=attachment, extra=extra)
+    return AOCFormCR285(petition_document=attachment, extra=extra)
 
 
 #
@@ -42,7 +43,7 @@ def test_map_header__superior(form):
 
 
 def test_map_header__district(form):
-    form.jurisdiction = constants.DISTRICT_COURT
+    form.petition.jurisdiction = constants.DISTRICT_COURT
     form.map_header()
     assert form.data["District"] == "Yes"
     assert form.data["Superior"] == ""
@@ -70,7 +71,8 @@ def test_map_petitioner__name(form):
 
 
 @pytest.mark.parametrize(
-    "field", ["name", "address1", "address2", "city", "state", "zipcode"],
+    "field",
+    ["name", "address1", "address2", "city", "state", "zipcode"],
 )
 def test_map_agencies__fields(field, form, contact1, contact2, contact3):
     form.extra["agencies"] = [contact1, contact2, contact3]
@@ -121,7 +123,10 @@ def test_map_offenses__offense_date(form, record2, offense_record1):
     ],
 )
 def test_map_offenses__disposition_method(
-    form, offense1, offense_record1, disposition_method,
+    form,
+    offense1,
+    offense_record1,
+    disposition_method,
 ):
     offense1.disposition_method = disposition_method
     offense1.save()

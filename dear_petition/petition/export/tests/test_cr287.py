@@ -9,8 +9,8 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def form(petition, extra):
-    return AOCFormCR287(petition, extra)
+def form(petition_document, extra):
+    return AOCFormCR287(petition_document, extra)
 
 
 #

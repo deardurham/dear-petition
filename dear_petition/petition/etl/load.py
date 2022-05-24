@@ -8,7 +8,7 @@ from dear_petition.petition.constants import (
     NOT_GUILTY,
     UNDERAGED_CONVICTIONS,
 )
-from dear_petition.petition.models import Batch, CIPRSRecord
+from dear_petition.petition import models as pm
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
     petition_offense_records,
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def import_ciprs_records(files, user, parser_mode):
     """Import uploaded CIPRS records into models."""
     logger.info("Importing CIPRS records")
-    batch = Batch.objects.create(user=user)
+    batch = pm.Batch.objects.create(user=user)
     logger.info(f"Created batch {batch.id}")
     for idx, file_ in enumerate(files):
         logger.info(f"Importing file {file_}")
@@ -35,14 +35,12 @@ def import_ciprs_records(files, user, parser_mode):
             # fails
             file_ = batch_file.file
         for record_data in parse_ciprs_document(file_, parser_mode):
-            record = CIPRSRecord(batch=batch, data=record_data)
+            record = pm.CIPRSRecord(batch=batch, data=record_data)
             record.refresh_record_from_data()
             if record.label and idx == 0:
                 batch.label = record.label
                 batch.save()
     create_batch_petitions(batch)
-    underaged_convictions = batch.underaged_conviction_records()
-    underaged_convictions.update(active=False)
     return batch
 
 
@@ -65,20 +63,33 @@ def create_petitions_from_records(batch, form_type):
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
-        link_offense_records_and_attachments(petition)
+        link_offense_records(petition)
+        create_documents(petition)
+
+        if form_type == UNDERAGED_CONVICTIONS:
+            pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
+                active=False
+            )
 
 
-def link_offense_records_and_attachments(petition):
+def link_offense_records(petition, filter_active=True):
     """Divide offense records across petition and any needed attachment forms."""
+
+    offense_records = petition.get_all_offense_records()
+    petition.offense_records.add(*offense_records)
+
+
+def create_documents(petition):
     paginator = petition.get_offense_record_paginator()
-    # add first 10 offense records to petition
-    petition.offense_records.add(*paginator.petition_offense_records())
-    # add offense records to attachment forms
+
+    base_petition = pm.PetitionDocument.objects.create(petition=petition)
+    base_petition.offense_records.add(*paginator.petition_offense_records())
+
+    previous_document = base_petition
+
     for attachment_records in paginator.attachment_offense_records():
-        attachment = petition.attachments.create(
-            batch=petition.batch,
-            form_type=ATTACHMENT,
-            jurisdiction=petition.jurisdiction,
-            county=petition.county,
+        attachment = pm.PetitionDocument.objects.create(
+            petition=petition, previous_document=previous_document
         )
         attachment.offense_records.add(*attachment_records)
+        previous_document = attachment

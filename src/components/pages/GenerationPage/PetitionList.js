@@ -121,7 +121,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
             collapsedIcon={faDownload}
             windowWidth={windowSize.width}
             label={petition.form_type}
-            onClick={() => handleSelect(petition)}
+            onClick={() => handleSelect(petition.base_document)}
             isDisabled={isDisabled}
             title={PETITION_FORM_NAMES[petition.form_type]}
           />
