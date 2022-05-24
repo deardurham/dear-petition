@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import keyAndAmbientShadows from '../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution, colorGrey } from '../../styles/colors';
+import { colorPrimary, colorWhite, colorCaution, greyScale } from '../../styles/colors';
 import { fontPrimary } from '../../styles/fonts';
 
 export const Button = styled.button`
   cursor: pointer;
   ${({ colorClass }) => mapTypeToStartingState(colorClass)}
-
+  ${({ disabled }) => disabled && mapTypeToStartingState(DISABLED)}
   border-radius: 3px;
   padding: 0.25rem;
   outline: none;
@@ -65,8 +65,8 @@ function mapTypeToStartingState(colorClass) {
 }
 
 const disabled = css`
-  background: ${colorGrey};
-  border: 1px solid ${colorGrey};
+  background: ${greyScale(7.25)};
+  border: 1px solid ${greyScale(7.25)};
   color: ${colorWhite};
 `;
 const positive = css`

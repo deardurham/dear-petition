@@ -14,11 +14,22 @@ const TooltipContentWrapper = styled.div`
   padding: 1rem 0.5rem;
 `;
 
-export const Tooltip = ({ children, tooltipContent }) => {
+export const Tooltip = ({ children, tooltipContent, hideTooltip = false, offset = [0, 0] }) => {
   const hoverDiv = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
   const [popperElement, setPopperElement] = useState();
-  const { styles, attributes } = usePopper(hoverDiv.current, popperElement, { placement: 'top' });
+  const { styles, attributes } = usePopper(hoverDiv.current, popperElement, {
+    placement: 'top',
+    modifiers: {
+      name: 'offset',
+      options: {
+        offset,
+      },
+    },
+  });
+  if (hideTooltip) {
+    return children;
+  }
   return (
     <Popover>
       <div

@@ -4,7 +4,7 @@ import { axiosBaseQuery } from './axios';
 export const api = createApi({
   // TODO: use baseUrl here instead of in axios.js
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['User'],
+  tagTypes: ['Petition', 'User'],
   endpoints: (builder) => ({
     checkLogin: builder.query({
       query: () => ({ url: 'token/', method: 'get' }),
@@ -39,6 +39,18 @@ export const api = createApi({
       query: ({ id, data, method = 'put' }) => ({ url: `users/${id}/`, method, data }),
       invalidatesTags: ['User'],
     }),
+    petition: builder.query({
+      query: ({ petitionId }) => ({ url: `/petitions/${petitionId}/`, method: 'GET' }),
+      providesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
+    }),
+    recalculatePetitions: builder.mutation({
+      query: ({ petitionId, offenseRecordIds }) => ({
+        url: `/petitions/${petitionId}/recalculate_petitions/`,
+        data: { offense_record_ids: offenseRecordIds },
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
+    }),
   }),
 });
 
@@ -48,6 +60,8 @@ export const {
   useGetBatchQuery,
   useLoginMutation,
   useLogoutMutation,
+  usePetitionQuery,
+  useRecalculatePetitionsMutation,
   useCreateUserMutation,
   useModifyUserMutation,
   useUsersQuery,

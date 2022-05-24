@@ -45,16 +45,20 @@ export const TableStyle = styled.table`
   }
 `;
 
-export const TableCell = ({ children, header, tooltip }) => {
+export const TableCell = ({ children, className, header, tooltip }) => {
   if (header) {
-    return <th title={tooltip ?? ''}>{children}</th>;
+    return (
+      <th className={className} title={tooltip ?? ''}>
+        {children}
+      </th>
+    );
   }
-  return <td title={tooltip ?? ''}>{children}</td>;
+  return (
+    <td className={className} title={tooltip ?? ''}>
+      {children}
+    </td>
+  );
 };
-
-export const TableSpanCell = styled.td`
-  grid-column: 1 / span ${(props) => props.spanLength};
-`;
 
 export const TableBody = ({ children }) => <tbody>{children}</tbody>;
 
@@ -64,11 +68,7 @@ export const TableHeader = ({ children }) => (
   </thead>
 );
 
-export const TableRow = styled.tr`
-  input[type='checkbox'] {
-    cursor: pointer;
-  }
-`;
+export const TableRow = ({ children, className }) => <tr className={className}>{children}</tr>;
 
 export const Table = ({ children, className, columnSizes, numColumns }) => {
   const defaultSize = `repeat(${numColumns}, 1fr)`;
