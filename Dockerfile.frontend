@@ -1,0 +1,12 @@
+FROM node:16-slim
+
+WORKDIR /code
+ENV PATH /code/node_modules/.bin:$PATH
+COPY package.json package-lock.json tailwind.config.js /code/
+RUN npm install --silent
+COPY ./public /code/public/
+COPY ./src /code/src/
+
+WORKDIR /code/
+
+CMD ["npm", "run", "start"]

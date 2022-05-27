@@ -125,3 +125,28 @@ ENTRYPOINT ["/code/docker-entrypoint.sh"]
 
 # Start uWSGI
 CMD ["uwsgi", "--http=0.0.0.0:$PORT", "--show-config"]
+
+FROM base AS dev
+
+# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step.
+# Correct the path to your production requirements file, if needed.
+RUN set -ex \
+    && BUILD_DEPS=" \
+    build-essential \
+    libpq-dev \
+    git-core \
+    " \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    && pip install --no-cache-dir -r /requirements/local.txt \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.local
+
+# Copy in node-built files
+COPY --from=static_files /code/build /static
+
+ENTRYPOINT ["/code/docker-entrypoint.sh"]
+
+CMD ["python", "/code/manage.py", "runserver", "0.0.0.0:8000"]
