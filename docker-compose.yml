@@ -13,7 +13,8 @@ services:
       - postgres
       - mailhog
     volumes:
-      - .:/code
+      - ./dear_petition:/code/dear_petition
+      - ./config:/code/config
     env_file:
       - ./.envs/.local/.django
     ports:
