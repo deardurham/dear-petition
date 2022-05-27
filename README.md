@@ -187,3 +187,14 @@ coverage report:
 ### Sign up for Sentry
 
 The dear-petition project is now on Sentry. Visit sentry.io and make an account or sign in with Github. Reach out to an existing member for an invite to the project.
+
+
+# Production testing
+
+To test the production Dockerfile locally, run:
+
+```sh
+COMPOSE_FILE=docker-compose.deploy.yml docker compose up --build -d django
+# View logs for debugging
+COMPOSE_FILE=docker-compose.deploy.yml docker compose logs django -f
+```

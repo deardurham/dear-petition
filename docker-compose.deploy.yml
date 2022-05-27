@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-  app:
-    environment:
-      DJANGO_MANAGEPY_MIGRATE: "on"
+  django:
+    build:
+      context: .
+      target: deploy
     env_file:
-      - .envs/.production/.django
-    image: petition:latest
-    links:
-      - db:db
-      - redis:redis
+      - .envs/.production-local-testing/.django
+    depends_on:
+      - db
+      - redis
     ports:
       - "8000:8000"
   db:
@@ -21,4 +21,3 @@ services:
     image: redis:5-alpine
   mailhog:
     image: mailhog/mailhog:v1.0.0
-
