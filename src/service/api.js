@@ -4,8 +4,24 @@ import { axiosBaseQuery } from './axios';
 export const api = createApi({
   // TODO: use baseUrl here instead of in axios.js
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['Petition', 'User'],
+  tagTypes: ['AgencyList', 'Petition', 'User'],
   endpoints: (builder) => ({
+    agencies: builder.query({
+      query: ({ params }) => ({ url: 'contact/?category=agency', params, method: 'get' }),
+      providesTags: ['AgencyList'],
+    }),
+    createAgency: builder.mutation({
+      query: ({ data }) => ({ url: `contact/`, method: 'post', data }),
+      invalidatesTags: ['AgencyList'],
+    }),
+    deleteAgency: builder.mutation({
+      query: ({ id }) => ({ url: `contact/${id}/`, method: 'delete' }),
+      invalidatesTags: ['AgencyList'],
+    }),
+    updateAgency: builder.mutation({
+      query: ({ id, data }) => ({ url: `contact/${id}/`, method: 'put', data }),
+      invalidatesTags: ['AgencyList'],
+    }),
     checkLogin: builder.query({
       query: () => ({ url: 'token/', method: 'get' }),
     }),
@@ -55,6 +71,10 @@ export const api = createApi({
 });
 
 export const {
+  useAgenciesQuery,
+  useCreateAgencyMutation,
+  useDeleteAgencyMutation,
+  useUpdateAgencyMutation,
   useCreateBatchMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,

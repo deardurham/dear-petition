@@ -28,5 +28,6 @@ export const InputErrors = styled(motion.div)`
     @media (${smallerThanTabletLandscape}) {
       font-size: 1.4rem;
     }
+    white-space: normal;
   }
 `;

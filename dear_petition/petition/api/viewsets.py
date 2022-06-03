@@ -119,9 +119,11 @@ class ContactViewSet(viewsets.ModelViewSet):
     queryset = petition.Contact.objects.all()
     serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["category"]
     search_fields = ["name"]
+    ordering_fields = ['name', 'address1', 'address2', 'city', 'zipcode']
+    ordering = ["name"]
 
 
 class BatchViewSet(viewsets.ModelViewSet):

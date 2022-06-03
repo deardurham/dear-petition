@@ -16,6 +16,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
 import UsersPage from './pages/UsersPage/UsersPage';
+import AgenciesPage from './pages/AgenciesPage';
 
 const WarningModal = styled(Modal)`
   width: 500px;
@@ -77,7 +78,13 @@ function App() {
             <ProtectedRoute exact path="/generate/:batchId">
               <GenerationPage />
             </ProtectedRoute>
-            <ProtectedRoute exact path="/users">
+            <ProtectedRoute exact path="/users" isAdminOnly>
+              <UsersPage />
+            </ProtectedRoute>
+            <ProtectedRoute exact path="/agencies" isAdminOnly>
+              <AgenciesPage />
+            </ProtectedRoute>
+            <ProtectedRoute exact path="/attornies" isAdminOnly>
               <UsersPage />
             </ProtectedRoute>
             <ProtectedRoute exact path="/help">

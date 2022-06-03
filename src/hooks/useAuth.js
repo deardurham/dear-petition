@@ -6,4 +6,9 @@ const useAuth = () => {
   return useMemo(() => ({ user }), [user]);
 };
 
+export const useIsAdmin = () => {
+  const { user } = useAuth();
+  return user?.is_admin;
+};
+
 export default useAuth;
