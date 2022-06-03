@@ -19,7 +19,6 @@ class EmailAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "recipient",
-        "sender",
         "attachment_count",
         "spam_score",
         "date_created",

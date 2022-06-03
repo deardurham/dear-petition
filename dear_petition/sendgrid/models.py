@@ -13,7 +13,7 @@ class Email(models.Model):
     recipient = models.CharField(max_length=4096)  # aka "To"
     sender = models.CharField(max_length=4096)  # aka "From"
     headers = models.TextField()
-    text = models.TextField()
+    text = models.TextField(blank=True)
     html = models.TextField(blank=True)
     payload = JSONField()
     spam_score = models.FloatField(null=True)
