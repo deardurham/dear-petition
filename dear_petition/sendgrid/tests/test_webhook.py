@@ -1,3 +1,4 @@
+import io
 import json
 import pytest
 
@@ -6,15 +7,11 @@ from faker import Faker
 from django.urls import reverse
 
 from dear_petition.sendgrid.forms import EmailForm
-from dear_petition.sendgrid.models import Email, Attachment
-
-faker = Faker()
-
-
-import csv
-import io
+from dear_petition.sendgrid.models import Email
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+
+faker = Faker()
 
 
 @pytest.fixture
