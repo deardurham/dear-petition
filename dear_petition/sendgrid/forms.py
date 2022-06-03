@@ -44,7 +44,11 @@ class EmailForm(forms.ModelForm):
         """Re-key POST data to match our form field names."""
         data = post_data.copy()
         for model_name, sendgrid_name in self.FIELD_MAP.items():
-            data[model_name] = data[sendgrid_name]
+            try:
+                sendgrid_value = data[sendgrid_name]
+            except KeyError:
+                logger.exception(f"{sendgrid_name} missing from POST data")
+            data[model_name] = sendgrid_value
         return data
 
     def clean_attachment_info(self):
@@ -64,7 +68,7 @@ class EmailForm(forms.ModelForm):
         for key, file_ in self.files.items():
             metadata = self.cleaned_data["attachment_info"][key]
             attachment = instance.attachments.create(
-                name=metadata["filename"],
+                name=metadata["name"],
                 type=metadata["type"],
                 content_id=metadata["content-id"],
                 file=file_,
