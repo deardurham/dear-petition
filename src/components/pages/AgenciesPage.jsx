@@ -1,13 +1,93 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import PageBase from './PageBase';
-import { useAgenciesQuery, useCreateAgencyMutation } from '../../service/api';
-import AgenciesTable from '../features/AgenciesTable/AgenciesTable';
+import { useAgenciesQuery } from '../../service/api';
+import AgenciesTable from '../features/AgenciesManagement/AgenciesTable';
+import CreateAgency from '../features/AgenciesManagement/CreateAgency';
 import { Button } from '../elements/Button';
-import FormInput from '../elements/Input/FormInput';
-import FormTextArea from '../elements/Input/FormTextArea';
 import StyledDialog from '../elements/Modal/Dialog';
+import Select from '../elements/Input/Select';
+import { calculateNumberOfPages } from '../elements/Table';
+
+const DEFAULT_NUM_AGENCIES = 10;
+const NUM_AGENCIES_OPTIONS = [10, 25, 50].map((value) => ({ value, label: value }));
+const MODALS = {
+  CREATE_AGENCY: 'CREATE_AGENCY',
+  DISPLAY_SETTINGS: 'DISPLAY_SETTINGS',
+};
+
+const ActionsRow = ({ agenciesCount, numDisplayAgencies, onSetPageNumber, onSetNumAgencies }) => {
+  const [selectedModal, setSelectedModal] = useState('');
+  const onCloseModal = () => setSelectedModal('');
+  const test = calculateNumberOfPages(agenciesCount, numDisplayAgencies);
+  console.log({ test });
+  return (
+    <div className="flex gap-8 mb-1">
+      <>
+        <Button
+          className="flex gap-2 font-semibold px-2 py-1"
+          colorClass="neutral"
+          onClick={() => setSelectedModal(MODALS.CREATE_AGENCY)}
+        >
+          <FontAwesomeIcon icon={faPlus} />
+          Add New Agency
+        </Button>
+        <StyledDialog isOpen={selectedModal === MODALS.CREATE_AGENCY} onClose={onCloseModal}>
+          <CreateAgency onClose={onCloseModal} />
+        </StyledDialog>
+      </>
+
+      <>
+        <Button
+          className="flex gap-2 font-semibold px-2 py-1"
+          colorClass="neutral"
+          onClick={() => setSelectedModal(MODALS.DISPLAY_SETTINGS)}
+        >
+          <FontAwesomeIcon icon={faCog} />
+          Display Settings
+        </Button>
+        <StyledDialog isOpen={selectedModal === MODALS.DISPLAY_SETTINGS} onClose={onCloseModal}>
+          <div className="px-24 py-16 flex flex-col gap-8">
+            <h2 className="self-center">Settings</h2>
+            <Select
+              label="# of agencies to display"
+              value={{ value: numDisplayAgencies, label: numDisplayAgencies }}
+              options={NUM_AGENCIES_OPTIONS}
+              onChange={({ value }) => onSetNumAgencies(value)}
+            />
+            <Button className="self-center w-fit px-6 py-2" onClick={() => onCloseModal()}>
+              Close
+            </Button>
+          </div>
+        </StyledDialog>
+      </>
+
+      <>
+        <Button
+          className="flex gap-2 font-semibold px-2 py-1"
+          colorClass="neutral"
+          onClick={() => setSelectedModal('')}
+        >
+          <FontAwesomeIcon icon={faList} />
+          Filters
+        </Button>
+      </>
+
+      <div className="flex-1 flex items-end justify-end gap-4">
+        {[...Array(test).keys()].map((pageIndex) => {
+          const pageNum = pageIndex + 1;
+          return (
+            <button key={pageNum} type="button" onClick={() => onSetPageNumber(pageNum)}>
+              {pageNum}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const ADDRESS_SORT_FIELD = ['address1', 'address2'];
 
@@ -19,121 +99,32 @@ const getOrdering = ({ field, dir }) => {
   return `${sortDir}${field}`;
 };
 
-const CreateAgency = ({ onClose }) => {
-  const [triggerCreate] = useCreateAgencyMutation();
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      name: '',
-      address: '',
-      city: '',
-      zipcode: '',
-    },
-    reValidateMode: 'onSubmit',
-  });
-  const onSubmit = async (formData) => {
-    console.log({ formData });
-    const submitData = {};
-    Object.keys(formData).forEach((field) => {
-      if (field === 'address') {
-        const [address1, address2] = formData.address.split('\n');
-        submitData.address1 = address1.trim();
-        submitData.address2 = address2 ? address2.trim() : '';
-      } else {
-        submitData[field] = formData[field];
-      }
-    });
-    await triggerCreate({ data: submitData }).unwrap();
-  };
-  const onSubmitAndClose = async (data) => {
-    try {
-      await onSubmit(data);
-      onClose();
-    } catch (e) {
-      // noop
-      console.log('dont close');
-    }
-  };
-  return (
-    <div className="w-[550px] px-40 py-20 flex flex-col gap-8">
-      <h3>Add New Arresting Agency</h3>
-      <form className="flex flex-col gap-4">
-        <FormInput
-          label="Name"
-          inputProps={{
-            control,
-            name: 'name',
-            rules: { required: true },
-          }}
-        />
-        <FormTextArea
-          label="Address"
-          rows={2}
-          inputProps={{
-            control,
-            name: 'address',
-            // Server should treat address1 as required
-            rules: { validate: (value) => !!value?.trim() && !!value.split('\n')[0] },
-          }}
-        />
-        <FormInput
-          label="City"
-          className="w-[200px]"
-          inputProps={{
-            control,
-            name: 'city',
-            rules: { required: true },
-          }}
-        />
-        <FormInput
-          label="Zipcode"
-          className="w-[200px]"
-          maxLength={5}
-          inputProps={{
-            control,
-            name: 'zipcode',
-            rules: {
-              required: true,
-              minLength: 5,
-              validate: (value) => !Number.isNaN(+value),
-            },
-          }}
-        />
-      </form>
-      <div className="flex flex-row gap-4 justify-center">
-        <Button type="submit" onClick={handleSubmit(onSubmitAndClose)}>
-          Save
-        </Button>
-        <Button colorClass="neutral" onClick={() => onClose()}>
-          Cancel
-        </Button>
-      </div>
-    </div>
-  );
-};
+const getOffset = (pageNumber, numAgenciesPerPage) => (pageNumber - 1) * numAgenciesPerPage;
 
 const AgenciesPage = () => {
   const [sortBy, setSortBy] = useState({ field: 'name', dir: 'dsc' });
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [numAgenciesPerPage, setNumAgenciesPerPage] = useState(DEFAULT_NUM_AGENCIES);
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
-  const { data } = useAgenciesQuery({ params: { ordering: getOrdering(sortBy) } });
+  const { data } = useAgenciesQuery({
+    params: {
+      ordering: getOrdering(sortBy),
+      offset: getOffset(pageNumber, numAgenciesPerPage),
+      limit: numAgenciesPerPage,
+    },
+  });
   return (
     <PageBase>
       <div className="flex flex-col gap-4">
         <h2>Arresting Agencies</h2>
-        <div className="flex mb-4">
-          <Button
-            className="font-semibold px-2 py-1"
-            colorClass="neutral"
-            onClick={() => setShowCreateModal(true)}
-          >
-            Add New Agency +
-          </Button>
-          <StyledDialog isOpen={showCreateModal} onClose={() => setShowCreateModal(false)}>
-            <CreateAgency onClose={() => setShowCreateModal(false)} />
-          </StyledDialog>
-        </div>
+        <ActionsRow
+          onSetPageNumber={(nextNumber) => setPageNumber(nextNumber)}
+          agenciesCount={data?.count ?? 0}
+          numDisplayAgencies={numAgenciesPerPage}
+          onSetNumAgencies={(n) => setNumAgenciesPerPage(n)}
+        />
         <AgenciesTable agencies={data?.results ?? []} sortBy={sortBy} onSortBy={onSortBy} />
       </div>
     </PageBase>

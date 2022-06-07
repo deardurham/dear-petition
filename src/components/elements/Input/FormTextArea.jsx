@@ -22,7 +22,7 @@ const FormTextArea = ({ className, label, rows, errors, inputProps }) => {
   };
   return (
     <div>
-      <label className="flex flex-col text-xl select-none">
+      <label className="flex flex-col text-2xl select-none">
         {label}
         <textarea
           className={cx('resize-none rounded-[5px] p-2 border border-gray', className)}

@@ -106,6 +106,9 @@ export const Table = ({ children, className, columnSizes, numColumns }) => {
   );
 };
 
+export const calculateNumberOfPages = (count, numPerPage) =>
+  Math.floor(count / numPerPage) + (count % numPerPage > 0 ? 1 : 0);
+
 const getOppositeSort = (sortDir) => (sortDir === 'dsc' ? 'asc' : 'dsc');
 
 export const SortableHeader = ({ children, field, onSelect, isSelected, sortDir = 'dsc' }) => {
