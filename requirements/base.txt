@@ -10,21 +10,19 @@ pyjwt==2.1.0
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.28  # pyup: < 2.1  # https://www.djangoproject.com/
-django-environ==0.4.5  # https://github.com/joke2k/django-environ
-django-model-utils==3.1.2  # https://github.com/jazzband/django-model-utils
-django-allauth==0.39.1  # https://github.com/pennersr/django-allauth
-django-crispy-forms==1.7.2  # https://github.com/django-crispy-forms/django-crispy-forms
-django-redis==4.10.0  # https://github.com/niwinz/django-redis
-django-localflavor==3.0.1 # https://django-localflavor.readthedocs.io/en/latest/
-django-filter==2.2.0 # https://github.com/baskoopmans/django-filters/
-django-model-utils==3.1.2 # https://github.com/jazzband/django-model-utils
+django==3.2.13  # pyup: < 2.1  # https://www.djangoproject.com/ good
+django-environ==0.8.1  # https://github.com/joke2k/django-environ
+django-model-utils==4.2.0  # https://github.com/jazzband/django-model-utils
+django-allauth==0.46.0  # https://github.com/pennersr/django-allauth
+django-crispy-forms==1.11.1  # https://github.com/django-crispy-forms/django-crispy-forms
+django-redis==5.2.0  # https://github.com/niwinz/django-redis
+django-localflavor==3.1 # https://django-localflavor.readthedocs.io/en/latest/
+django-filter==21.1 # https://github.com/baskoopmans/django-filters/
 django-celery-beat==2.2.0 # https://pypi.org/project/django-celery-beat/
 
 # Django REST Framework
-djangorestframework==3.11.2  # https://github.com/encode/django-rest-framework
-djangorestframework-simplejwt==4.6.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
-coreapi==2.3.3  # https://github.com/core-api/python-client
+djangorestframework==3.13.1  # https://github.com/encode/django-rest-framework
+djangorestframework-simplejwt==5.2.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
 
 pdfrw==0.4
 -e git+https://github.com/codefordurham/ciprs-reader.git@main#egg=ciprs-reader
