@@ -6,8 +6,14 @@ import {
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance, isBefore, isValid } from 'date-fns';
-import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../../elements/Table';
-import { Tooltip } from '../../elements/Tooltip/Tooltip';
+import {
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+  TableStyle,
+} from '../../components/elements/Table';
+import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
 
 function StyledTable({ children, className, columnSizes, numColumns }) {
   const defaultSize = `repeat(${numColumns}, 1fr)`;
@@ -55,7 +61,7 @@ function OffenseRow({ offenseRecord, selected, onSelect, dob }) {
             tooltipContent="This offense may be a candidate for the AOC-CR-293 petition form"
             offset={[0, 10]}
           >
-            <FontAwesomeIcon className="text-3xl text-red-600" icon={faExclamationTriangle} />
+            <FontAwesomeIcon className="text-xl text-red-600" icon={faExclamationTriangle} />
           </Tooltip>
         )}
       </TableCell>

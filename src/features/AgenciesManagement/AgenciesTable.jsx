@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDeleteAgencyMutation, useUpdateAgencyMutation } from '../../../service/api';
+import { useDeleteAgencyMutation, useUpdateAgencyMutation } from '../../service/api';
 import {
   EditableRow,
   HeaderCell,
@@ -9,11 +9,11 @@ import {
   TableBody,
   TableCell,
   TableHeader,
-} from '../../elements/Table';
-import { Button } from '../../elements/Button';
-import FormInput from '../../elements/Input/FormInput';
-import FormTextArea from '../../elements/Input/FormTextArea';
-import StyledDialog from '../../elements/Modal/Dialog';
+} from '../../components/elements/Table';
+import { Button } from '../../components/elements/Button';
+import FormInput from '../../components/elements/Input/FormInput';
+import FormTextArea from '../../components/elements/Input/FormTextArea';
+import StyledDialog from '../../components/elements/Modal/Dialog';
 
 const getFormattedAddress = (address1, address2) =>
   address2 ? `${address1}\n${address2}` : address1;
@@ -186,17 +186,27 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
                 isOpen={deleteModalId === agencyData.pk}
                 onClose={() => onCloseDeleteModal()}
               >
-                <div className="max-w-[600px] p-24 flex flex-col gap-8 text-3xl">
-                  <p className="self-center text-4xl font-bold">WARNING</p>
+                <div className="max-w-[600px] p-24 flex flex-col gap-8">
+                  <p className="self-center text-3xl font-bold">WARNING</p>
                   <p className="text-[1.6rem] flex flex-wrap gap-x-2 gap-y-4">
                     <span>This action will PERMANENTLY delete the agency:</span>
                     <span className="font-semibold">{agencyData.name}</span>
                   </p>
-                  <div className="self-end flex gap-4">
-                    <Button type="button" colorClass="neutral" onClick={() => onCloseDeleteModal()}>
+                  <div className="self-end flex gap-4 text-lg">
+                    <Button
+                      type="button"
+                      className="p-2"
+                      colorClass="neutral"
+                      onClick={() => onCloseDeleteModal()}
+                    >
                       Cancel
                     </Button>
-                    <Button type="button" colorClass="caution" onClick={() => onDelete(agencyData)}>
+                    <Button
+                      type="button"
+                      className="p-2"
+                      colorClass="caution"
+                      onClick={() => onDelete(agencyData)}
+                    >
                       Delete
                     </Button>
                   </div>

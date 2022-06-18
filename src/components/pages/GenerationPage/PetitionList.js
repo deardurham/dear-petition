@@ -12,7 +12,7 @@ import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
 import { usePetitionQuery } from '../../../service/api';
 
-import OffenseTableModal from '../../features/OffenseTable/OffenseTableModal';
+import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 
 const PetitionTable = styled(Table)`

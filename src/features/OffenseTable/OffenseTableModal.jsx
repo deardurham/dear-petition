@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { usePetitionQuery, useRecalculatePetitionsMutation } from '../../../service/api';
-import StyledDialog from '../../elements/Modal/Dialog';
+import { usePetitionQuery, useRecalculatePetitionsMutation } from '../../service/api';
+import StyledDialog from '../../components/elements/Modal/Dialog';
 import OffenseTable from './OffenseTable';
-import { Button } from '../../elements/Button';
-import { Spinner } from '../../elements/Spinner';
-import { Tooltip } from '../../elements/Tooltip/Tooltip';
+import { Button } from '../../components/elements/Button';
+import { Spinner } from '../../components/elements/Spinner';
+import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
 
 const OffenseTableModal = ({ isOpen, onClose, petitionId }) => (
   <StyledDialog isOpen={isOpen} onClose={() => onClose()}>

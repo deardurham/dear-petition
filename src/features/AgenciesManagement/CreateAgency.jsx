@@ -1,16 +1,26 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useCreateAgencyMutation } from '../../../service/api';
-import US_STATES from '../../../constants/US_STATES';
-import FormInput from '../../elements/Input/FormInput';
-import FormSelect from '../../elements/Input/FormSelect';
-import FormTextArea from '../../elements/Input/FormTextArea';
-import { Button } from '../../elements/Button';
+import { useCreateAgencyMutation } from '../../service/api';
+import US_STATES from '../../constants/US_STATES';
+import FormInput from '../../components/elements/Input/FormInput';
+import FormSelect from '../../components/elements/Input/FormSelect';
+import FormTextArea from '../../components/elements/Input/FormTextArea';
+import { Button } from '../../components/elements/Button';
+import { useModalContext } from '../../components/elements/Button/ModalButton';
+
+export const CreateAgencyModal = () => {
+  const { closeModal } = useModalContext();
+  return (
+    <div className="w-[550px] px-40 py-20">
+      <CreateAgency onClose={closeModal} />
+    </div>
+  );
+};
 
 const CreateAgency = ({ onClose }) => {
   const [triggerCreate] = useCreateAgencyMutation();
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       name: '',
       address: '',
@@ -21,7 +31,6 @@ const CreateAgency = ({ onClose }) => {
     reValidateMode: 'onSubmit',
   });
   const onSubmit = async (formData) => {
-    console.log({ formData });
     const submitData = {};
     Object.keys(formData).forEach((field) => {
       if (field === 'address') {
@@ -35,18 +44,14 @@ const CreateAgency = ({ onClose }) => {
       }
     });
     await triggerCreate({ data: submitData }).unwrap();
+    reset();
   };
   const onSubmitAndClose = async (data) => {
-    try {
-      await onSubmit(data);
-      onClose();
-    } catch (e) {
-      // noop
-      console.log('dont close');
-    }
+    await onSubmit(data);
+    onClose();
   };
   return (
-    <div className="w-[550px] px-40 py-20 flex flex-col gap-8">
+    <div className="flex flex-col gap-8">
       <h3>Add New Arresting Agency</h3>
       <form className="flex flex-col gap-4">
         <FormInput
@@ -98,9 +103,12 @@ const CreateAgency = ({ onClose }) => {
           }}
         />
       </form>
-      <div className="flex flex-row gap-4 justify-center">
+      <div className="flex flex-row gap-4 justify-center text-base">
+        <Button type="submit" onClick={handleSubmit(onSubmit)}>
+          Submit
+        </Button>
         <Button type="submit" onClick={handleSubmit(onSubmitAndClose)}>
-          Save
+          Submit and Close
         </Button>
         <Button colorClass="neutral" onClick={() => onClose()}>
           Cancel

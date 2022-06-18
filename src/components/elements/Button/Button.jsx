@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import keyAndAmbientShadows from '../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution, greyScale } from '../../styles/colors';
-import { fontPrimary } from '../../styles/fonts';
+import keyAndAmbientShadows from '../../../styles/shadows';
+import { colorPrimary, colorWhite, colorCaution, greyScale } from '../../../styles/colors';
+import { fontPrimary } from '../../../styles/fonts';
 
 export const Button = styled.button`
   cursor: pointer;
   ${({ colorClass }) => mapTypeToStartingState(colorClass)}
   ${({ disabled }) => disabled && mapTypeToStartingState(DISABLED)}
   border-radius: 3px;
-  padding: 0.25rem;
+  padding: 0.5rem;
   outline: none;
 
   font-size: inherit;

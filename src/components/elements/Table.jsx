@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import cx from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
@@ -108,6 +108,92 @@ export const Table = ({ children, className, columnSizes, numColumns }) => {
 
 export const calculateNumberOfPages = (count, numPerPage) =>
   Math.floor(count / numPerPage) + (count % numPerPage > 0 ? 1 : 0);
+
+const calculateVisiblePages = (currentPage, numPages, maxVisiblePages = 7) => {
+  const offset = 1;
+  const lastPageNumber = numPages;
+  if (numPages <= maxVisiblePages) {
+    return [...Array(numPages).keys()].map((index) => index + 1);
+  }
+  if (currentPage - offset <= 1) {
+    const startingPages = [...Array(maxVisiblePages - 2).keys()].map((index) => index + 1);
+    return [...startingPages, lastPageNumber];
+  }
+  if (currentPage + offset >= lastPageNumber) {
+    return [1, ...Array(maxVisiblePages - 2).keys()].map(
+      (index) => lastPageNumber - maxVisiblePages + index + 1
+    );
+  }
+  return [1, currentPage - offset, currentPage, currentPage + offset, lastPageNumber];
+};
+
+export const PageSelection = ({ currentPage, numPages, onPageSelect }) => {
+  const visiblePageNumbers = calculateVisiblePages(currentPage, numPages);
+  return (
+    <div className="flex-1 flex items-end justify-end gap-4">
+      {visiblePageNumbers.map((pageNum, idx) => {
+        // gaps in visible pages should be represented as "..."
+        const isNotConsecutive = idx > 0 && visiblePageNumbers?.[idx - 1] !== pageNum - 1;
+        return (
+          <>
+            {isNotConsecutive && <span key={idx}>...</span>}
+            <button key={idx} type="button" onClick={() => onPageSelect(pageNum)}>
+              {pageNum}
+            </button>
+          </>
+        );
+      })}
+    </div>
+  );
+};
+
+const VISIBLE_OFFSET = 2;
+const MAX_PAGES = 9;
+const calculatePageIndices = (current, numPages) => {
+  let startIndex = current - VISIBLE_OFFSET;
+  let endIndex = current + VISIBLE_OFFSET;
+  if (current < MAX_PAGES - 3) {
+    startIndex = 1;
+    endIndex = Math.max(MAX_PAGES - 2, current + VISIBLE_OFFSET);
+  }
+  if (current > numPages - MAX_PAGES + 4) {
+    startIndex = Math.min(numPages - MAX_PAGES + 3, current - VISIBLE_OFFSET);
+    endIndex = numPages;
+  }
+  return [Math.max(1, startIndex), Math.min(endIndex, numPages)];
+};
+
+export const LegacyPageSelection = ({ currentPage, numPages, onPageSelect, disabled }) => {
+  const [startPage, endPage] = calculatePageIndices(currentPage, numPages);
+  return (
+    <div className="flex-1 flex items-end justify-end gap-4">
+      {[...Array(numPages).keys()].map((idx) => {
+        const page = idx + 1;
+        const withinLeft = page >= startPage && page <= currentPage;
+        const withinRight = page >= currentPage && page <= endPage;
+        if (page !== 1 && page !== numPages && !withinLeft && !withinRight) {
+          return page === startPage - 1 || page === endPage + 1 ? '...' : null;
+        }
+        const isCurrentPage = page === currentPage;
+        return (
+          <button
+            type="button"
+            className={cx('px-2 py-0.5 outline-1', {
+              'outline outline-gray-700': isCurrentPage,
+              'hover:outline hover:text-blue-600 hover:outline-blue-400': !isCurrentPage,
+              'focus:outline focus:text-blue-600 focus:outline-blue-400': !isCurrentPage,
+            })}
+            key={idx}
+            onClick={() => onPageSelect(page)}
+            disabled={disabled}
+          >
+            {page}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const getOppositeSort = (sortDir) => (sortDir === 'dsc' ? 'asc' : 'dsc');
 
