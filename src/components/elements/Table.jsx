@@ -1,7 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCaretDown,
+  faCaretUp,
+  faChevronLeft,
+  faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import { colorPrimary, greyScale } from '../../styles/colors';
 
@@ -167,6 +172,14 @@ export const LegacyPageSelection = ({ currentPage, numPages, onPageSelect, disab
   const [startPage, endPage] = calculatePageIndices(currentPage, numPages);
   return (
     <div className="flex-1 flex items-end justify-end gap-4">
+      <button
+        type="button"
+        className="disabled:text-gray-400 text-gray-700"
+        onClick={() => onPageSelect(currentPage - 1)}
+        disabled={currentPage <= 1}
+      >
+        <FontAwesomeIcon icon={faChevronLeft} />
+      </button>
       {[...Array(numPages).keys()].map((idx) => {
         const page = idx + 1;
         const withinLeft = page >= startPage && page <= currentPage;
@@ -180,8 +193,8 @@ export const LegacyPageSelection = ({ currentPage, numPages, onPageSelect, disab
             type="button"
             className={cx('px-2 py-0.5 outline-1', {
               'outline outline-gray-700': isCurrentPage,
-              'hover:outline hover:text-blue-600 hover:outline-blue-400': !isCurrentPage,
-              'focus:outline focus:text-blue-600 focus:outline-blue-400': !isCurrentPage,
+              'hover:outline hover:text-blue-700 hover:outline-blue-400': !isCurrentPage,
+              'focus:outline focus:text-blue-700 focus:outline-blue-400': !isCurrentPage,
             })}
             key={idx}
             onClick={() => onPageSelect(page)}
@@ -191,6 +204,14 @@ export const LegacyPageSelection = ({ currentPage, numPages, onPageSelect, disab
           </button>
         );
       })}
+      <button
+        type="button"
+        className="disabled:text-gray-400 text-gray-700"
+        onClick={() => onPageSelect(currentPage + 1)}
+        disabled={currentPage >= numPages}
+      >
+        <FontAwesomeIcon icon={faChevronRight} />
+      </button>
     </div>
   );
 };
