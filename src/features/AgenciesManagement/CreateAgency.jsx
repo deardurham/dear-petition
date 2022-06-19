@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useCreateAgencyMutation } from '../../service/api';
@@ -8,11 +8,16 @@ import FormSelect from '../../components/elements/Input/FormSelect';
 import FormTextArea from '../../components/elements/Input/FormTextArea';
 import { Button } from '../../components/elements/Button';
 import { useModalContext } from '../../components/elements/Button/ModalButton';
+import useOnClickOutside from '../../hooks/useOnClickOutside';
 
 export const CreateAgencyModal = () => {
+  const modalElement = useRef();
   const { closeModal } = useModalContext();
+  useOnClickOutside(modalElement, () => {
+    closeModal();
+  });
   return (
-    <div className="w-[550px] px-40 py-20">
+    <div className="w-[550px] px-40 py-20" ref={modalElement}>
       <CreateAgency onClose={closeModal} />
     </div>
   );

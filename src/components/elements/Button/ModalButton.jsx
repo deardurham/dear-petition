@@ -12,7 +12,7 @@ export const useModalContext = () => {
   return context;
 };
 
-export const ModalButton = ({ children, className, colorClass, title }) => {
+export const ModalButton = ({ children, className, colorClass, title, manualOnClose = false }) => {
   const [showModal, setShowModal] = useState(false);
   const closeModal = useCallback(() => setShowModal(false));
   return (
@@ -23,7 +23,7 @@ export const ModalButton = ({ children, className, colorClass, title }) => {
     >
       {title}
       <ModalContext.Provider value={{ closeModal }}>
-        <StyledDialog isOpen={showModal} onClose={closeModal}>
+        <StyledDialog isOpen={showModal} onClose={!manualOnClose ? closeModal : undefined}>
           {children}
         </StyledDialog>
       </ModalContext.Provider>

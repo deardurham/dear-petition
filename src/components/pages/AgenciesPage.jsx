@@ -56,6 +56,7 @@ const AgenciesPage = () => {
                 <FontAwesomeIcon icon={faPlus} /> Add New Agency
               </span>
             }
+            manualOnClose
           >
             <CreateAgencyModal />
           </ModalButton>
