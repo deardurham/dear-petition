@@ -7,20 +7,27 @@ export const api = createApi({
   tagTypes: ['AgencyList', 'Petition', 'User'],
   endpoints: (builder) => ({
     agencies: builder.query({
-      query: ({ params }) => ({ url: 'contact/?category=agency', params, method: 'get' }),
+      query: ({ queryString }) => ({
+        url: `contact/?category=agency&${queryString}`,
+        method: 'get',
+      }),
       providesTags: ['AgencyList'],
     }),
     createAgency: builder.mutation({
       query: ({ data }) => ({ url: `contact/`, method: 'post', data }),
-      invalidatesTags: ['AgencyList'],
+      invalidatesTags: ['AgencyList', 'ContactFilterOptions'],
     }),
     deleteAgency: builder.mutation({
       query: ({ id }) => ({ url: `contact/${id}/`, method: 'delete' }),
-      invalidatesTags: ['AgencyList'],
+      invalidatesTags: ['AgencyList', 'ContactFilterOptions'],
     }),
     updateAgency: builder.mutation({
       query: ({ id, data }) => ({ url: `contact/${id}/`, method: 'put', data }),
-      invalidatesTags: ['AgencyList'],
+      invalidatesTags: ['AgencyList', 'ContactFilterOptions'],
+    }),
+    getContactFilterOptions: builder.query({
+      query: ({ params }) => ({ url: 'contact/get_filter_options/', method: 'get', params }),
+      providesTags: (result) => (result ? ['ContactFilterOptions'] : []),
     }),
     checkLogin: builder.query({
       query: () => ({ url: 'token/', method: 'get' }),
@@ -75,6 +82,7 @@ export const {
   useCreateAgencyMutation,
   useDeleteAgencyMutation,
   useUpdateAgencyMutation,
+  useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,

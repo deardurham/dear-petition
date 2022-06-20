@@ -11,6 +11,7 @@ import Select from '../elements/Input/Select';
 import SearchInput from '../elements/ManagementTable/SearchInput';
 import { calculateNumberOfPages, LegacyPageSelection } from '../elements/Table';
 import { DisplaySettingsModal } from '../elements/ManagementTable/DisplaySettings';
+import { AgencyFiltersModal } from '../../features/AgenciesManagement/AgencyFilters';
 
 const DEFAULT_NUM_AGENCIES = 10;
 const NUM_AGENCIES_OPTIONS = [10, 25, 50].map((value) => ({ value, label: value }));
@@ -27,21 +28,29 @@ const getOrdering = ({ field, dir }) => {
 
 const getOffset = (pageNumber, numAgenciesPerPage) => (pageNumber - 1) * numAgenciesPerPage;
 
+const getFilters = (filterSelections) =>
+  Object.keys(filterSelections).map((key) => [`${key}__in`, filterSelections[key].join(',')]);
+
 const AgenciesPage = () => {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState({ field: 'name', dir: 'dsc' });
   const [pageNumber, setPageNumber] = useState(1);
   const [numAgenciesPerPage, setNumAgenciesPerPage] = useState(DEFAULT_NUM_AGENCIES);
+  const [filterSelections, setFilterSelections] = useState({ city: [], zipcode: [] });
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
+  const onFilter = (field, selections) => {
+    setFilterSelections((prev) => ({ ...prev, [field]: selections }));
+  };
   const { data } = useAgenciesQuery({
-    params: {
-      search,
-      ordering: getOrdering(sortBy),
-      offset: getOffset(pageNumber, numAgenciesPerPage),
-      limit: numAgenciesPerPage,
-    },
+    queryString: new URLSearchParams([
+      ['search', search],
+      ['ordering', getOrdering(sortBy)],
+      ['offset', getOffset(pageNumber, numAgenciesPerPage)],
+      ['limit', numAgenciesPerPage],
+      ...getFilters(filterSelections),
+    ]).toString(),
   });
   return (
     <PageBase>
@@ -55,7 +64,6 @@ const AgenciesPage = () => {
                 <FontAwesomeIcon icon={faPlus} /> Add New Agency
               </span>
             }
-            manualOnClose
           >
             <CreateAgencyModal />
           </ModalButton>
@@ -84,12 +92,10 @@ const AgenciesPage = () => {
               </span>
             }
           >
-            <div>
-              <h2>Filters</h2>
-            </div>
+            <AgencyFiltersModal onFilter={onFilter} filterSelections={filterSelections} />
           </ModalButton>
           <SearchInput
-            className="w-[250px]"
+            className="w-[300px]"
             onSearch={(value) => setSearch(value)}
             placeholder="Search agency name..."
           />

@@ -11,9 +11,9 @@ const SearchInput = ({ className, onSearch, placeholder }) => {
   const debounceSearch = useDebounce((value) => onSearch(value), { timeout: 400 });
   return (
     <div className="flex gap-2">
-      <FontAwesomeIcon className="self-center text-gray-400" icon={faSearch} />
+      <FontAwesomeIcon className="self-center text-primary" icon={faSearch} />
       <input
-        type="text"
+        type="search"
         className={cx('px-3 rounded border border-1 border-gray', className)}
         placeholder={placeholder}
         value={formValue}
@@ -26,7 +26,7 @@ const SearchInput = ({ className, onSearch, placeholder }) => {
       {formValue && (
         <Button
           colorClass="neutral"
-          className="p-1 border border-gray-700 rounded-md shadow-md font-semibold"
+          className="px-2 py-1 border border-gray-700 rounded-md shadow-md font-semibold"
           onClick={() => {
             setFormValue('');
             onSearch('');

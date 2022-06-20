@@ -7,14 +7,10 @@ const AutoCompleteBadge = ({ name, ...props }) => (
   </AutoCompleteBadgeStyled>
 );
 
-const Badge = ({ name, remove, ...props }) => (
-  <BadgeStyled {...props} data-cy="badge">
+const Badge = ({ name, remove }) => (
+  <BadgeStyled>
     <p>{name}</p>
-    {remove && (
-      <IconStyled onClick={remove} data-cy="badge_close">
-        x
-      </IconStyled>
-    )}
+    {remove && <IconStyled onClick={remove}>x</IconStyled>}
   </BadgeStyled>
 );
 
