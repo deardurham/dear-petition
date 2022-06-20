@@ -4,11 +4,11 @@ import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import PageBase from './PageBase';
 import { useAgenciesQuery } from '../../service/api';
-import useDebounce from '../../hooks/useDebounce';
 import AgenciesTable from '../../features/AgenciesManagement/AgenciesTable';
 import { CreateAgencyModal } from '../../features/AgenciesManagement/CreateAgency';
 import { ModalButton } from '../elements/Button';
 import Select from '../elements/Input/Select';
+import SearchInput from '../elements/ManagementTable/SearchInput';
 import { calculateNumberOfPages, LegacyPageSelection } from '../elements/Table';
 import { DisplaySettingsModal } from '../elements/ManagementTable/DisplaySettings';
 
@@ -32,7 +32,6 @@ const AgenciesPage = () => {
   const [sortBy, setSortBy] = useState({ field: 'name', dir: 'dsc' });
   const [pageNumber, setPageNumber] = useState(1);
   const [numAgenciesPerPage, setNumAgenciesPerPage] = useState(DEFAULT_NUM_AGENCIES);
-  const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
@@ -48,7 +47,7 @@ const AgenciesPage = () => {
     <PageBase>
       <div className="flex flex-col gap-4">
         <h2>Arresting Agencies</h2>
-        <div className="flex gap-8 mb-1">
+        <div className="flex gap-6 mb-1">
           <ModalButton
             className="flex gap-2 font-semibold px-2 py-1"
             title={
@@ -89,6 +88,11 @@ const AgenciesPage = () => {
               <h2>Filters</h2>
             </div>
           </ModalButton>
+          <SearchInput
+            className="w-[250px]"
+            onSearch={(value) => setSearch(value)}
+            placeholder="Search agency name..."
+          />
           <div className="flex-1 flex items-end justify-end gap-4">
             <LegacyPageSelection
               currentPage={pageNumber}
