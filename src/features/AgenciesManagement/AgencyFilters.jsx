@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useLazyGetContactFilterOptionsQuery } from '../../service/api';
 import { useModalContext } from '../../components/elements/Button/ModalButton';
@@ -8,7 +8,7 @@ import AutocompleteInput from '../../components/elements/Input/AutocompleteInput
 export const AgencyFiltersModal = ({ onFilter, filterSelections }) => {
   const { closeModal } = useModalContext();
   return (
-    <div className="px-24 py-16 flex flex-col gap-4">
+    <div className="w-[500px] h-[400px] flex flex-col justify-center items-center gap-4">
       <h2 className="self-center">Filters</h2>
       <AgencyFilters onFilter={onFilter} filterSelections={filterSelections} />
       <Button colorClass="neutral" className="self-center w-max mt-4" onClick={() => closeModal()}>
