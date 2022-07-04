@@ -132,6 +132,7 @@ class PetitionSerializer(serializers.ModelSerializer):
             "county",
             "jurisdiction",
             "offense_records",
+            "agencies",
         ]
 
 
@@ -156,6 +157,7 @@ class ParentPetitionSerializer(PetitionSerializer):
     attachments = serializers.SerializerMethodField()
     offense_records = serializers.SerializerMethodField()
     active_records = serializers.SerializerMethodField()
+    agencies = ContactSerializer(many=True, read_only=True)
 
     class Meta(PetitionSerializer.Meta):
         fields = PetitionSerializer.Meta.fields + [

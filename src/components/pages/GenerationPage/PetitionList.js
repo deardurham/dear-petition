@@ -7,9 +7,11 @@ import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import StyledDialog from '../../elements/Modal/Dialog';
+import Modal from '../../elements/Modal/Modal';
 import useWindowSize from '../../../hooks/useWindowSize';
 import HighlightTable from '../../elements/HighlightTable/HighlightTable';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
+import AgencyAutocomplete from './GenerationInput/AgencyAutocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -60,7 +62,8 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   const [attachmentNumber, setAttachmentNumber] = useState();
   const [selectedPetition, setSelectedPetition] = useState();
   const windowSize = useWindowSize();
-  const [isDetailed, setIsDetailed] = useState();
+  const [isOffensesDetailed, setIsOffensesDetailed] = useState();
+  const [isAgenciesDetailed, setIsAgenciesDetailed] = useState();
 
   const [offenseRecords, setOffenseRecords] = useState();
   const [offenseRecordsLoading, setOffenseRecordsLoading] = useState(false);
@@ -79,15 +82,27 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     }
   };
 
-  const handlePress = () => {
-    setIsDetailed(!isDetailed);
+  const fetchData = () => {
+    setOffenseRecordsLoading(true);
+    Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
+      setOffenseRecords(data.offense_records);
+      setHighlightedRows(data.active_records);
+      setAgencies(data.agencies);
+      setOffenseRecordsLoading(false);
+    });
+  };
+
+  const handleOffensesPress = () => {
+    setIsOffensesDetailed(!isOffensesDetailed);
     if (!offenseRecords) {
-      setOffenseRecordsLoading(true);
-      Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
-        setOffenseRecords(data.offense_records);
-        setHighlightedRows(data.active_records);
-        setOffenseRecordsLoading(false);
-      });
+      fetchData();
+    }
+  };
+
+  const handleAgenciesPress = () => {
+    setIsAgenciesDetailed(!isAgenciesDetailed);
+    if (!agencies.length) {
+      fetchData();
     }
   };
 
@@ -104,8 +119,17 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
       offense_record_ids: highlightedRows,
     }).then(({ data }) => {
       setPetition(data);
-      setIsDetailed(false);
+      setAgencies(data.agencies);
       setIsDisabled(false);
+    });
+  };
+
+  const assignAgenciesToDocuments = () => {
+    Axios.post(`/petitions/${petitionId}/assign_agencies_to_documents/`, {
+      agencies,
+    }).then(({ data }) => {
+      setPetition(data);
+      setAgencies(data.agencies);
     });
   };
 
@@ -145,13 +169,21 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
           <GenerateButton
             label="View"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
-            onClick={() => handlePress()}
+            onClick={() => handleOffensesPress()}
             title="Reveal offense records"
           />
         </TableCell>
+        <TableCell>
+          <GenerateButton
+            label="View"
+            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
+            onClick={() => handleAgenciesPress()}
+            title="Reveal agencies"
+          />
+        </TableCell>
       </TableRow>
-      {isDetailed && (
-        <StyledDialog isOpen={isDetailed} onClose={() => setIsDetailed(false)}>
+      {isOffensesDetailed && (
+        <StyledDialog isOpen={isOffensesDetailed} onClose={() => setIsOffensesDetailed(false)}>
           {offenseRecordsLoading ? (
             <h5>Loading...</h5>
           ) : (
@@ -183,7 +215,40 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
                   title="Update the petitions on the main petition row with your changes."
                   isDisabled={!isModified}
                 />
-                <Button className="px-4" onClick={() => setIsDetailed(false)}>
+                <Button className="px-4" onClick={() => setIsOffensesDetailed(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </StyledDialog>
+      )}
+      {isAgenciesDetailed && (
+        <StyledDialog isOpen={isAgenciesDetailed} onClose={() => setIsAgenciesDetailed(false)}>
+          {offenseRecordsLoading ? (
+            <h5>Loading...</h5>
+          ) : (
+            <div className="w-[900px] h-auto p-10 flex flex-col gap-8">
+              <h3>View / Select Agencies</h3>
+              <p className="text-[1.6rem]">
+                Please select or de-select agencies here if you wish to include or exclude them from
+                the petition.
+              </p>
+              <AgencyAutocomplete
+                agencies={agencies}
+                setAgencies={setAgencies}
+                isModified={isModified}
+                setIsModified={setIsModified}
+              />
+              <div className="self-center flex gap-8">
+                <GenerateButton
+                  className="w-[15rem]"
+                  label="Update Agencies"
+                  onClick={assignAgenciesToDocuments}
+                  title="Update the petitions on the main petition row with your changes."
+                  isDisabled={!isModified}
+                />
+                <Button className="px-4" onClick={() => setIsAgenciesDetailed(false)}>
                   Close
                 </Button>
               </div>
@@ -211,13 +276,14 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
 
 export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
   return (
-    <PetitionTable numColumns={5}>
+    <PetitionTable numColumns={6}>
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
         <TableCell header>Petition</TableCell>
         <TableCell header>Attachments</TableCell>
         <TableCell header>Offenses</TableCell>
+        <TableCell header>Agencies</TableCell>
       </TableHeader>
       <TableBody>
         {petitions.map((petition, index) => (

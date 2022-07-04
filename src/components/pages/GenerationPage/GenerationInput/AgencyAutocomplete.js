@@ -46,7 +46,7 @@ const AgencyAutoSuggestInput = (inputProps) => (
   </AgencyAutoSuggestInputStyled>
 );
 
-const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
+const AgencyAutocomplete = ({ agencies, setAgencies, isModified, setIsModified, ...props }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
 
@@ -83,11 +83,17 @@ const AgencyAutocomplete = ({ agencies, setAgencies, ...props }) => {
   };
 
   const addAgency = (thisAgency) => {
+    if (!isModified) {
+      setIsModified(true);
+    }
     setSuggestionValue('');
     setAgencies((prev) => [...prev, thisAgency]);
   };
 
   const removeAgency = (thisAgency) => {
+    if (!isModified) {
+      setIsModified(true);
+    }
     setAgencies((prev) => {
       const theseAgencies = prev.slice();
       if (thisAgency) {

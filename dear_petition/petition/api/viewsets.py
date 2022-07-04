@@ -2,6 +2,7 @@ import csv
 import logging
 from datetime import datetime
 
+from django.db import transaction
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import update_last_login
@@ -17,12 +18,16 @@ from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from dear_petition.petition import constants
-from dear_petition.petition import models as petition
+from dear_petition.petition import models as pm
 from dear_petition.petition import utils
 from dear_petition.petition.admin import GeneratedPetitionAdmin
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
-from dear_petition.petition.etl import import_ciprs_records, recalculate_petitions
+from dear_petition.petition.etl import (
+    import_ciprs_records,
+    recalculate_petitions,
+    assign_agencies_to_documents,
+)
 from dear_petition.petition.export import generate_petition_pdf
 from dear_petition.users.models import User
 
@@ -63,19 +68,19 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
 
-    queryset = petition.CIPRSRecord.objects.all()
+    queryset = pm.CIPRSRecord.objects.all()
     serializer_class = serializers.CIPRSRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class OffenseViewSet(viewsets.ModelViewSet):
-    queryset = petition.Offense.objects.all()
+    queryset = pm.Offense.objects.all()
     serializer_class = serializers.OffenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class OffenseRecordViewSet(viewsets.ModelViewSet):
-    queryset = petition.OffenseRecord.objects.all()
+    queryset = pm.OffenseRecord.objects.all()
     serializer_class = serializers.OffenseRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -93,8 +98,8 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            pet = petition.Petition.objects.get(id=petition_id)
-        except petition.Petition.DoesNotExist:
+            pet = pm.Petition.objects.get(id=petition_id)
+        except pm.Petition.DoesNotExist:
             return Response(
                 "Petition with this id does not exist.",
                 status=status.HTTP_400_BAD_REQUEST,
@@ -116,7 +121,7 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
 class ContactViewSet(viewsets.ModelViewSet):
 
-    queryset = petition.Contact.objects.all()
+    queryset = pm.Contact.objects.all()
     serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -125,7 +130,7 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 
 class BatchViewSet(viewsets.ModelViewSet):
-    queryset = petition.Batch.objects.prefetch_related(
+    queryset = pm.Batch.objects.prefetch_related(
         "petitions", "records__offenses__offense_records"
     )
     permission_classes = [permissions.IsAuthenticated]
@@ -164,7 +169,7 @@ class BatchViewSet(viewsets.ModelViewSet):
 
 
 class PetitionViewSet(viewsets.ModelViewSet):
-    queryset = petition.Petition.objects.all()
+    queryset = pm.Petition.objects.all()
     serializer_class = serializers.ParentPetitionSerializer
 
     def create(self, request):
@@ -180,7 +185,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
             "post",
         ],
     )
-    def recalculate_petitions(self, request, pk=None):
+    def recalculate_petitions(self, request, pk):
         data = request.data
 
         offense_record_ids = data["offense_record_ids"]
@@ -197,6 +202,28 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
         return Response(new_petition.data, status=200)
 
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def assign_agencies_to_documents(self, request, pk):
+        data = request.data
+        agencies = data["agencies"]
+        agency_ids = [agency["pk"] for agency in agencies]
+
+        with transaction.atomic():
+            petition = pm.Petition.objects.get(id=pk)
+            petition.agencies.clear()
+            for agency_id in agency_ids:
+                petition.agencies.add(agency_id)
+            petition = assign_agencies_to_documents(petition)
+
+        petition = self.get_serializer(petition)
+
+        return Response(petition.data, status=200)
+
 
 class GeneratePetitionView(viewsets.GenericViewSet):
 
@@ -208,13 +235,11 @@ class GeneratePetitionView(viewsets.GenericViewSet):
         generated_petition_pdf = generate_petition_pdf(
             serializer.data["petition"], serializer.data
         )
-        petition_document = petition.PetitionDocument.objects.get(
-            id=request.data["petition"]
-        )
+        petition_document = pm.PetitionDocument.objects.get(id=request.data["petition"])
         batch = petition_document.petition.batch
         user = request.user
 
-        petition.GeneratedPetition.objects.create(
+        pm.GeneratedPetition.objects.create(
             username=user.username,
             form_type=petition_document.form_type,
             number_of_charges=petition_document.offense_records.count(),
@@ -242,7 +267,7 @@ class GenerateDataPetitionView(viewsets.ModelViewSet):
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data_petition = petition.DataPetition(form_type=serializer.data["form_type"])
+        data_petition = pm.DataPetition(form_type=serializer.data["form_type"])
         generated_petition_pdf = generate_petition_pdf(
             data_petition, serializer.data["form_context"]
         )
@@ -254,7 +279,7 @@ class GenerateDataPetitionView(viewsets.ModelViewSet):
 
 class GeneratedPetitionViewSet(viewsets.GenericViewSet):
 
-    queryset = petition.GeneratedPetition.objects.all()
+    queryset = pm.GeneratedPetition.objects.all()
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     @action(
@@ -264,7 +289,7 @@ class GeneratedPetitionViewSet(viewsets.GenericViewSet):
         ],
     )
     def download_as_csv(self, request):
-        model_fields = petition.GeneratedPetition._meta.fields
+        model_fields = pm.GeneratedPetition._meta.fields
         field_names = [
             field.name
             for field in model_fields

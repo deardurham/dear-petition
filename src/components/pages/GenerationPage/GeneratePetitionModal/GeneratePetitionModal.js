@@ -7,7 +7,6 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import useKeyPress from '../../../../hooks/useKeyPress';
 
 import Modal from '../../../elements/Modal/Modal';
-import AgencyAutocomplete from '../GenerationInput/AgencyAutocomplete';
 import { Button, CloseButton } from '../../../elements/Button';
 import Axios from '../../../../service/axios';
 
@@ -126,7 +125,6 @@ const GeneratePetitionModal = ({
             <li>County: {petition.county} County</li>
             <li>Jurisdiction: {petition.jurisdiction}</li>
           </ul>
-          <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
           <Button onClick={handleGenerate}>Generate</Button>
         </>
       )}
