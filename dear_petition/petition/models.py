@@ -7,7 +7,7 @@ from collections import namedtuple
 from datetime import datetime
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import Q, IntegerField, Case, When, Value

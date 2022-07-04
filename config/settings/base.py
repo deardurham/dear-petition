@@ -14,6 +14,7 @@ ROOT_DIR = (
 )  # (dear_petition/config/settings/base.py - 3 = dear_petition/)
 APPS_DIR = ROOT_DIR.path("dear_petition")
 FRONTEND_BUILD_DIR = Path(ROOT_DIR) / "build"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 env = environ.Env()
 

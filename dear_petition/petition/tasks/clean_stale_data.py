@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def clean_stale_data():
     now = timezone.now()
     stale_time = now - timedelta(hours=48)
-    stale_data = pm.Batch.objects.filter(date_uploaded__lt=stale_time).distinct()
+    stale_data = pm.Batch.objects.filter(date_uploaded__lt=stale_time)
     num_deleted, _ = stale_data.delete()
     logger.info(f"Deleted {num_deleted} batches.")
     return num_deleted

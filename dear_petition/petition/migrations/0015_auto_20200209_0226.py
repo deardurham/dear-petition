@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -13,17 +14,19 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="batch", options={"verbose_name_plural": "Batches"},
+            name="batch",
+            options={"verbose_name_plural": "Batches"},
         ),
         migrations.AlterModelOptions(
-            name="ciprsrecord", options={"verbose_name": "CIPRSRecord"},
+            name="ciprsrecord",
+            options={"verbose_name": "CIPRSRecord"},
         ),
         migrations.AddField(
             model_name="batch",
             name="user",
             field=models.ForeignKey(
                 null=True,
-                on_delete="CASCADE",
+                on_delete=django.db.models.deletion.CASCADE,
                 related_name="batches",
                 to=settings.AUTH_USER_MODEL,
             ),
