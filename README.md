@@ -12,7 +12,7 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 ```bash
 git clone git@github.com:deardurham/dear-petition.git
 cd dear-petition
-docker-compose up -d
+docker-compose up -d django
 docker-compose run --rm django python manage.py createsuperuser
 ```
 

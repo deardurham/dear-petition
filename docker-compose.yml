@@ -11,7 +11,6 @@ services:
     image: dear_petition_local_django
     depends_on:
       - postgres
-      - mailhog
     volumes:
       - ./dear_petition:/code/dear_petition
       - ./config:/code/config
@@ -46,11 +45,6 @@ services:
     environment:
       - OVERRIDE_API_PROXY
 
-  mailhog:
-    image: mailhog/mailhog:v1.0.0
-    ports:
-      - "8025:8025"
-
   redis:
     image: redis:5-alpine
 
@@ -70,4 +64,4 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /start-jupyter
+    command: jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root --no-browser
