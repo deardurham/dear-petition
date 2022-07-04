@@ -126,23 +126,6 @@ const GeneratePetitionModal = ({
             <li>County: {petition.county} County</li>
             <li>Jurisdiction: {petition.jurisdiction}</li>
           </ul>
-          <AutocompleteInput
-            label="Agencies"
-            selections={agencies.map((agencyObject) => agencyObject.name)}
-            onSelect={(value) => setAgencies((prev) => [...prev, value])}
-            onRemoveSelection={(name) =>
-              setAgencies((prev) => prev.filter((agency) => agency.name !== name))
-            }
-            getSuggestionLabel={(agencySuggestion) => agencySuggestion.name}
-            fetchSuggestions={async (searchValue) => {
-              const data = await triggerSuggestionsFetch(
-                { queryString: `search=${searchValue}` },
-                true
-              ).unwrap();
-              const selectedAgencyNames = agencies.map((agency) => agency.name);
-              return data.results.filter((agency) => !selectedAgencyNames.includes(agency.name));
-            }}
-          />
           <Button onClick={handleGenerate}>Generate</Button>
           {error && <span className="text-red">{`Error: ${error}`}</span>}
         </>

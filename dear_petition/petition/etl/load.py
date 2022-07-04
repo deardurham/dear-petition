@@ -2,19 +2,18 @@ import logging
 
 from django.conf import settings
 
+from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
     ATTACHMENT,
     DISMISSED,
     NOT_GUILTY,
     UNDERAGED_CONVICTIONS,
 )
-from dear_petition.petition import models as pm
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
-    petition_offense_records,
     identify_distinct_petitions,
+    petition_offense_records,
 )
-
 
 __all__ = ("import_ciprs_records",)
 
@@ -84,7 +83,7 @@ def link_offense_records(petition, filter_active=True):
     petition.offense_records.add(*offense_records)
 
 
-def create_documents(petition):
+def create_documents(petition, agencies=[]):
     paginator = petition.get_offense_record_paginator()
 
     base_petition = pm.PetitionDocument.objects.create(petition=petition)
@@ -104,3 +103,42 @@ def create_documents(petition):
             f"Created {attachment} with {attachment.offense_records.count()} records"
         )
         previous_document = attachment
+
+
+def assign_agencies_to_documents(petition):
+    agencies = petition.agencies.all()
+    current_document = None
+    i = 0
+    while True:
+        current_document_agencies = agencies[
+            i : (i + 3)
+        ]  # 3 boxes for agencies per document
+        if not current_document_agencies:
+            break
+
+        if not current_document:
+            current_document = petition.base_document
+        else:
+            try:
+                current_document = current_document.following_document
+            except pm.PetitionDocument.DoesNotExist:  # Have to create new attachment
+                current_document = pm.PetitionDocument.objects.create(
+                    petition=petition, previous_document=current_document
+                )
+
+        current_document.agencies.clear()
+
+        for agency in current_document_agencies:
+            current_document.agencies.add(agency)
+
+        i += 3
+
+    try:
+        current_document = current_document.following_document
+        if not current_document.offense_records.exists():
+            # This must have been an extra attachment for agencies, but agencies were removed so no longer necessary
+            current_document.delete()
+    except:
+        pass
+
+    return petition
