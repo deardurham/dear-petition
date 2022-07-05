@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -10,14 +11,17 @@ const AutoCompleteBadge = ({ name, ...props }) => (
 );
 
 const Badge = ({ name, remove }) => (
-  <div className="flex items-center justify-between gap-3 rounded-md bg-gray-600 px-2 py-1">
-    <p className="text-gray-100 text-lg">{name}</p>
+  <div className="flex items-center justify-between gap-3 rounded-md bg-gray-600 px-2 py-1 text-gray-100">
+    <p className="text-lg text-inherit">{name}</p>
     {remove && (
-      <FontAwesomeIcon
-        className="text-gray-100 hover:text-gray-800 cursor-pointer"
+      <button
+        type="button"
+        className="outline-white outline-offset-2 hover:outline-dotted hover:outline-[1px]"
         onClick={remove}
-        icon={faTimes}
-      />
+        onKeyDown={(e) => e?.code === 13 && remove()}
+      >
+        <FontAwesomeIcon icon={faTimes} />
+      </button>
     )}
   </div>
 );
