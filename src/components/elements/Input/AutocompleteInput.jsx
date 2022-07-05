@@ -27,7 +27,7 @@ const SuggestionContainer = ({ containerProps: { className, ...restProps }, chil
     className={cx(
       className,
       { 'border border-gray-800 rounded-md': !!children },
-      '[&>ul]:divide-gray-800 [&>ul]:divide-y w-[200px]'
+      '[&>ul]:divide-gray-800 [&>ul]:divide-y w-full'
     )}
     {...restProps}
   >
@@ -36,7 +36,7 @@ const SuggestionContainer = ({ containerProps: { className, ...restProps }, chil
 );
 
 const renderSuggestion = (suggestion, { isHighlighted }) => (
-  <Suggestion name={suggestion} isHighlighted={isHighlighted} isSuggestion />
+  <Suggestion name={suggestion} isHighlighted={isHighlighted} />
 );
 
 const renderAutoSuggestInput = (inputProps, label) => (
@@ -58,14 +58,13 @@ const AutocompleteInput = ({
   fetchSuggestions,
   highlightFirstSuggestion,
   label,
+  getSuggestionLabel,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
   const debounceFetchSuggestions = useDebounce(
     async (value) => {
-      const newSuggestions = ((await fetchSuggestions(value)) ?? [])
-        .filter((suggestion) => !selections.includes(suggestion))
-        .slice(0, MAX_SUGGESTIONS);
+      const newSuggestions = ((await fetchSuggestions(value)) ?? []).slice(0, MAX_SUGGESTIONS);
       setSuggestions(newSuggestions);
     },
     {
@@ -100,7 +99,9 @@ const AutocompleteInput = ({
         onSuggestionsFetchRequested={handleSuggestionFetch}
         onSuggestionsClearRequested={() => setSuggestions([])}
         getSuggestionValue={(suggestion) => suggestion.name}
-        renderSuggestion={renderSuggestion}
+        renderSuggestion={(suggestion, params) =>
+          renderSuggestion(getSuggestionLabel ? getSuggestionLabel(suggestion) : suggestion, params)
+        }
         inputProps={inputProps}
         onSuggestionSelected={handleSuggestionSelected}
         highlightFirstSuggestion={highlightFirstSuggestion ?? false}

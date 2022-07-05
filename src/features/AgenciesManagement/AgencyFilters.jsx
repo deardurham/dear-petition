@@ -20,13 +20,13 @@ export const AgencyFiltersModal = ({ onFilter, filterSelections }) => {
 
 const ContactFilter = ({ field, category, label, onFilter, filterSelections }) => {
   const [triggerSuggestionsFetch] = useLazyGetContactFilterOptionsQuery();
-  const addSelection = (value) => {
-    onFilter(field, [...filterSelections, value]);
+  const addSelection = (selection) => {
+    onFilter(field, [...filterSelections, selection]);
   };
-  const removeSelection = (value) => {
+  const removeSelection = (selection) => {
     onFilter(
       field,
-      filterSelections.filter((element) => element !== value)
+      filterSelections.filter((element) => element !== selection)
     );
   };
   return (
@@ -42,7 +42,7 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
           },
           true
         ).unwrap();
-        return data;
+        return data.filter((suggestion) => !filterSelections.includes(suggestion));
       }}
     />
   );

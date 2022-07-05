@@ -79,6 +79,7 @@ export const api = createApi({
 
 export const {
   useAgenciesQuery,
+  useLazyAgenciesQuery,
   useCreateAgencyMutation,
   useDeleteAgencyMutation,
   useUpdateAgencyMutation,

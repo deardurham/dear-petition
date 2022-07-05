@@ -44,3 +44,5 @@ export const axiosBaseQuery =
       };
     }
   };
+
+export const manualAxiosRequest = axiosBaseQuery();

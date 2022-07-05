@@ -12,7 +12,9 @@ const AutoCompleteBadge = ({ name, ...props }) => (
 
 const Badge = ({ name, remove }) => (
   <div className="flex items-center justify-between gap-3 rounded-md bg-gray-600 px-2 py-1 text-gray-100">
-    <p className="text-lg text-inherit">{name}</p>
+    <p title={name} className="text-lg text-inherit max-w-[200px] truncate">
+      {name}
+    </p>
     {remove && (
       <button
         type="button"

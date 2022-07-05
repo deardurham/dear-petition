@@ -69,11 +69,6 @@ function PageBase({ children, className, ...props }) {
             ) : null}
             {user?.is_admin ? (
               <LinkWrapper>
-                <Link to="/attornies">Attornies</Link>
-              </LinkWrapper>
-            ) : null}
-            {user?.is_admin ? (
-              <LinkWrapper>
                 <Link to="/users">Users</Link>
               </LinkWrapper>
             ) : null}
