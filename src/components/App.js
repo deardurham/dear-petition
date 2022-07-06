@@ -84,9 +84,6 @@ function App() {
             <ProtectedRoute exact path="/agencies" isAdminOnly>
               <AgenciesPage />
             </ProtectedRoute>
-            <ProtectedRoute exact path="/attornies" isAdminOnly>
-              <UsersPage />
-            </ProtectedRoute>
             <ProtectedRoute exact path="/help">
               <FAQPage />
             </ProtectedRoute>
