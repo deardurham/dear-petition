@@ -46,16 +46,24 @@ class OffenseRecordInline(admin.StackedInline):
 @admin.register(models.Offense)
 class OffenseAdmin(admin.ModelAdmin):
     list_display = (
-        "pk",
-        "offense_record_count",
-        "ciprs_record",
+        "id",
+        "batch",
+        "file_no",
         "disposed_on",
         "disposition_method",
+        "offense_record_count",
     )
-    list_filter = ("disposed_on",)
+    list_filter = ("disposed_on", "disposition_method")
     date_hierarchy = "disposed_on"
-    ordering = ("-disposed_on",)
+    ordering = (
+        "-ciprs_record__batch",
+        "ciprs_record__file_no",
+        "id",
+    )
     inlines = (OffenseRecordInline,)
+    raw_id_fields = ("ciprs_record",)
+    list_select_related = ("ciprs_record__batch",)
+    search_fields = ("ciprs_record__file_no", "ciprs_record__batch__label")
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -67,10 +75,26 @@ class OffenseAdmin(admin.ModelAdmin):
     def offense_record_count(self, obj):
         return obj._offense_record_count
 
+    @admin.display(ordering="ciprs_record__batch")
+    def batch(self, obj):
+        return obj.ciprs_record.batch
+
+    @admin.display(ordering="ciprs_record__file_no", description="CIPRS File No")
+    def file_no(self, obj):
+        return obj.ciprs_record.file_no
+
 
 @admin.register(models.OffenseRecord)
 class OffenseRecordAdmin(admin.ModelAdmin):
-    list_display = ("pk", "offense", "law", "code", "action", "severity", "description")
+    list_display = (
+        "pk",
+        "batch",
+        "offense",
+        "law",
+        "action",
+        "severity",
+        "description",
+    )
     list_filter = (
         "law",
         "code",
@@ -80,8 +104,18 @@ class OffenseRecordAdmin(admin.ModelAdmin):
         "description",
         "law",
         "code",
+        "offense__ciprs_record__file_no",
     )
-    ordering = ("law", "code", "offense")
+    ordering = (
+        "-offense__ciprs_record__batch",
+        "offense__ciprs_record__file_no",
+        "offense",
+    )
+    raw_id_fields = ("offense",)
+
+    @admin.display(ordering="offense__ciprs_record__batch")
+    def batch(self, obj):
+        return obj.offense.ciprs_record.batch
 
 
 @admin.register(models.Batch)
@@ -148,8 +182,20 @@ class PetitionAdmin(admin.ModelAdmin):
 @admin.register(models.PetitionDocument)
 class PetitionDocumentAdmin(admin.ModelAdmin):
 
-    list_display = ("pk", "petition", "offense_record_count", "previous_document")
-    ordering = ("pk",)
+    list_display = (
+        "id",
+        "batch",
+        "petition",
+        "is_an_attachment",
+        "offense_record_count",
+    )
+    ordering = ("-petition__batch", "id")
+    raw_id_fields = ("petition", "offense_records", "previous_document")
+    list_select_related = (
+        "petition__batch",
+        "previous_document__petition",
+    )
+    search_fields = ("petition__batch__label",)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -160,6 +206,14 @@ class PetitionDocumentAdmin(admin.ModelAdmin):
 
     def offense_record_count(self, obj):
         return obj._offense_record_count
+
+    @admin.display(ordering="petition__batch")
+    def batch(self, obj):
+        return obj.petition.batch
+
+    @admin.display(boolean=True, description="Is attachment?")
+    def is_an_attachment(self, obj):
+        return obj.is_attachment
 
 
 @admin.register(models.GeneratedPetition)

@@ -75,7 +75,7 @@ class CIPRSRecord(models.Model):
     objects = CIPRSRecordManager()
 
     def __str__(self):
-        return f"{self.label} ({self.pk})"
+        return f"{self.label} {self.file_no} ({self.pk})"
 
     class Meta:
         verbose_name = "CIPRSRecord"
@@ -117,7 +117,7 @@ class Offense(models.Model):
     plea = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
-        return f"offense ${self.pk}"
+        return f"{self.id} ({self.ciprs_record.file_no})"
 
 
 class OffenseRecord(models.Model):
@@ -131,7 +131,8 @@ class OffenseRecord(models.Model):
     description = models.CharField(max_length=256)
 
     def __str__(self):
-        return f"offense record {self.pk}"
+        ciprs_record = self.offense.ciprs_record
+        return f"{ciprs_record.file_no} {self.action} {self.severity} ({self.id})"
 
 
 class Contact(models.Model):
@@ -372,6 +373,11 @@ class PetitionDocument(models.Model):
     @property
     def county(self):
         return self.petition.county
+
+    def __str__(self):
+        attachment = " attachment " if self.is_attachment else " "
+        jurisdiction = self.petition.get_jurisdiction_display()
+        return f"{self.county} {self.form_type} {jurisdiction}{attachment}({self.id})"
 
 
 class PetitionOffenseRecord(models.Model):
