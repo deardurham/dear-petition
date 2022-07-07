@@ -198,7 +198,11 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "ciprs": {"level": APP_LOG_LEVEL, "handlers": ["console"], "propagate": False},
+        "ciprs_reader": {
+            "level": APP_LOG_LEVEL,
+            "handlers": ["console"],
+            "propagate": False,
+        },
         # Errors logged by the SDK itself
         "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
         "django.security.DisallowedHost": {

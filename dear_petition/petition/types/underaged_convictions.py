@@ -50,8 +50,9 @@ def get_offense_records(batch, jurisdiction=""):
 
 def build_query(dob):
     eighteenth_birthday = dob + relativedelta(years=18)
+    logger.debug(f"Using {eighteenth_birthday} as eighteenth birthday (dob={dob})")
     dismissed_query = build_dismissed_query()
     not_guilty_query = build_not_guilty_query()
-    action = Q(offense__ciprs_record__offense_date__lt=eighteenth_birthday)
+    action = Q(offense__ciprs_record__offense_date__date__lt=eighteenth_birthday)
     query = action & ~dismissed_query & ~not_guilty_query
     return query
