@@ -103,7 +103,7 @@ RUN touch /code/.env
 COPY --from=static_files /code/build /code/build
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
-RUN DATABASE_URL='' ENVIRONMENT='' DJANGO_SECRET_KEY='dummy' DOMAIN='' python manage.py collectstatic --noinput
+RUN SENDGRID_API_KEY='' DJANGO_ADMIN_URL='' SENTRY_DSN='' DATABASE_URL='' ENVIRONMENT='' DJANGO_SECRET_KEY='dummy' DOMAIN='' python manage.py collectstatic --noinput
 
 # Tell uWSGI where to find your wsgi file (change this):
 ENV UWSGI_WSGI_FILE=config/wsgi.py
