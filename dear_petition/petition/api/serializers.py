@@ -1,3 +1,4 @@
+import logging
 from django.urls import reverse
 
 from dear_petition.users.models import User
@@ -14,6 +15,9 @@ from dear_petition.petition.constants import ATTACHMENT, DISMISSED
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from localflavor.us import us_states
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -54,7 +58,12 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
     file_no = serializers.SerializerMethodField()
 
     def get_offense_date(self, offense_record):
-        return offense_record.offense.ciprs_record.offense_date.date()
+        ciprs_record = offense_record.offense.ciprs_record
+        try:
+            return ciprs_record.offense_date.date()
+        except AttributeError:
+            logger.warning(f"{ciprs_record} missing offense date")
+            return None
 
     def get_dob(self, offense_record):
         return offense_record.offense.ciprs_record.dob
