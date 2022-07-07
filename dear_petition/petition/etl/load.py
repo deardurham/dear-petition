@@ -55,6 +55,7 @@ def create_batch_petitions(batch):
 
 
 def create_petitions_from_records(batch, form_type):
+    logger.info(f"Searching for {form_type} records (batch {batch})")
     record_set = petition_offense_records(batch, form_type)
     petition_types = identify_distinct_petitions(record_set)
     for petition_type in petition_types:
@@ -64,7 +65,11 @@ def create_petitions_from_records(batch, form_type):
             county=petition_type["county"],
         )
         link_offense_records(petition)
+        logger.info(
+            f"Creating documents for {petition_type['county']} ({petition_type['jurisdiction']}) records"
+        )
         create_documents(petition)
+        logger.info(f"Associated {petition.offense_records.count()} total records")
 
         if form_type == UNDERAGED_CONVICTIONS:
             pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
@@ -84,6 +89,9 @@ def create_documents(petition):
 
     base_petition = pm.PetitionDocument.objects.create(petition=petition)
     base_petition.offense_records.add(*paginator.petition_offense_records())
+    logger.info(
+        f"Created {base_petition} with {base_petition.offense_records.count()} records"
+    )
 
     previous_document = base_petition
 
@@ -92,4 +100,7 @@ def create_documents(petition):
             petition=petition, previous_document=previous_document
         )
         attachment.offense_records.add(*attachment_records)
+        logger.info(
+            f"Created {attachment} with {attachment.offense_records.count()} records"
+        )
         previous_document = attachment

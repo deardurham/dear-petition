@@ -17,7 +17,6 @@ TYPE_MAP = {
 def petition_offense_records(batch, petition_type, jurisdiction=""):
     get_offense_records = TYPE_MAP.get(petition_type)
     qs = get_offense_records(batch, jurisdiction)
-    logger.info(f"{petition_type} records: {qs}")
     return qs
 
 
@@ -29,5 +28,5 @@ def identify_distinct_petitions(offense_records):
         jurisdiction=F("offense__ciprs_record__jurisdiction"),
         county=F("offense__ciprs_record__county"),
     ).distinct()
-    logger.info(f"Distinct petitions: {qs}")
+    logger.info(f"Distinct petitions: {list(qs.values_list('county', 'jurisdiction'))}")
     return qs

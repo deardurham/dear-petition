@@ -98,7 +98,11 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
-        "ciprs": {"level": APP_LOG_LEVEL, "handlers": ["console"], "propagate": False},
+        "ciprs_reader": {
+            "level": APP_LOG_LEVEL,
+            "handlers": ["console"],
+            "propagate": False,
+        },
     },
 }
 
