@@ -99,7 +99,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # REST_FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "dear_petition.petition.api.authentication.SessionAuthentication",
         # SessionAuthentication needs to go before JWTHttpOnlyCookieAuthentication so that csrf is included in request
         "dear_petition.petition.api.authentication.JWTHttpOnlyCookieAuthentication",
     ],

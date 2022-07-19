@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
-import cx from 'classnames';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretUp, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
 import { useModifyUserMutation } from '../../../service/api';
 import useAuth from '../../../hooks/useAuth';
 import { Button } from '../../elements/Button';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
+import {
+  SortableHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from '../../elements/Table';
 import Modal from '../../elements/Modal/Modal';
 import FormInput from '../../elements/Input/FormInput';
 
@@ -205,51 +211,17 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const SortableHeader = ({ children, label, ordering, setOrdering }) => {
-  const handleClick = () => {
-    setOrdering((prev) => {
-      if (prev === label) {
-        setOrdering(`-${label}`);
-      } else {
-        setOrdering(label);
-      }
-    });
-  };
-  const isSorted = ordering === label || ordering === `-${label}`;
-  return (
-    <TableCell header>
-      <div
-        className={cx(
-          'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-1 focus:underline-offset-4',
-          { 'underline decoration-1 underline-offset-4': isSorted }
-        )}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleClick();
-          }
-        }}
-        onClick={() => handleClick()}
-      >
-        {children}
-        {isSorted && <FontAwesomeIcon icon={ordering === label ? faCaretDown : faCaretUp} />}
-      </div>
-    </TableCell>
-  );
-};
-
 const UsersTable = ({ ordering, users, setOrdering }) => (
   <UsersTableStyled numColumns={5}>
     <TableHeader>
-      <SortableHeader label="username" ordering={ordering} setOrdering={setOrdering}>
+      <SortableHeader field="username" ordering={ordering} setOrdering={setOrdering}>
         Username
       </SortableHeader>
-      <SortableHeader label="email" ordering={ordering} setOrdering={setOrdering}>
+      <SortableHeader field="email" ordering={ordering} setOrdering={setOrdering}>
         Email
       </SortableHeader>
       <TableCell header>Admin?</TableCell>
-      <SortableHeader label="last_login" ordering={ordering} setOrdering={setOrdering}>
+      <SortableHeader field="last_login" ordering={ordering} setOrdering={setOrdering}>
         Last Login
       </SortableHeader>
       <TableCell header>Actions</TableCell>

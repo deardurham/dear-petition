@@ -1,15 +1,31 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useController } from 'react-hook-form';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function FormInput({ className, label, errors, inputProps, ...restProps }) {
-  const { field } = useController(inputProps);
+const ActualInputRestyled = styled(ActualInputStyled)`
+  width: 100%;
+  padding: 0.5rem;
+`;
+
+const InputRestyled = styled(InputStyled)`
+  width: 100%;
+`;
+
+const FormInput = ({ className, label, errors, inputProps, ...restProps }) => {
+  const { field, fieldState } = useController(inputProps);
+  const { error: inputError } = fieldState;
+  const error = inputError ? (
+    <p>Invalid value</p>
+  ) : (
+    errors?.map((errMsg, i) => <p key={`${i}${errMsg}`}>{errMsg}</p>)
+  );
   return (
     <InputWrapper className={className}>
-      <InputStyled>{label}</InputStyled>
-      <ActualInputStyled {...field} {...restProps} />
-      {errors && (
+      <InputRestyled>{label}</InputRestyled>
+      <ActualInputRestyled type="input" {...field} {...restProps} />
+      {error && (
         <AnimatePresence>
           <InputErrors
             initial={{ opacity: 0, y: -25 }}
@@ -17,12 +33,12 @@ function FormInput({ className, label, errors, inputProps, ...restProps }) {
             exit={{ opacity: 0, y: '50' }}
             positionTransition
           >
-            {errors && errors.map((errMsg) => <p key={errMsg}>{errMsg}</p>)}
+            {error}
           </InputErrors>
         </AnimatePresence>
       )}
     </InputWrapper>
   );
-}
+};
 
 export default FormInput;

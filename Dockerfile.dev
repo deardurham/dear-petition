@@ -2,20 +2,9 @@ FROM node:16-alpine3.14
 
 WORKDIR /app/
 
+COPY . .
+
 ENV PATH /app/node_modules/.bin:$PATH
-
-# Install node_modules in directory outside of mounted volume
-ENV NODE_PACKAGES_HOME=/home/node_install
-RUN mkdir -p $NODE_PACKAGES_HOME
-COPY package.json package-lock.json $NODE_PACKAGES_HOME
-
-WORKDIR $NODE_PACKAGES_HOME
-
-# Dependencies will be persisted in /app/ volume under /app/node_modules
 RUN npm install
-
-WORKDIR /app/
-
-COPY . /app/
 
 CMD ["npm", "run", "start"]

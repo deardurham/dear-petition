@@ -2,12 +2,12 @@ import React from 'react';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
 import { AnimatePresence } from 'framer-motion';
 
-function Input({ className, label, errors, register, name, ...inputProps }, ref) {
+function Input({ className, innerClassName, label, errors, register, name, ...inputProps }, ref) {
   const registerProps = register && name ? { ...register(name) } : {};
   return (
     <InputWrapper className={className}>
       <InputStyled>{label}</InputStyled>
-      <ActualInputStyled {...inputProps} {...registerProps} ref={ref} />
+      <ActualInputStyled className={innerClassName} {...inputProps} {...registerProps} ref={ref} />
       {errors && (
         <AnimatePresence>
           <InputErrors

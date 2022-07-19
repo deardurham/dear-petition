@@ -15,12 +15,12 @@ export default Axios;
 export const axiosBaseQuery =
   () =>
   async ({ url, method, timeout, data, params }, api) => {
+    const requestConfig = { url, method, data, params };
+    if (timeout) {
+      requestConfig.timeout = timeout;
+    }
     try {
-      const config = { url, method, data, params };
-      if (timeout) {
-        config.timeout = timeout;
-      }
-      const result = await Axios(config);
+      const result = await Axios(requestConfig);
       return { data: result.data };
     } catch (axiosError) {
       const isLoginAttempt =
@@ -35,7 +35,7 @@ export const axiosBaseQuery =
     // retry logic - use refresh token to get new access key and try again
     try {
       await Axios({ url: 'token/refresh/', method: 'post' });
-      const result = await Axios({ url, method, data }); // retry
+      const result = await Axios(requestConfig); // retry
       return { data: result.data };
     } catch (axiosError) {
       api.dispatch(loggedOut());
@@ -44,3 +44,5 @@ export const axiosBaseQuery =
       };
     }
   };
+
+export const manualAxiosRequest = axiosBaseQuery();

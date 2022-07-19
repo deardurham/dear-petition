@@ -64,6 +64,11 @@ function PageBase({ children, className, ...props }) {
             </LinkWrapper>
             {user?.is_admin ? (
               <LinkWrapper>
+                <Link to="/agencies">Agencies</Link>
+              </LinkWrapper>
+            ) : null}
+            {user?.is_admin ? (
+              <LinkWrapper>
                 <Link to="/users">Users</Link>
               </LinkWrapper>
             ) : null}

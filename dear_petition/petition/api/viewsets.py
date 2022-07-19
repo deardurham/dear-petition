@@ -8,7 +8,7 @@ from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
 from django.middleware import csrf
 from django.utils import timezone
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import BaseInFilter, DjangoFilterBackend, FilterSet
 from rest_framework import filters, parsers, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -113,15 +113,39 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
         return Response(serialized_data)
 
+class ContactSearchFilter(filters.SearchFilter):
+    def get_search_fields(self, view, request):
+        search_field = request.query_params.get('field', None)
+        if search_field is not None:
+            return [search_field]
+        return super().get_search_fields(view, request)
+
 
 class ContactViewSet(viewsets.ModelViewSet):
 
     queryset = petition.Contact.objects.all()
     serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ["category"]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
+    filterset_fields = {
+        "category": ["exact"],
+        "city": ["exact", "in"],
+        "zipcode": ["exact", "in"],
+    }
     search_fields = ["name"]
+    ordering_fields = ['name', 'address1', 'address2', 'city', 'zipcode']
+    ordering = ["name"]
+
+    @action(detail=False, methods=['get'])
+    def get_filter_options(self, request):
+        field = request.query_params.get('field', None)
+        if field is None or field not in self.filterset_fields:
+            return Response(
+                "Provided field is not a valid filter field",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        field_options = self.filter_queryset(self.get_queryset()).values_list(field, flat=True).distinct().order_by()
+        return Response(field_options)
 
 
 class BatchViewSet(viewsets.ModelViewSet):

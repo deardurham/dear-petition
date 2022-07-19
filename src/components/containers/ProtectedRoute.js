@@ -6,7 +6,7 @@ import useAuth from '../../hooks/useAuth';
 import { useLazyCheckLoginQuery } from '../../service/api';
 import { loggedIn } from '../../slices/auth';
 
-function ProtectedRoute({ children, ...props }) {
+function ProtectedRoute({ children, isAdminOnly, ...props }) {
   const { user } = useAuth();
   const dispatch = useDispatch();
   const [checkLogin, { data, isFetching, isUninitialized }] = useLazyCheckLoginQuery();
@@ -28,6 +28,14 @@ function ProtectedRoute({ children, ...props }) {
   // Note: extra render needed before loggedIn dispatch is propogated to useAuth()
   if (!user && (isWaiting || data?.user)) {
     return null;
+  }
+
+  if (isAdminOnly && !user?.is_admin) {
+    return (
+      <Route {...props}>
+        <Redirect to={{ pathname: '/' }} />
+      </Route>
+    );
   }
 
   return <Route {...props}>{user ? children : <Redirect to={{ pathname: '/login' }} />}</Route>;

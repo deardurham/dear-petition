@@ -24,8 +24,6 @@ const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 8;
 const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
-// TODO: Add timeout to axiosBaseQuery
-// const MAX_TIMEOUT = 30; // seconds
 
 const ModalStyled = styled(Modal)`
   & > div {
@@ -170,7 +168,7 @@ function HomePage() {
         descriptions.
       </p>
       <p>
-        Please try this mode if you are having issue with a CIPRS record that has a long offense
+        Please try this mode if you are having issues with a CIPRS record that has a long offense
         description.
       </p>
     </ExperimentalMessage>

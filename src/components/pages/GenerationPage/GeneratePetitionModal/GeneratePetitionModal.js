@@ -7,9 +7,10 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import useKeyPress from '../../../../hooks/useKeyPress';
 
 import Modal from '../../../elements/Modal/Modal';
-import AgencyAutocomplete from '../GenerationInput/AgencyAutocomplete';
 import { Button, CloseButton } from '../../../elements/Button';
 import Axios from '../../../../service/axios';
+import { useLazyAgenciesQuery } from '../../../../service/api';
+import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
 
 const ModalCloseButton = styled(CloseButton)`
   position: absolute;
@@ -24,12 +25,6 @@ const ModalStyled = styled(Modal)`
     gap: 1.25rem;
   }
 
-  ul {
-    & > li:not(:last-child) {
-      margin-bottom: 0.5rem;
-    }
-    font-size: 1.6rem;
-  }
   ul + div {
     padding: 0;
   }
@@ -56,6 +51,9 @@ const GeneratePetitionModal = ({
   setAgencies,
 }) => {
   const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
+  const [error, setError] = useState('');
+  // const [generatePetition, { error }] = useGeneratePetitionMutation();
+  const [triggerSuggestionsFetch] = useLazyAgenciesQuery();
 
   const _buildPetition = () => ({
     petition: petition.pk,
@@ -102,14 +100,16 @@ const GeneratePetitionModal = ({
   const handleGenerate = async () => {
     const derivedPetition = _buildPetition();
     try {
+      setError('');
       const { data } = await Axios.post('/generate-petition/', derivedPetition, {
         responseType: 'arraybuffer',
       });
+      // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
+      // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
+      // const data = await generatePetition(derivedPetition).unwrap();
       _openPdf(data);
-    } catch (error) {
-      // TODO: add error message
-      console.error(error);
-      console.log(error?.response);
+    } catch (e) {
+      setError(!e?.response && e?.message ? e?.message : 'An unexpected error occurred');
     }
   };
 
@@ -126,8 +126,25 @@ const GeneratePetitionModal = ({
             <li>County: {petition.county} County</li>
             <li>Jurisdiction: {petition.jurisdiction}</li>
           </ul>
-          <AgencyAutocomplete agencies={agencies} setAgencies={setAgencies} />
+          <AutocompleteInput
+            label="Agencies"
+            selections={agencies.map((agencyObject) => agencyObject.name)}
+            onSelect={(value) => setAgencies((prev) => [...prev, value])}
+            onRemoveSelection={(name) =>
+              setAgencies((prev) => prev.filter((agency) => agency.name !== name))
+            }
+            getSuggestionLabel={(agencySuggestion) => agencySuggestion.name}
+            fetchSuggestions={async (searchValue) => {
+              const data = await triggerSuggestionsFetch(
+                { queryString: `search=${searchValue}` },
+                true
+              ).unwrap();
+              const selectedAgencyNames = agencies.map((agency) => agency.name);
+              return data.results.filter((agency) => !selectedAgencyNames.includes(agency.name));
+            }}
+          />
           <Button onClick={handleGenerate}>Generate</Button>
+          {error && <span className="text-red">{`Error: ${error}`}</span>}
         </>
       )}
     </ModalStyled>

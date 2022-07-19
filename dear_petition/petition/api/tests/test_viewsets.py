@@ -141,30 +141,30 @@ class TestBatchViewSet(APITestCase):
 
         with self.subTest("Get - List"):
             response = self.client.get(self.list_url)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         with self.subTest("Get - Detail"):
             response = self.client.get(self.detail_url)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         with self.subTest("POST"):
             data = {"code": "NEWPROJECT"}
             response = self.client.post(self.list_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         with self.subTest("PUT"):
             data = {"code": "NEWPROJECT"}
             response = self.client.put(self.detail_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         with self.subTest("PATCH"):
             data = {"code": "NEWPROJECT"}
             response = self.client.patch(self.detail_url, data=data)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         with self.subTest("DELETE"):
             response = self.client.delete(self.detail_url)
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class TestGeneratePetitionViewSet(APITestCase):

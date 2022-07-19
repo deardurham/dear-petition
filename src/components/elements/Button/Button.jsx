@@ -1,29 +1,21 @@
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import keyAndAmbientShadows from '../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution, colorGrey } from '../../styles/colors';
-import { fontPrimary } from '../../styles/fonts';
+import keyAndAmbientShadows from '../../../styles/shadows';
+import { colorPrimary, colorWhite, colorCaution, greyScale } from '../../../styles/colors';
+import { fontPrimary } from '../../../styles/fonts';
 
 export const Button = styled.button`
   cursor: pointer;
   ${({ colorClass }) => mapTypeToStartingState(colorClass)}
-
+  ${({ disabled }) => disabled && mapTypeToStartingState(DISABLED)}
   border-radius: 3px;
-  padding: 0.25rem;
+  padding: 0.5rem;
   outline: none;
 
   font-size: inherit;
   font-family: ${fontPrimary};
 
-  ${keyAndAmbientShadows.dp2};
-
-  &:hover {
-    ${keyAndAmbientShadows.dp2};
-  }
-
-  &:active {
-    ${keyAndAmbientShadows.dp2};
-  }
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 `;
 
 export const CloseButton = styled(Button)`
@@ -65,8 +57,8 @@ function mapTypeToStartingState(colorClass) {
 }
 
 const disabled = css`
-  background: ${colorGrey};
-  border: 1px solid ${colorGrey};
+  background: ${greyScale(7.25)};
+  border: 1px solid ${greyScale(7.25)};
   color: ${colorWhite};
 `;
 const positive = css`

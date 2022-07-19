@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import cx from 'classnames';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import UsersTable from './UsersTable';
 import PageBase from '../PageBase';
-import useAuth from '../../../hooks/useAuth';
 import useDebounce from '../../../hooks/useDebounce';
 import { useUsersQuery } from '../../../service/api';
 import Select from '../../elements/Input/Select';
@@ -45,19 +43,6 @@ const SearchRow = styled(FlexRow)`
   }
 `;
 
-const PaginationFlexRow = styled(FlexRow)`
-  margin-left: auto;
-  align-self: flex-end;
-  max-width: 400px;
-  & > div {
-    justify-content: space-evenly;
-    flex: 1;
-  }
-  & button {
-    padding: 0.4rem;
-  }
-`;
-
 const SearchBox = styled.input`
   margin-left: 3rem;
   align-self: center;
@@ -91,24 +76,13 @@ const calculatePageIndices = (current, numPages) => {
 };
 
 const UsersPage = () => {
-  const history = useHistory();
-  const { user: authenticatedUser } = useAuth();
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
   const [ordering, setOrdering] = useState('username');
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
   const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
-  const { data } = useUsersQuery(
-    { params: { limit: limit.value, offset, ordering, search } },
-    { skip: !authenticatedUser?.is_admin }
-  );
-
-  useEffect(() => {
-    if (authenticatedUser?.is_admin !== true) {
-      history.replace('/');
-    }
-  }, [authenticatedUser]);
+  const { data } = useUsersQuery({ params: { limit: limit.value, offset, ordering, search } });
 
   const numUsers = data?.count ?? 0;
   useEffect(() => {

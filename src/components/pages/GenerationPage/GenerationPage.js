@@ -128,8 +128,7 @@ function GenerationPage() {
             <h2>Petition List</h2>
             <p>
               Click on the buttons below to generate petition forms and their attachments. Click on
-              the detail arrow to reveal a list of offense records. Click on the offense records to
-              customize the records that populate the generated petition.
+              the &rsquo;View&rsquo; button to reveal a list of offense records.
             </p>
             {data && (
               <PetitionList

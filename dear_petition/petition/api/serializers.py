@@ -116,6 +116,14 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    formatted_address = serializers.SerializerMethodField()
+
+    def get_formatted_address(self, contact_obj):
+        lines = [contact_obj.address1]
+        if contact_obj.address2:
+            lines.append(contact_obj.address2)
+        return ", ".join(lines)
+
     class Meta:
         model = Contact
         fields = [
@@ -124,6 +132,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "category",
             "address1",
             "address2",
+            "formatted_address",
             "city",
             "state",
             "zipcode",
