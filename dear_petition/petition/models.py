@@ -285,11 +285,9 @@ class Petition(TimeStampedModel):
         two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
 
         qs = self.batch.petition_offense_records(
-            petition_type=self.form_type
+            petition_type=self.form_type, jurisdiction=self.jurisdiction
         ).select_related("offense__ciprs_record")
         qs = qs.filter(
-            offense__jurisdiction=self.jurisdiction,
-            offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
 

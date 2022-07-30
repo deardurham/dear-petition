@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db import transaction
 
 from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
@@ -83,41 +84,48 @@ def link_offense_records(petition, filter_active=True):
     petition.offense_records.add(*offense_records)
 
 
-def create_documents(petition, agencies=[]):
-    paginator = petition.get_offense_record_paginator()
+def create_documents(petition):
+    with transaction.atomic():
+        pm.PetitionDocument.objects.filter(petition=petition).delete()
 
-    base_petition = pm.PetitionDocument.objects.create(petition=petition)
-    base_petition.offense_records.add(*paginator.petition_offense_records())
-    logger.info(
-        f"Created {base_petition} with {base_petition.offense_records.count()} records"
-    )
+        paginator = petition.get_offense_record_paginator()
 
-    previous_document = base_petition
+        base_document = pm.PetitionDocument.objects.create(petition=petition)
+        base_document.offense_records.add(*paginator.petition_offense_records())
 
-    for attachment_records in paginator.attachment_offense_records():
-        attachment = pm.PetitionDocument.objects.create(
-            petition=petition, previous_document=previous_document
-        )
-        attachment.offense_records.add(*attachment_records)
         logger.info(
-            f"Created {attachment} with {attachment.offense_records.count()} records"
+            f"Created {base_document} with {base_document.offense_records.count()} records"
         )
-        previous_document = attachment
+
+        previous_document = base_document
+
+        for attachment_records in paginator.attachment_offense_records():
+            attachment = pm.PetitionDocument.objects.create(
+                petition=petition, previous_document=previous_document
+            )
+            attachment.offense_records.add(*attachment_records)
+            previous_document = attachment
+            logger.info(
+                f"Created {attachment} with {attachment.offense_records.count()} records"
+            )
+    return petition
 
 
 def assign_agencies_to_documents(petition):
     agencies = petition.agencies.all()
-    current_document = None
+    current_document = petition.base_document
+    first_iteration = True
     i = 0
     while True:
+
         current_document_agencies = agencies[
             i : (i + 3)
         ]  # 3 boxes for agencies per document
         if not current_document_agencies:
             break
 
-        if not current_document:
-            current_document = petition.base_document
+        if first_iteration:
+            first_iteration = False
         else:
             try:
                 current_document = current_document.following_document
@@ -128,17 +136,23 @@ def assign_agencies_to_documents(petition):
 
         current_document.agencies.clear()
 
+        current_document.agencies.set(current_document_agencies)
         for agency in current_document_agencies:
             current_document.agencies.add(agency)
 
         i += 3
 
-    try:
-        current_document = current_document.following_document
-        if not current_document.offense_records.exists():
-            # This must have been an extra attachment for agencies, but agencies were removed so no longer necessary
-            current_document.delete()
-    except:
-        pass
+    # All agencies have been assigned. Now we need to clear agencies on any proceeding attachments.
+    while True:
+        try:
+            current_document = current_document.following_document
+            if (
+                not current_document.offense_records.exists()
+            ):  # This must have been an extra attachment for agencies, but agencies were removed so no longer necessary
+                current_document.delete()
+            else:
+                current_document.agencies.clear()
+        except pm.PetitionDocument.DoesNotExist:
+            break
 
     return petition

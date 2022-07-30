@@ -5,9 +5,16 @@ from dear_petition.petition.models import Batch
 from dear_petition.petition.etl.load import (
     create_batch_petitions,
     import_ciprs_records,
+    create_documents,
     assign_agencies_to_documents,
 )
-from dear_petition.petition.tests.factories import ContactFactory
+from dear_petition.petition.tests.factories import (
+    ContactFactory,
+    CIPRSRecordFactory,
+    OffenseFactory,
+    DismissedOffenseRecordFactory,
+    PetitionOffenseRecordFactory,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -86,10 +93,42 @@ def test_assign_agencies_to_documents(petition, petition_document):
     petition = assign_agencies_to_documents(petition)
     assert petition.documents.count() == 1
 
+    # 4th contact should attachment
     petition.agencies.add(contact4)
+    petition = assign_agencies_to_documents(petition)
+    assert petition.documents.count() == 2
+
+
+def test_removing_agency_does_not_delete_attachment_with_offense_records(
+    petition, petition_document
+):
+    contact1 = ContactFactory()
+    contact2 = ContactFactory()
+    contact3 = ContactFactory()
+    contact4 = ContactFactory()
+
+    petition.agencies.set([contact1, contact2, contact3, contact4])
+    ciprs_record = CIPRSRecordFactory(
+        batch=petition.batch,
+        jurisdiction=constants.DISTRICT_COURT,
+        county=petition.county,
+    )
+    i = 0
+    while i < 20:
+        offense = OffenseFactory(
+            ciprs_record=ciprs_record,
+            disposition_method=constants.DISTRICT_COURT_WITHOUT_DA_LEAVE,
+        )
+        PetitionOffenseRecordFactory(
+            petition=petition,
+            offense_record=DismissedOffenseRecordFactory(offense=offense),
+        )
+        i += 1
+
+    petition = create_documents(petition)
     petition = assign_agencies_to_documents(petition)
     assert petition.documents.count() == 2
 
     petition.agencies.remove(contact3)
     petition = assign_agencies_to_documents(petition)
-    assert petition.documents.count() == 1
+    assert petition.documents.count() == 2

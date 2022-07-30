@@ -17,7 +17,6 @@ def recalculate_petitions(petition_id, offense_record_ids):
         pm.PetitionOffenseRecord.objects.filter(
             petition_id=petition.id, offense_record_id__in=offense_record_ids
         ).update(active=True)
-        pm.PetitionDocument.objects.filter(petition=petition).delete()
         create_documents(petition)
         petition = assign_agencies_to_documents(petition)
 
