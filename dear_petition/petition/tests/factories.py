@@ -23,6 +23,7 @@ from ..constants import (
     DISTRICT_COURT,
     SUPERIOR_COURT,
     DURHAM_COUNTY,
+    DISTRICT_COURT_WITHOUT_DA_LEAVE,
 )
 
 
@@ -126,6 +127,20 @@ class PetitionOffenseRecordFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = PetitionOffenseRecord
+
+
+class DismissedOffenseRecordFactory(factory.DjangoModelFactory):
+    offense = factory.SubFactory(
+        OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
+    )
+    law = "20-141(J1)"
+    code = "4450"
+    action = CHARGED
+    severity = "TRAFFIC"
+    description = "SPEEDING(96 mph in a 70 mph zone) "
+
+    class Meta:
+        model = OffenseRecord
 
 
 class PetitionDocumentFactory(factory.DjangoModelFactory):

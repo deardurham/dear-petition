@@ -264,6 +264,7 @@ class Petition(TimeStampedModel):
     offense_records = models.ManyToManyField(
         OffenseRecord, related_name="petitions", through="PetitionOffenseRecord"
     )
+    agencies = models.ManyToManyField(Contact, related_name="+")
 
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
@@ -284,11 +285,9 @@ class Petition(TimeStampedModel):
         two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
 
         qs = self.batch.petition_offense_records(
-            petition_type=self.form_type
+            petition_type=self.form_type, jurisdiction=self.jurisdiction
         ).select_related("offense__ciprs_record")
         qs = qs.filter(
-            offense__jurisdiction=self.jurisdiction,
-            offense__ciprs_record__jurisdiction=self.jurisdiction,
             offense__ciprs_record__county=self.county,
         )
 
@@ -351,9 +350,10 @@ class PetitionDocument(models.Model):
         Petition, on_delete=models.CASCADE, related_name="documents"
     )
     offense_records = models.ManyToManyField(OffenseRecord, related_name="documents")
-    previous_document = models.ForeignKey(
+    previous_document = models.OneToOneField(
         "self", on_delete=models.CASCADE, null=True, related_name="following_document"
     )
+    agencies = models.ManyToManyField(Contact, related_name="+")
 
     @property
     def is_attachment(self):

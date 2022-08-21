@@ -52,6 +52,8 @@
       "devDependencies": ["src/setupTests.js", "**/*.test.js", "**/*.test.jsx"]
     }],
     "camelcase": "warn",
-    "consistent-return": "warn"
+    "consistent-return": "warn",
+    "import/no-named-as-default": 0,
+    "import/no-named-as-default-member": 0
   }
 }

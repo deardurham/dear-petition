@@ -149,7 +149,10 @@ class AOCFormCR287(PetitionForm):
         self.data["PetitionNotFiledSignDate"] = self.format_date(dt.datetime.today())
 
     def map_agencies(self):
-        agencies = self.extra.get("agencies", [])
+        agencies = self.petition_document.agencies.all()
+        assert (
+            len(agencies) <= 3
+        ), f"This form was given {len(agencies)} agencies. Three is the maximum."
         for i, agency in enumerate(agencies, 1):
             self.data[f"NameAgency{i}"] = agency.name
             self.data[f"AddrAgency{i}"] = agency.address1
@@ -203,7 +206,10 @@ class AOCFormCR285(AOCFormCR287):
         self.data["PetitionerName"] = self.extra.get("name_petitioner")
 
     def map_agencies(self):
-        agencies = self.extra.get("agencies", [])
+        agencies = self.petition_document.agencies.all()
+        assert (
+            len(agencies) <= 3
+        ), f"This form was given {len(agencies)} Three is the maximum."
         if len(agencies) > 0:
             self.data["FormNo1"] = self.petition_document.petition.form_type.split("-")[
                 -1
