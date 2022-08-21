@@ -6,14 +6,13 @@ import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import StyledDialog from '../../elements/Modal/Dialog';
-import Modal from '../../elements/Modal/Modal';
 import useWindowSize from '../../../hooks/useWindowSize';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import AgencyAutocomplete from './GenerationInput/AgencyAutocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
-import api, { usePetitionQuery } from '../../../service/api';
+import { api, usePetitionQuery } from '../../../service/api';
 import Axios from '../../../service/axios';
 import { useDispatch } from 'react-redux';
 
@@ -76,11 +75,8 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
   const [isAgenciesDetailed, setIsAgenciesDetailed] = useState();
 
-  const [offenseRecords, setOffenseRecords] = useState();
   const [offenseRecordsLoading, setOffenseRecordsLoading] = useState(false);
-  const [highlightedRows, setHighlightedRows] = useState();
   const [isModified, setIsModified] = useState(false);
-  const petitionId = petition.pk;
   const handleSelect = (newPetition, num) => {
     if (validateInput()) {
       setSelectedPetition(newPetition);
@@ -93,12 +89,11 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   if (!petition) {
     return null;
   }
+  const petitionId = petition.pk;
 
   const fetchData = () => {
     setOffenseRecordsLoading(true);
     Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
-      setOffenseRecords(data.offense_records);
-      setHighlightedRows(data.active_records);
       setAgencies(data.agencies);
       setOffenseRecordsLoading(false);
     });
@@ -109,10 +104,6 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     if (!agencies.length) {
       fetchData();
     }
-  };
-
-  const highlightRow = (offenseRecordId) => {
-    setHighlightedRows([...highlightedRows, offenseRecordId]);
   };
 
   const disabledMessageLines = [PETITION_FORM_NAMES[petition.form_type], ...DISABLED_MESSAGE];
@@ -141,8 +132,6 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
       setAgencies(data.agencies);
     });
   };
-
-  const petitionerDOB = offenseRecords?.find((record) => !!record?.dob)?.dob;
 
   return (
     <>
@@ -177,7 +166,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         </TableCell>
         <TableCell>
           <GenerateButton
-            label="View"
+            label="View/Modify"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
             title="View/Modify offense records"
@@ -185,7 +174,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         </TableCell>
         <TableCell>
           <GenerateButton
-            label="View"
+            label="View/Modify"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => handleAgenciesPress()}
             title="Reveal agencies"
