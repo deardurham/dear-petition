@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-// TODO: why doesn't the above rule handle wrapped textarea properly?
 import React from 'react';
 import cx from 'classnames';
 import { useController } from 'react-hook-form';
