@@ -2,45 +2,36 @@ version: '3'
 
 volumes:
   local_postgres_data: {}
-  local_postgres_data_backups: {}
 
 services:
   django: &django
     build:
       context: .
-      dockerfile: ./compose/local/django/Dockerfile
+      target: dev
     image: dear_petition_local_django
     depends_on:
       - postgres
-      - mailhog
     volumes:
-      - .:/app
-      - /app/frontend/node_modules
-      - /app/node_modules
+      - ./dear_petition:/code/dear_petition
+      - ./config:/code/config
     env_file:
       - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
     ports:
       - "8000:8000"
-    command: /start
     tty: true
     stdin_open: true
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: dear_petition_production_postgres
+    image: postgres:12-alpine
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
 
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.frontend
     stdin_open: true
     depends_on:
       - django
@@ -53,12 +44,6 @@ services:
       - ./.envs/.local/.frontend
     environment:
       - OVERRIDE_API_PROXY
-      - NODE_PATH=/home/node_install/node_modules
-
-  mailhog:
-    image: mailhog/mailhog:v1.0.0
-    ports:
-      - "8025:8025"
 
   redis:
     image: redis:5-alpine
@@ -79,4 +64,4 @@ services:
     depends_on:
       - postgres
       - redis
-    command: /start-jupyter
+    command: jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root --no-browser

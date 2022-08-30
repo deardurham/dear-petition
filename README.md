@@ -7,12 +7,35 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 [![Build Status](https://travis-ci.org/deardurham/dear-petition.svg?branch=master)](https://travis-ci.org/deardurham/dear-petition)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
+- [DEAR Petition](#dear-petition)
+  - [🚀 Docker Quick Start (recommended)](#-docker-quick-start-recommended)
+  - [Frontend Development](#frontend-development)
+    - [🚀 Quick Setup](#-quick-setup)
+    - [API Proxy Configuration](#api-proxy-configuration)
+      - [Docker Container](#docker-container)
+      - [Local Frontend](#local-frontend)
+  - [Backend Development (with Docker)](#backend-development-with-docker)
+    - [Using docker-compose.override.yml](#using-docker-composeoverrideyml)
+    - [Initial Setup](#initial-setup)
+    - [Restore database](#restore-database)
+  - [Backend Development (without Docker)](#backend-development-without-docker)
+    - [Setting Up a Virtual Environment](#setting-up-a-virtual-environment)
+    - [Setting Up Your Users](#setting-up-your-users)
+  - [Development Tools and Testing](#development-tools-and-testing)
+    - [Type checks](#type-checks)
+    - [Test coverage](#test-coverage)
+    - [Running tests with py.test](#running-tests-with-pytest)
+      - [Docker](#docker)
+      - [Without Docker](#without-docker)
+    - [Sign up for Sentry](#sign-up-for-sentry)
+- [Production testing](#production-testing)
+
 ## 🚀 Docker Quick Start (recommended)
 
 ```bash
 git clone git@github.com:deardurham/dear-petition.git
 cd dear-petition
-docker-compose up -d
+docker-compose up -d django
 docker-compose run --rm django python manage.py createsuperuser
 ```
 
@@ -68,6 +91,27 @@ Run the containers:
     docker-compose up django
 
 Visit http://localhost:8000/petition/api/ in your browser.
+
+### Using docker-compose.override.yml
+
+To develop in a Docker container, we'll use a `docker-compose.override.yml`
+override file to configure the Django container to sleep by default:
+
+```yaml
+# file: docker-compose.override.yml
+version: '3'
+
+services:
+  django:
+    command: ["sleep", "infinity"]
+```
+
+Now we run `runserver` manually to have more control over restarts:
+
+```sh
+docker compose exec django bash
+root$ python manage.py runserver 0.0.0.0:8000
+```
 
 ### Initial Setup
 
@@ -187,3 +231,14 @@ coverage report:
 ### Sign up for Sentry
 
 The dear-petition project is now on Sentry. Visit sentry.io and make an account or sign in with Github. Reach out to an existing member for an invite to the project.
+
+
+# Production testing
+
+To test the production Dockerfile locally, run:
+
+```sh
+COMPOSE_FILE=docker-compose.deploy.yml docker compose up --build -d django
+# View logs for debugging
+COMPOSE_FILE=docker-compose.deploy.yml docker compose logs django -f
+```

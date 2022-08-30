@@ -82,7 +82,14 @@ RUN set -ex \
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /code/
 WORKDIR /code/
-ADD . /code/
+COPY config/ /code/config/
+COPY dear_petition/ /code/dear_petition/
+COPY manage.py /code/manage.py
+COPY docker-entrypoint.sh /code/docker-entrypoint.sh
+# Silence missing .env notices
+RUN touch /code/.env
+# Copy in node-built files
+COPY --from=static_files /code/build /code/build
 
 FROM base AS deploy
 
@@ -95,12 +102,6 @@ EXPOSE 8000
 
 # Add any static environment variables needed by Django or your settings file here:
 ENV DJANGO_SETTINGS_MODULE=config.settings.production
-
-# Silence missing .env notices
-RUN touch /code/.env
-
-# Copy in node-built files
-COPY --from=static_files /code/build /code/build
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 RUN SENDGRID_API_KEY='' DJANGO_ADMIN_URL='' SENTRY_DSN='' DATABASE_URL='' ENVIRONMENT='' DJANGO_SECRET_KEY='dummy' DOMAIN='' python manage.py collectstatic --noinput
@@ -125,3 +126,25 @@ ENTRYPOINT ["/code/docker-entrypoint.sh"]
 
 # Start uWSGI
 CMD ["uwsgi", "--http=0.0.0.0:$PORT", "--show-config"]
+
+FROM base AS dev
+
+# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step.
+# Correct the path to your production requirements file, if needed.
+RUN set -ex \
+    && BUILD_DEPS=" \
+    build-essential \
+    libpq-dev \
+    git-core \
+    " \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    && pip install --no-cache-dir -r /requirements/local.txt \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV DJANGO_SETTINGS_MODULE=config.settings.local
+
+ENTRYPOINT ["/code/docker-entrypoint.sh"]
+
+CMD ["python", "/code/manage.py", "runserver", "0.0.0.0:8000"]
