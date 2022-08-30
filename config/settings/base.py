@@ -92,6 +92,7 @@ LOCAL_APPS = [
     "dear_petition.users.apps.UsersAppConfig",
     # Your stuff: custom apps go here
     "dear_petition.petition",
+    "dear_petition.sendgrid",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
