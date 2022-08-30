@@ -70,7 +70,7 @@ class EmailForm(forms.ModelForm):
             attachment = instance.attachments.create(
                 name=metadata["name"],
                 type=metadata["type"],
-                content_id=metadata["content-id"],
+                content_id=metadata.get("content-id", "unknown"),
                 file=file_,
             )
             logger.info(f'Attachment {metadata["name"]} [id: {attachment.id}] created')
