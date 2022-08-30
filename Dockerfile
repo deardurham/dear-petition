@@ -86,7 +86,7 @@ COPY config/ /code/config/
 COPY dear_petition/ /code/dear_petition/
 COPY manage.py /code/manage.py
 COPY docker-entrypoint.sh /code/docker-entrypoint.sh
-COPY post-deploy.sh /code/post-deploy.sh
+COPY postdeploy.sh /code/postdeploy.sh
 # Silence missing .env notices
 RUN touch /code/.env
 # Copy in node-built files
