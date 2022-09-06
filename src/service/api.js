@@ -13,6 +13,12 @@ export const api = createApi({
       }),
       providesTags: ['AgencyList'],
     }),
+    searchAgencies: builder.query({
+      query: ({ search }) => ({
+        url: `contact/?category=agency&search=${search}`,
+        method: 'get',
+      }),
+    }),
     createAgency: builder.mutation({
       query: ({ data }) => ({ url: `contact/`, method: 'post', data }),
       invalidatesTags: ['AgencyList', 'ContactFilterOptions'],
@@ -74,15 +80,25 @@ export const api = createApi({
       }),
       invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
     }),
+    assignAgenciesToDocuments: builder.mutation({
+      query: ({ petitionId, agencies }) => ({
+        url: `/petitions/${petitionId}/assign_agencies_to_documents/`,
+        method: 'post',
+        data: { agencies },
+      }),
+      invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
+    }),
   }),
 });
 
 export const {
   useAgenciesQuery,
   useLazyAgenciesQuery,
+  useLazySearchAgenciesQuery,
   useCreateAgencyMutation,
   useDeleteAgencyMutation,
   useUpdateAgencyMutation,
+  useAssignAgenciesToDocumentsMutation,
   useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
   useLazyCheckLoginQuery,
