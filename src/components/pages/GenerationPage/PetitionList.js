@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
-import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
+import Axios from '../../../service/axios';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import useWindowSize from '../../../hooks/useWindowSize';
@@ -14,6 +14,7 @@ import { usePetitionQuery } from '../../../service/api';
 import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
+import { cleanFilename } from '../../../util/file';
 
 const PetitionTable = styled(Table)`
   font-size: 1.7rem;
@@ -30,10 +31,9 @@ const Label = styled.span`
   font-size: 1.75rem;
 `;
 
-function GenerateButton({
+function ActionButton({
   className,
   label,
-  windowWidth,
   onClick,
   collapsedIcon,
   title = '',
@@ -41,9 +41,10 @@ function GenerateButton({
   tooltipMessage = '',
   tooltipOffset = [0, 10],
 }) {
-  const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
+  const windowSize = useWindowSize();
+  const isCollapsed = windowSize.width <= TABLET_LANDSCAPE_SIZE;
   return (
-    <Tooltip tooltipContent={tooltipMessage} hideTooltip={!tooltipMessage} offset={tooltipOffset}>
+    <TooltipWrapper tooltipMessage={tooltipMessage} tooltipOffset={tooltipOffset}>
       <Button
         className={cx(className, 'text-[1.55rem]')}
         onClick={onClick}
@@ -52,9 +53,15 @@ function GenerateButton({
       >
         {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
       </Button>
-    </Tooltip>
+    </TooltipWrapper>
   );
 }
+
+const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10] }) => (
+  <Tooltip tooltipContent={tooltipMessage} hideTooltip={!tooltipMessage} offset={tooltipOffset}>
+    {children}
+  </Tooltip>
+);
 
 const DISABLED_MESSAGE = [
   'There are no records selected for the petition document.',
@@ -62,26 +69,93 @@ const DISABLED_MESSAGE = [
 ];
 
 function PetitionRow({ attorney, petitionData, petitionerData, validateInput, backgroundColor }) {
+  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
+  const [error, setError] = useState('');
   const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
-  const [agencies, setAgencies] = useState([]);
-  const [attachmentNumber, setAttachmentNumber] = useState();
-  const [selectedPetition, setSelectedPetition] = useState();
-  const windowSize = useWindowSize();
   const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
   const [isAgencySelectModalOpen, setIsAgencySelectModalOpen] = useState(false);
 
-  const handleSelect = (newPetition, num) => {
-    if (validateInput()) {
-      setSelectedPetition(newPetition);
-      if (num) {
-        setAttachmentNumber(num);
-      }
+  const _openPdf = (pdf) => {
+    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
+
+    // IE doesn't allow using a blob object directly as link href
+    // instead it is necessary to use msSaveOrOpenBlob
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(pdfBlob);
+      return;
+    }
+
+    // Clean up previous pdf when generating new one
+    const { handle: oldHandle, url: oldUrl } = pdfWindow;
+    if (oldUrl) window.URL.revokeObjectURL(oldUrl);
+    if (oldHandle) oldHandle.close();
+
+    const url = window.URL.createObjectURL(pdfBlob);
+    setPdfWindow({ handle: window.open(url), url });
+  };
+
+  const downloadPdf = (pdf, filename) => {
+    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      link.remove();
+    });
+  };
+
+  const closePdf = () => {
+    const { url, handle } = pdfWindow;
+    if (url) window.URL.revokeObjectURL(url);
+    if (handle) handle.close();
+
+    setPdfWindow({ handle: null, url: null });
+  };
+
+  const handleGenerate = async () => {
+    if (!validateInput()) {
+      return;
+    }
+    const derivedPetition = _buildPetition();
+    try {
+      setError('');
+      const { data, headers } = await Axios.post(
+        `/petitions/${petition.pk}/generate_petition_pdf/`,
+        derivedPetition,
+        {
+          responseType: 'arraybuffer',
+        }
+      );
+      // content-disposition: 'inline; filename="petition.pdf"'
+      const filename =
+        headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
+      // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
+      // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
+      // const data = await generatePetition(derivedPetition).unwrap();
+      downloadPdf(data, filename);
+    } catch (e) {
+      setError(!e?.response && e?.message ? e?.message : 'An unexpected error occurred');
     }
   };
 
   if (!petition) {
     return null;
   }
+
+  const _buildPetition = () => ({
+    documents: [petition.base_document.pk, ...petition.attachments.map(({ pk }) => pk)],
+    name_petitioner: petitionerData.name,
+    address1: petitionerData.address1,
+    address2: petitionerData.address2,
+    city: petitionerData.city,
+    state: petitionerData.state.value,
+    zip_code: petitionerData.zipCode,
+    attorney: attorney.value,
+    agencies: petition.agencies.map((agency) => agency.pk),
+  });
 
   const disabledMessageLines = [PETITION_FORM_NAMES[petition.form_type], ...DISABLED_MESSAGE];
   if (petition.form_type === 'AOC-CR-293') {
@@ -98,42 +172,30 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   );
 
   const formName = <span className="px-4 py-2">{PETITION_FORM_NAMES[petition.form_type]}</span>;
-
   const isDisabled = petition.active_records.length === 0;
-
   return (
     <>
       <TableRow key={petition.pk} backgroundColor={backgroundColor}>
         <TableCell>{petition.county}</TableCell>
         <TableCell>{petition.jurisdiction}</TableCell>
         <TableCell>
-          <GenerateButton
+          <TooltipWrapper tooltipMessage={PETITION_FORM_NAMES[petition.form_type]}>
+            <div className="w-max border-b border-gray-700">{petition.form_type}</div>
+          </TooltipWrapper>
+        </TableCell>
+        <TableCell>
+          {/* TODO: Options menu allows selection of "Download all", "Download Selected", and "Preview" */}
+          {/* TODO: Add separate "Generate" button */}
+          <ActionButton
             collapsedIcon={faDownload}
-            windowWidth={windowSize.width}
             label={petition.form_type}
-            onClick={() => handleSelect(petition.base_document)}
+            onClick={() => handleGenerate(petition)}
             isDisabled={isDisabled}
             tooltipMessage={isDisabled ? disabledMessage : formName}
-            tooltipOffset={!isDisabled ? [-35, 10] : undefined}
           />
         </TableCell>
         <TableCell>
-          <Attachments>
-            {petition.attachments.map((attachment, i) => (
-              <li key={attachment.pk}>
-                <Label>{`${i + 1}) `}</Label>
-                <GenerateButton
-                  collapsedIcon={faDownload}
-                  windowWidth={windowSize.width}
-                  label={attachment.form_type}
-                  onClick={() => handleSelect(attachment, i + 1)}
-                />
-              </li>
-            ))}
-          </Attachments>
-        </TableCell>
-        <TableCell>
-          <GenerateButton
+          <ActionButton
             label="View/Modify"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
@@ -141,7 +203,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
           />
         </TableCell>
         <TableCell>
-          <GenerateButton
+          <ActionButton
             label="View/Modify"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsAgencySelectModalOpen(true)}
@@ -158,20 +220,6 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         isOpen={isAgencySelectModalOpen}
         onClose={() => setIsAgencySelectModalOpen(false)}
       />
-      {selectedPetition && (
-        <GeneratePetitionModal
-          petition={selectedPetition}
-          attachmentNumber={attachmentNumber}
-          petitionerData={petitionerData}
-          attorney={attorney}
-          agencies={agencies}
-          setAgencies={setAgencies}
-          onClose={() => {
-            setSelectedPetition();
-            setAttachmentNumber();
-          }}
-        />
-      )}
     </>
   );
 }
@@ -182,8 +230,8 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
-        <TableCell header>Petition</TableCell>
-        <TableCell header>Attachments</TableCell>
+        <TableCell header>Form</TableCell>
+        <TableCell header>Documents</TableCell>
         <TableCell header>Offenses</TableCell>
         <TableCell header>Agencies</TableCell>
       </TableHeader>

@@ -256,8 +256,8 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     petition = serializers.ChoiceField(
         choices=[],
-        style={"base_template": "input.html"},
     )
+    documents = serializers.PrimaryKeyRelatedField(many=True, queryset=PetitionDocument.objects.all())
     name_petitioner = serializers.CharField(label="Petitioner Name")
     address1 = serializers.CharField(label="Address Line 1")
     address2 = serializers.CharField(
@@ -271,7 +271,8 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["petition"].choices = PetitionDocument.objects.values_list(
+        # Only parent petitions are valid
+        self.fields["petition"].choices = PetitionDocument.objects.filter(previous_document__isnull=True).values_list(
             "pk", "pk"
         )
         self.fields["attorney"].choices = Contact.objects.filter(
@@ -283,6 +284,11 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def validate_petition(self, value):
         return PetitionDocument.objects.get(pk=value)
+
+    def validate_documents(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError("Must select at least one document for pdf generation")
+        return value
 
     def validate_attorney(self, value):
         return Contact.objects.get(pk=value)

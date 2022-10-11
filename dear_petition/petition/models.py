@@ -400,3 +400,24 @@ class GeneratedPetition(TimeStampedModel):
         max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, null=True
     )
     age = models.PositiveIntegerField(null=True)
+
+    @classmethod
+    def get_stats_generated_petition(cls, petition_id, user):
+        petition_document = PetitionDocument.objects.get(id=petition_id)
+        batch = petition_document.petition.batch
+        user = user
+
+        GeneratedPetition.objects.create(
+            username=user.username,
+            form_type=petition_document.form_type,
+            number_of_charges=petition_document.offense_records.count(),
+            batch_id=batch.id,
+            county=petition_document.county,
+            jurisdiction=petition_document.jurisdiction,
+            race=batch.race,
+            sex=batch.sex,
+            age=batch.age,
+        )
+
+        user.last_generated_petition_time = timezone.now()
+        user.save()

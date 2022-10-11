@@ -8,16 +8,26 @@ from django.conf import settings
 __all__ = ("write_pdf",)
 
 
-def write_pdf(data, form_type):
-    output = io.BytesIO()
+def write_template_and_annotations_to_stream(bytes_stream, data, form_type):
     template_path = os.path.join(
         settings.APPS_DIR, "static", "templates", f"{form_type}.pdf"
     )
-    petition = Writer(data, template_path, output)
-    petition.get_annotations()
+    petition = Writer(data, template_path, bytes_stream)
+    petition.set_annotations()
     petition.write()
-    output.seek(0)
-    return output
+
+def concatenate_pdf_streams(paths, output):
+    writer = pdfrw.PdfWriter()
+
+    for path in paths:
+        path.seek(0)
+        bytes = path.read()
+        if len(bytes) == 0:
+            continue
+        reader = pdfrw.PdfReader(fdata=bytes)
+        writer.addpages(reader.pages)
+
+    writer.write(output)
 
 
 class Writer:
@@ -40,7 +50,7 @@ class Writer:
             pdfrw.PdfDict(NeedAppearances=pdfrw.PdfObject("true"))
         )
 
-    def get_annotations(self):
+    def set_annotations(self):
         self.annotations = self.template.pages[0][self.ANNOT_KEY]
 
     def write(self):
