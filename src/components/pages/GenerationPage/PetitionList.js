@@ -8,27 +8,17 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elemen
 import useWindowSize from '../../../hooks/useWindowSize';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faChevronDown, faBook } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
 import { usePetitionQuery } from '../../../service/api';
 import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
-import { cleanFilename } from '../../../util/file';
+import { SelectDocumentsModal } from '../../../features/SelectDocuments';
 
 const PetitionTable = styled(Table)`
   font-size: 1.7rem;
   font-family: Arial, Helvetica, sans-serif;
-`;
-
-const Attachments = styled.ul`
-  & > li:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-`;
-
-const Label = styled.span`
-  font-size: 1.75rem;
 `;
 
 function ActionButton({
@@ -74,6 +64,10 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
   const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
   const [isAgencySelectModalOpen, setIsAgencySelectModalOpen] = useState(false);
+  const [isSelectDocumentsOpen, setIsSelectDocumentsOpen] = useState(false);
+
+  const allDocuments = [petitionData.base_document, ...(petitionData.attachments ?? [])];
+  const [selectedDocuments, setSelectedDocuments] = useState(allDocuments.map(({ pk }) => pk));
 
   const _openPdf = (pdf) => {
     const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
@@ -146,7 +140,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   }
 
   const _buildPetition = () => ({
-    documents: [petition.base_document.pk, ...petition.attachments.map(({ pk }) => pk)],
+    documents: selectedDocuments,
     name_petitioner: petitionerData.name,
     address1: petitionerData.address1,
     address2: petitionerData.address2,
@@ -183,32 +177,44 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
             <div className="w-max border-b border-gray-700">{petition.form_type}</div>
           </TooltipWrapper>
         </TableCell>
+
         <TableCell>
-          {/* TODO: Options menu allows selection of "Download all", "Download Selected", and "Preview" */}
-          {/* TODO: Add separate "Generate" button */}
           <ActionButton
-            collapsedIcon={faDownload}
-            label={petition.form_type}
-            onClick={() => handleGenerate(petition)}
-            isDisabled={isDisabled}
-            tooltipMessage={isDisabled ? disabledMessage : formName}
+            label={`${petition.agencies.length} Agencies`}
+            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
+            onClick={() => setIsAgencySelectModalOpen(true)}
+            title="View/Modify agencies"
           />
         </TableCell>
         <TableCell>
           <ActionButton
-            label="View/Modify"
+            label={`${petition.offense_records.reduce(
+              (acc, { pk }) => (petition.active_records.includes(pk) ? acc + 1 : acc),
+              0
+            )} Offenses`}
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
             title="View/Modify offense records"
           />
         </TableCell>
         <TableCell>
+          {/* TODO: Options menu allows selection of "Download all", "Download Selected", and "Preview" */}
+          {/* TODO: Add separate "Generate" button */}
+          {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
           <ActionButton
-            label="View/Modify"
-            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
-            onClick={() => setIsAgencySelectModalOpen(true)}
-            title="Reveal agencies"
+            collapsedIcon={faBook}
+            label={`${selectedDocuments.length} Selected`}
+            onClick={() => setIsSelectDocumentsOpen(true)}
           />
+        </TableCell>
+        <TableCell>
+          <button type="button" onClick={() => handleGenerate(petition)} isDisabled={isDisabled}>
+            <FontAwesomeIcon
+              title="Download Documents"
+              icon={faDownload}
+              className="text-blue-primary"
+            />
+          </button>
         </TableCell>
       </TableRow>
       <OffenseTableModal
@@ -217,8 +223,20 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         onClose={() => setIsOffenseModalOpen(false)}
       />
       <SelectAgenciesModal
+        petitionId={petition.pk}
         isOpen={isAgencySelectModalOpen}
         onClose={() => setIsAgencySelectModalOpen(false)}
+      />
+      <SelectDocumentsModal
+        petitionId={petition.pk}
+        documents={allDocuments}
+        selectedDocuments={selectedDocuments}
+        onAddDocument={(newPk) => setSelectedDocuments((prevList) => [...prevList, newPk])}
+        onRemoveDocument={(removePk) =>
+          setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))
+        }
+        isOpen={isSelectDocumentsOpen}
+        onClose={() => setIsSelectDocumentsOpen(false)}
       />
     </>
   );
@@ -226,14 +244,17 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
 
 export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
   return (
-    <PetitionTable numColumns={6}>
+    <PetitionTable columnSizes="3fr 3fr 2fr 2fr 2fr 2fr 1fr">
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
         <TableCell header>Form</TableCell>
-        <TableCell header>Documents</TableCell>
+        <TableCell tooltip="Arresting Agencies" header>
+          Agencies
+        </TableCell>
         <TableCell header>Offenses</TableCell>
-        <TableCell header>Agencies</TableCell>
+        <TableCell header>Documents</TableCell>
+        <TableCell header />
       </TableHeader>
       <TableBody>
         {petitions.map((petition, index) => (

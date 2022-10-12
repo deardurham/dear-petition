@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '../components/elements/Button';
 import StyledDialog from '../components/elements/Modal/Dialog';
 import AutocompleteInput from '../components/elements/Input/AutocompleteInput';
-import { useParams } from 'react-router-dom';
 import {
   useLazySearchAgenciesQuery,
   useAssignAgenciesToDocumentsMutation,
@@ -32,12 +31,15 @@ const sortAgencyArrayByPk = ({ pk: pkA }, { pk: pkB }) => {
   return 0;
 };
 
-export const SelectAgenciesModal = ({ isOpen, onClose }) => {
-  const { batchId } = useParams();
-  const { data: petitionData } = usePetitionQuery({ petitionId: batchId });
+export const SelectAgenciesModal = ({ isOpen, onClose, petitionId }) => {
+  const { data: petitionData } = usePetitionQuery({ petitionId });
 
   const content = petitionData ? (
-    <SelectAgencies selectedAgencies={petitionData.agencies} onClose={onClose} />
+    <SelectAgencies
+      petitionId={petitionId}
+      selectedAgencies={petitionData.agencies}
+      onClose={onClose}
+    />
   ) : (
     <Spinner />
   );
@@ -49,8 +51,7 @@ export const SelectAgenciesModal = ({ isOpen, onClose }) => {
   );
 };
 
-const SelectAgencies = ({ selectedAgencies, onClose }) => {
-  const { batchId } = useParams();
+const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
   const [selections, setSelections] = useState(selectedAgencies);
   const [triggerSuggestionsFetch] = useLazySearchAgenciesQuery();
   const [triggerAssignAgenciesToDocuments] = useAssignAgenciesToDocumentsMutation();
@@ -87,9 +88,7 @@ const SelectAgencies = ({ selectedAgencies, onClose }) => {
           className="px-4"
           disabled={agencyArraysAreEqual(selectedAgencies, selections)}
           title="Update the petitions on the main petition row with your changes."
-          onClick={() =>
-            triggerAssignAgenciesToDocuments({ petitionId: batchId, agencies: selections })
-          }
+          onClick={() => triggerAssignAgenciesToDocuments({ petitionId, agencies: selections })}
         >
           Update Agencies
         </Button>
