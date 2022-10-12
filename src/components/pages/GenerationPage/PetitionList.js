@@ -203,7 +203,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
           {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
           <ActionButton
             collapsedIcon={faBook}
-            label={`${selectedDocuments.length} Selected`}
+            label={`${selectedDocuments.length}/${allDocuments.length} Selected`}
             onClick={() => setIsSelectDocumentsOpen(true)}
           />
         </TableCell>
