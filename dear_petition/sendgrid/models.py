@@ -16,7 +16,7 @@ class Email(models.Model):
     text = models.TextField(blank=True)
     html = models.TextField(blank=True)
     payload = JSONField()
-    spam_score = models.FloatField(null=True)
+    spam_score = models.FloatField(null=True, blank=True)
     attachment_count = models.PositiveIntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -28,7 +28,7 @@ class Attachment(models.Model):
     """Email Attachment"""
 
     name = models.CharField(max_length=1024)
-    content_id = models.CharField("Content ID", max_length=256)
+    content_id = models.CharField("Content ID", max_length=256, blank=True)
     type = models.CharField(max_length=256)
     file = models.FileField(upload_to="attachments/%Y/%m/%d/", max_length=1024)
     email = models.ForeignKey(

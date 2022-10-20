@@ -31,11 +31,13 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
     date_hierarchy = "date_uploaded"
     search_fields = ("label", "batch__label")
     ordering = ("-date_uploaded",)
+    raw_id_fields = ("batch", "batch_file")
 
 
 class CIPRSRecordInline(admin.StackedInline):
     model = models.CIPRSRecord
     extra = 1
+    raw_id_fields = ("batch_file",)
 
 
 class OffenseRecordInline(admin.StackedInline):
@@ -125,6 +127,7 @@ class BatchAdmin(admin.ModelAdmin):
     date_hierarchy = "date_uploaded"
     search_fields = ("label",)
     ordering = ("-date_uploaded", "label")
+    raw_id_fields = ("emails",)
     inlines = (CIPRSRecordInline,)
 
     def get_queryset(self, request):

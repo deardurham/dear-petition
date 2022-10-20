@@ -1,6 +1,6 @@
 import pytest
 
-from dear_petition.sendgrid.actions import extract_username_and_label
+from dear_petition.petition.etl.email import extract_username_and_label
 
 
 @pytest.mark.parametrize(

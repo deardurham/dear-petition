@@ -57,6 +57,13 @@ class CIPRSRecordManager(models.Manager):
 class CIPRSRecord(models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
+    batch_file = models.ForeignKey(
+        "BatchFile",
+        related_name="records",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     date_uploaded = models.DateTimeField(auto_now_add=True)
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
@@ -155,6 +162,9 @@ class Batch(models.Model):
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
+    emails = models.ManyToManyField(
+        "sendgrid.Email", related_name="batches", blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Batches"

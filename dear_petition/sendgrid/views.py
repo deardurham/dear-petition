@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import EmailForm
-from .actions import link_email_to_user
+from .actions import notify_sendgrid_listeners
 
 
 logger = logging.getLogger(__name__)
@@ -21,5 +21,5 @@ def webhook(request):
         logger.warning(f"Webhook validation failed: {form.errors.as_json()}")
         return HttpResponse(status=400)
     email = form.save()
-    link_email_to_user(email_id=email.id)
+    notify_sendgrid_listeners(email_id=email.id)
     return HttpResponse(status=201)

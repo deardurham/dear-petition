@@ -313,3 +313,7 @@ REFRESH_COOKIE_KEY = "Refresh"
 # the same domain.
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
 CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
+
+SENDGRID_WEBHOOK_LISTENERS = (
+    "dear_petition.petition.etl.email.sendgrid_webhook_listener",
+)
