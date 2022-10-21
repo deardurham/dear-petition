@@ -82,11 +82,7 @@ class TestAttachments:
             },
         )
         payload["attachment2"] = attachment_file
-        return rf.post(
-            reverse("sendgrid-webhook"),
-            data=payload,
-            # files={"attachment2": attachment_file},
-        )
+        return rf.post(reverse("sendgrid-webhook"), data=payload)
 
     def test_attachment_email_created(self, request_with_files):
         form = EmailForm(request_with_files)
