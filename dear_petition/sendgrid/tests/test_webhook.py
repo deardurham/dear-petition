@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from dear_petition.sendgrid.forms import EmailForm
 from dear_petition.sendgrid.models import Email
+from dear_petition.sendgrid.views import email_is_allowed, webhook
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -67,6 +68,24 @@ class TestEmails:
         form.save()
         assert Email.objects.count() == 1
 
+    @pytest.mark.django_db
+    def test_sender_allowed(self, settings, rf, payload):
+        payload["from"] = "user@example.com"
+        settings.SENDGRID_ALLOWED_SENDERS = ["example.com"]
+        request = rf.post(reverse("sendgrid-webhook"), data=payload)
+        response = webhook(request)
+        assert response.status_code == 201
+        assert Email.objects.count() == 1
+
+    @pytest.mark.django_db
+    def test_sender_not_allowed(self, settings, rf, payload):
+        payload["from"] = "nope@foo.com"
+        settings.SENDGRID_ALLOWED_SENDERS = ["example.com"]
+        request = rf.post(reverse("sendgrid-webhook"), data=payload)
+        response = webhook(request)
+        assert response.status_code == 201
+        assert Email.objects.count() == 0
+
 
 @pytest.mark.django_db
 class TestAttachments:
@@ -98,3 +117,28 @@ class TestAttachments:
         assert email.attachments.count() == 1
         attachment = email.attachments.first()
         assert attachment.name == "test.pdf"
+
+
+class TestAllowList:
+    @pytest.mark.parametrize(
+        "sender,allowed_senders",
+        [
+            ("user@example.com", ["user@example.com"]),
+            ("user@example.com", ["example.com"]),
+            ("user@example.com", ["foo.io", "example.com"]),
+        ],
+    )
+    def test_allowed_senders(self, sender, allowed_senders):
+        assert email_is_allowed(sender, allowed_senders)
+
+    @pytest.mark.parametrize(
+        "sender,allowed_senders",
+        [
+            ("nope@example.com", ["user@example.com"]),
+            ("user@example.com", ["user@foo.com"]),
+            ("user@example.com", ["foo.com"]),
+            ("user@example.com", ["foo.com", "bar.com"]),
+        ],
+    )
+    def test_not_allowed_senders(self, sender, allowed_senders):
+        assert not email_is_allowed(sender, allowed_senders)
