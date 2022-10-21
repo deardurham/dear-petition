@@ -18,8 +18,8 @@ class AttachmentFactory(factory.DjangoModelFactory):
 
     name = factory.Faker("file_name")
     type = factory.Faker("mime_type")
-    file = factory.Faker("file_path")
-    email = factory.RelatedFactory(EmailFactory)
+    file = factory.Faker("file_path", absolute=False)
+    email = factory.SubFactory(EmailFactory)
 
     class Meta:
         model = Attachment

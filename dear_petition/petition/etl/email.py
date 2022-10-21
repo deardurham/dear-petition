@@ -44,3 +44,4 @@ def sendgrid_webhook_listener(email_id):
         files=attachment_files, user=user, parser_mode=1, batch_label=label
     )
     batch.emails.add(email)
+    return batch
