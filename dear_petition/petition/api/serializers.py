@@ -257,6 +257,7 @@ class MyInboxSerializer(serializers.ModelSerializer):
     total_emails = serializers.IntegerField()
     total_petitions = serializers.SerializerMethodField()
     total_ciprs_records = serializers.SerializerMethodField()
+    automatic_delete_date = serializers.DateTimeField()
 
     class Meta:
         model = Batch
@@ -264,6 +265,7 @@ class MyInboxSerializer(serializers.ModelSerializer):
             "pk",
             "label",
             "date_uploaded",
+            "automatic_delete_date",
             "total_files",
             "total_emails",
             "total_petitions",

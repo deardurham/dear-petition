@@ -305,6 +305,7 @@ SOCIALACCOUNT_ADAPTER = "dear_petition.users.adapters.SocialAccountAdapter"
 # ------------------------------------------------------------------------------
 CIPRS_READER_SOURCE = env.bool("CIPRS_READER_SOURCE", False)
 CIPRS_SAVE_PDF = env.bool("CIPRS_SAVE_PDF", False)
+CIPRS_RECORD_LIFETIME_HOURS = env.int("CIPRS_RECORD_LIFETIME_HOURS", 48)
 
 AUTH_COOKIE_KEY = "Authorization"
 REFRESH_COOKIE_KEY = "Refresh"

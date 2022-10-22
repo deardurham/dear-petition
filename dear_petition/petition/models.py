@@ -4,13 +4,13 @@ import os
 import subprocess
 import tempfile
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import Q, IntegerField, Case, When, Value
+from django.db.models import IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
@@ -229,6 +229,13 @@ class Batch(models.Model):
             return
         today = timezone.now().date()
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+    @property
+    def automatic_delete_date(self):
+        """Date when this batch will be automatically deleted by the cleanup task"""
+        return self.date_uploaded + timedelta(
+            hours=settings.CIPRS_RECORD_LIFETIME_HOURS
+        )
 
 
 def get_batch_file_upload_path(instance, filename):
