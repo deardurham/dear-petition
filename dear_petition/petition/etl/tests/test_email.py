@@ -26,16 +26,16 @@ def test_extract(attr, username, label):
 
 
 @pytest.mark.django_db
-class TestWebhookReceiver:
+class TestWebhookListener:
     def test_email_linked_to_batch(self):
-        """Webhook should associate to users by username"""
+        """Listener should associate users by username"""
         UserFactory(username="gina")
         email = EmailFactory(recipient="gina@deardurham.org")
         batch = sendgrid_webhook_listener(email_id=email.id)
         assert batch.emails.filter(id=email.id).exists()
 
     def test_email_not_linked_to_batch(self):
-        """Webhook should not match other users"""
+        """Listener should not match to other users"""
         UserFactory(username="gina")
         email = EmailFactory(recipient="jessica@deardurham.org")
         batch = sendgrid_webhook_listener(email_id=email.id)

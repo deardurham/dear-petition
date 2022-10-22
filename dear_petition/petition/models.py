@@ -231,10 +231,14 @@ class Batch(models.Model):
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 
+def get_batch_file_upload_path(instance, filename):
+    return "batch/%s/%s" % (instance.batch.id, filename)
+
+
 class BatchFile(models.Model):
     batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    file = models.FileField(upload_to="ciprs/")
+    file = models.FileField(upload_to=get_batch_file_upload_path)
 
     def __str__(self):
         return f"{self.file.name}"
