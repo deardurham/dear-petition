@@ -252,6 +252,33 @@ class BatchDetailSerializer(serializers.ModelSerializer):
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
 
+class MyInboxSerializer(serializers.ModelSerializer):
+    total_files = serializers.IntegerField()
+    total_emails = serializers.IntegerField()
+    total_petitions = serializers.SerializerMethodField()
+    total_ciprs_records = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Batch
+        fields = [
+            "pk",
+            "label",
+            "date_uploaded",
+            "total_files",
+            "total_emails",
+            "total_petitions",
+            "total_ciprs_records",
+        ]
+
+    def get_total_petitions(self, instance):
+        # workaround for multiple table annotation failure: https://code.djangoproject.com/ticket/10060
+        return instance.petitions.count()
+
+    def get_total_ciprs_records(self, instance):
+        # workaround for multiple table annotation failure: https://code.djangoproject.com/ticket/10060
+        return instance.records.count()
+
+
 class GeneratePetitionSerializer(serializers.Serializer):
 
     petition = serializers.ChoiceField(
