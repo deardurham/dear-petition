@@ -70,6 +70,7 @@ class TestEmails:
 
     @pytest.mark.django_db
     def test_sender_allowed(self, settings, rf, payload):
+        """Emails should be saved from allowed senders"""
         payload["from"] = "user@example.com"
         settings.SENDGRID_ALLOWED_SENDERS = ["example.com"]
         request = rf.post(reverse("sendgrid-webhook"), data=payload)
@@ -79,6 +80,7 @@ class TestEmails:
 
     @pytest.mark.django_db
     def test_sender_not_allowed(self, settings, rf, payload):
+        """Emails should NOT be saved from unknown senders"""
         payload["from"] = "nope@foo.com"
         settings.SENDGRID_ALLOWED_SENDERS = ["example.com"]
         request = rf.post(reverse("sendgrid-webhook"), data=payload)
