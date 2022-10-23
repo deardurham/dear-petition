@@ -315,6 +315,7 @@ REFRESH_COOKIE_KEY = "Refresh"
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
 CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
 
+SENDGRID_ALLOWED_SENDERS = env.list("SENDGRID_ALLOWED_SENDERS", default=[])
 SENDGRID_WEBHOOK_LISTENERS = (
     "dear_petition.petition.etl.email.sendgrid_webhook_listener",
 )

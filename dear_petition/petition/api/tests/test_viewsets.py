@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 import pytest
 from django.conf import settings
 from django.urls import reverse
@@ -7,13 +5,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from dear_petition.users.tests.factories import UserFactory
-
 from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
     GeneratedPetitionFactory,
 )
+from dear_petition.sendgrid.tests.factories import EmailFactory
+from dear_petition.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -27,6 +25,7 @@ def get_tokens_for_user(user):
     }
 
 
+@pytest.mark.django_db
 class TestBatchViewSet(APITestCase):
     def setUp(self):
         self.user = UserFactory()
@@ -167,6 +166,7 @@ class TestBatchViewSet(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+@pytest.mark.django_db
 class TestGeneratePetitionViewSet(APITestCase):
     def setUp(self):
         self.user = UserFactory(is_staff=True)
@@ -180,3 +180,25 @@ class TestGeneratePetitionViewSet(APITestCase):
         lines = content.split("\n")
         self.assertTrue(lines[0].startswith("id"))
         self.assertTrue(lines[1].startswith("1"))
+
+
+class TestMyInbox:
+    def test_login_required(self, api_client_anon):
+        response = api_client_anon.get(reverse("api:my-inbox"))
+        assert response.status_code == 401
+
+    @pytest.mark.django_db
+    def test_foo(self, user, api_client):
+        BatchFactory(user=user)
+        email = EmailFactory()
+        batch = BatchFactory(label="myperson", user=user)
+        batch.emails.add(email)
+        CIPRSRecordFactory(batch=batch)
+        CIPRSRecordFactory(batch=batch)
+        response = api_client.get(reverse("api:my-inbox"))
+        assert response.status_code == 200
+        data = response.json()["results"][0]
+        assert data["total_ciprs_records"] == 2
+        assert data["total_emails"] == 1
+        assert data["total_files"] == 0
+        assert data["total_petitions"] == 0
