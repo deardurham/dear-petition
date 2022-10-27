@@ -66,6 +66,7 @@ const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
       <AutocompleteInput
         label="Agencies"
         selections={selections}
+        showSelections
         onSelect={(agency) => setSelections((prev) => [...prev, agency].sort(sortAgencyArrayByPk))}
         onRemoveSelection={(agency) =>
           setSelections((prev) => prev.filter((a) => a.pk !== agency.pk))
@@ -87,7 +88,10 @@ const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
         <Button
           className="px-4"
           disabled={agencyArraysAreEqual(selectedAgencies, selections)}
-          title="Update the petitions on the main petition row with your changes."
+          title={
+            agencyArraysAreEqual(selectedAgencies, selections) &&
+            'You must modify the selected agencies to update the petition'
+          }
           onClick={() => triggerAssignAgenciesToDocuments({ petitionId, agencies: selections })}
         >
           Update Agencies

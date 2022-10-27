@@ -35,6 +35,7 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
     <AutocompleteInput
       label={label}
       selections={filterSelections}
+      showSelections
       onSelect={(value) => addSelection(value)}
       onRemoveSelection={(value) => removeSelection(value)}
       fetchSuggestions={async (searchValue) => {

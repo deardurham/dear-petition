@@ -254,9 +254,6 @@ class BatchDetailSerializer(serializers.ModelSerializer):
 
 class GeneratePetitionSerializer(serializers.Serializer):
 
-    petition = serializers.ChoiceField(
-        choices=[],
-    )
     documents = serializers.PrimaryKeyRelatedField(many=True, queryset=PetitionDocument.objects.all())
     name_petitioner = serializers.CharField(label="Petitioner Name")
     address1 = serializers.CharField(label="Address Line 1")
@@ -271,19 +268,12 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only parent petitions are valid
-        self.fields["petition"].choices = PetitionDocument.objects.filter(previous_document__isnull=True).values_list(
-            "pk", "pk"
-        )
         self.fields["attorney"].choices = Contact.objects.filter(
             category="attorney"
         ).values_list("pk", "name")
         self.fields["agencies"].choices = Contact.objects.filter(
             category="agency"
         ).values_list("pk", "name")
-
-    def validate_petition(self, value):
-        return PetitionDocument.objects.get(pk=value)
 
     def validate_documents(self, value):
         if len(value) == 0:

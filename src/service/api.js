@@ -13,6 +13,12 @@ export const api = createApi({
       }),
       providesTags: ['AgencyList'],
     }),
+    searchAttornies: builder.query({
+      query: ({ search }) => ({
+        url: `/contact/?category=attorney&search=${search}`,
+        method: 'get',
+      }),
+    }),
     searchAgencies: builder.query({
       query: ({ search }) => ({
         url: `contact/?category=agency&search=${search}`,
@@ -43,6 +49,8 @@ export const api = createApi({
     }),
     getBatch: builder.query({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
+      providesTags: (result) =>
+        result ? result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]) : [],
     }),
     login: builder.mutation({
       query: (data) => ({ url: 'token/', method: 'post', data }),
@@ -95,6 +103,7 @@ export const {
   useAgenciesQuery,
   useLazyAgenciesQuery,
   useLazySearchAgenciesQuery,
+  useLazySearchAttorniesQuery,
   useCreateAgencyMutation,
   useDeleteAgencyMutation,
   useUpdateAgencyMutation,

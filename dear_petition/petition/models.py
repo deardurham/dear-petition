@@ -402,8 +402,8 @@ class GeneratedPetition(TimeStampedModel):
     age = models.PositiveIntegerField(null=True)
 
     @classmethod
-    def get_stats_generated_petition(cls, petition_id, user):
-        petition_document = PetitionDocument.objects.get(id=petition_id)
+    def get_stats_generated_petition(cls, petition_document_id, user):
+        petition_document = PetitionDocument.objects.get(id=petition_document_id)
         batch = petition_document.petition.batch
         user = user
 

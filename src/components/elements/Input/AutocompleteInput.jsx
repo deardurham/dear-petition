@@ -26,7 +26,7 @@ const SuggestionContainer = ({ containerProps: { className, ...restProps }, chil
   <div
     className={cx(
       className,
-      { 'border border-gray-800 rounded-md': !!children },
+      { 'border-2 border-gray-800 rounded-md absolute z-10': !!children },
       '[&>ul]:divide-gray-800 [&>ul]:divide-y w-full'
     )}
     {...restProps}
@@ -59,6 +59,8 @@ const AutocompleteInput = ({
   highlightFirstSuggestion,
   label,
   getSuggestionLabel,
+  placeholder = '',
+  showSelections = false,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
@@ -91,6 +93,7 @@ const AutocompleteInput = ({
     value: suggestionValue,
     onChange: handleSuggestionChange,
     onBlur: () => setSuggestions([]),
+    placeholder,
   };
   return (
     <div>
@@ -107,6 +110,7 @@ const AutocompleteInput = ({
             )
           }
           inputProps={inputProps}
+          containerProps={{ className: 'relative' }}
           onSuggestionSelected={handleSuggestionSelected}
           highlightFirstSuggestion={highlightFirstSuggestion ?? false}
           renderInputComponent={(autoSuggestInputProps) =>
@@ -115,18 +119,20 @@ const AutocompleteInput = ({
           renderSuggestionsContainer={(props) => <SuggestionContainer {...props} />}
         />
       </div>
-      <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
-        {selections.map((selection, i) => {
-          const selectionLabel = getSuggestionLabel ? getSuggestionLabel(selection) : selection;
-          return (
-            <Badge
-              key={`${i}_${selectionLabel}`}
-              name={selectionLabel}
-              remove={() => onRemoveSelection(selection)}
-            />
-          );
-        })}
-      </div>
+      {showSelections && (
+        <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
+          {selections.map((selection, i) => {
+            const selectionLabel = getSuggestionLabel ? getSuggestionLabel(selection) : selection;
+            return (
+              <Badge
+                key={`${i}_${selectionLabel}`}
+                name={selectionLabel}
+                remove={() => onRemoveSelection(selection)}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

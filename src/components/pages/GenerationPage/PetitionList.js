@@ -8,18 +8,18 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elemen
 import useWindowSize from '../../../hooks/useWindowSize';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faChevronDown, faBook } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faChevronDown,
+  faBook,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
 import { usePetitionQuery } from '../../../service/api';
 import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import { SelectDocumentsModal } from '../../../features/SelectDocuments';
-
-const PetitionTable = styled(Table)`
-  font-size: 1.7rem;
-  font-family: Arial, Helvetica, sans-serif;
-`;
 
 function ActionButton({
   className,
@@ -53,40 +53,38 @@ const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10]
   </Tooltip>
 );
 
-const DISABLED_MESSAGE = [
+const NO_ACTIVE_RECORDS = [
   'There are no records selected for the petition document.',
   'Please review the list of offense records and update the petition to include offense records if needed.',
 ];
 
-function PetitionRow({ attorney, petitionData, petitionerData, validateInput, backgroundColor }) {
-  const [pdfWindow, setPdfWindow] = useState({ handle: null, url: null });
+const NO_AGENCIES_SELECTED = ['There are no agencies selected for the petition document.'];
+
+const NO_DOCUMENTS_SELECTED = [
+  'There are no documents selected for download for the petition document.',
+];
+
+function PetitionRow({
+  attorney,
+  petitionData,
+  petitionerData,
+  validateInput,
+  backgroundColor,
+  setFormErrors,
+}) {
   const [error, setError] = useState('');
   const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
+  const [prevPetition, setPrevPetition] = useState(petition);
   const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
   const [isAgencySelectModalOpen, setIsAgencySelectModalOpen] = useState(false);
   const [isSelectDocumentsOpen, setIsSelectDocumentsOpen] = useState(false);
 
-  const allDocuments = [petitionData.base_document, ...(petitionData.attachments ?? [])];
+  const allDocuments = petition ? [petition.base_document, ...(petition.attachments ?? [])] : [];
   const [selectedDocuments, setSelectedDocuments] = useState(allDocuments.map(({ pk }) => pk));
-
-  const _openPdf = (pdf) => {
-    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
-
-    // IE doesn't allow using a blob object directly as link href
-    // instead it is necessary to use msSaveOrOpenBlob
-    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveOrOpenBlob(pdfBlob);
-      return;
-    }
-
-    // Clean up previous pdf when generating new one
-    const { handle: oldHandle, url: oldUrl } = pdfWindow;
-    if (oldUrl) window.URL.revokeObjectURL(oldUrl);
-    if (oldHandle) oldHandle.close();
-
-    const url = window.URL.createObjectURL(pdfBlob);
-    setPdfWindow({ handle: window.open(url), url });
-  };
+  if (petition !== prevPetition) {
+    setSelectedDocuments(allDocuments.map(({ pk }) => pk));
+    setPrevPetition(petition);
+  }
 
   const downloadPdf = (pdf, filename) => {
     const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
@@ -101,14 +99,6 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     });
   };
 
-  const closePdf = () => {
-    const { url, handle } = pdfWindow;
-    if (url) window.URL.revokeObjectURL(url);
-    if (handle) handle.close();
-
-    setPdfWindow({ handle: null, url: null });
-  };
-
   const handleGenerate = async () => {
     if (!validateInput()) {
       return;
@@ -117,7 +107,7 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     try {
       setError('');
       const { data, headers } = await Axios.post(
-        `/petitions/${petition.pk}/generate_petition_pdf/`,
+        `/petitions/${petitionData.pk}/generate_petition_pdf/`,
         derivedPetition,
         {
           responseType: 'arraybuffer',
@@ -131,6 +121,20 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
       // const data = await generatePetition(derivedPetition).unwrap();
       downloadPdf(data, filename);
     } catch (e) {
+      if (e?.response?.data) {
+        const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
+        const { attorney: attorneyError, name, address1, city, state, zipCode } = errorData;
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          attorney: attorneyError,
+          name,
+          address1,
+          city,
+          state,
+          zipCode,
+        }));
+        return;
+      }
       setError(!e?.response && e?.message ? e?.message : 'An unexpected error occurred');
     }
   };
@@ -147,26 +151,36 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
     city: petitionerData.city,
     state: petitionerData.state.value,
     zip_code: petitionerData.zipCode,
-    attorney: attorney.value,
+    attorney: attorney.pk,
     agencies: petition.agencies.map((agency) => agency.pk),
   });
 
-  const disabledMessageLines = [PETITION_FORM_NAMES[petition.form_type], ...DISABLED_MESSAGE];
-  if (petition.form_type === 'AOC-CR-293') {
-    disabledMessageLines.push(
-      'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
-    );
-  }
-  const disabledMessage = (
-    <div className="flex flex-col gap-4 p-4">
-      {disabledMessageLines.map((str, i) => (
-        <span key={i}>{str}</span>
-      ))}
+  const getDisabledMessage = () => {
+    if (petition.active_records.length === 0) {
+      const message = [...NO_ACTIVE_RECORDS];
+      if (petition.form_type === 'AOC-CR-293') {
+        message.push(
+          'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
+        );
+      }
+      return message;
+    }
+    if (petition.agencies.length === 0) {
+      return NO_AGENCIES_SELECTED;
+    }
+    if (selectedDocuments.length === 0) {
+      return NO_DOCUMENTS_SELECTED;
+    }
+    return null;
+  };
+
+  const disabledReason = getDisabledMessage();
+  const disabledTooltipContent = (
+    <div className="flex flex-col gap-2">
+      {disabledReason?.map((line) => <span key={line}>{line}</span>) || error}
     </div>
   );
-
-  const formName = <span className="px-4 py-2">{PETITION_FORM_NAMES[petition.form_type]}</span>;
-  const isDisabled = petition.active_records.length === 0;
+  const areALlDocumentsSelected = selectedDocuments.length === allDocuments.length;
   return (
     <>
       <TableRow key={petition.pk} backgroundColor={backgroundColor}>
@@ -180,41 +194,64 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
 
         <TableCell>
           <ActionButton
+            className="w-[100px]"
             label={`${petition.agencies.length} Agencies`}
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsAgencySelectModalOpen(true)}
-            title="View/Modify agencies"
+            title="View/modify agencies"
           />
         </TableCell>
         <TableCell>
           <ActionButton
-            label={`${petition.offense_records.reduce(
-              (acc, { pk }) => (petition.active_records.includes(pk) ? acc + 1 : acc),
-              0
-            )} Offenses`}
+            label={`${petition.active_records.length} Offense${
+              petition.active_records.length === 1 ? '' : 's'
+            }`}
+            className="w-[105px]"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
-            title="View/Modify offense records"
+            title="View/modify offense records"
           />
         </TableCell>
         <TableCell>
-          {/* TODO: Options menu allows selection of "Download all", "Download Selected", and "Preview" */}
-          {/* TODO: Add separate "Generate" button */}
           {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
           <ActionButton
             collapsedIcon={faBook}
-            label={`${selectedDocuments.length}/${allDocuments.length} Selected`}
+            className="w-[120px]"
+            label={
+              areALlDocumentsSelected
+                ? `${allDocuments.length} Document${allDocuments.length === 1 ? '' : 's'}`
+                : `${selectedDocuments.length}/${allDocuments.length} Selected`
+            }
             onClick={() => setIsSelectDocumentsOpen(true)}
+            title="Select documents for download"
           />
         </TableCell>
         <TableCell>
-          <button type="button" onClick={() => handleGenerate(petition)} isDisabled={isDisabled}>
-            <FontAwesomeIcon
-              title="Download Documents"
-              icon={faDownload}
-              className="text-blue-primary"
-            />
-          </button>
+          <div className="flex justify-end items-center h-full gap-4 ">
+            <Tooltip
+              tooltipContent={disabledTooltipContent}
+              hideTooltip={!disabledReason && !error}
+            >
+              <FontAwesomeIcon
+                className={cx('text-[24px] text-red', { invisible: !disabledReason && !error })}
+                icon={faExclamationTriangle}
+              />
+            </Tooltip>
+            <button
+              type="button"
+              onClick={() => handleGenerate(petition)}
+              disabled={!!disabledReason}
+            >
+              <FontAwesomeIcon
+                title="Download Documents"
+                icon={faDownload}
+                className={cx('text-[24px]', {
+                  'text-blue-primary': !disabledReason,
+                  'text-gray': !!disabledReason,
+                })}
+              />
+            </button>
+          </div>
         </TableCell>
       </TableRow>
       <OffenseTableModal
@@ -242,9 +279,15 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
   );
 }
 
-export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
+export default function PetitionList({
+  attorney,
+  petitions,
+  petitionerData,
+  validateInput,
+  setFormErrors,
+}) {
   return (
-    <PetitionTable columnSizes="3fr 3fr 2fr 2fr 2fr 2fr 1fr">
+    <Table className="text-[1.7rem]" columnSizes="4fr 4fr 3fr 3fr 3fr 3fr 2fr">
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
@@ -265,9 +308,10 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
             attorney={attorney}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}
+            setFormErrors={setFormErrors}
           />
         ))}
       </TableBody>
-    </PetitionTable>
+    </Table>
   );
 }

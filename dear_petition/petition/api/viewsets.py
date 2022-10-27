@@ -249,17 +249,17 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def generate_petition_pdf(self, request, pk=None):
-        serializer_input = request.data.copy()
-        serializer_input.update({'petition': pk})
-        serializer = serializers.GeneratePetitionSerializer(data=serializer_input)
+        serializer = serializers.GeneratePetitionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        petition_documents = pm.PetitionDocument.objects.filter(pk__in=serializer.data["documents"])
+        petition_documents = pm.PetitionDocument.objects.filter(petition=pk, pk__in=serializer.data["documents"]).order_by('pk')
+        assert len(petition_documents) > 0, 'Petition documents could not be found for petition'
         generated_petition_pdf = generate_petition_pdf(
             petition_documents, serializer.data
         )
 
-        pm.GeneratedPetition.get_stats_generated_petition(pk, request.user)
+        for doc in petition_documents.iterator():
+            pm.GeneratedPetition.get_stats_generated_petition(doc.pk, request.user)
 
         resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"
