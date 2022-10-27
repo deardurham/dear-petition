@@ -28,6 +28,7 @@ def concatenate_pdf_streams(paths, output):
         writer.addpages(reader.pages)
 
     writer.write(output)
+    output.seek(0)
 
 
 class Writer:

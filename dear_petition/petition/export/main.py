@@ -38,11 +38,14 @@ def build_pdf_template_context(petition_document, extra):
 
 def generate_petition_pdf(petition_documents, extra):
     pdf_stream = io.BytesIO()
+    doc_streams = []
     for petition_document in petition_documents:
-        with io.BytesIO() as doc_stream:
-            context = build_pdf_template_context(petition_document, extra)
-            add_pdf_template_annotations(context)
-            write_template_and_annotations_to_stream(doc_stream, context, petition_document.form_type)
-            concatenate_pdf_streams([pdf_stream, doc_stream], pdf_stream)
-    pdf_stream.seek(0)
+        doc_stream = io.BytesIO()
+        context = build_pdf_template_context(petition_document, extra)
+        add_pdf_template_annotations(context)
+        write_template_and_annotations_to_stream(doc_stream, context, petition_document.form_type)
+        doc_streams.append(doc_stream)
+    concatenate_pdf_streams(doc_streams, pdf_stream)
+    for doc_stream in doc_streams:
+        doc_stream.close()
     return pdf_stream
