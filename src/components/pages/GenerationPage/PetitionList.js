@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
 import Axios from '../../../service/axios';
