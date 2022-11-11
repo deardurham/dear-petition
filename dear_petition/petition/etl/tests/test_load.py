@@ -54,7 +54,6 @@ def test_created_petition(batch, record1, charged_dismissed_record, mock_ciprs_r
 
 @pytest.mark.parametrize("parser_mode", [1, 2])
 def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parser_mode):
-    settings.CIPRS_SAVE_PDF = True
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf], user, parser_mode)
@@ -65,7 +64,6 @@ def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parse
 def test_save_pdf__multiple(
     fake_pdf, fake_pdf2, user, settings, mock_transform_ciprs_document, parser_mode
 ):
-    settings.CIPRS_SAVE_PDF = True
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
