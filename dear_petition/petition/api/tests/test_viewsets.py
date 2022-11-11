@@ -188,7 +188,7 @@ class TestMyInbox:
         assert response.status_code == 401
 
     @pytest.mark.django_db
-    def test_foo(self, user, api_client):
+    def test_basic_inbox_stats(self, user, api_client):
         BatchFactory(user=user)
         email = EmailFactory()
         batch = BatchFactory(label="myperson", user=user)
