@@ -83,7 +83,7 @@ function GenerationPage() {
     if (!attorney) {
       setFormErrors((oldErrors) => ({
         ...oldErrors,
-        attorney: ['Please select an attorney from the list'],
+        attorney: ['Please select an attorney'],
       }));
       hasErrors = true;
     }
@@ -136,6 +136,7 @@ function GenerationPage() {
                 attorney={attorney}
                 petitionerData={petitionerData}
                 validateInput={validateInput}
+                setFormErrors={setFormErrors}
               />
             )}
           </GenerationSection>

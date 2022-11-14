@@ -14,11 +14,6 @@ router.register(r"batch", viewsets.BatchViewSet)
 router.register(r"petitions", viewsets.PetitionViewSet)
 router.register(r"generatedpetition", viewsets.GeneratedPetitionViewSet)
 router.register(
-    r"generate-petition",
-    viewsets.GeneratePetitionView,
-    basename="generate-petition",
-)
-router.register(
     r"generate-data-petition",
     viewsets.GenerateDataPetitionView,
     basename="generate-data-petition",

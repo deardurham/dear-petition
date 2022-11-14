@@ -75,7 +75,7 @@ const ExperimentalMessage = styled.div`
 
 function HomePage() {
   const fileInputRef = React.createRef();
-  const [parserMode, setParserMode] = useState();
+  const [parserMode, setParserMode] = useState(true);
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [files, setFiles] = useState(new Set());

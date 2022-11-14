@@ -1,43 +1,28 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
-import GeneratePetitionModal from './GeneratePetitionModal/GeneratePetitionModal';
+import Axios from '../../../service/axios';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
-import StyledDialog from '../../elements/Modal/Dialog';
 import useWindowSize from '../../../hooks/useWindowSize';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
-import AgencyAutocomplete from './GenerationInput/AgencyAutocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faChevronDown,
+  faBook,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
-import { api, usePetitionQuery } from '../../../service/api';
-import Axios from '../../../service/axios';
-import { useDispatch } from 'react-redux';
-
+import { usePetitionQuery } from '../../../service/api';
+import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
+import { SelectDocumentsModal } from '../../../features/SelectDocuments';
 
-const PetitionTable = styled(Table)`
-  font-size: 1.7rem;
-  font-family: Arial, Helvetica, sans-serif;
-`;
-
-const Attachments = styled.ul`
-  & > li:not(:last-child) {
-    margin-bottom: 1rem;
-  }
-`;
-
-const Label = styled.span`
-  font-size: 1.75rem;
-`;
-
-function GenerateButton({
+function ActionButton({
   className,
   label,
-  windowWidth,
   onClick,
   collapsedIcon,
   title = '',
@@ -45,9 +30,10 @@ function GenerateButton({
   tooltipMessage = '',
   tooltipOffset = [0, 10],
 }) {
-  const isCollapsed = windowWidth <= TABLET_LANDSCAPE_SIZE;
+  const windowSize = useWindowSize();
+  const isCollapsed = windowSize.width <= TABLET_LANDSCAPE_SIZE;
   return (
-    <Tooltip tooltipContent={tooltipMessage} hideTooltip={!tooltipMessage} offset={tooltipOffset}>
+    <TooltipWrapper tooltipMessage={tooltipMessage} tooltipOffset={tooltipOffset}>
       <Button
         className={cx(className, 'text-[1.55rem]')}
         onClick={onClick}
@@ -56,129 +42,215 @@ function GenerateButton({
       >
         {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
       </Button>
-    </Tooltip>
+    </TooltipWrapper>
   );
 }
 
-const DISABLED_MESSAGE = [
+const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10] }) => (
+  <Tooltip tooltipContent={tooltipMessage} hideTooltip={!tooltipMessage} offset={tooltipOffset}>
+    {children}
+  </Tooltip>
+);
+
+const NO_ACTIVE_RECORDS = [
   'There are no records selected for the petition document.',
   'Please review the list of offense records and update the petition to include offense records if needed.',
 ];
 
-function PetitionRow({ attorney, petitionData, petitionerData, validateInput, backgroundColor }) {
-  const dispatch = useDispatch();
-  const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
-  const [agencies, setAgencies] = useState([]);
-  const [attachmentNumber, setAttachmentNumber] = useState();
-  const [selectedPetition, setSelectedPetition] = useState();
-  const windowSize = useWindowSize();
-  const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
-  const [isAgenciesDetailed, setIsAgenciesDetailed] = useState();
+const NO_AGENCIES_SELECTED = ['There are no agencies selected for the petition document.'];
 
-  const [offenseRecordsLoading, setOffenseRecordsLoading] = useState(false);
-  const [isModified, setIsModified] = useState(false);
-  const handleSelect = (newPetition, num) => {
-    if (validateInput()) {
-      setSelectedPetition(newPetition);
-      if (num) {
-        setAttachmentNumber(num);
+const NO_DOCUMENTS_SELECTED = [
+  'There are no documents selected for download for the petition document.',
+];
+
+function PetitionRow({
+  attorney,
+  petitionData,
+  petitionerData,
+  validateInput,
+  backgroundColor,
+  setFormErrors,
+}) {
+  const [error, setError] = useState('');
+  const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
+  const [prevPetition, setPrevPetition] = useState(petition);
+  const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
+  const [isAgencySelectModalOpen, setIsAgencySelectModalOpen] = useState(false);
+  const [isSelectDocumentsOpen, setIsSelectDocumentsOpen] = useState(false);
+
+  const allDocuments = petition ? [petition.base_document, ...(petition.attachments ?? [])] : [];
+  const [selectedDocuments, setSelectedDocuments] = useState(allDocuments.map(({ pk }) => pk));
+  if (petition !== prevPetition) {
+    setSelectedDocuments(allDocuments.map(({ pk }) => pk));
+    setPrevPetition(petition);
+  }
+
+  const downloadPdf = (pdf, filename) => {
+    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      link.remove();
+    });
+  };
+
+  const handleGenerate = async () => {
+    if (!validateInput()) {
+      return;
+    }
+    const derivedPetition = _buildPetition();
+    try {
+      setError('');
+      const { data, headers } = await Axios.post(
+        `/petitions/${petitionData.pk}/generate_petition_pdf/`,
+        derivedPetition,
+        {
+          responseType: 'arraybuffer',
+        }
+      );
+      // content-disposition: 'inline; filename="petition.pdf"'
+      const filename =
+        headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
+      // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
+      // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
+      // const data = await generatePetition(derivedPetition).unwrap();
+      downloadPdf(data, filename);
+    } catch (e) {
+      if (e?.response?.data) {
+        const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
+        const { attorney: attorneyError, name, address1, city, state, zipCode } = errorData;
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          attorney: attorneyError,
+          name,
+          address1,
+          city,
+          state,
+          zipCode,
+        }));
+        return;
       }
+      setError(!e?.response && e?.message ? e?.message : 'An unexpected error occurred');
     }
   };
 
   if (!petition) {
     return null;
   }
-  const petitionId = petition.pk;
 
-  const fetchData = () => {
-    setOffenseRecordsLoading(true);
-    Axios.get(`/petitions/${petitionId}/`).then(({ data }) => {
-      setAgencies(data.agencies);
-      setOffenseRecordsLoading(false);
-    });
-  };
+  const _buildPetition = () => ({
+    documents: selectedDocuments,
+    name_petitioner: petitionerData.name,
+    address1: petitionerData.address1,
+    address2: petitionerData.address2,
+    city: petitionerData.city,
+    state: petitionerData.state.value,
+    zip_code: petitionerData.zipCode,
+    attorney: attorney.pk,
+    agencies: petition.agencies.map((agency) => agency.pk),
+  });
 
-  const handleAgenciesPress = () => {
-    setIsAgenciesDetailed(!isAgenciesDetailed);
-    if (!agencies.length) {
-      fetchData();
+  const getDisabledMessage = () => {
+    if (petition.active_records.length === 0) {
+      const message = [...NO_ACTIVE_RECORDS];
+      if (petition.form_type === 'AOC-CR-293') {
+        message.push(
+          'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
+        );
+      }
+      return message;
     }
+    if (petition.agencies.length === 0) {
+      return NO_AGENCIES_SELECTED;
+    }
+    if (selectedDocuments.length === 0) {
+      return NO_DOCUMENTS_SELECTED;
+    }
+    return null;
   };
 
-  const disabledMessageLines = [PETITION_FORM_NAMES[petition.form_type], ...DISABLED_MESSAGE];
-  if (petition.form_type === 'AOC-CR-293') {
-    disabledMessageLines.push(
-      'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
-    );
-  }
-  const disabledMessage = (
-    <div className="flex flex-col gap-4 p-4">
-      {disabledMessageLines.map((str, i) => (
-        <span key={i}>{str}</span>
-      ))}
+  const disabledReason = getDisabledMessage();
+  const disabledTooltipContent = (
+    <div className="flex flex-col gap-2">
+      {disabledReason?.map((line) => <span key={line}>{line}</span>) || error}
     </div>
   );
-
-  const formName = <span className="px-4 py-2">{PETITION_FORM_NAMES[petition.form_type]}</span>;
-
-  const isDisabled = petition.active_records.length === 0;
-
-  const assignAgenciesToDocuments = () => {
-    Axios.post(`/petitions/${petitionId}/assign_agencies_to_documents/`, {
-      agencies,
-    }).then(({ data }) => {
-      dispatch(api.util.invalidateTags([{ type: 'Petition', id: petitionId }]));
-      setAgencies(data.agencies);
-    });
-  };
-
+  const areALlDocumentsSelected = selectedDocuments.length === allDocuments.length;
   return (
     <>
       <TableRow key={petition.pk} backgroundColor={backgroundColor}>
         <TableCell>{petition.county}</TableCell>
         <TableCell>{petition.jurisdiction}</TableCell>
         <TableCell>
-          <GenerateButton
-            collapsedIcon={faDownload}
-            windowWidth={windowSize.width}
-            label={petition.form_type}
-            onClick={() => handleSelect(petition.base_document)}
-            isDisabled={isDisabled}
-            tooltipMessage={isDisabled ? disabledMessage : formName}
-            tooltipOffset={!isDisabled ? [-35, 10] : undefined}
+          <TooltipWrapper tooltipMessage={PETITION_FORM_NAMES[petition.form_type]}>
+            <div className="w-max border-b border-gray-700">{petition.form_type}</div>
+          </TooltipWrapper>
+        </TableCell>
+
+        <TableCell>
+          <ActionButton
+            className="w-[100px]"
+            label={`${petition.agencies.length} Agencies`}
+            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
+            onClick={() => setIsAgencySelectModalOpen(true)}
+            title="View/modify agencies"
           />
         </TableCell>
         <TableCell>
-          <Attachments>
-            {petition.attachments.map((attachment, i) => (
-              <li key={attachment.pk}>
-                <Label>{`${i + 1}) `}</Label>
-                <GenerateButton
-                  collapsedIcon={faDownload}
-                  windowWidth={windowSize.width}
-                  label={attachment.form_type}
-                  onClick={() => handleSelect(attachment, i + 1)}
-                />
-              </li>
-            ))}
-          </Attachments>
-        </TableCell>
-        <TableCell>
-          <GenerateButton
-            label="View/Modify"
+          <ActionButton
+            label={`${petition.active_records.length} Offense${
+              petition.active_records.length === 1 ? '' : 's'
+            }`}
+            className="w-[105px]"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
-            title="View/Modify offense records"
+            title="View/modify offense records"
           />
         </TableCell>
         <TableCell>
-          <GenerateButton
-            label="View/Modify"
-            isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
-            onClick={() => handleAgenciesPress()}
-            title="Reveal agencies"
+          {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
+          <ActionButton
+            collapsedIcon={faBook}
+            className="w-[120px]"
+            label={
+              areALlDocumentsSelected
+                ? `${allDocuments.length} Document${allDocuments.length === 1 ? '' : 's'}`
+                : `${selectedDocuments.length}/${allDocuments.length} Selected`
+            }
+            onClick={() => setIsSelectDocumentsOpen(true)}
+            title="Select documents for download"
           />
+        </TableCell>
+        <TableCell>
+          <div className="flex justify-end items-center h-full gap-4 ">
+            <Tooltip
+              tooltipContent={disabledTooltipContent}
+              hideTooltip={!disabledReason && !error}
+            >
+              <FontAwesomeIcon
+                className={cx('text-[24px] text-red', { invisible: !disabledReason && !error })}
+                icon={faExclamationTriangle}
+              />
+            </Tooltip>
+            <button
+              type="button"
+              onClick={() => handleGenerate(petition)}
+              disabled={!!disabledReason}
+            >
+              <FontAwesomeIcon
+                title="Download Documents"
+                icon={faDownload}
+                className={cx('text-[24px]', {
+                  'text-blue-primary': !disabledReason,
+                  'text-gray': !!disabledReason,
+                })}
+              />
+            </button>
+          </div>
         </TableCell>
       </TableRow>
       <OffenseTableModal
@@ -186,67 +258,45 @@ function PetitionRow({ attorney, petitionData, petitionerData, validateInput, ba
         isOpen={isOffenseModalOpen}
         onClose={() => setIsOffenseModalOpen(false)}
       />
-      {isAgenciesDetailed && (
-        <StyledDialog isOpen={isAgenciesDetailed} onClose={() => setIsAgenciesDetailed(false)}>
-          {offenseRecordsLoading ? (
-            <h5>Loading...</h5>
-          ) : (
-            <div className="w-[900px] h-auto p-10 flex flex-col gap-8">
-              <h3>View / Select Agencies</h3>
-              <p className="text-[1.6rem]">
-                Please select or de-select agencies here if you wish to include or exclude them from
-                the petition.
-              </p>
-              <AgencyAutocomplete
-                agencies={agencies}
-                setAgencies={setAgencies}
-                isModified={isModified}
-                setIsModified={setIsModified}
-              />
-              <div className="self-center flex gap-8">
-                <GenerateButton
-                  className="w-[15rem]"
-                  label="Update Agencies"
-                  onClick={assignAgenciesToDocuments}
-                  title="Update the petitions on the main petition row with your changes."
-                  isDisabled={!isModified}
-                />
-                <Button className="px-4" onClick={() => setIsAgenciesDetailed(false)}>
-                  Close
-                </Button>
-              </div>
-            </div>
-          )}
-        </StyledDialog>
-      )}
-      {selectedPetition && (
-        <GeneratePetitionModal
-          petition={selectedPetition}
-          attachmentNumber={attachmentNumber}
-          petitionerData={petitionerData}
-          attorney={attorney}
-          agencies={agencies}
-          setAgencies={setAgencies}
-          onClose={() => {
-            setSelectedPetition();
-            setAttachmentNumber();
-          }}
-        />
-      )}
+      <SelectAgenciesModal
+        petitionId={petition.pk}
+        isOpen={isAgencySelectModalOpen}
+        onClose={() => setIsAgencySelectModalOpen(false)}
+      />
+      <SelectDocumentsModal
+        petitionId={petition.pk}
+        documents={allDocuments}
+        selectedDocuments={selectedDocuments}
+        onAddDocument={(newPk) => setSelectedDocuments((prevList) => [...prevList, newPk])}
+        onRemoveDocument={(removePk) =>
+          setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))
+        }
+        isOpen={isSelectDocumentsOpen}
+        onClose={() => setIsSelectDocumentsOpen(false)}
+      />
     </>
   );
 }
 
-export default function PetitionList({ attorney, petitions, petitionerData, validateInput }) {
+export default function PetitionList({
+  attorney,
+  petitions,
+  petitionerData,
+  validateInput,
+  setFormErrors,
+}) {
   return (
-    <PetitionTable numColumns={6}>
+    <Table className="text-[1.7rem]" columnSizes="4fr 4fr 3fr 3fr 3fr 3fr 2fr">
       <TableHeader>
         <TableCell header>County</TableCell>
         <TableCell header>Jurisdiction</TableCell>
-        <TableCell header>Petition</TableCell>
-        <TableCell header>Attachments</TableCell>
+        <TableCell header>Form</TableCell>
+        <TableCell tooltip="Arresting Agencies" header>
+          Agencies
+        </TableCell>
         <TableCell header>Offenses</TableCell>
-        <TableCell header>Agencies</TableCell>
+        <TableCell header>Documents</TableCell>
+        <TableCell header />
       </TableHeader>
       <TableBody>
         {petitions.map((petition, index) => (
@@ -257,9 +307,10 @@ export default function PetitionList({ attorney, petitions, petitionerData, vali
             attorney={attorney}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}
+            setFormErrors={setFormErrors}
           />
         ))}
       </TableBody>
-    </PetitionTable>
+    </Table>
   );
 }
