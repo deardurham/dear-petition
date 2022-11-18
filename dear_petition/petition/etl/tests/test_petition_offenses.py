@@ -1,7 +1,7 @@
 import pytest
 
 from dear_petition.petition.etl.load import link_offense_records, create_documents
-from dear_petition.petition.etl.paginator import OffenseRecordPaginator
+from dear_petition.petition.etl.paginator import INITIAL_PAGE_SIZE, UNDERAGE_CONVICTIONS_PAGE_SIZE, OffenseRecordPaginator
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
 from dear_petition.petition.export.forms import AOCFormCR287, AOCFormCR285
@@ -50,6 +50,12 @@ def paginator(petition):
 @pytest.mark.parametrize("initial_page_size,expected", [[10, 10], [0, 10], [-10, 10]])
 def test_paginator_initial_page_size(petition, initial_page_size, expected):
     paginator = OffenseRecordPaginator(petition, initial_page_size=initial_page_size)
+    assert paginator.initial_page_size == expected
+
+@pytest.mark.parametrize("form_type,expected", [[constants.DISMISSED, INITIAL_PAGE_SIZE], [constants.NOT_GUILTY, INITIAL_PAGE_SIZE], [constants.UNDERAGED_CONVICTIONS, UNDERAGE_CONVICTIONS_PAGE_SIZE]])
+def test_paginator_default_page_size(petition, form_type, expected):
+    petition.form_type = form_type
+    paginator = OffenseRecordPaginator(petition)
     assert paginator.initial_page_size == expected
 
 

@@ -1,6 +1,7 @@
-from dear_petition.petition.constants import DISMISSED, ATTACHMENT
+from dear_petition.petition.constants import DISMISSED, ATTACHMENT, UNDERAGED_CONVICTIONS
 
 INITIAL_PAGE_SIZE = 10
+UNDERAGE_CONVICTIONS_PAGE_SIZE = 6
 ATTACHMENT_PAGE_SIZE = 20
 
 
@@ -23,10 +24,11 @@ class OffenseRecordPaginator:
         attachment_page_size=None,
         filter_active=True,
     ):
+        default_page_size = UNDERAGE_CONVICTIONS_PAGE_SIZE if petition.form_type == UNDERAGED_CONVICTIONS else INITIAL_PAGE_SIZE
         self.initial_page_size = (
             abs(initial_page_size)
             if initial_page_size and initial_page_size >= 0
-            else INITIAL_PAGE_SIZE
+            else default_page_size
         )
         self.attachment_page_size = (
             abs(attachment_page_size)
