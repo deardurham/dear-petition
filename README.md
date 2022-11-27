@@ -40,7 +40,7 @@ docker-compose run --rm django python manage.py migrate
 docker-compose run --rm django python manage.py createsuperuser
 ```
 
-When asked for a username and password, enter values of your choosing.  Email address may be left empty.
+Try out DEAR Petition Generator by logging in as the superuser you created and uploading test CIPRS records (in pdf format) which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
 
 ## Frontend Development
 
@@ -79,10 +79,6 @@ You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 API_PROXY=http://localhost:8888 npm start
 ```
 
-### Try it out
-
-Try out DEAR Petition Generator by logging in as the superuser you created and uploading test CIPRS records (in pdf format) which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
-
 ## Backend Development (with Docker)
 
 To run this on a Mac, use [Docker for
@@ -97,28 +93,6 @@ Run the containers:
     docker-compose up django
 
 Visit http://localhost:8000/petition/api/ in your browser.  If you get authentication errors, you may login as the superuser you created at http://localhost:8000/ and try again.
-
-### Using docker-compose.override.yml
-
-To develop in a Docker container, we'll create a `docker-compose.override.yml`
-override file in the root of the dear-petition directory to configure the Django container to sleep by default:
-
-```yaml
-# file: docker-compose.override.yml
-version: '3'
-
-services:
-  django:
-    command: ["sleep", "infinity"]
-```
-
-Now we run `runserver` manually to have more control over restarts:
-
-```sh
-docker-compose up -d django
-docker-compose exec django bash
-root$ python manage.py runserver 0.0.0.0:8000
-```
 
 ### Initial Setup
 
@@ -148,6 +122,27 @@ $ pg_restore -Ox -d dear_petition latest.dump
 $ python manage.py migrate
 ```
 
+### Configuring the containers using docker-compose.override.yml (optional)
+
+To develop in a Docker container, we'll create a `docker-compose.override.yml`
+override file in the root of the dear-petition directory to configure the Django container to sleep by default:
+
+```yaml
+# file: docker-compose.override.yml
+version: '3'
+
+services:
+  django:
+    command: ["sleep", "infinity"]
+```
+
+Now we run `runserver` manually to have more control over restarts:
+
+```sh
+docker-compose up -d django
+docker-compose exec django bash
+root$ python manage.py runserver 0.0.0.0:8000
+```
 
 ## Backend Development (without Docker)
 
