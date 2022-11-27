@@ -36,9 +36,11 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 git clone git@github.com:deardurham/dear-petition.git
 cd dear-petition
 docker-compose up -d django
+docker-compose run --rm django python manage.py migrate
 docker-compose run --rm django python manage.py createsuperuser
 ```
 
+When asked for a username and password, enter values of your choosing.  Email address may be left empty.
 
 ## Frontend Development
 
@@ -77,6 +79,10 @@ You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 API_PROXY=http://localhost:8888 npm start
 ```
 
+### Try it out
+
+Try out DEAR Petition Generator by logging in as the superuser you created and uploading test CIPRS records (in pdf format) which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
+
 ## Backend Development (with Docker)
 
 To run this on a Mac, use [Docker for
@@ -90,12 +96,12 @@ Run the containers:
 
     docker-compose up django
 
-Visit http://localhost:8000/petition/api/ in your browser.
+Visit http://localhost:8000/petition/api/ in your browser.  If you get authentication errors, you may login as the superuser you created at http://localhost:8000/ and try again.
 
 ### Using docker-compose.override.yml
 
-To develop in a Docker container, we'll use a `docker-compose.override.yml`
-override file to configure the Django container to sleep by default:
+To develop in a Docker container, we'll create a `docker-compose.override.yml`
+override file in the root of the dear-petition directory to configure the Django container to sleep by default:
 
 ```yaml
 # file: docker-compose.override.yml
@@ -109,19 +115,22 @@ services:
 Now we run `runserver` manually to have more control over restarts:
 
 ```sh
-docker compose exec django bash
+docker-compose up -d django
+docker-compose exec django bash
 root$ python manage.py runserver 0.0.0.0:8000
 ```
 
 ### Initial Setup
 
+Migrate DB:
+
+    docker-compose run --rm django python manage.py migrate
+
 Create a superuser:
 
     docker-compose run --rm django python manage.py createsuperuser
 
-Migrate DB:
-
-    docker-compose run --rm django python manage.py migrate
+When asked for a username and password, enter values of your choosing.  Email address may be left empty.    
 
 See detailed [cookiecutter-django Docker
 documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
@@ -129,7 +138,7 @@ documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-wi
 
 ### Restore database
 
-To restore a database dump, you can run:
+If you have a database dump you wish to restore, you can run:
 
 ```sh
 docker-compose run --rm django sh
