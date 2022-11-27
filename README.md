@@ -125,7 +125,7 @@ $ python manage.py migrate
 ### Configuring the containers using docker-compose.override.yml (optional)
 
 To develop in a Docker container, we'll create a `docker-compose.override.yml`
-override file in the root of the dear-petition directory to configure the Django container to sleep by default:
+override file in the root of the `dear-petition` directory to configure the Django container to sleep by default:
 
 ```yaml
 # file: docker-compose.override.yml
