@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.annotate import Checkbox
+from dear_petition.petition.helpers import get_285_form_agency_address
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
@@ -215,17 +216,7 @@ class AOCFormCR285(AOCFormCR287):
                 -1
             ]
         for i, agency in enumerate(agencies, 1):
-            body = ""
-            for field_name in [
-                "name",
-                "address1",
-                "address2",
-                "city",
-                "state",
-                "zipcode",
-            ]:
-                field = getattr(agency, field_name)
-                body += f"{field}\n"
+            body = get_285_form_agency_address(agency)
             self.data[f"NameAddress{i}"] = body
 
     def map_offenses(self):

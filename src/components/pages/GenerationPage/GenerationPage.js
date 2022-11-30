@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { GenerationPageStyled, GenerationContentStyled } from './GenerationPage.styled';
 import { colorGrey } from '../../../styles/colors';
 import { smallerThanTabletLandscape } from '../../../styles/media';
+import { saveAs } from 'file-saver';
 
 // Router
 import { useParams } from 'react-router-dom';
@@ -13,6 +14,8 @@ import { useGetBatchQuery } from '../../../service/api';
 import AttorneyInput from './GenerationInput/AttorneyInput';
 import PetitionerInput from './GenerationInput/PetitionerInput';
 import PetitionList from './PetitionList';
+import Button from '../../elements/Button';
+import Axios from '../../../service/axios';
 
 const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
 
@@ -64,6 +67,13 @@ const InputSection = ({ children, label }) => (
   </InputSectionStyled>
 );
 
+const _openDoc = (doc) => {
+  const docBlob = new Blob([doc], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  });
+  saveAs(docBlob, 'Advice Letter.docx');
+};
+
 function GenerationPage() {
   const { batchId } = useParams();
   const [attorney, setAttorney] = useState('');
@@ -102,6 +112,25 @@ function GenerationPage() {
     }
   };
 
+  const generateAdviceLetter = async () => {
+    if (!validateInput()) {
+      return;
+    }
+
+    Axios.post(
+      `/batch/${batchId}/generate_advice_letter/`,
+      {
+        petitionerData,
+        attorney,
+      },
+      {
+        responseType: 'arraybuffer',
+      }
+    ).then((adviceLetter) => {
+      _openDoc(adviceLetter.data);
+    });
+  };
+
   return (
     <GenerationPageStyled>
       {isLoading ? (
@@ -123,6 +152,9 @@ function GenerationPage() {
               errors={formErrors}
               onClearError={clearError}
             />
+            <Button type="button" onClick={() => generateAdviceLetter()}>
+              Generate Advice Letter
+            </Button>
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>

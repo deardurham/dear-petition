@@ -27,6 +27,8 @@ services:
       - local_postgres_data:/var/lib/postgresql/data
     env_file:
       - ./.envs/.local/.postgres
+    ports:
+      - "5435:5432"
 
   frontend:
     build:

@@ -4,6 +4,7 @@ from dear_petition.petition import constants, utils
 from dear_petition.petition.etl.load import assign_agencies_to_documents
 from dear_petition.petition.export.forms import AOCFormCR285
 from dear_petition.petition.tests.factories import PetitionDocumentFactory
+from dear_petition.petition.helpers import get_285_form_agency_address
 
 
 pytestmark = pytest.mark.django_db
@@ -71,16 +72,13 @@ def test_map_petitioner__name(form):
 #
 
 
-@pytest.mark.parametrize(
-    "field",
-    ["name", "address1", "address2", "city", "state", "zipcode"],
-)
-def test_map_agencies__fields(field, petition, form, contact1, contact2, contact3):
+def test_map_agencies__address(petition, form, contact1, contact2, contact3):
     agencies = [contact1, contact2, contact3]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
-    for i, agency in enumerate(agencies, 1):
-        assert getattr(agency, field) in form.data[f"NameAddress{i}"]
+    addresses = [form.data[f"NameAddress{i+1}"] for i in range(len(agencies))]
+    for agency in agencies:
+        assert get_285_form_agency_address(agency) in addresses
 
 
 #

@@ -1,5 +1,6 @@
 import csv
 import logging
+import tempfile
 
 from django.db import transaction
 from django.db.models import Count
@@ -27,6 +28,9 @@ from dear_petition.petition.etl import (
 )
 from dear_petition.petition.export import generate_petition_pdf
 from dear_petition.users.models import User
+from dear_petition.petition.export.documents.advice_letter import (
+    generate_advice_letter as generate_advice_letter,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +163,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         "petitions", "records__offenses__offense_records"
     )
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
 
     def get_serializer_class(self):
         """Use a custom serializer when accessing a specific batch"""
@@ -191,6 +195,28 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def generate_advice_letter(self, request, pk):
+        petitioner_info = request.data["petitionerData"]
+        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
+        batch = self.get_object()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            filepath = "/code/dear_petition/advice_letter.docx"
+            advice_letter = generate_advice_letter(batch, contact, petitioner_info)
+            advice_letter.save(filepath)
+            resp = FileResponse(open(filepath, "rb"))
+            resp[
+                "Content-Type"
+            ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            resp["Content-Disposition"] = 'attachment; filename="Advice Letter.docx"'
+            return resp
 
 
 class MyInboxView(generics.ListAPIView):
