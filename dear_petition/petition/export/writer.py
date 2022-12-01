@@ -1,4 +1,3 @@
-import io
 import os
 
 from pdfrw import PdfDict, PdfName, PdfObject, PdfReader, PdfWriter
@@ -16,55 +15,51 @@ def write_template_and_annotations_to_stream(bytes_stream, data, form_type):
     petition.set_annotations()
     petition.write()
 
+def merge_acroforms(acroforms, output_form_fields):
+    if not acroforms:
+        return None
+
+    output_acroform = acroforms[0]
+    for source_acroform in acroforms[1:]:
+        for key in source_acroform.keys():
+            if key not in output_acroform:
+                output_acroform[key] = source_acroform[key]
+
+    output_acroform[PdfName('Fields')] = output_form_fields
+    return output_acroform
+
 def concatenate_pdf_streams(paths, output):
     writer = PdfWriter()
-    output_acroform = None
+    acroforms = []
+    output_form_fields = []
     for file_num, path in enumerate(paths):
         path.seek(0)
-        bytes = path.read()
-        if len(bytes) == 0:
+        data_bytes = path.read()
+        if len(data_bytes) == 0:
             continue
-        reader = PdfReader(fdata=bytes)
+        reader = PdfReader(fdata=data_bytes)
         writer.addpages(reader.pages)
 
-        # Not all PDFs have an AcroForm node
         if PdfName('AcroForm') not in reader[PdfName('Root')].keys():
             continue
 
-        source_acroform = reader[PdfName('Root')][PdfName('AcroForm')]
-        output_formfields = source_acroform[PdfName('Fields')] if PdfName('Fields') in source_acroform else []
-        for field_num, form_field in enumerate(output_formfields):
+        # Extract PDF Acroform data and avoid form_field collisions
+        # Note: This is needed to keep acroform data after merging
+        # https://stackoverflow.com/a/57687160
+        acroform = reader[PdfName('Root')][PdfName('AcroForm')]
+        form_fields = acroform[PdfName('Fields')] if PdfName('Fields') in acroform else []
+        for field_num, form_field in enumerate(form_fields):
             key = PdfName('T')
             old_name = form_field[key].replace('(','').replace(')','')  # Field names are in the "(name)" format
             form_field[key] = f'FILE_{file_num}_FIELD_{field_num}_{old_name}'
 
-        if output_acroform == None:
-            # copy the first AcroForm node
-            output_acroform = source_acroform
-        else:
-            for key in source_acroform.keys():
-                # Add new AcroForms keys if output_acroform already existing
-                if key not in output_acroform:
-                    output_acroform[key] = source_acroform[key]
+        acroforms.append(acroform)
+        output_form_fields.extend(form_fields)
 
-            # Add missing font entries in /DR node of source file
-            if (PdfName('DR') in source_acroform.keys()) and (PdfName('Font') in source_acroform[PdfName('DR')].keys()):
-                if PdfName('Font') not in output_acroform[PdfName('DR')].keys():
-                    # if output_acroform is missing entirely the /Font node under an existing /DR, simply add it
-                    output_acroform[PdfName('DR')][PdfName('Font')] = source_acroform[PdfName('DR')][PdfName('Font')]
-                else:
-                    # else add new fonts only
-                    for font_key in source_acroform[PdfName('DR')][PdfName('Font')].keys():
-                        if font_key not in output_acroform[PdfName('DR')][PdfName('Font')]:
-                            output_acroform[PdfName('DR')][PdfName('Font')][font_key] = source_acroform[PdfName('DR')][PdfName('Font')][font_key]
+    output_acroform = merge_acroforms(acroforms, output_form_fields)
+    if output_acroform is not None:
+        writer.trailer[PdfName('Root')][PdfName('AcroForm')] = output_acroform
 
-        if PdfName('Fields') not in output_acroform:
-            output_acroform[PdfName('Fields')] = output_formfields
-        else:
-            # Add new fields
-            output_acroform[PdfName('Fields')] += output_formfields
-
-    writer.trailer[PdfName('Root')][PdfName('AcroForm')] = output_acroform
     writer.write(output)
     output.seek(0)
 
