@@ -1,7 +1,6 @@
-import io
 import os
 
-import pdfrw
+from pdfrw import PdfDict, PdfName, PdfObject, PdfReader, PdfWriter
 from django.conf import settings
 
 
@@ -16,16 +15,50 @@ def write_template_and_annotations_to_stream(bytes_stream, data, form_type):
     petition.set_annotations()
     petition.write()
 
-def concatenate_pdf_streams(paths, output):
-    writer = pdfrw.PdfWriter()
+def merge_acroforms(acroforms, output_form_fields):
+    if not acroforms:
+        return None
 
-    for path in paths:
+    output_acroform = acroforms[0]
+    for source_acroform in acroforms[1:]:
+        for key in source_acroform.keys():
+            if key not in output_acroform:
+                output_acroform[key] = source_acroform[key]
+
+    output_acroform[PdfName('Fields')] = output_form_fields
+    return output_acroform
+
+def concatenate_pdf_streams(paths, output):
+    writer = PdfWriter()
+    acroforms = []
+    output_form_fields = []
+    for file_num, path in enumerate(paths):
         path.seek(0)
-        bytes = path.read()
-        if len(bytes) == 0:
+        data_bytes = path.read()
+        if len(data_bytes) == 0:
             continue
-        reader = pdfrw.PdfReader(fdata=bytes)
+        reader = PdfReader(fdata=data_bytes)
         writer.addpages(reader.pages)
+
+        if PdfName('AcroForm') not in reader[PdfName('Root')].keys():
+            continue
+
+        # Extract PDF Acroform data and avoid form_field collisions
+        # Note: This is needed to keep acroform data after merging
+        # https://stackoverflow.com/a/57687160
+        acroform = reader[PdfName('Root')][PdfName('AcroForm')]
+        form_fields = acroform[PdfName('Fields')] if PdfName('Fields') in acroform else []
+        for field_num, form_field in enumerate(form_fields):
+            key = PdfName('T')
+            old_name = form_field[key].replace('(','').replace(')','')  # Field names are in the "(name)" format
+            form_field[key] = f'FILE_{file_num}_FIELD_{field_num}_{old_name}'
+
+        acroforms.append(acroform)
+        output_form_fields.extend(form_fields)
+
+    output_acroform = merge_acroforms(acroforms, output_form_fields)
+    if output_acroform is not None:
+        writer.trailer[PdfName('Root')][PdfName('AcroForm')] = output_acroform
 
     writer.write(output)
     output.seek(0)
@@ -42,14 +75,15 @@ class Writer:
 
     def __init__(self, data, template_path, output_path):
         def read_template(template_path):
-            return pdfrw.PdfReader(template_path)
+            return PdfReader(template_path)
 
         self.data = data
         self.output_path = output_path
         self.template = read_template(template_path)
         self.template.Root.AcroForm.update(
-            pdfrw.PdfDict(NeedAppearances=pdfrw.PdfObject("true"))
+            PdfDict(NeedAppearances=PdfObject("true"))
         )
+        self.annotations = []
 
     def set_annotations(self):
         self.annotations = self.template.pages[0][self.ANNOT_KEY]
@@ -62,5 +96,5 @@ class Writer:
             ):
                 key = annotation[self.ANNOT_FIELD_KEY][1:-1]
                 if key in self.data:
-                    annotation.update(pdfrw.PdfDict(**self.data[key]))
-        pdfrw.PdfWriter().write(self.output_path, self.template)
+                    annotation.update(PdfDict(**self.data[key]))
+        PdfWriter().write(self.output_path, self.template)
