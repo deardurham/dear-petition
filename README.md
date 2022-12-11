@@ -14,19 +14,13 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
     - [API Proxy Configuration](#api-proxy-configuration)
       - [Docker Container](#docker-container)
       - [Local Frontend](#local-frontend)
-  - [Backend Development (with Docker)](#backend-development-with-docker)
-    - [Using docker-compose.override.yml](#using-docker-composeoverrideyml)
+  - [Backend Development](#backend-development)
     - [Initial Setup](#initial-setup)
     - [Restore database](#restore-database)
-  - [Backend Development (without Docker)](#backend-development-without-docker)
-    - [Setting Up a Virtual Environment](#setting-up-a-virtual-environment)
-    - [Setting Up Your Users](#setting-up-your-users)
+    - [Configuring the containers using docker-compose.override.yml (optional)](#configuring-the-containers-using-docker-composeoverrideyml-optional)
   - [Development Tools and Testing](#development-tools-and-testing)
-    - [Type checks](#type-checks)
-    - [Test coverage](#test-coverage)
     - [Running tests with py.test](#running-tests-with-pytest)
-      - [Docker](#docker)
-      - [Without Docker](#without-docker)
+    - [Test coverage](#test-coverage)
     - [Sign up for Sentry](#sign-up-for-sentry)
 - [Production testing](#production-testing)
 
@@ -79,7 +73,9 @@ You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 API_PROXY=http://localhost:8888 npm start
 ```
 
-## Backend Development (with Docker)
+## Backend Development
+
+### Initial Setup
 
 To run this on a Mac, use [Docker for
 Mac](https://docs.docker.com/docker-for-mac/install/).
@@ -90,11 +86,7 @@ Build the project containers:
 
 Run the containers:
 
-    docker-compose up django
-
-Visit http://localhost:8000/petition/api/ in your browser.  If you get authentication errors, you may login as the superuser you created at http://localhost:8000/ and try again.
-
-### Initial Setup
+    docker-compose up -d django
 
 Migrate DB:
 
@@ -105,6 +97,8 @@ Create a superuser:
     docker-compose run --rm django python manage.py createsuperuser
 
 When asked for a username and password, enter values of your choosing.  Email address may be left empty.    
+
+Visit http://localhost:8000/petition/api/ in your browser.  If you get authentication errors, you may login as the superuser you created at http://localhost:8000/ and try again.
 
 See detailed [cookiecutter-django Docker
 documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
@@ -144,75 +138,11 @@ docker-compose exec django bash
 root$ python manage.py runserver 0.0.0.0:8000
 ```
 
-## Backend Development (without Docker)
-
-Run the setup\_project.py script from the base directory, providing as a
-command line argument the directory to the related ciprs-reader project.
-This will set up the project in your environment.
-
-
-### Setting Up a Virtual Environment
-
-Developing inside a virtual environment is recommended.
-
-On Mac run the following command to set up a virtual environment:
-```
-brew install pipenv
-pipenv shell
-pip install -r requirements/base.txt
-```
-
-On Linux run the following command to set up a virtual environment:
-```
-sudo yum install python-tools
-pip3 install pipenv
-pipenv shell
-pip install -r requirements/base.txt
-```
-
-While inside of the pipenv run the setup\_project.py script from the base directory, providing as a
-command line argument the directory to the related ciprs-reader project.
-This will set up the project in your environment.
-```
-python3 setup-project.py <path-to-ciprs-reader>
-```
-
-Additional Pipenv Notes:
-To exit the pip environment:
-```
-(dear-petition) bash-3.2$ exit
-exit
-bash-3.2$
-```
-
-To delete the pipenv environment:
-```
-bash-3.2$ pipenv --rm
-Removing virtualenv (/Users/user/.local/share/virtualenvs/dear-petition-fJpn7FEC)…
-```
-
-
-### Setting Up Your Users
-
--   To create an **superuser account**, use this command:
-
-        $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and
-your superuser logged in on Firefox (or similar), so that you can see
-how the site behaves for both kinds of users.
-
 ## Development Tools and Testing
 
 ### Running tests with py.test
 
-#### Docker
-
     $ docker-compose run --rm django pytest
-
-#### Without Docker
-
-    $ pytest
     
 ### Test coverage
 
