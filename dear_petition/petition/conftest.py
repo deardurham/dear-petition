@@ -1,8 +1,11 @@
 import io
+import string
+from datetime import datetime
 
 import pytest
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from dear_petition.petition.constants import CHARGED, FEMALE
 from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
@@ -34,9 +37,31 @@ def batch(user):
 
 
 @pytest.fixture
+def record0(batch):
+    def _record0(dob: datetime, race: string, sex: string):
+        """
+        For example, create a CIPRS Record with:
+        record0(datetime(1994, 12, 31), "ASIAN", "F")
+        """
+        CIPRSRecordFactory(
+            batch=batch,
+            label=batch.label,
+            dob=dob,
+            race=race,
+            sex=sex
+        )
+    yield _record0
+
+
+@pytest.fixture
 def record1(batch):
     yield CIPRSRecordFactory(
-        batch=batch, label=batch.label, jurisdiction=constants.DISTRICT_COURT
+        batch=batch,
+        label=batch.label,
+        jurisdiction=constants.DISTRICT_COURT,
+        dob=datetime(1980, 7, 7),
+        race="ASIAN",
+        sex=FEMALE
     )
 
 
@@ -152,7 +177,12 @@ def non_dismissed_offense(record1):
 
 @pytest.fixture
 def charged_dismissed_record(dismissed_offense):
-    return OffenseRecordFactory(action="CHARGED", offense=dismissed_offense)
+    return OffenseRecordFactory(action=CHARGED, offense=dismissed_offense)
+
+
+@pytest.fixture
+def charged_not_guilty_record(not_guilty_offense):
+    return OffenseRecordFactory(action=CHARGED, offense=not_guilty_offense)
 
 
 @pytest.fixture
