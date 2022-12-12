@@ -204,23 +204,6 @@ how the site behaves for both kinds of users.
 
 ## Development Tools and Testing
 
-
-### Type checks
-
-Running type checks with mypy:
-
-    $ mypy dear_petition
-
-
-### Test coverage
-
-To run the tests, check your test coverage, and generate an HTML
-coverage report:
-
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
-
 ### Running tests with py.test
 
 #### Docker
@@ -230,7 +213,17 @@ coverage report:
 #### Without Docker
 
     $ pytest
+    
+### Test coverage
 
+Test coverage is automatically generated as part of `pytest`.
+
+To manually run the tests, check your test coverage, and generate an HTML
+coverage report:
+
+    $ coverage run -m pytest
+    $ coverage html
+    $ open htmlcov/index.html
 
 ### Sign up for Sentry
 
