@@ -24,6 +24,10 @@ from ..constants import (
     SUPERIOR_COURT,
     DURHAM_COUNTY,
     DISTRICT_COURT_WITHOUT_DA_LEAVE,
+    FEMALE,
+    MALE,
+    NOT_AVAILABLE,
+    UNKNOWN,
 )
 
 
@@ -84,6 +88,9 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
     )
     county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
     file_no = "99CRAAAAAAAAAAAA"
+    race = factory.LazyFunction(lambda: random.choice(["ASIAN", "BLACK", "WHITE"]))
+    sex = factory.LazyFunction(lambda: random.choice([FEMALE, MALE, NOT_AVAILABLE, UNKNOWN]))
+
 
     class Meta:
         model = CIPRSRecord

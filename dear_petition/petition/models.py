@@ -381,7 +381,7 @@ class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
         batch = petition_document.petition.batch
         user = user
 
-        GeneratedPetition.objects.create(
+        generated_petition = GeneratedPetition.objects.create(
             username=user.username,
             form_type=petition_document.form_type,
             number_of_charges=petition_document.offense_records.count(),
@@ -395,3 +395,5 @@ class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
 
         user.last_generated_petition_time = timezone.now()
         user.save()
+
+        return generated_petition
