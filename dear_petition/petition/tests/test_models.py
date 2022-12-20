@@ -124,9 +124,9 @@ def test_generated_petition_get_stats_generated_petition(mocker, charged_dismiss
     assert(user.last_generated_petition_time == TODAY)
 
 
-def test_generated_petition_get_stats_generated_petition_dob_before_today(mocker, petition_document, record0, user):
+def test_generated_petition_get_stats_generated_petition_dob_after_today(mocker, petition_document, record0, user):
     """
-    Test get_stats_generated_petition in GeneratedPetition when date of birth on CIPRS record (mistakenly) is before
+    Test get_stats_generated_petition in GeneratedPetition when date of birth on CIPRS record (mistakenly) is after
     today
     """
 
