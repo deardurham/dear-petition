@@ -6,7 +6,6 @@ COPY package.json package-lock.json tailwind.config.js /code/
 RUN npm install --silent
 COPY ./public /code/public/
 COPY ./src /code/src/
-WORKDIR /code/
 RUN npm run build
 
 FROM python:3.8-slim-bullseye as base

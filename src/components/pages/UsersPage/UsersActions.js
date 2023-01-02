@@ -93,12 +93,12 @@ const CreateUserAction = ({ onCloseModal }) => {
         <FormInput
           label="Username"
           inputProps={{ name: 'username', control }}
-          errors={error?.data?.username ?? ''}
+          errors={[error?.data?.username] ?? []}
         />
         <FormInput
           label="Email"
           inputProps={{ name: 'email', control }}
-          errors={error?.data?.email ?? ''}
+          errors={[error?.data?.email] ?? []}
         />
         <div>
           <span>User Role</span>

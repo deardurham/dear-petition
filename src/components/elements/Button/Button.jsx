@@ -80,7 +80,7 @@ const neutral = css`
 
 Button.propTypes = {
   /** Reflects the state of the button */
-  colorClass: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL]),
+  colorClass: PropTypes.oneOf([POSITIVE, CAUTION, NEUTRAL, DISABLED]),
   /** What happens when the button is clicked */
   onClick: PropTypes.func.isRequired,
 };

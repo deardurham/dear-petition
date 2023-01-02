@@ -20,6 +20,7 @@ import ciprs_reader
 from localflavor.us import us_states
 from dear_petition.users.models import User
 from dear_petition.users import constants as uc
+from dear_petition.common.models import PrintableModelMixin
 from . import constants as pc
 
 from .constants import (
@@ -38,7 +39,7 @@ from .utils import make_datetime_aware
 logger = logging.getLogger(__name__)
 
 
-class CIPRSRecordManager(models.Manager):
+class CIPRSRecordManager(PrintableModelMixin, models.Manager):
     def create_record(self, batch, label, data):
         """Extract General, Case, and Defendant details from data
 
@@ -54,7 +55,7 @@ class CIPRSRecordManager(models.Manager):
         ciprs_record.refresh_record_from_data()
 
 
-class CIPRSRecord(models.Model):
+class CIPRSRecord(PrintableModelMixin, models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
     batch_file = models.ForeignKey(
@@ -80,9 +81,6 @@ class CIPRSRecord(models.Model):
     )
 
     objects = CIPRSRecordManager()
-
-    def __str__(self):
-        return f"{self.label} {self.file_no} ({self.pk})"
 
     class Meta:
         verbose_name = "CIPRSRecord"
@@ -111,7 +109,7 @@ class CIPRSRecord(models.Model):
         refresh_record_from_data(self)
 
 
-class Offense(models.Model):
+class Offense(PrintableModelMixin, models.Model):
     ciprs_record = models.ForeignKey(
         "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
@@ -123,11 +121,8 @@ class Offense(models.Model):
     verdict = models.CharField(max_length=256, blank=True)
     plea = models.CharField(max_length=256, blank=True)
 
-    def __str__(self):
-        return f"{self.id} ({self.ciprs_record.file_no})"
 
-
-class OffenseRecord(models.Model):
+class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
         "Offense", related_name="offense_records", on_delete=models.CASCADE
     )
@@ -137,12 +132,8 @@ class OffenseRecord(models.Model):
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
 
-    def __str__(self):
-        ciprs_record = self.offense.ciprs_record
-        return f"{ciprs_record.file_no} {self.action} {self.severity} ({self.id})"
 
-
-class Contact(models.Model):
+class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(
         max_length=16, choices=CONTACT_CATEGORIES, default="agency"
@@ -153,11 +144,8 @@ class Contact(models.Model):
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
 
-    def __str__(self):
-        return self.name
 
-
-class Batch(models.Model):
+class Batch(PrintableModelMixin, models.Model):
 
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
@@ -168,9 +156,6 @@ class Batch(models.Model):
 
     class Meta:
         verbose_name_plural = "Batches"
-
-    def __str__(self):
-        return f"{self.pk}: {self.label}"
 
     def get_absolute_url(self):
         return reverse("create-petition", kwargs={"pk": self.pk})
@@ -242,16 +227,13 @@ def get_batch_file_upload_path(instance, filename):
     return "batch/%s/%s" % (instance.batch.id, filename)
 
 
-class BatchFile(models.Model):
+class BatchFile(PrintableModelMixin, models.Model):
     batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=get_batch_file_upload_path)
 
-    def __str__(self):
-        return f"{self.file.name}"
 
-
-class Comment(models.Model):
+class Comment(PrintableModelMixin, models.Model):
 
     user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
     text = models.TextField()
@@ -276,7 +258,7 @@ class Comment(models.Model):
         super(Comment, self).save(*args, **kwargs)
 
 
-class Petition(TimeStampedModel):
+class Petition(PrintableModelMixin, TimeStampedModel):
 
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
@@ -286,9 +268,6 @@ class Petition(TimeStampedModel):
         OffenseRecord, related_name="petitions", through="PetitionOffenseRecord"
     )
     agencies = models.ManyToManyField(Contact, related_name="+")
-
-    def __str__(self):
-        return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
 
     def get_offense_record_paginator(self, filter_active=True):
         from dear_petition.petition.etl.paginator import OffenseRecordPaginator
@@ -366,7 +345,7 @@ DataPetition = namedtuple("DataPetition", ["form_type", "data_only"], defaults=[
 DataPetitionDocument = namedtuple("DataPetitionDocument", ["petition"])
 
 
-class PetitionDocument(models.Model):
+class PetitionDocument(PrintableModelMixin, models.Model):
     petition = models.ForeignKey(
         Petition, on_delete=models.CASCADE, related_name="documents"
     )
@@ -395,19 +374,14 @@ class PetitionDocument(models.Model):
     def county(self):
         return self.petition.county
 
-    def __str__(self):
-        attachment = " attachment " if self.is_attachment else " "
-        jurisdiction = self.petition.get_jurisdiction_display()
-        return f"{self.county} {self.form_type} {jurisdiction}{attachment}({self.id})"
 
-
-class PetitionOffenseRecord(models.Model):
+class PetitionOffenseRecord(PrintableModelMixin, models.Model):
     petition = models.ForeignKey(Petition, on_delete=models.CASCADE)
     offense_record = models.ForeignKey(OffenseRecord, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
 
 
-class GeneratedPetition(TimeStampedModel):
+class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
     username = models.CharField(max_length=uc.NAME_MAX_LENGTH)
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     number_of_charges = models.IntegerField()
@@ -421,3 +395,26 @@ class GeneratedPetition(TimeStampedModel):
         max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, null=True
     )
     age = models.PositiveIntegerField(null=True)
+
+    @classmethod
+    def get_stats_generated_petition(cls, petition_document_id, user):
+        petition_document = PetitionDocument.objects.get(id=petition_document_id)
+        batch = petition_document.petition.batch
+        user = user
+
+        generated_petition = GeneratedPetition.objects.create(
+            username=user.username,
+            form_type=petition_document.form_type,
+            number_of_charges=petition_document.offense_records.count(),
+            batch_id=batch.id,
+            county=petition_document.county,
+            jurisdiction=petition_document.jurisdiction,
+            race=batch.race,
+            sex=batch.sex,
+            age=batch.age,
+        )
+
+        user.last_generated_petition_time = timezone.now()
+        user.save()
+
+        return generated_petition

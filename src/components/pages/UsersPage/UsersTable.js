@@ -171,11 +171,14 @@ const InputCells = ({ user, onStopEdit }) => {
         <TableCell>
           <TextboxInput
             inputProps={{ control, name: 'username' }}
-            errors={error?.data?.username ?? ''}
+            errors={[error?.data?.username] ?? []}
           />
         </TableCell>
         <TableCell>
-          <TextboxInput inputProps={{ control, name: 'email' }} errors={error?.data?.email ?? ''} />
+          <TextboxInput
+            inputProps={{ control, name: 'email' }}
+            errors={[error?.data?.email] ?? []}
+          />
         </TableCell>
         <TableCell>
           <input type="checkbox" disabled={myUser.pk === user.pk} {...register('is_admin')} />

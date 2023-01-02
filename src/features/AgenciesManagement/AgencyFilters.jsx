@@ -10,7 +10,9 @@ export const AgencyFiltersModal = ({ onFilter, filterSelections }) => {
   return (
     <div className="w-[500px] h-[400px] flex flex-col justify-center items-center gap-4">
       <h2 className="self-center">Filters</h2>
-      <AgencyFilters onFilter={onFilter} filterSelections={filterSelections} />
+      <div className="w-[300px]">
+        <AgencyFilters onFilter={onFilter} filterSelections={filterSelections} />
+      </div>
       <Button colorClass="neutral" className="self-center w-max mt-4" onClick={() => closeModal()}>
         Close
       </Button>
@@ -33,6 +35,7 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
     <AutocompleteInput
       label={label}
       selections={filterSelections}
+      showSelections
       onSelect={(value) => addSelection(value)}
       onRemoveSelection={(value) => removeSelection(value)}
       fetchSuggestions={async (searchValue) => {

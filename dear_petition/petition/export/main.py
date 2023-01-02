@@ -1,3 +1,4 @@
+import io
 from .annotate import add_pdf_template_annotations
 from .forms import (
     AOCFormCR287,
@@ -6,7 +7,7 @@ from .forms import (
     AOCFormCR293,
     DataPetitionForm,
 )
-from .writer import write_pdf
+from .writer import concatenate_pdf_streams, write_template_and_annotations_to_stream
 
 from dear_petition.petition import constants
 
@@ -28,14 +29,23 @@ def build_pdf_template_context(petition_document, extra):
         form_type = constants.DATA_PETITION
     else:
         form_type = petition_document.form_type
-    Form = FORM_TYPE_MAP.get(form_type, AOCFormCR287)
+    assert form_type in FORM_TYPE_MAP, 'Invalid form type provided'
+    Form = FORM_TYPE_MAP.get(form_type)
     form = Form(petition_document, extra=extra)
     form.build_form_context()
     return form.data
 
 
-def generate_petition_pdf(petition_document, extra):
-    context = build_pdf_template_context(petition_document, extra)
-    add_pdf_template_annotations(context)
-    generate_petition_pdf = write_pdf(context, form_type=petition_document.form_type)
-    return generate_petition_pdf
+def generate_petition_pdf(petition_documents, extra):
+    pdf_stream = io.BytesIO()
+    doc_streams = []
+    for petition_document in petition_documents:
+        doc_stream = io.BytesIO()
+        context = build_pdf_template_context(petition_document, extra)
+        add_pdf_template_annotations(context)
+        write_template_and_annotations_to_stream(doc_stream, context, petition_document.form_type)
+        doc_streams.append(doc_stream)
+    concatenate_pdf_streams(doc_streams, pdf_stream)
+    for doc_stream in doc_streams:
+        doc_stream.close()
+    return pdf_stream

@@ -5,6 +5,7 @@ import OffenseTable from './OffenseTable';
 import { Button } from '../../components/elements/Button';
 import { Spinner } from '../../components/elements/Spinner';
 import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
+import { DISABLED, POSITIVE } from '../../components/elements/Button/Button';
 
 const OffenseTableModal = ({ isOpen, onClose, petitionId }) => (
   <StyledDialog isOpen={isOpen} onClose={() => onClose()}>
@@ -64,7 +65,7 @@ const ModalContent = ({ petitionId, onClose }) => {
   const onRecalculatePetitions = async () => {
     try {
       await recalculatePetitions({ petitionId, offenseRecordIds: selectedRows }).unwrap();
-      onClose();
+      setIsModified(false);
     } catch (_e) {
       // no-op
     }
@@ -92,19 +93,15 @@ const ModalContent = ({ petitionId, onClose }) => {
         dob={new Date(petitionerDOB)}
       />
       <div className="self-center flex gap-8">
-        <Tooltip
-          tooltipContent="You must modify the selected offenses to update the the petition"
-          hideTooltip={isModified}
-          offset={[0, 10]}
+        <Button
+          className="w-[15rem]"
+          colorClass={isModified ? POSITIVE : DISABLED}
+          onClick={() => onRecalculatePetitions()}
+          title={!isModified && 'You must modify the selected offenses to update the the petition'}
+          disabled={!isModified}
         >
-          <Button
-            className="w-[15rem]"
-            onClick={() => onRecalculatePetitions()}
-            disabled={!isModified}
-          >
-            Update Petition
-          </Button>
-        </Tooltip>
+          Update Petition
+        </Button>
         <Button className="px-4" onClick={() => onClose()}>
           Close
         </Button>

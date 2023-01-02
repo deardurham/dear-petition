@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
-from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, parsers, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -262,39 +261,31 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
         return Response(petition.data, status=200)
 
-
-class GeneratePetitionView(viewsets.GenericViewSet):
-
-    serializer_class = serializers.GeneratePetitionSerializer
-
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
+    @action(detail=True, methods=["post"])
+    def generate_petition_pdf(self, request, pk=None):
+        serializer = serializers.GeneratePetitionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        petition_documents = pm.PetitionDocument.objects.filter(
+            petition=pk, pk__in=serializer.data["documents"]
+        ).order_by("pk")
+        assert (
+            len(petition_documents) > 0
+        ), "Petition documents could not be found for petition"
         generated_petition_pdf = generate_petition_pdf(
-            serializer.data["petition"], serializer.data
-        )
-        petition_document = pm.PetitionDocument.objects.get(id=request.data["petition"])
-        batch = petition_document.petition.batch
-        user = request.user
-
-        pm.GeneratedPetition.objects.create(
-            username=user.username,
-            form_type=petition_document.form_type,
-            number_of_charges=petition_document.offense_records.count(),
-            batch_id=batch.id,
-            county=petition_document.county,
-            jurisdiction=petition_document.jurisdiction,
-            race=batch.race,
-            sex=batch.sex,
-            age=batch.age,
+            petition_documents, serializer.data
         )
 
-        user.last_generated_petition_time = timezone.now()
-        user.save()
+        for doc in petition_documents.iterator():
+            pm.GeneratedPetition.get_stats_generated_petition(doc.pk, request.user)
 
         resp = FileResponse(generated_petition_pdf)
         resp["Content-Type"] = "application/pdf"
-        resp["Content-Disposition"] = 'inline; filename="petition.pdf"'
+
+        petition = self.get_object()
+        filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
+        resp["Content-Disposition"] = f'inline; filename="{filename}"'
+
         return resp
 
 
