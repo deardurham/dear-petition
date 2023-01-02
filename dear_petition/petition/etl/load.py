@@ -31,14 +31,11 @@ def import_ciprs_records(files, user, parser_mode, batch_label=""):
     logger.info(f"Created batch {batch.id}")
     for idx, file_ in enumerate(files):
         logger.info(f"Importing file {file_}")
-        if settings.CIPRS_SAVE_PDF:
-            batch_file = batch.files.create(file=file_)
-            # Need to re-assign file_ since storages backend
-            # closes file handle, so parse_ciprs_document below
-            # fails
-            file_ = batch_file.file
-        for record_data in parse_ciprs_document(file_, parser_mode):
-            record = pm.CIPRSRecord(batch=batch, data=record_data)
+        batch_file = batch.files.create(file=file_)
+        for record_data in parse_ciprs_document(batch_file.file, parser_mode):
+            record = pm.CIPRSRecord(
+                batch=batch, batch_file=batch_file, data=record_data
+            )
             record.refresh_record_from_data()
             if record.label and idx == 0 and not batch_label:
                 batch.label = record.label

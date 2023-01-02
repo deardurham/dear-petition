@@ -4,13 +4,13 @@ import os
 import subprocess
 import tempfile
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import Q, IntegerField, Case, When, Value
+from django.db.models import IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
@@ -58,6 +58,13 @@ class CIPRSRecordManager(PrintableModelMixin, models.Manager):
 class CIPRSRecord(PrintableModelMixin, models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
+    batch_file = models.ForeignKey(
+        "BatchFile",
+        related_name="records",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     date_uploaded = models.DateTimeField(auto_now_add=True)
     label = models.CharField(max_length=2048, blank=True)
     data = JSONField(blank=True, null=True)
@@ -143,6 +150,9 @@ class Batch(PrintableModelMixin, models.Model):
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
+    emails = models.ManyToManyField(
+        "sendgrid.Email", related_name="batches", blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Batches"
@@ -205,11 +215,22 @@ class Batch(PrintableModelMixin, models.Model):
         today = timezone.now().date()
         return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
+    @property
+    def automatic_delete_date(self):
+        """Date when this batch will be automatically deleted by the cleanup task"""
+        return self.date_uploaded + timedelta(
+            hours=settings.CIPRS_RECORD_LIFETIME_HOURS
+        )
+
+
+def get_batch_file_upload_path(instance, filename):
+    return "batch/%s/%s" % (instance.batch.id, filename)
+
 
 class BatchFile(PrintableModelMixin, models.Model):
     batch = models.ForeignKey(Batch, related_name="files", on_delete=models.CASCADE)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    file = models.FileField(upload_to="ciprs/")
+    file = models.FileField(upload_to=get_batch_file_upload_path)
 
 
 class Comment(PrintableModelMixin, models.Model):

@@ -2,7 +2,6 @@ from django.urls import include, path
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import routers
 from . import viewsets
-from dear_petition.petition.api import authentication
 
 router = routers.DefaultRouter()
 router.register(r"users", viewsets.UserViewSet)
@@ -23,6 +22,7 @@ app_name = "api"
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("my-inbox/", viewsets.MyInboxView.as_view(), name="my-inbox"),
     path(
         "token/",
         ensure_csrf_cookie(viewsets.TokenObtainPairCookieView.as_view()),

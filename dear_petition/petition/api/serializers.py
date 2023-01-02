@@ -252,9 +252,40 @@ class BatchDetailSerializer(serializers.ModelSerializer):
         return ParentPetitionSerializer(parent_petitions, many=True).data
 
 
+class MyInboxSerializer(serializers.ModelSerializer):
+    total_files = serializers.IntegerField()
+    total_emails = serializers.IntegerField()
+    total_petitions = serializers.SerializerMethodField()
+    total_ciprs_records = serializers.SerializerMethodField()
+    automatic_delete_date = serializers.DateTimeField()
+
+    class Meta:
+        model = Batch
+        fields = [
+            "pk",
+            "label",
+            "date_uploaded",
+            "automatic_delete_date",
+            "total_files",
+            "total_emails",
+            "total_petitions",
+            "total_ciprs_records",
+        ]
+
+    def get_total_petitions(self, instance):
+        # workaround for multiple table annotation failure: https://code.djangoproject.com/ticket/10060
+        return instance.petitions.count()
+
+    def get_total_ciprs_records(self, instance):
+        # workaround for multiple table annotation failure: https://code.djangoproject.com/ticket/10060
+        return instance.records.count()
+
+
 class GeneratePetitionSerializer(serializers.Serializer):
 
-    documents = serializers.PrimaryKeyRelatedField(many=True, queryset=PetitionDocument.objects.all())
+    documents = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=PetitionDocument.objects.all()
+    )
     name_petitioner = serializers.CharField(label="Petitioner Name")
     address1 = serializers.CharField(label="Address Line 1")
     address2 = serializers.CharField(
@@ -277,7 +308,9 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
     def validate_documents(self, value):
         if len(value) == 0:
-            raise serializers.ValidationError("Must select at least one document for pdf generation")
+            raise serializers.ValidationError(
+                "Must select at least one document for pdf generation"
+            )
         return value
 
     def validate_attorney(self, value):

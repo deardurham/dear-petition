@@ -17,7 +17,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 QATESTER_PASSWORD = env("QATESTER_PASSWORD", default=None)
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[".herokuapp.com"])
-ENVIRONMENT = "PRODUCTION"
+ENVIRONMENT = env("ENVIRONMENT")
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -97,6 +97,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 AWS_DEFAULT_ACL = None
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 AWS_S3_REGION_NAME = env("DJANGO_AWS_S3_REGION_NAME", default=None)
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
+AWS_LOCATION = env("AWS_LOCATION", default=ENVIRONMENT.lower())
 
 
 # STATIC
@@ -115,7 +117,6 @@ class StaticRootS3Boto3Storage(S3Boto3Storage):
 
 
 class MediaRootS3Boto3Storage(S3Boto3Storage):
-    location = "media"
     file_overwrite = False
 
 

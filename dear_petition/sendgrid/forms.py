@@ -3,7 +3,7 @@ import logging
 
 from django import forms
 
-from .models import Email, Attachment
+from .models import Email
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class EmailForm(forms.ModelForm):
     def clean_attachment_info(self):
         try:
             return json.loads(self.cleaned_data["attachment_info"])
-        except Exception as e:
+        except Exception:
             msg = "Failed to parse attachment_info JSON data"
             logger.exception(msg)
             raise forms.ValidationError(msg)
@@ -70,7 +70,7 @@ class EmailForm(forms.ModelForm):
             attachment = instance.attachments.create(
                 name=metadata["name"],
                 type=metadata["type"],
-                content_id=metadata.get("content-id", "unknown"),
+                content_id=metadata.get("content-id", ""),
                 file=file_,
             )
             logger.info(f'Attachment {metadata["name"]} [id: {attachment.id}] created')

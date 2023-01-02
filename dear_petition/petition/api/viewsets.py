@@ -1,15 +1,14 @@
 import csv
 import logging
-from datetime import datetime
 
 from django.db import transaction
+from django.db.models import Count
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
-from django.middleware import csrf
-from django_filters.rest_framework import BaseInFilter, DjangoFilterBackend, FilterSet
-from rest_framework import filters, parsers, permissions, status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, parsers, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions
@@ -19,7 +18,6 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
 from dear_petition.petition import utils
-from dear_petition.petition.admin import GeneratedPetitionAdmin
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import (
@@ -85,9 +83,7 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=[
-            "get",
-        ],
+        methods=["get"],
     )
     def get_petition_records(self, request):
         petition_id = request.GET.get("petition")
@@ -117,9 +113,10 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
         return Response(serialized_data)
 
+
 class ContactSearchFilter(filters.SearchFilter):
     def get_search_fields(self, view, request):
-        search_field = request.query_params.get('field', None)
+        search_field = request.query_params.get("field", None)
         if search_field is not None:
             return [search_field]
         return super().get_search_fields(view, request)
@@ -137,18 +134,23 @@ class ContactViewSet(viewsets.ModelViewSet):
         "zipcode": ["exact", "in"],
     }
     search_fields = ["name"]
-    ordering_fields = ['name', 'address1', 'address2', 'city', 'zipcode']
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
     ordering = ["name"]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def get_filter_options(self, request):
-        field = request.query_params.get('field', None)
+        field = request.query_params.get("field", None)
         if field is None or field not in self.filterset_fields:
             return Response(
                 "Provided field is not a valid filter field",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        field_options = self.filter_queryset(self.get_queryset()).values_list(field, flat=True).distinct().order_by()
+        field_options = (
+            self.filter_queryset(self.get_queryset())
+            .values_list(field, flat=True)
+            .distinct()
+            .order_by()
+        )
         return Response(field_options)
 
 
@@ -189,6 +191,18 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class MyInboxView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.MyInboxSerializer
+
+    def get_queryset(self):
+        return (
+            pm.Batch.objects.filter(user=self.request.user)
+            .annotate(total_files=Count("files"), total_emails=Count("emails"))
+            .order_by("-date_uploaded")
+        )
 
 
 class PetitionViewSet(viewsets.ModelViewSet):
@@ -252,8 +266,12 @@ class PetitionViewSet(viewsets.ModelViewSet):
         serializer = serializers.GeneratePetitionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        petition_documents = pm.PetitionDocument.objects.filter(petition=pk, pk__in=serializer.data["documents"]).order_by('pk')
-        assert len(petition_documents) > 0, 'Petition documents could not be found for petition'
+        petition_documents = pm.PetitionDocument.objects.filter(
+            petition=pk, pk__in=serializer.data["documents"]
+        ).order_by("pk")
+        assert (
+            len(petition_documents) > 0
+        ), "Petition documents could not be found for petition"
         generated_petition_pdf = generate_petition_pdf(
             petition_documents, serializer.data
         )
