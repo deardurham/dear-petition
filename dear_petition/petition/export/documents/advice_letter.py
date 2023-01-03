@@ -1,5 +1,5 @@
-from docxtpl import DocxTemplate
 from django.conf import settings
+from docxtpl import DocxTemplate
 
 from dear_petition.petition import helpers
 from dear_petition.petition import models as pm
@@ -13,10 +13,18 @@ from dear_petition.petition.types.underaged_convictions import (
 TEMPLATE = "advice_letter.docx"
 
 
-def template_offense_records(qs):
+def get_county_string(counties: list):
     """
-    Takes a queryset of offense records and turns them into the template format the document requires.
+    Returns string of comma separated counties given a list of counties.
+    If the offense records have offenses in county1, county2, county3, this should return 'county1, county2, and county3 '
+    If the offense records only have offenses in county1, it should just return 'county1 '
     """
+    if len(counties) == 0:
+        return ""
+    elif len(counties) == 1:
+        return f"{counties[0] }"
+    else:
+        return ", ".join(counties[0:-1]) + ", and " + counties[-1]
 
 
 def generate_context(batch, contact, petitioner_info):
@@ -29,22 +37,41 @@ def generate_context(batch, contact, petitioner_info):
     context["city"] = petitioner_info["city"]
     context["state"] = petitioner_info["state"]
     context["zipcode"] = petitioner_info["zipCode"]
-    context["felonies"] = [
-        felony
-        for felony in pm.OffenseRecord.objects.filter(
-            offense__ciprs_record__batch=batch, severity="FELONY"
+
+    felonies = pm.OffenseRecord.objects.filter(
+        offense__ciprs_record__batch=batch, severity="FELONY"
+    )
+    context["felonies"] = list(felonies)
+
+    misdemeanors = pm.OffenseRecord.objects.filter(
+        offense__ciprs_record__batch=batch, severity="MISDEMEANOR"
+    )
+    context["misdemeanors"] = list(misdemeanors)
+    conviction_counties = list(
+        set(felony.county.capitalize() for felony in felonies).union(
+            set(misdemeanor.county.capitalize() for misdemeanor in misdemeanors)
         )
-    ]
-    context["misdemeanors"] = [
-        misdemeanor
-        for misdemeanor in pm.OffenseRecord.objects.filter(
-            offense__ciprs_record__batch=batch, severity="MISDEMEANOR"
+    )
+    context["conviction_counties_string"] = get_county_string(conviction_counties)
+    underaged_convictions = get_underaged_conviction_records(batch)
+    context["underaged"] = list(underaged_convictions)
+    underaged_conviction_counties = list(
+        set(
+            underaged_conviction.county.capitalize()
+            for underaged_conviction in underaged_convictions
         )
-    ]
-    context["underaged"] = [
-        conviction for conviction in get_underaged_conviction_records(batch)
-    ]
-    context["dismissed"] = [conviction for conviction in get_dismissed_records(batch)]
+    )
+    context["underaged_conviction_counties_string"] = get_county_string(
+        underaged_conviction_counties
+    )
+
+    dismissals = get_dismissed_records(batch)
+    context["dismissed"] = list(dismissals)
+    dismissed_counties = list(
+        set(dismissal.county.capitalize() for dismissal in dismissals)
+    )
+    context["dismissed_counties_string"] = get_county_string(dismissed_counties)
+
     context["phone_number"] = contact.phone_number
     context["email"] = contact.email
     context["attorney_name"] = contact.name
