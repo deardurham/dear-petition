@@ -1,13 +1,18 @@
 import pytest
 
 from dear_petition.petition.export.documents.advice_letter import generate_context
-from dear_petition.petition.tests.factories import BatchFactory, ContactFactory
+from dear_petition.petition.tests.factories import (
+    BatchFactory,
+    ContactFactory,
+    CIPRSRecordFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
 
 def test_advice_letter_context():
     batch = BatchFactory(label="Faker Fakerson")
+    ciprs_record = CIPRSRecordFactory(batch=batch, sex="M")
     contact = ContactFactory()
 
     PETITIONER_INFO = {
@@ -21,6 +26,7 @@ def test_advice_letter_context():
     EXPECTED_ADVICE_LETTER_CONTEXT = {
         "first_name": "Faker",
         "last_name": "Fakerson",
+        "sex": "M",
         "address": PETITIONER_INFO["address1"],
         "address_second_line": PETITIONER_INFO["address2"],
         "city": PETITIONER_INFO["city"],
