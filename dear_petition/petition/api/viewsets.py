@@ -208,7 +208,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         batch = self.get_object()
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            filepath = "/code/dear_petition/advice_letter.docx"
+            filepath = tmpdir + "/advice_letter.docx"
             advice_letter = generate_advice_letter(batch, contact, petitioner_info)
             advice_letter.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
