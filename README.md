@@ -38,7 +38,7 @@ Try out DEAR Petition Generator by logging in as the superuser you created and u
 
 ## Frontend Development
 
-The user facing side of the DEAR Petition Generator is a React single page app (SPA). It is common to run the frontend locally while running the backend on docker.
+The user facing  side of the DEAR Petition Generator is a React single page app (SPA). It is common to run the frontend locally while running the backend on docker.
 
 
 ### 🚀 Quick Setup
