@@ -32,6 +32,7 @@ def generate_context(batch, contact, petitioner_info):
     context["first_name"], context["last_name"] = helpers.split_first_and_last_name(
         batch.label
     )
+    context["sex"] = batch.sex
     context["address"] = petitioner_info["address1"]
     context["address_second_line"] = petitioner_info["address2"]
     context["city"] = petitioner_info["city"]
