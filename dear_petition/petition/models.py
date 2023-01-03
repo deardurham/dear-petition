@@ -15,6 +15,7 @@ from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
+from phonenumber_field.modelfields import PhoneNumberField
 
 import ciprs_reader
 from localflavor.us import us_states
@@ -132,6 +133,30 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
 
+    def __str__(self):
+        ciprs_record = self.offense.ciprs_record
+        return f"{ciprs_record.file_no} {self.action} {self.severity} ({self.id})"
+
+    @property
+    def is_felony(self):
+        return self.severity == "FELONY"
+
+    @property
+    def is_misdemeanor(self):
+        return self.severity == "MISDEMEANOR"
+
+    @property
+    def county(self):
+        return self.offense.ciprs_record.county
+
+    @property
+    def file_no(self):
+        return self.offense.ciprs_record.file_no
+
+    @property
+    def disposed_on(self):
+        return self.offense.disposed_on
+
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
@@ -143,6 +168,8 @@ class Contact(PrintableModelMixin, models.Model):
     city = models.CharField(max_length=64, blank=True)
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
+    phone_number = PhoneNumberField(null=True, blank=True)
+    email = models.EmailField(max_length=254, null=True, blank=True)
 
 
 class Batch(PrintableModelMixin, models.Model):

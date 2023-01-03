@@ -7,6 +7,7 @@ redis==3.2.1  # https://github.com/antirez/redis
 celery==4.4.7  # pyup: < 5.0  # https://github.com/celery/celery
 flower==0.9.5  # https://github.com/mher/flower
 pyjwt==2.1.0
+docxtpl==0.16.4 # https://docxtpl.readthedocs.io/en/latest/
 
 # Django
 # ------------------------------------------------------------------------------
@@ -19,6 +20,8 @@ django-redis==5.2.0  # https://github.com/niwinz/django-redis
 django-localflavor==3.1 # https://django-localflavor.readthedocs.io/en/latest/
 django-filter==21.1 # https://github.com/baskoopmans/django-filters/
 django-celery-beat==2.2.0 # https://pypi.org/project/django-celery-beat/
+phonenumbers==8.12.56
+django-phonenumber-field==7.0.0 # https://django-phonenumber-field.readthedocs.io/en/latest/
 
 # Django REST Framework
 djangorestframework==3.13.1  # https://github.com/encode/django-rest-framework

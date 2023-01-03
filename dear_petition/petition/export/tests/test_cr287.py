@@ -188,12 +188,9 @@ def test_map_agencies__street_address(form, contact1, contact2, contact3):
     agencies = [contact1, contact2, contact3]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
-    for i, contact in enumerate(agencies, start=1):
-        key = f"AddrAgency{i}"
-        if key in form.data:
-            assert contact.address1 in form.data[key]
-        else:
-            pytest.fail(f"Expected key '{key}' in form data")
+    addresses = [form.data[f"AddrAgency{i+1}"] for i in range(len(agencies))]
+    for contact in agencies:
+        assert contact.address1 in addresses
 
 
 def test_map_agencies__mail_address(
