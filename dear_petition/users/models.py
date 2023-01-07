@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.core.mail import send_mail
 
 from . import constants as uc
-from ..common.models import PrintableModelMixin
+from dear_petition.common.models import PrintableModelMixin
 
 
 class User(PrintableModelMixin, AbstractUser):
@@ -20,11 +20,6 @@ class User(PrintableModelMixin, AbstractUser):
     def send_email(self, subject, message, send_anyway=False):
         if settings.ENVIRONMENT == "PRODUCTION" or send_anyway:
             send_mail(subject, message, uc.FROM_EMAIL_ADDRESS, [self.email])
-
-    def __str__(self):
-        # for security reasons, do not include the password field
-        exclude_fields = ["password"]
-        return super().__str__(exclude_fields)
 
     def __repr__(self):
         # for security reasons, do not include the password field

@@ -83,6 +83,9 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
 
     objects = CIPRSRecordManager()
 
+    def __str__(self):
+        return f"{self.label} {self.file_no} ({self.pk})"
+
     class Meta:
         verbose_name = "CIPRSRecord"
 
@@ -121,6 +124,9 @@ class Offense(PrintableModelMixin, models.Model):
     disposition_method = models.CharField(max_length=256)
     verdict = models.CharField(max_length=256, blank=True)
     plea = models.CharField(max_length=256, blank=True)
+
+    def __str__(self):
+        return f"{self.id} ({self.ciprs_record.file_no})"
 
 
 class OffenseRecord(PrintableModelMixin, models.Model):
@@ -171,6 +177,9 @@ class Contact(PrintableModelMixin, models.Model):
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Batch(PrintableModelMixin, models.Model):
 
@@ -183,6 +192,9 @@ class Batch(PrintableModelMixin, models.Model):
 
     class Meta:
         verbose_name_plural = "Batches"
+
+    def __str__(self):
+        return f"{self.pk}: {self.label}"
 
     def get_absolute_url(self):
         return reverse("create-petition", kwargs={"pk": self.pk})
@@ -259,6 +271,9 @@ class BatchFile(PrintableModelMixin, models.Model):
     date_uploaded = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=get_batch_file_upload_path)
 
+    def __str__(self):
+        return f"{self.file.name}"
+
 
 class Comment(PrintableModelMixin, models.Model):
 
@@ -295,6 +310,9 @@ class Petition(PrintableModelMixin, TimeStampedModel):
         OffenseRecord, related_name="petitions", through="PetitionOffenseRecord"
     )
     agencies = models.ManyToManyField(Contact, related_name="+")
+
+    def __str__(self):
+        return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
 
     def get_offense_record_paginator(self, filter_active=True):
         from dear_petition.petition.etl.paginator import OffenseRecordPaginator
@@ -400,6 +418,11 @@ class PetitionDocument(PrintableModelMixin, models.Model):
     @property
     def county(self):
         return self.petition.county
+
+    def __str__(self):
+        attachment = " attachment " if self.is_attachment else " "
+        jurisdiction = self.petition.get_jurisdiction_display()
+        return f"{self.county} {self.form_type} {jurisdiction}{attachment}({self.id})"
 
 
 class PetitionOffenseRecord(PrintableModelMixin, models.Model):

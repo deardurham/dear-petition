@@ -7,6 +7,7 @@ from dear_petition.common.models import PrintableModelMixin
 class Email(PrintableModelMixin, models.Model):
     """
     SendGrid Parse Email
+
     https://docs.sendgrid.com/for-developers/parsing-email/setting-up-the-inbound-parse-webhook#default-parameters
     """
 
@@ -21,6 +22,9 @@ class Email(PrintableModelMixin, models.Model):
     attachment_count = models.PositiveIntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.subject[:20]} to {self.recipient}"
+
 
 class Attachment(PrintableModelMixin, models.Model):
     """Email Attachment"""
@@ -32,3 +36,6 @@ class Attachment(PrintableModelMixin, models.Model):
     email = models.ForeignKey(
         Email, related_name="attachments", on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return self.name
