@@ -9,6 +9,7 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 
 - [DEAR Petition](#dear-petition)
   - [🚀 Docker Quick Start (recommended)](#-docker-quick-start-recommended)
+  - [🐳 Development Container](#-development-container)
   - [Frontend Development](#frontend-development)
     - [🚀 Quick Setup](#-quick-setup)
     - [API Proxy Configuration](#api-proxy-configuration)
@@ -35,6 +36,34 @@ docker-compose run --rm django python manage.py createsuperuser
 ```
 
 Try out DEAR Petition Generator by logging in as the superuser you created and uploading test CIPRS records (in pdf format) which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
+
+## 🐳 Development Container
+
+This project supports using a [Development Container](https://containers.dev/), is based on the [postgres](https://github.com/devcontainers/templates/tree/main/src/postgres) template and enables several features, including [python](https://github.com/devcontainers/features/tree/main/src/python) and [node](https://github.com/devcontainers/features/tree/main/src/node).
+
+1. **Build and start dev container:** Using the [VS Code Command Pallete (`⇧⌘P`)](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette), select `Dev Containers: Reopen in Container`.
+2. **Install Python and Node requirements:** 
+   ```sh
+   # Update pip
+   python -m pip install --upgrade pip
+   # Install Python packages
+   pip install --user -r requirements/local.txt
+   # Install node packages
+   npm install
+   ```
+3. **Setup pre-commit:** Insetall pre-commit to enforce a variety of community standards:
+   ```sh
+   pre-commit clean
+   pre-commit install
+   ```
+4. **Start dev server:**: Start the Django development server:
+   ```sh
+   python manage.py runserver
+   ```
+6. **Start Node dev server:**: Start the Node development server in a separate terminal:
+   ```sh
+   npm run start
+   ```
 
 ## Frontend Development
 
