@@ -20,7 +20,7 @@
 		3000
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo chown vscode /home/vscode/.cache /home/vscode/.local /workspaces/dear-petition/node_modules",
+	"postCreateCommand": "sudo chown vscode /home/vscode/.cache /home/vscode/.local /workspaces/dear-petition/node_modules /workspaces/dear-petition/dear_petition/media",
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
@@ -31,7 +31,8 @@
 				"ms-vsliveshare.vsliveshare-pack",
 				"yzhang.markdown-all-in-one",
 				"esbenp.prettier-vscode",
-				"dsznajder.es7-react-js-snippets"
+				"dsznajder.es7-react-js-snippets",
+				"vscode-icons-team.vscode-icons"
 			]
 		}
 	}
