@@ -41,6 +41,8 @@ Try out DEAR Petition Generator by logging in as the superuser you created and u
 
 This project supports using a [Development Container](https://containers.dev/), is based on the [postgres](https://github.com/devcontainers/templates/tree/main/src/postgres) template and enables several features, including [python](https://github.com/devcontainers/features/tree/main/src/python) and [node](https://github.com/devcontainers/features/tree/main/src/node).
 
+Before getting started, install [Visual Studio Code](https://code.visualstudio.com/) with the [Remote Development extension pack](https://aka.ms/vscode-remote/download/extension). See [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers) for additional information.
+
 1. **Build and start dev container:** Using the [VS Code Command Pallete (`⇧⌘P`)](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette), select `Dev Containers: Reopen in Container`.
 2. **Install Python and Node requirements:** 
    ```sh
@@ -60,7 +62,7 @@ This project supports using a [Development Container](https://containers.dev/), 
    ```sh
    python manage.py runserver
    ```
-6. **Start Node dev server:**: Start the Node development server in a separate terminal:
+5. **Start Node dev server:**: Start the Node development server in a separate terminal:
    ```sh
    npm run start
    ```
