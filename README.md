@@ -53,16 +53,21 @@ Before getting started, install [Visual Studio Code](https://code.visualstudio.c
    # Install node packages
    npm install
    ```
-3. **Setup pre-commit:** Insetall pre-commit to enforce a variety of community standards:
+3. **Setup pre-commit:** Install pre-commit to enforce a variety of community standards:
    ```sh
    pre-commit clean
    pre-commit install
    ```
-4. **Start dev server:**: Start the Django development server:
+4. **Prepare your environment**: Run migrate and create a user for yourself:
+   ```sh
+   python manage.py migrate
+   python manage.py createsuperuser
+   ```
+5. **Start dev server:** Start the Django development server:
    ```sh
    python manage.py runserver
    ```
-5. **Start Node dev server:**: Start the Node development server in a separate terminal:
+6. **Start Node dev server:** Start the Node development server in a separate terminal:
    ```sh
    npm run start
    ```
