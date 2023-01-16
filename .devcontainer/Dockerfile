@@ -14,3 +14,25 @@ RUN set -ex \
     " \
     && apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends $RUN_DEPS
+
+# Install poppler pdftotext, based on xpdf3 (for parser mode V1)
+RUN set -ex \
+    && curl -k https://poppler.freedesktop.org/poppler-0.57.0.tar.xz | tar xJ \
+    && chmod -R 755 ./poppler-0.57.0 \
+    && cd ./poppler-0.57.0/ \
+    && ./configure \
+        --prefix=/tmp/poppler \
+        --disable-shared \
+        --enable-static \
+        --enable-build-type=release \
+        --enable-libopenjpeg=none \
+        --enable-dctdecoder=none \
+        --enable-shared=no \
+    && make install \
+    && cp /tmp/poppler/bin/pdftotext /usr/local/bin/pdftotext
+
+# Install pdftotext
+RUN set -ex \
+    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
+    && tar -xvf xpdf-tools-linux-4.04.tar.gz \
+    && cp xpdf-tools-linux-4.04/bin64/pdftotext /usr/local/bin/pdftotext-4
