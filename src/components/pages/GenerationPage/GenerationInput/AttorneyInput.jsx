@@ -18,8 +18,8 @@ const TextInput = styled(Input)`
 
 export default function AttorneyInput({ attorney, setAttorney, errors, onClearError }) {
   const [triggerSuggestionsFetch] = useLazySearchAttorniesQuery();
-  const { address1, address2, city, state, zipCode } = attorney;
-
+  // const { address1, address2, city, state, zipCode } = attorney;
+  const { ...address } = attorney;
   return (
     <div className="mt-2">
       <AutocompleteInput
@@ -49,8 +49,8 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
         : null}
       {attorney && (
         <div>
-          <TextInput label="Name" value={attorney.name} disabled />
-          <AddressInput address={{ address1, address2, city, state, zipCode }} disabled />
+          <TextInput label="Name" value={address.name} disabled />
+          <AddressInput address={address} disabled />
         </div>
       )}
     </div>
