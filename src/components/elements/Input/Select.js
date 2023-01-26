@@ -4,12 +4,6 @@ import { SelectWrapper, SelectStyled, ActualSelectStyled, InputErrors } from './
 import { AnimatePresence } from 'framer-motion';
 
 function Select({ value, onChange, label, errors, options, disabled, className }) {
-  // const { state } = value;
-  // const stateObj = {
-  //   state: value,
-  // };
-  console.log(`value prop as passed into Select:`, value);
-  // console.log(`stateObj from Select`, typeof stateObj, stateObj);
   return (
     <SelectWrapper className={className}>
       <SelectStyled>
