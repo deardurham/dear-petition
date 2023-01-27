@@ -26,7 +26,7 @@ const TextInput = styled(Input)`
 `;
 
 export default function AddressInput({ address, setAddress, disabled, errors, onClearError }) {
-  const { address1, address2, city, state, zipcode } = address;
+  const { address1, address2, city, stateAsObject, zipcode } = address;
   const handleChange = (key, value) => {
     if (disabled) return;
     setAddress((prev) => ({ ...prev, [key]: value }));
@@ -58,7 +58,7 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
         <Select
           label="State"
           disabled={disabled}
-          value={state}
+          value={stateAsObject}
           onChange={(value) => handleChange('state', value)}
           options={US_STATES.map((s) => ({ value: s[0], label: s[0] }))}
           errors={!disabled && errors.state}
