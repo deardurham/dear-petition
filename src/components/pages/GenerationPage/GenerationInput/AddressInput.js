@@ -26,7 +26,7 @@ const TextInput = styled(Input)`
 `;
 
 export default function AddressInput({ address, setAddress, disabled, errors, onClearError }) {
-  const { address1, address2, city, state, zipCode } = address;
+  const { address1, address2, city, state, zipcode } = address;
   const handleChange = (key, value) => {
     if (disabled) return;
     setAddress((prev) => ({ ...prev, [key]: value }));
@@ -66,7 +66,7 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
         <TextInput
           label="Zip Code"
           disabled={disabled}
-          value={zipCode}
+          value={zipcode}
           maxLength={5}
           onChange={(e) => handleChange('zipCode', e.target.value)}
           errors={!disabled && errors.zipCode}
