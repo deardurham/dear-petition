@@ -27,7 +27,7 @@ const TextInput = styled(Input)`
 
 export default function AddressInput({ address, setAddress, disabled, errors, onClearError }) {
   const { address1, address2, city, state, zipcode } = address;
-  const stateObj = { value: state, label: state };
+  const stateObj = typeof state === 'string' ? { label: state, value: state } : state;
   const handleChange = (key, value) => {
     if (disabled) return;
     setAddress((prev) => ({ ...prev, [key]: value }));
