@@ -1,0 +1,40 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
+{
+	"name": "dear-petition",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers-contrib/features/heroku-cli:1": {},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "lts"
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or the host.
+	"forwardPorts": [
+		8000,
+		3000
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "sudo chown vscode /home/vscode/.cache /home/vscode/.local /workspaces/dear-petition/node_modules /workspaces/dear-petition/dear_petition/media",
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"batisteo.vscode-django",
+				"ms-vsliveshare.vsliveshare-pack",
+				"yzhang.markdown-all-in-one",
+				"esbenp.prettier-vscode",
+				"dsznajder.es7-react-js-snippets",
+				"vscode-icons-team.vscode-icons"
+			]
+		}
+	}
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

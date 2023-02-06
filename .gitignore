@@ -83,8 +83,6 @@ ENV/
 
 # mypy
 .mypy_cache/
-.vscode/
-
 
 ### Node template
 # Logs
@@ -319,8 +317,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # IDE
-.vscode
-
 latest.dump
 notebooks
 src/ciprs-reader
