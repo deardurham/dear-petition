@@ -41,6 +41,9 @@ const ModalContent = ({ petitionId, onClose }) => {
     return null;
   }
   const { offense_records: offenseRecords } = petition;
+  const sortedOffenseRecords = [...offenseRecords].sort((a, b) =>
+    a.offense_date > b.offense_date ? -1 : 1
+  );
 
   const onSelect = (offenseRecordId) => {
     setSelectedRows((prevSelectedRows) => {
@@ -87,7 +90,7 @@ const ModalContent = ({ petitionId, onClose }) => {
         </p>
       )}
       <OffenseTable
-        offenseRecords={offenseRecords}
+        offenseRecords={sortedOffenseRecords}
         selectedRows={selectedRows}
         onSelect={onSelect}
         dob={new Date(petitionerDOB)}
