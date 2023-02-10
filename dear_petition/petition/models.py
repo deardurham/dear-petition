@@ -244,11 +244,14 @@ class Batch(PrintableModelMixin, models.Model):
         return self.records.first().sex
 
     @property
-    def age(self):
+    def dob(self):
         for record in self.records.all():
-            dob = record.dob
-            if dob:
-                break
+            if record.dob:
+                return record.dob
+
+    @property
+    def age(self):
+        dob = self.dob
         if not dob:
             return
         today = timezone.now().date()
