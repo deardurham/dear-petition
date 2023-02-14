@@ -47,7 +47,7 @@ class CIPRSRecordManager(PrintableModelMixin, models.Manager):
         Parses the raw data from our JSONField (data) and
         places values in their associated model fields.
 
-        Note: This method is use to create the record that
+        Note: This method is used to create the record that
         is why we are also passing batch, date_uploaded,
         report_pdf, and label alongside data. Although data is
         all that is needed when refresh_record_from_data is called.
