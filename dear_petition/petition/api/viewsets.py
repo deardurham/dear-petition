@@ -31,6 +31,9 @@ from dear_petition.users.models import User
 from dear_petition.petition.export.documents.advice_letter import (
     generate_advice_letter as generate_advice_letter,
 )
+from dear_petition.petition.export.documents.expungable_summary import (
+    generate_expungable_summary as generate_expungable_summary,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +219,28 @@ class BatchViewSet(viewsets.ModelViewSet):
                 "Content-Type"
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             resp["Content-Disposition"] = 'attachment; filename="Advice Letter.docx"'
+            return resp
+
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def generate_expungable_summary(self, request, pk):
+        petitioner_info = request.data["petitionerData"]
+        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
+        batch = self.get_object()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            filepath = tmpdir + "/expungable_summary.docx"
+            expungable_summary = generate_expungable_summary(batch, contact, petitioner_info)
+            expungable_summary.save(filepath)
+            resp = FileResponse(open(filepath, "rb"))
+            resp[
+                "Content-Type"
+            ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            resp["Content-Disposition"] = 'attachment; filename="Expungable Record Summary.docx"'
             return resp
 
 

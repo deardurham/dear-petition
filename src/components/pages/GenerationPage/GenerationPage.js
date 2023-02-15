@@ -58,6 +58,13 @@ const InputSectionStyled = styled(GenerationSection)`
   }
 `;
 
+const ButtonsRow = styled.div`
+  display: flex;
+  & > div {
+    margin: 1rem 1rem;
+  }
+`;
+
 const InputSection = ({ children, label }) => (
   <InputSectionStyled>
     <div>
@@ -67,11 +74,11 @@ const InputSection = ({ children, label }) => (
   </InputSectionStyled>
 );
 
-const _openDoc = (doc) => {
+const _openDoc = (doc, filename) => {
   const docBlob = new Blob([doc], {
     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   });
-  saveAs(docBlob, 'Advice Letter.docx');
+  saveAs(docBlob, filename);
 };
 
 function GenerationPage() {
@@ -127,7 +134,26 @@ function GenerationPage() {
         responseType: 'arraybuffer',
       }
     ).then((adviceLetter) => {
-      _openDoc(adviceLetter.data);
+      _openDoc(adviceLetter.data, 'Advice Letter.docx');
+    });
+  };
+
+  const generateExpungableSummary = async () => {
+    if (!validateInput()) {
+      return;
+    }
+
+    Axios.post(
+      `/batch/${batchId}/generate_expungable_summary/`,
+      {
+        petitionerData,
+        attorney,
+      },
+      {
+        responseType: 'arraybuffer',
+      }
+    ).then((expungableSummary) => {
+      _openDoc(expungableSummary.data, 'Expungable Record Summary.docx');
     });
   };
 
@@ -152,9 +178,20 @@ function GenerationPage() {
               errors={formErrors}
               onClearError={clearError}
             />
-            <Button type="button" onClick={() => generateAdviceLetter()}>
-              Generate Advice Letter
-            </Button>
+          </InputSection>
+          <InputSection label="Documents">
+            <ButtonsRow>
+              <div>
+                <Button type="button" onClick={() => generateExpungableSummary()}>
+                  Create Expungable Record Summary
+                </Button>
+              </div>
+              <div>
+                <Button type="button" onClick={() => generateAdviceLetter()}>
+                  Create Advice Letter
+                </Button>
+              </div>
+            </ButtonsRow>
           </InputSection>
           <GenerationSection>
             <h2>Petition List</h2>
