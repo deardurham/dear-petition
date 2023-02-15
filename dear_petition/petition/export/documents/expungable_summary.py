@@ -69,7 +69,7 @@ def __get_tables_data(batch):
         offense__ciprs_record__batch=batch
     ).exclude(
         offense__disposition_method=SUPERSEDING_INDICTMENT_OR_PROCESS
-    )
+    ).select_related("offense__ciprs_record__batch")
 
     table_data = {}
 
