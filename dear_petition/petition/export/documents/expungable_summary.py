@@ -27,7 +27,11 @@ def generate_context(batch, contact, petitioner_info):
     birthday_18th = "None"
     birthday_22nd = "None"
 
-    # if born in leap year, add one day so birthdays will be on March 1
+    """
+    If born in leap year, add one day so 18th and 22nd birthdays will be on March 1. Note that birthdays that are
+    divisible by 4 (eg 20th, 24th birthday) would not be adjusted if we ever calculate them. They would fall on a leap
+    year, so the birthday would be on February 29.
+    """
     leap_year_adjustment = 1 if dob.month == 2 and dob.day == 29 else 0
 
     if dob:
