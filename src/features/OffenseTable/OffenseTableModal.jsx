@@ -42,7 +42,7 @@ const ModalContent = ({ petitionId, onClose }) => {
   }
   const { offense_records: offenseRecords } = petition;
   const sortedOffenseRecords = [...offenseRecords].sort((a, b) =>
-    a.offense_date > b.offense_date ? -1 : 1
+    a.offense_date > b.offense_date ? 1 : -1
   );
 
   const onSelect = (offenseRecordId) => {
