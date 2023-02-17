@@ -29,7 +29,7 @@ class CIPRSRecordAdmin(admin.ModelAdmin):
         "case_status",
     )
     date_hierarchy = "date_uploaded"
-    search_fields = ("label", "batch__label")
+    search_fields = ("label", "batch__label", "file_no")
     ordering = ("-date_uploaded",)
     raw_id_fields = ("batch", "batch_file")
 
