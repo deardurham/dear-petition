@@ -32,7 +32,7 @@ def generate_context(batch, contact, petitioner_info):
     divisible by 4 (eg 20th, 24th birthday) would not be adjusted if we ever calculate them. They would fall on a leap
     year, so the birthday would be on February 29.
     """
-    leap_year_adjustment = 1 if dob.month == 2 and dob.day == 29 else 0
+    leap_year_adjustment = 1 if dob and dob.month == 2 and dob.day == 29 else 0
 
     if dob:
         birthday_18th = dob + relativedelta(years=18, days=leap_year_adjustment)
