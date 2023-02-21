@@ -23,10 +23,11 @@ def resolve_dob(qs):
     if not dobs:
         return None
 
+    earliest_dob = min(dobs)[0]
     if len(dobs) > 1:
-        logger.debug("This batch has multiple dobs. Taking the most conservative one.")
+        logger.warning(f"This batch has multiple birthdates. Using the earliest birthdate {earliest_dob}")
 
-    return min(dobs)[0]
+    return earliest_dob
 
 
 def get_offense_records(batch, jurisdiction=""):
