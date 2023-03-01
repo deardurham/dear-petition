@@ -6,7 +6,7 @@ const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
 const BAD_TYPE_MSG = 'One or more of your files is not the right type';
 
 const DragNDrop = React.forwardRef((props, ref) => {
-  const { children, mimeTypes, maxFiles, onDrop, onDragEnter, onDragLeave } = props;
+  const { children, className, mimeTypes, maxFiles, onDrop, onDragEnter, onDragLeave } = props;
   const [draggedOver, setDraggedOver] = useState(false);
 
   useEffect(() => {
@@ -92,6 +92,7 @@ const DragNDrop = React.forwardRef((props, ref) => {
         onDrop={handleDrop}
         draggedOver={draggedOver}
         positionTransition
+        className={className}
       >
         {children}
       </DragNDropStyled>

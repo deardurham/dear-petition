@@ -16,6 +16,9 @@ import { smallerThanTabletLandscape } from '../../styles/media';
 import useAuth from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../service/api';
 import { loggedOut } from '../../slices/auth';
+import { DropdownMenu } from '../elements/DropdownMenu';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
 const LogoLink = styled(LinkWrapper)`
   border: none;
@@ -56,26 +59,38 @@ function PageBase({ children, className, ...props }) {
           <LinksGroup>
             {user && (
               <LinkWrapper>
-                <Link to="/">New Petition</Link>
+                <Link to="/">Dashboard</Link>
               </LinkWrapper>
             )}
             <LinkWrapper>
               <Link to="/help">Help</Link>
             </LinkWrapper>
             {user?.is_admin ? (
-              <LinkWrapper>
-                <Link to="/agencies">Agencies</Link>
-              </LinkWrapper>
-            ) : null}
-            {user?.is_admin ? (
-              <LinkWrapper>
-                <Link to="/users">Users</Link>
-              </LinkWrapper>
-            ) : null}
-            {user?.is_admin ? (
-              <LinkWrapper>
-                <a href={user.admin_url}>Admin</a>
-              </LinkWrapper>
+              <DropdownMenu
+                items={[
+                  <Link to="/agencies">
+                    <LinkWrapper>Agencies</LinkWrapper>
+                  </Link>,
+                  <Link to="/users">
+                    <LinkWrapper>Users</LinkWrapper>
+                  </Link>,
+                  <a href={user.admin_url} target="_blank" rel="noreferrer">
+                    <LinkWrapper>
+                      <div className="flex gap-2 items-baseline">
+                        <span>Admin</span>
+                        <FontAwesomeIcon className="text-[14px]" icon={faExternalLinkAlt} />
+                      </div>
+                    </LinkWrapper>
+                  </a>,
+                ]}
+              >
+                <LinkWrapper>
+                  <div className="flex gap-2">
+                    <span>Manage</span>
+                    <FontAwesomeIcon className="text-[20px]" icon={faCaretDown} />
+                  </div>
+                </LinkWrapper>
+              </DropdownMenu>
             ) : null}
             <LogoutLink
               to="/"
