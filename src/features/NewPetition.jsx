@@ -7,6 +7,8 @@ import { Button, CloseButton } from '../components/elements/Button';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { useCreateBatchMutation } from '../service/api';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
+import CenteredDialog from '../components/elements/Modal/Dialog';
+import useAuth from '../hooks/useAuth';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
 const MAX_FILES = 10;
@@ -35,6 +37,8 @@ export const NewPetition = () => {
   const history = useHistory();
   const [createBatch] = useCreateBatchMutation();
   const [isMounted, setIsMounted] = useState(false);
+  const { user } = useAuth();
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -112,18 +116,23 @@ export const NewPetition = () => {
       });
   };
 
+  const hasFiles = files?.size > 0 ?? false;
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2">
+        <h3>How to Submit the CIPRS documents</h3>
         <p>There are two methods of starting a new expunction petition</p>
         <p>
           1. Email the documents directly from the CIPRS computer.
-          <Link to="/help">Click here for instructions</Link>
+          <button type="button" className="text-blue" onClick={() => setShowEmailModal(true)}>
+            Click here for instructions
+          </button>
         </p>
         <p>2. If you have access to the CIPRS record PDF files, you may manually upload them.</p>
       </div>
       <DragNDrop
-        className="mt-8 w-[350px] h-[125px]"
+        className="w-[350px] h-[125px]"
         ref={fileInputRef}
         mimeTypes={ALLOWED_MIME_TYPES}
         maxFiles={MAX_FILES}
@@ -132,8 +141,10 @@ export const NewPetition = () => {
       >
         <div className="flex flex-col justify-between items-center [&>div]:mt-10">
           <div>
-            <h2>Upload CIPRS Files</h2>
-            <p className="whitespace-normal">Drag and Drop files here or click to select</p>
+            <h2>Upload CIPRS PDF Files</h2>
+            <p className="whitespace-normal">
+              Drag and Drop files here or click to open file finder
+            </p>
           </div>
           <div>
             {dragWarnings && (
@@ -153,51 +164,85 @@ export const NewPetition = () => {
           </div>
         </div>
       </DragNDrop>
-      {files && files.size > 0 && (
-        <>
-          <div className="flex gap-1 items-baseline self-start">
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-4 items-center self-start">
+          <span className="flex gap-2">
             (Beta) Multi-Line Reader Mode
             <Tooltip tooltipContent={EXPERIMENTAL_PARSER_MESSAGE}>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </Tooltip>
-            <input
-              type="checkbox"
-              checked={!!parserMode}
-              onChange={() => setParserMode((prev) => !prev)}
-            />
-          </div>
-          <div
-            key="files_list"
-            className="flex flex-col justify-between overflow-y-hidden w-[350px]"
-            initial={{ opacity: 0, x: '50' }}
-            animate={{ opacity: 1, x: '0' }}
-            exit={{ opacity: 0, x: '-50' }}
+          </span>
+          <input
+            type="checkbox"
+            checked={!!parserMode}
+            onChange={() => setParserMode((prev) => !prev)}
+          />
+        </div>
+        <div
+          key="files_list"
+          className="flex flex-col justify-between overflow-y-hidden w-[350px]"
+          initial={{ opacity: 0, x: '50' }}
+          animate={{ opacity: 1, x: '0' }}
+          exit={{ opacity: 0, x: '-50' }}
+        >
+          <Button
+            className="text-2xl"
+            disabled={!hasFiles}
+            onClick={handlePreparePetitions}
+            title={!hasFiles ? 'Files have not yet been selected' : undefined}
           >
-            <Button onClick={handlePreparePetitions}>Prepare petitions</Button>
-            {uploadError}
-            <ul className="mt-2 [&_p]:text-[18px]">
-              {[...files].map((file) => (
-                <AnimatePresence key={file.name}>
-                  <motion.li
-                    className="flex flex-row items-center my-2"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: '-50' }}
-                    positionTransition
-                  >
-                    <p className="flex-1 pr-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                      {file.name}
-                    </p>
-                    <CloseButton onClick={() => handleRemoveFile(file)}>
-                      <FontAwesomeIcon icon={faTimes} />
-                    </CloseButton>
-                  </motion.li>
-                </AnimatePresence>
-              ))}
+            Submit Files
+          </Button>
+          <span className="text-red">{uploadError}</span>
+          <ul className="mt-2 [&_p]:text-[18px]">
+            {[...files].map((file) => (
+              <AnimatePresence key={file.name}>
+                <motion.li
+                  className="flex flex-row items-center my-2"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: '-50' }}
+                  positionTransition
+                >
+                  <p className="flex-1 pr-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                    {file.name}
+                  </p>
+                  <CloseButton onClick={() => handleRemoveFile(file)}>
+                    <FontAwesomeIcon icon={faTimes} />
+                  </CloseButton>
+                </motion.li>
+              </AnimatePresence>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <CenteredDialog isOpen={showEmailModal} onClose={() => setShowEmailModal(false)}>
+        <div className="flex flex-col px-8 py-16 w-[800px]">
+          <h3 className="">Upload CIPRS Record via Court Email System</h3>
+          <div className="mt-6 [&_li]:text-[17px]">
+            <ul className="list-disc list-inside flex flex-col gap-4">
+              <li>
+                <span>You may send an email with CIPRS record attachments to </span>
+                <b>
+                  {user.username}
+                  @inbox.durhamexpunction.org
+                </b>
+                <span> to view and generate documents.</span>
+              </li>
+              <li>
+                <span>
+                  You may optionally add a label for the CIPRS records by adding a `+`. For example:{' '}
+                </span>
+                <b>{user.username}+JohnDoeDurhamRecords@inbox.durhamexpunction.org</b>
+              </li>
             </ul>
+            <div className="mt-6 flex gap-4">
+              <Button>Print</Button>
+              <Button>Email</Button>
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </CenteredDialog>
     </div>
   );
 };

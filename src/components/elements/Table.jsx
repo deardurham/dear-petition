@@ -37,6 +37,7 @@ export const TableStyle = styled.table`
     text-align: left;
     color: white;
     user-select: none;
+    overflow: visible;
   }
 
   & th:last-child {

@@ -20,8 +20,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 */
 
 export const Dashboard = () => {
-  const { user } = useAuth();
-  const hasExistingPetitions = false;
+  const hasExistingPetitions = true;
   return (
     <PageBase>
       <div className="flex flex-col gap-4">
@@ -57,13 +56,13 @@ export const Dashboard = () => {
                     )}
                     colorClass={selected ? 'neutral' : 'positive'}
                   >
-                    Existing Petition
+                    Existing Petitions
                   </button>
                 )}
               </Tab>
             </div>
           </Tab.List>
-          <Tab.Panels as="div" className="mt-4">
+          <Tab.Panels as="div">
             <Tab.Panel>
               <NewPetition />
             </Tab.Panel>
@@ -72,21 +71,6 @@ export const Dashboard = () => {
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
-      </div>
-      <div className="flex flex-col">
-        <h3 className="mt-12">Upload CIPRS Record via Court Email System</h3>
-        <div className="mt-4 [&_li]:text-[17px]">
-          <ul className="list-disc list-inside flex flex-col gap-2">
-            <li>
-              You may send an email with CIPRS record attachments to {user.username}
-              @inbox.durhamexpunction.org to view and generate documents.
-            </li>
-            <li>
-              You may optionally add a label for the CIPRS records by adding a `+`. For example:{' '}
-              {user.username}+JohnDoeDurhamRecords@inbox.durhamexpunction.org
-            </li>
-          </ul>
-        </div>
       </div>
     </PageBase>
   );

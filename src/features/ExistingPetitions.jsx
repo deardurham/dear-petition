@@ -17,16 +17,19 @@ export const ExistingPetitions = () => {
             <TableCell header>Label</TableCell>
             <TableCell header># Petitions</TableCell>
             <TableCell header>
-              <Tooltip
-                tooltipContent={
-                  <p>Records are available for 24 hours before they need to be uploaded again</p>
-                }
-              >
-                <div className="flex gap-2">
-                  Time until removed
+              <div className="flex gap-2">
+                Time until removed
+                <Tooltip
+                  tooltipContent={
+                    <p className="w-[300px] whitespace-normal text-black">
+                      Note: Records are available for 24 hours before they need to be uploaded again
+                    </p>
+                  }
+                  offset={[-10, 15]}
+                >
                   <FontAwesomeIcon icon={faQuestionCircle} />
-                </div>
-              </Tooltip>
+                </Tooltip>
+              </div>
             </TableCell>
             <TableCell header />
           </TableHeader>
