@@ -66,3 +66,47 @@ def test_case_information_arrest_date(record1):
         record1.arrest_date.strftime("%Y-%m-%d")
         == record1.data["Case Information"]["Arrest Date"]
     )
+
+
+def test_refresh_record_from_data__exclude_file_numbers_contains(record1):
+    """
+    CIPRS record file number is in the list of excluded file numbers.
+    """
+    exclude_file_nos = ["20CR000001", "20CR012345", "20CR000002"]
+    record1.data = {"General": {"File No": "20CR012345"}}
+    record1.refresh_record_from_data(exclude_file_nos)
+    record1.refresh_from_db()
+    assert record1.file_no != "20CR012345"
+
+
+def test_refresh_record_from_data__exclude_file_numbers_does_not_contain(record1):
+    """
+    CIPRS record file number is not in the list of excluded file numbers.
+    """
+    exclude_file_nos = ["20CR000001"]
+    record1.data = {"General": {"File No": "20CR012345"}}
+    record1.refresh_record_from_data(exclude_file_nos)
+    record1.refresh_from_db()
+    assert record1.file_no == "20CR012345"
+
+
+def test_refresh_record_from_data__exclude_file_numbers_empty(record1):
+    """
+    List of excluded file numbers is empty.
+    """
+    exclude_file_nos = []
+    record1.data = {"General": {"File No": "20CR012345"}}
+    record1.refresh_record_from_data(exclude_file_nos)
+    record1.refresh_from_db()
+    assert record1.file_no == "20CR012345"
+
+
+def test_refresh_record_from_data__exclude_file_numbers_none(record1):
+    """
+    List of excluded file numbers is None.
+    """
+    exclude_file_nos = None
+    record1.data = {"General": {"File No": "20CR012345"}}
+    record1.refresh_record_from_data(exclude_file_nos)
+    record1.refresh_from_db()
+    assert record1.file_no == "20CR012345"

@@ -29,17 +29,24 @@ def import_ciprs_records(files, user, parser_mode, batch_label=""):
     else:
         batch = pm.Batch.objects.create(user=user)
     logger.info(f"Created batch {batch.id}")
+    saved_file_nos = []
     for idx, file_ in enumerate(files):
         logger.info(f"Importing file {file_}")
         batch_file = batch.files.create(file=file_)
+
         for record_data in parse_ciprs_document(batch_file.file, parser_mode):
             record = pm.CIPRSRecord(
                 batch=batch, batch_file=batch_file, data=record_data
             )
-            record.refresh_record_from_data()
+            # Pass file numbers of CIPRS records that have already been saved in this batch of CIPRS records.
+            # If this CIPRS record is in the list, it will not be saved again.
+            record.refresh_record_from_data(saved_file_nos)
+            saved_file_nos.append(record.file_no)
+
             if record.label and idx == 0 and not batch_label:
                 batch.label = record.label
                 batch.save()
+
     create_batch_petitions(batch)
     return batch
 
