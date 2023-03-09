@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import cx from 'classnames';
+import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import { DragNDropStyled, FileInputStyled } from './DragNDrop.styled';
 
 const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
 const BAD_TYPE_MSG = 'One or more of your files is not the right type';
@@ -37,8 +38,10 @@ const DragNDrop = React.forwardRef((props, ref) => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    const { dropEffect, files } = e.dataTransfer;
-    if (dropEffect !== 'none') return;
+    const { files } = e.dataTransfer;
+    if (!files?.length) {
+      return;
+    }
 
     _handleFiles(files);
   };
@@ -75,8 +78,9 @@ const DragNDrop = React.forwardRef((props, ref) => {
 
   return (
     <>
-      <FileInputStyled
+      <input
         ref={ref}
+        className="w-[0.1px] h-[0.1px] opacity-0 overflow-hidden absolute -z-10"
         type="file"
         name="ciprs_file"
         id="ciprs_file"
@@ -84,18 +88,22 @@ const DragNDrop = React.forwardRef((props, ref) => {
         accept={mimeTypes.join(',')}
         multiple={!maxFiles || maxFiles > 1}
       />
-      <DragNDropStyled
+      <motion.label
         htmlFor="ciprs_file"
+        className={cx(
+          className,
+          'select-none cursor-pointer min-h-[5px] min-w-[5px] rounded-[2px] border-[5px] border-dashed',
+          draggedOver ? 'border-primary' : 'border-gray'
+        )}
         onDragOver={(e) => e.preventDefault()}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         draggedOver={draggedOver}
         positionTransition
-        className={className}
       >
         {children}
-      </DragNDropStyled>
+      </motion.label>
     </>
   );
 });
@@ -111,7 +119,7 @@ DragNDrop.propTypes = {
 
 DragNDrop.defaultProps = {
   mimeTypes: [],
-  maxFiles: 8,
+  maxFiles: 10,
   onDragEnter: undefined,
   onDragLeave: undefined,
 };

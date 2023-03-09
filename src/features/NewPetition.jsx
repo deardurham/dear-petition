@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +8,8 @@ import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { useCreateBatchMutation } from '../service/api';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import CenteredDialog from '../components/elements/Modal/Dialog';
+import { Spinner } from '../components/elements/Spinner';
+import { POSITIVE } from '../components/elements/Button/Button';
 import useAuth from '../hooks/useAuth';
 
 const ALLOWED_MIME_TYPES = ['application/pdf'];
@@ -27,7 +29,7 @@ const EXPERIMENTAL_PARSER_MESSAGE = (
   </div>
 );
 
-export const NewPetition = () => {
+const RecordUpload = () => {
   const fileInputRef = React.createRef();
   const [parserMode, setParserMode] = useState(true);
   const [dragWarnings, setDragWarnings] = useState();
@@ -35,10 +37,8 @@ export const NewPetition = () => {
   const [uploadError, setUploadError] = useState('');
   const [files, setFiles] = useState(new Set());
   const history = useHistory();
-  const [createBatch] = useCreateBatchMutation();
+  const [createBatch, { isLoading: isUploading }] = useCreateBatchMutation();
   const [isMounted, setIsMounted] = useState(false);
-  const { user } = useAuth();
-  const [showEmailModal, setShowEmailModal] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -117,47 +117,39 @@ export const NewPetition = () => {
   };
 
   const hasFiles = files?.size > 0 ?? false;
-
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-2">
-        <h3>How to Submit the CIPRS documents</h3>
-        <p>There are two methods of starting a new expunction petition</p>
-        <p>
-          1. Email the documents directly from the CIPRS computer.
-          <button type="button" className="text-blue" onClick={() => setShowEmailModal(true)}>
-            Click here for instructions
-          </button>
-        </p>
-        <p>2. If you have access to the CIPRS record PDF files, you may manually upload them.</p>
-      </div>
+    <>
       <DragNDrop
-        className="w-[350px] h-[125px]"
+        className="max-w-[350px] min-h-[125px]"
         ref={fileInputRef}
         mimeTypes={ALLOWED_MIME_TYPES}
         maxFiles={MAX_FILES}
         maxSize={MAX_FILE_SIZE}
         onDrop={handleDrop}
       >
-        <div className="flex flex-col justify-between items-center [&>div]:mt-10">
-          <div>
+        <div className="flex flex-col justify-between items-center gap-4 px-3 py-10">
+          <div className="">
             <h2>Upload CIPRS PDF Files</h2>
             <p className="whitespace-normal">
               Drag and Drop files here or click to open file finder
             </p>
           </div>
-          <div>
+          <div className="flex flex-col gap-4 self-start">
             {dragWarnings && (
-              <div className="text-yellow flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
                 {dragWarnings.map((warning) => (
-                  <p key={warning}>{warning}</p>
+                  <p key={warning} className="text-yellow">
+                    {`Warning: ${warning}`}
+                  </p>
                 ))}
               </div>
             )}
             {dragErrors && (
-              <div className="text-red flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
                 {dragErrors.map((error) => (
-                  <p key={error}>{error}</p>
+                  <p key={error} className="text-red">
+                    {`Error: ${error}`}
+                  </p>
                 ))}
               </div>
             )}
@@ -186,12 +178,13 @@ export const NewPetition = () => {
           exit={{ opacity: 0, x: '-50' }}
         >
           <Button
-            className="text-2xl"
+            className="text-2xl flex justify-center items-center gap-4"
             disabled={!hasFiles}
             onClick={handlePreparePetitions}
             title={!hasFiles ? 'Files have not yet been selected' : undefined}
           >
-            Submit Files
+            <span>Submit Files</span>
+            {isUploading && <Spinner size="xs" color={POSITIVE} />}
           </Button>
           <span className="text-red">{uploadError}</span>
           <ul className="mt-2 [&_p]:text-[18px]">
@@ -216,8 +209,34 @@ export const NewPetition = () => {
           </ul>
         </div>
       </div>
+    </>
+  );
+};
+
+export const NewPetition = () => {
+  const { user } = useAuth();
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  return (
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-2">
+        <h3>How to Submit the CIPRS documents</h3>
+        <p>There are two methods of starting a new expunction petition</p>
+        <p className="flex gap-2">
+          1. Email the documents directly from the CIPRS computer.
+          <button
+            type="button"
+            className="text-blue font-semibold"
+            onClick={() => setShowEmailModal(true)}
+          >
+            Click here for instructions
+          </button>
+        </p>
+        <p>2. If you have access to the CIPRS record PDF files, you may manually upload them.</p>
+      </div>
+      <RecordUpload />
+      <iframe id="printIframe" title="Print" className="h-0 w-0 absolute" />
       <CenteredDialog isOpen={showEmailModal} onClose={() => setShowEmailModal(false)}>
-        <div className="flex flex-col px-8 py-16 w-[800px]">
+        <div id="printableInstructions" className="flex flex-col px-8 py-16 w-[800px]">
           <h3 className="">Upload CIPRS Record via Court Email System</h3>
           <div className="mt-6 [&_li]:text-[17px]">
             <ul className="list-disc list-inside flex flex-col gap-4">
@@ -236,9 +255,20 @@ export const NewPetition = () => {
                 <b>{user.username}+JohnDoeDurhamRecords@inbox.durhamexpunction.org</b>
               </li>
             </ul>
-            <div className="mt-6 flex gap-4">
-              <Button>Print</Button>
-              <Button>Email</Button>
+            <div className="mt-6 flex gap-4" media="print" style={{ display: 'none' }}>
+              <Button
+                onClick={() => {
+                  const content = document.getElementById('printableInstructions');
+                  const pri = document.getElementById('printIframe').contentWindow;
+                  pri.document.open();
+                  pri.document.write(content.innerHTML);
+                  pri.document.close();
+                  pri.focus();
+                  pri.print();
+                }}
+              >
+                Print
+              </Button>
             </div>
           </div>
         </div>

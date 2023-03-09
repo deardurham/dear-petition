@@ -23,11 +23,11 @@ export const Dashboard = () => {
   const hasExistingPetitions = true;
   return (
     <PageBase>
-      <div className="flex flex-col gap-4">
-        <span className="flex gap-2 items-center">
+      <div className="flex flex-col gap-8">
+        <span className="flex gap-4 items-center">
           <FontAwesomeIcon className="text-[18px] text-blue-primary" icon={faInfoCircle} />
           First time creating an expunction petition form?
-          <Link to="/help">Click here for instructions</Link>
+          <Link to="/help">See the Help page for more information.</Link>
         </span>
         <Tab.Group defaultIndex={hasExistingPetitions ? 1 : 0}>
           <Tab.List className="flex">
@@ -40,7 +40,6 @@ export const Dashboard = () => {
                       'px-4 py-2 rounded-md border-0',
                       selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]'
                     )}
-                    colorClass={selected ? 'neutral' : 'positive'}
                   >
                     New Petition
                   </button>
@@ -54,7 +53,6 @@ export const Dashboard = () => {
                       'px-4 py-2 rounded-md border-0',
                       selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]'
                     )}
-                    colorClass={selected ? 'neutral' : 'positive'}
                   >
                     Existing Petitions
                   </button>
