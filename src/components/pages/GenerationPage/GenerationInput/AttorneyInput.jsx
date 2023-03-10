@@ -16,7 +16,7 @@ const TextInput = styled(Input)`
   }
 `;
 
-export default function AttorneyInput({ attorney, setAttorney, errors, onClearError }) {
+export default function AttorneyInput({ attorney, onSelectAttorney, errors, onClearError }) {
   const [triggerSuggestionsFetch] = useLazySearchAttorniesQuery();
   const { address1, address2, city, state, zipcode } = attorney;
 
@@ -26,7 +26,7 @@ export default function AttorneyInput({ attorney, setAttorney, errors, onClearEr
         placeholder="Search for an attorney..."
         selections={attorney}
         onSelect={(attorneyResult) => {
-          setAttorney(attorneyResult);
+          onSelectAttorney(attorneyResult);
           onClearError('attorney');
         }}
         getSuggestionLabel={({ name }) => name}

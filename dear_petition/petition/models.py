@@ -167,7 +167,7 @@ class OffenseRecord(PrintableModelMixin, models.Model):
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(
-        max_length=16, choices=CONTACT_CATEGORIES, default="agency"
+        max_length=16, choices=CONTACT_CATEGORIES
     )
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
@@ -188,6 +188,22 @@ class Batch(PrintableModelMixin, models.Model):
     user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
     emails = models.ManyToManyField(
         "sendgrid.Email", related_name="batches", blank=True
+    )
+    attorney = models.ForeignKey(
+        Contact,
+        related_name='+',
+        null=True,
+        default=None,
+        limit_choices_to={'category': 'attorney'},
+        on_delete=models.SET_NULL
+    )
+    client = models.ForeignKey(
+        Contact,
+        related_name='+',
+        null=True,
+        default=None,
+        limit_choices_to={'category': 'client'},
+        on_delete=models.SET_NULL
     )
 
     class Meta:

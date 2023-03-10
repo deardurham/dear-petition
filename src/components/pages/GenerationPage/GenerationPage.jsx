@@ -8,7 +8,7 @@ import { saveAs } from 'file-saver';
 // Router
 import { useParams } from 'react-router-dom';
 
-import { useGetBatchQuery } from '../../../service/api';
+import { useGetBatchQuery, useUpdateBatchMutation } from '../../../service/api';
 
 // Children
 import AttorneyInput from './GenerationInput/AttorneyInput';
@@ -83,7 +83,6 @@ const _openDoc = (doc, filename) => {
 
 function GenerationPage() {
   const { batchId } = useParams();
-  const [attorney, setAttorney] = useState('');
   const [petitionerData, setPetitionerData] = useState({
     name: '',
     address1: '',
@@ -94,10 +93,11 @@ function GenerationPage() {
   });
   const [formErrors, setFormErrors] = useState({});
   const { data, isLoading } = useGetBatchQuery({ id: batchId });
+  const [triggerUpdate] = useUpdateBatchMutation();
 
   const validateInput = () => {
     let hasErrors = false;
-    if (!attorney) {
+    if (!data.attorney) {
       setFormErrors((oldErrors) => ({
         ...oldErrors,
         attorney: ['Please select an attorney'],
@@ -128,7 +128,7 @@ function GenerationPage() {
       `/batch/${batchId}/generate_advice_letter/`,
       {
         petitionerData,
-        attorney,
+        attorney: data.attorney,
       },
       {
         responseType: 'arraybuffer',
@@ -165,8 +165,20 @@ function GenerationPage() {
         <GenerationContentStyled>
           <InputSection label="Attorney Information">
             <AttorneyInput
-              attorney={attorney}
-              setAttorney={setAttorney}
+              attorney={data.attorney}
+              onSelectAttorney={async (selectedAttorney) => {
+                try {
+                  triggerUpdate({
+                    id: batchId,
+                    data: { attorney_id: selectedAttorney.pk },
+                  }).unwrap();
+                } catch (e) {
+                  setFormErrors((oldErrors) => ({
+                    ...oldErrors,
+                    attorney: ['Error: Unable to select attorney'],
+                  }));
+                }
+              }}
               errors={formErrors}
               onClearError={clearError}
             />
@@ -202,7 +214,7 @@ function GenerationPage() {
             {data && (
               <PetitionList
                 petitions={data?.petitions || []}
-                attorney={attorney}
+                attorney={data.attorney}
                 petitionerData={petitionerData}
                 validateInput={validateInput}
                 setFormErrors={setFormErrors}

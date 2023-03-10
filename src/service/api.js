@@ -4,7 +4,7 @@ import { axiosBaseQuery } from './axios';
 export const api = createApi({
   // TODO: use baseUrl here instead of in axios.js
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['AgencyList', 'Petition', 'User'],
+  tagTypes: ['AgencyList', 'Batch', 'Petition', 'User'],
   endpoints: (builder) => ({
     agencies: builder.query({
       query: ({ queryString }) => ({
@@ -47,10 +47,20 @@ export const api = createApi({
     createBatch: builder.mutation({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
     }),
+    updateBatch: builder.mutation({
+      query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
+      invalidatesTags: (_result, _err, { id }) => [{ type: 'Batch', id }],
+    }),
     getBatch: builder.query({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
-      providesTags: (result) =>
-        result ? result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]) : [],
+      providesTags: (result, _err, { id }) => {
+        const tags = [{ type: 'Batch', id }];
+        // TODO: Add petitions from this result to redux store
+        /* if (result?.petitions) {
+          tags.concat(result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]));
+        } */
+        return tags;
+      },
     }),
     getUserBatches: builder.query({
       query: ({ user }) => ({ url: `batch/`, method: 'get', params: { user, limit: 10 } }),
@@ -118,6 +128,7 @@ export const {
   useLazyCheckLoginQuery,
   useGetBatchQuery,
   useGetUserBatchesQuery,
+  useUpdateBatchMutation,
   useLoginMutation,
   useLogoutMutation,
   usePetitionQuery,

@@ -232,6 +232,10 @@ class BatchSerializer(serializers.ModelSerializer):
 class BatchDetailSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = serializers.SerializerMethodField()
+    attorney_id = serializers.PrimaryKeyRelatedField(
+        source='attorney', queryset=Contact.objects.filter(category='attorney'), write_only=True
+    )
+    attorney = ContactSerializer(read_only=True)
 
     class Meta:
         model = Batch
@@ -242,8 +246,11 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "user",
             "records",
             "petitions",
+            "attorney",
+            "attorney_id",
+            "client",
         ]
-        read_only_fields = ["user"]
+        read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 
     def get_petitions(self, instance):
         """Return sorted and structured petitions with associated attachments"""
