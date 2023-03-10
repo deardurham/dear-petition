@@ -224,8 +224,9 @@ class BatchSerializer(serializers.ModelSerializer):
             "records",
             "petitions",
             "parser_mode",
+            "automatic_delete_date",
         ]
-        read_only_fields = ["user"]
+        read_only_fields = ["user", "automatic_delete_date"]
 
 
 class BatchDetailSerializer(serializers.ModelSerializer):

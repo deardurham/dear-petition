@@ -120,7 +120,7 @@ const RecordUpload = () => {
   return (
     <>
       <DragNDrop
-        className="max-w-[350px] min-h-[125px]"
+        className="max-w-[360px] min-h-[125px]"
         ref={fileInputRef}
         mimeTypes={ALLOWED_MIME_TYPES}
         maxFiles={MAX_FILES}

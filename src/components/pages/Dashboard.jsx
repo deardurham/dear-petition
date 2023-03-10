@@ -1,13 +1,15 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Tab } from '@headlessui/react';
 import cx from 'classnames';
 import { Link } from 'react-router-dom';
 import PageBase from './PageBase';
+import { useGetUserBatchesQuery } from '../../service/api';
 import useAuth from '../../hooks/useAuth';
 import { ExistingPetitions } from '../../features/ExistingPetitions';
 import { NewPetition } from '../../features/NewPetition';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { Spinner } from '../elements/Spinner';
 
 /*
   Enhance Help Page
@@ -20,11 +22,20 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 */
 
 export const Dashboard = () => {
-  const hasExistingPetitions = true;
+  const { user } = useAuth();
+  const { data, isLoading, isUninitialized } = useGetUserBatchesQuery({ user: user.pk });
+  const hasExistingPetitions = data?.results?.length > 0;
+  if (isLoading || isUninitialized) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <Spinner size="2xl" />
+      </div>
+    );
+  }
   return (
     <PageBase>
       <div className="flex flex-col gap-8">
-        <span className="flex gap-4 items-center">
+        <span className="flex gap-3 items-center">
           <FontAwesomeIcon className="text-[18px] text-blue-primary" icon={faInfoCircle} />
           First time creating an expunction petition form?
           <Link to="/help">See the Help page for more information.</Link>

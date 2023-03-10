@@ -52,6 +52,11 @@ export const api = createApi({
       providesTags: (result) =>
         result ? result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]) : [],
     }),
+    getUserBatches: builder.query({
+      query: ({ user }) => ({ url: `batch/`, method: 'get', params: { user, limit: 10 } }),
+      providesTags: (result) =>
+        result ? result.results.map(({ pk }) => [{ type: 'Batch', id: pk }]) : [],
+    }),
     login: builder.mutation({
       query: (data) => ({ url: 'token/', method: 'post', data }),
     }),
@@ -112,6 +117,7 @@ export const {
   useCreateBatchMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,
+  useGetUserBatchesQuery,
   useLoginMutation,
   useLogoutMutation,
   usePetitionQuery,

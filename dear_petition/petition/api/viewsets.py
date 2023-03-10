@@ -167,6 +167,10 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ['user']
+    ordering_fields = ['date_uploaded']
+    ordering = ['-date_uploaded']
 
     def get_serializer_class(self):
         """Use a custom serializer when accessing a specific batch"""
