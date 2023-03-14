@@ -138,6 +138,11 @@ class ContactSerializer(serializers.ModelSerializer):
             "zipcode",
         ]
 
+class ClientSerializer(ContactSerializer):
+    address1 = serializers.CharField(required=True)
+    city = serializers.CharField(required=True)
+    state = serializers.CharField(required=True)
+    zipcode = serializers.CharField(required=True)
 
 class PetitionSerializer(serializers.ModelSerializer):
     jurisdiction = serializers.CharField(source="get_jurisdiction_display")
@@ -233,9 +238,13 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = serializers.SerializerMethodField()
     attorney_id = serializers.PrimaryKeyRelatedField(
-        source='attorney', queryset=Contact.objects.filter(category='attorney'), write_only=True
+        source='attorney', queryset=Contact.objects.filter(category='attorney'), write_only=True, required=False
     )
     attorney = ContactSerializer(read_only=True)
+    client_id = serializers.PrimaryKeyRelatedField(
+        source='client', queryset=Contact.objects.filter(category='client'), write_only=True, required=False
+    )
+    client = ClientSerializer(read_only=True)
 
     class Meta:
         model = Batch
@@ -249,6 +258,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "attorney",
             "attorney_id",
             "client",
+            "client_id",
         ]
         read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 
@@ -294,19 +304,15 @@ class GeneratePetitionSerializer(serializers.Serializer):
     documents = serializers.PrimaryKeyRelatedField(
         many=True, queryset=PetitionDocument.objects.all()
     )
-    name_petitioner = serializers.CharField(label="Petitioner Name")
-    address1 = serializers.CharField(label="Address Line 1")
-    address2 = serializers.CharField(
-        label="Address Line 2", required=False, allow_blank=True
-    )
-    city = serializers.CharField(label="City")
-    state = serializers.ChoiceField(choices=us_states.US_STATES)
-    zip_code = serializers.CharField(label="Zip Code")
+    client = serializers.ChoiceField(choices=[])
     attorney = serializers.ChoiceField(choices=[])
     agencies = serializers.MultipleChoiceField(choices=[])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["client"].choices = Contact.objects.filter(
+            category="client"
+        ).values_list("pk", "name")
         self.fields["attorney"].choices = Contact.objects.filter(
             category="attorney"
         ).values_list("pk", "name")
@@ -320,6 +326,9 @@ class GeneratePetitionSerializer(serializers.Serializer):
                 "Must select at least one document for pdf generation"
             )
         return value
+        
+    def validate_client(self, value):
+        return Contact.objects.get(pk=value)
 
     def validate_attorney(self, value):
         return Contact.objects.get(pk=value)

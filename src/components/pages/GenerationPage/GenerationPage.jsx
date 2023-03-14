@@ -17,10 +17,6 @@ import PetitionList from './PetitionList';
 import Button from '../../elements/Button';
 import Axios from '../../../service/axios';
 
-const DEFAULT_STATE_LABEL = { label: 'NC', value: 'NC' };
-
-const REQUIRED_FIELDS = ['name', 'address1', 'city', 'state', 'zipCode'];
-
 const GenerationSection = styled.div`
   padding: 2rem 0;
   margin-bottom: 2rem;
@@ -58,19 +54,12 @@ const InputSectionStyled = styled(GenerationSection)`
   }
 `;
 
-const ButtonsRow = styled.div`
-  display: flex;
-  & > div {
-    margin: 1rem 1rem;
-  }
-`;
-
 const InputSection = ({ children, label }) => (
   <InputSectionStyled>
     <div>
       <h3>{label}</h3>
     </div>
-    <div>{children}</div>
+    <div className="mt-2 flex flex-col gap-4">{children}</div>
   </InputSectionStyled>
 );
 
@@ -83,33 +72,36 @@ const _openDoc = (doc, filename) => {
 
 function GenerationPage() {
   const { batchId } = useParams();
-  const [petitionerData, setPetitionerData] = useState({
-    name: '',
-    address1: '',
-    address2: '',
-    city: '',
-    state: DEFAULT_STATE_LABEL,
-    zipCode: '',
-  });
   const [formErrors, setFormErrors] = useState({});
   const { data, isLoading } = useGetBatchQuery({ id: batchId });
   const [triggerUpdate] = useUpdateBatchMutation();
 
+  if (isLoading) {
+    return (
+      <GenerationPageStyled>
+        <h3>Loading...</h3>
+      </GenerationPageStyled>
+    );
+  }
+
+  const { attorney, client } = data;
+
   const validateInput = () => {
     let hasErrors = false;
-    if (!data.attorney) {
+    if (!attorney) {
       setFormErrors((oldErrors) => ({
         ...oldErrors,
         attorney: ['Please select an attorney'],
       }));
       hasErrors = true;
     }
-    REQUIRED_FIELDS.forEach((key) => {
-      if (!petitionerData[key]) {
-        setFormErrors((oldErrors) => ({ ...oldErrors, [key]: ['This field is required'] }));
-        hasErrors = true;
-      }
-    });
+    if (!client) {
+      setFormErrors((oldErrors) => ({
+        ...oldErrors,
+        client: ['Please select or add a client'],
+      }));
+      hasErrors = true;
+    }
     return !hasErrors;
   };
 
@@ -126,10 +118,7 @@ function GenerationPage() {
 
     Axios.post(
       `/batch/${batchId}/generate_advice_letter/`,
-      {
-        petitionerData,
-        attorney: data.attorney,
-      },
+      {},
       {
         responseType: 'arraybuffer',
       }
@@ -145,10 +134,7 @@ function GenerationPage() {
 
     Axios.post(
       `/batch/${batchId}/generate_expungable_summary/`,
-      {
-        petitionerData,
-        attorney,
-      },
+      {},
       {
         responseType: 'arraybuffer',
       }
@@ -159,70 +145,55 @@ function GenerationPage() {
 
   return (
     <GenerationPageStyled>
-      {isLoading ? (
-        <h3>Loading...</h3>
-      ) : (
-        <GenerationContentStyled>
-          <InputSection label="Attorney Information">
-            <AttorneyInput
-              attorney={data.attorney}
-              onSelectAttorney={async (selectedAttorney) => {
-                try {
-                  triggerUpdate({
-                    id: batchId,
-                    data: { attorney_id: selectedAttorney.pk },
-                  }).unwrap();
-                } catch (e) {
-                  setFormErrors((oldErrors) => ({
-                    ...oldErrors,
-                    attorney: ['Error: Unable to select attorney'],
-                  }));
-                }
-              }}
-              errors={formErrors}
-              onClearError={clearError}
+      <GenerationContentStyled>
+        <InputSection label="Attorney Information">
+          <AttorneyInput
+            attorney={attorney}
+            onSelectAttorney={async (selectedAttorney) => {
+              try {
+                await triggerUpdate({
+                  id: batchId,
+                  data: { attorney_id: selectedAttorney.pk },
+                }).unwrap();
+              } catch (e) {
+                setFormErrors((oldErrors) => ({
+                  ...oldErrors,
+                  attorney: ['Error: Unable to select attorney'],
+                }));
+              }
+            }}
+            errors={formErrors}
+            onClearError={clearError}
+          />
+        </InputSection>
+        <InputSection label="Petitioner Information">
+          <PetitionerInput petitioner={client} errors={formErrors} onClearError={clearError} />
+        </InputSection>
+        <InputSection label="Documents">
+          <div className="flex gap-4">
+            <Button onClick={() => generateExpungableSummary()}>
+              Create Expungable Record Summary
+            </Button>
+            <Button onClick={() => generateAdviceLetter()}>Create Advice Letter</Button>
+          </div>
+        </InputSection>
+        <GenerationSection>
+          <h2>Petition List</h2>
+          <p>
+            Click on the buttons below to generate petition forms and their attachments. Click on
+            the &rsquo;View&rsquo; button to reveal a list of offense records.
+          </p>
+          {data && (
+            <PetitionList
+              petitions={data?.petitions || []}
+              attorney={attorney}
+              petitioner={client}
+              validateInput={validateInput}
+              setFormErrors={setFormErrors}
             />
-          </InputSection>
-          <InputSection label="Petitioner Information">
-            <PetitionerInput
-              petitionerData={petitionerData}
-              setPetitionerData={setPetitionerData}
-              errors={formErrors}
-              onClearError={clearError}
-            />
-          </InputSection>
-          <InputSection label="Documents">
-            <ButtonsRow>
-              <div>
-                <Button type="button" onClick={() => generateExpungableSummary()}>
-                  Create Expungable Record Summary
-                </Button>
-              </div>
-              <div>
-                <Button type="button" onClick={() => generateAdviceLetter()}>
-                  Create Advice Letter
-                </Button>
-              </div>
-            </ButtonsRow>
-          </InputSection>
-          <GenerationSection>
-            <h2>Petition List</h2>
-            <p>
-              Click on the buttons below to generate petition forms and their attachments. Click on
-              the &rsquo;View&rsquo; button to reveal a list of offense records.
-            </p>
-            {data && (
-              <PetitionList
-                petitions={data?.petitions || []}
-                attorney={data.attorney}
-                petitionerData={petitionerData}
-                validateInput={validateInput}
-                setFormErrors={setFormErrors}
-              />
-            )}
-          </GenerationSection>
-        </GenerationContentStyled>
-      )}
+          )}
+        </GenerationSection>
+      </GenerationContentStyled>
     </GenerationPageStyled>
   );
 }

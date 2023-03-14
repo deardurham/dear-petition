@@ -119,13 +119,14 @@ class AOCFormCR287(PetitionForm):
                 ] = offense_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
-        self.data["PetitionerName"] = self.extra.get("name_petitioner")  # AOC-288
-        self.data["NamePetitioner"] = self.extra.get("name_petitioner")  # AOC-287
-        self.data["StreetAddr"] = self.extra.get("address1")
-        self.data["MailAddr"] = self.extra.get("address2")
-        self.data["City"] = self.extra.get("city")
-        self.data["State"] = self.extra.get("state")
-        self.data["ZipCode"] = self.extra.get("zip_code")
+        client = self.extra["client"]
+        self.data["PetitionerName"] = client.name  # AOC-288
+        self.data["NamePetitioner"] = client.name  # AOC-287
+        self.data["StreetAddr"] = client.address1
+        self.data["MailAddr"] = client.address2
+        self.data["City"] = client.city
+        self.data["State"] = client.state
+        self.data["ZipCode"] = client.zipcode
         offense_record = self.get_most_recent_record()
         if offense_record:
             record = offense_record.offense.ciprs_record
@@ -204,7 +205,8 @@ class AOCFormCR285(AOCFormCR287):
         self.data["CountyName"] = self.petition_document.county
 
     def map_petitioner(self):
-        self.data["PetitionerName"] = self.extra.get("name_petitioner")
+        client = self.extra["client"]
+        self.data["PetitionerName"] = client.name
 
     def map_agencies(self):
         agencies = self.petition_document.agencies.all()

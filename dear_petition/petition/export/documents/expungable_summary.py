@@ -12,17 +12,17 @@ from dear_petition.petition.constants import (
 TEMPLATE = "expungable_summary.docx"
 
 
-def generate_expungable_summary(batch, contact, petitioner_info):
+def generate_expungable_summary(batch):
+    assert batch.client is not None and batch.attorney is not None, 'Client and attorney must be set for batch before generating document'
 
-    context = generate_context(batch, contact, petitioner_info)
+    context = generate_context(batch, batch.attorney, batch.client)
     doc = DocxTemplate(settings.TEMPLATE_DIR.path(TEMPLATE))
     doc.render(context)
 
     return doc
 
 
-def generate_context(batch, contact, petitioner_info):
-
+def generate_context(batch, attorney, client):
     dob = batch.dob
     birthday_18th = "None"
     birthday_22nd = "None"
@@ -53,8 +53,8 @@ def generate_context(batch, contact, petitioner_info):
         tables.append(table)
 
     return {
-        "attorney": contact.name,
-        "petitioner": petitioner_info["name"],
+        "attorney": attorney.name,
+        "petitioner": client.name,
         "dob": dob,
         "birthday_18th": birthday_18th,
         "birthday_22nd": birthday_22nd,

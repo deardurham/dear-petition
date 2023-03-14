@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDeleteAgencyMutation, useUpdateAgencyMutation } from '../../service/api';
+import { useDeleteAgencyMutation, useUpdateContactMutation } from '../../service/api';
 import {
   EditableRow,
   HeaderCell,
@@ -19,7 +19,7 @@ const getFormattedAddress = (address1, address2) =>
   address2 ? `${address1}\n${address2}` : address1;
 
 const AgencyInputRow = ({ agencyData, onStopEditing }) => {
-  const [triggerUpdate, { error }] = useUpdateAgencyMutation();
+  const [triggerUpdate, { error }] = useUpdateContactMutation();
   const { data: errorData } = error ?? {};
 
   const { control, handleSubmit, formState } = useForm({
@@ -51,7 +51,10 @@ const AgencyInputRow = ({ agencyData, onStopEditing }) => {
       }
     });
     try {
-      await triggerUpdate({ id: agencyData.pk, data: submitData }).unwrap();
+      await triggerUpdate({
+        id: agencyData.pk,
+        data: { ...submitData, category: 'agency' },
+      }).unwrap();
       onStopEditing();
     } catch (e) {
       // noop

@@ -8,6 +8,7 @@ import {
   usePetitionQuery,
 } from '../service/api';
 import { Spinner } from '../components/elements/Spinner';
+import { Badge } from '../components/elements/Badge/Badge';
 
 const agencyArraysAreEqual = (agencyArr1, agencyArr2) => {
   if (agencyArr1.length !== agencyArr2.length) {
@@ -63,27 +64,40 @@ const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
         Please select or de-select agencies here if you wish to include or exclude them from the
         petition.
       </p>
-      <AutocompleteInput
-        label="Agencies"
-        selections={selections}
-        showSelections
-        onSelect={(agency) => setSelections((prev) => [...prev, agency].sort(sortAgencyArrayByPk))}
-        onRemoveSelection={(agency) =>
-          setSelections((prev) => prev.filter((a) => a.pk !== agency.pk))
-        }
-        getSuggestionLabel={({ name }) => name}
-        fetchSuggestions={async (searchValue) => {
-          const data = await triggerSuggestionsFetch(
-            {
-              search: searchValue,
-            },
-            true
-          ).unwrap();
-          return data.results.filter(
-            (suggestion) => !selections.map(({ pk }) => pk).includes(suggestion.pk)
-          );
-        }}
-      />
+      <div>
+        <AutocompleteInput
+          placeholder="Search for an agency..."
+          selections={selections}
+          showSelections
+          onSelect={(agency) =>
+            setSelections((prev) => [...prev, agency].sort(sortAgencyArrayByPk))
+          }
+          onRemoveSelection={(agency) =>
+            setSelections((prev) => prev.filter((a) => a.pk !== agency.pk))
+          }
+          getSuggestionLabel={({ name }) => name}
+          fetchSuggestions={async (searchValue) => {
+            const data = await triggerSuggestionsFetch(
+              {
+                search: searchValue,
+              },
+              true
+            ).unwrap();
+            return data.results.filter(
+              (suggestion) => !selections.map(({ pk }) => pk).includes(suggestion.pk)
+            );
+          }}
+        />
+        <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
+          {selections.map((selection, i) => (
+            <Badge
+              key={`${i}_${selection.name}`}
+              name={selection.name}
+              remove={() => setSelections((prev) => prev.filter((a) => a.pk !== selection.pk))}
+            />
+          ))}
+        </div>
+      </div>
       <div className="self-center flex gap-8">
         <Button
           className="px-4"

@@ -66,7 +66,7 @@ const NO_DOCUMENTS_SELECTED = [
 function PetitionRow({
   attorney,
   petitionData,
-  petitionerData,
+  petitioner,
   validateInput,
   backgroundColor,
   setFormErrors,
@@ -122,7 +122,7 @@ function PetitionRow({
     } catch (e) {
       if (e?.response?.data) {
         const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
-        const { attorney: attorneyError, name, address1, city, state, zipCode } = errorData;
+        const { attorney: attorneyError, name, address1, city, state, zipcode } = errorData;
         setFormErrors((prevErrors) => ({
           ...prevErrors,
           attorney: attorneyError,
@@ -130,7 +130,7 @@ function PetitionRow({
           address1,
           city,
           state,
-          zipCode,
+          zipcode,
         }));
         return;
       }
@@ -144,12 +144,7 @@ function PetitionRow({
 
   const _buildPetition = () => ({
     documents: selectedDocuments,
-    name_petitioner: petitionerData.name,
-    address1: petitionerData.address1,
-    address2: petitionerData.address2,
-    city: petitionerData.city,
-    state: petitionerData.state.value,
-    zip_code: petitionerData.zipCode,
+    client: petitioner.pk,
     attorney: attorney.pk,
     agencies: petition.agencies.map((agency) => agency.pk),
   });
@@ -214,7 +209,6 @@ function PetitionRow({
         <TableCell>
           {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
           <ActionButton
-            collapsedIcon={faBook}
             className="w-[120px]"
             label={
               areALlDocumentsSelected
@@ -281,7 +275,7 @@ function PetitionRow({
 export default function PetitionList({
   attorney,
   petitions,
-  petitionerData,
+  petitioner,
   validateInput,
   setFormErrors,
 }) {
@@ -303,7 +297,7 @@ export default function PetitionList({
           <PetitionRow
             key={petition.pk}
             petitionData={petition}
-            petitionerData={petitionerData}
+            petitioner={petitioner}
             attorney={attorney}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}

@@ -132,7 +132,6 @@ class ContactSearchFilter(filters.SearchFilter):
 class ContactViewSet(viewsets.ModelViewSet):
 
     queryset = pm.Contact.objects.all()
-    serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
     filterset_fields = {
@@ -143,6 +142,11 @@ class ContactViewSet(viewsets.ModelViewSet):
     search_fields = ["name"]
     ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
     ordering = ["name"]
+
+    def get_serializer_class(self):
+        if self.request.data.get('category') == 'client':
+            return serializers.ClientSerializer
+        return serializers.ContactSerializer
 
     @action(detail=False, methods=["get"])
     def get_filter_options(self, request):
@@ -210,13 +214,18 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def generate_advice_letter(self, request, pk):
-        petitioner_info = request.data["petitionerData"]
-        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
         batch = self.get_object()
+        errors = {}
+        if batch.attorney is None:
+            errors['attorney'] = ['This field is required']
+        if batch.client is None:
+            errors['client'] = ['This field is required']
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/advice_letter.docx"
-            advice_letter = generate_advice_letter(batch, contact, petitioner_info)
+            advice_letter = generate_advice_letter(batch)
             advice_letter.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
@@ -232,13 +241,18 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def generate_expungable_summary(self, request, pk):
-        petitioner_info = request.data["petitionerData"]
-        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
         batch = self.get_object()
+        errors = {}
+        if batch.attorney is None:
+            errors['attorney'] = ['This field is required']
+        if batch.client is None:
+            errors['client'] = ['This field is required']
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/expungable_summary.docx"
-            expungable_summary = generate_expungable_summary(batch, contact, petitioner_info)
+            expungable_summary = generate_expungable_summary(batch)
             expungable_summary.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
@@ -338,7 +352,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
         resp["Content-Type"] = "application/pdf"
 
         petition = self.get_object()
-        filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
+        filename = f'{serializer.data["client"].name} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
         resp["Content-Disposition"] = f'inline; filename="{filename}"'
 
         return resp

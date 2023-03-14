@@ -9,6 +9,7 @@ import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import { useGetUserBatchesQuery } from '../service/api';
 import useAuth from '../hooks/useAuth';
 
+// TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
   const { user } = useAuth();
   const { data } = useGetUserBatchesQuery({ user: user.pk });

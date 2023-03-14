@@ -20,7 +20,7 @@ def test_advice_letter_context():
         "address2": "Apt F",
         "city": "Fakesville",
         "state": "NC",
-        "zipCode": "99999",
+        "zipcode": "99999",
     }
 
     EXPECTED_ADVICE_LETTER_CONTEXT = {
@@ -31,7 +31,7 @@ def test_advice_letter_context():
         "address_second_line": PETITIONER_INFO["address2"],
         "city": PETITIONER_INFO["city"],
         "state": PETITIONER_INFO["state"],
-        "zipcode": PETITIONER_INFO["zipCode"],
+        "zipcode": PETITIONER_INFO["zipcode"],
         "felonies": [],
         "misdemeanors": [],
         "conviction_counties_string": "",
