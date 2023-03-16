@@ -143,11 +143,11 @@ class Offense(PrintableModelMixin, models.Model):
 
     def has_equivalent_offense_records(self):
         """
-        Return true if the CHARGED AND CONVICTED offense records are equivalent. Raise error if there is an unexpected
-        number of offense records.
+        Return true if the CHARGED AND CONVICTED offense records are equivalent.
         """
         offense_records = list(self.offense_records.all())
-        assert (len(offense_records) in [1, 2])
+        if len(offense_records) != 2:
+            return False
 
         same_description = offense_records[0].description == offense_records[1].description
         same_severity = offense_records[0].severity == offense_records[1].severity

@@ -327,3 +327,12 @@ def test_offense_has_equivalent_offense_records_different_severities(offense1):
     OffenseRecordFactory(offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR",)
 
     assert(not offense1.has_equivalent_offense_records())
+
+
+def test_offense_has_equivalent_offense_records_one_offense_record(offense1):
+    """
+    Test has_equivalent_offense_records in Offense. Should return false because there is only one offense record.
+    """
+    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
+
+    assert(not offense1.has_equivalent_offense_records())
