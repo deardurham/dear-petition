@@ -114,6 +114,32 @@ class Offense(PrintableModelMixin, models.Model):
     def __str__(self):
         return f"{self.id} ({self.ciprs_record.file_no})"
 
+    def is_convicted(self):
+        """
+        Return true if the offense is a convicted offense. Note, there is probably a better name for this method, but
+        I'm not exactly sure what it would be yet.
+        """
+        return self.verdict == pc.VERDICT_GUILTY and self.has_equivalent_offense_records()
+
+    def is_guilty_to_lesser(self):
+        """
+        Return true if the offense is a guilty to lesser offense.
+        """
+        return self.verdict == pc.VERDICT_GUILTY and not self.has_equivalent_offense_records()
+
+    def has_equivalent_offense_records(self):
+        """
+        Return true if the CHARGED AND CONVICTED offense records are equivalent.
+        """
+        offense_records = list(self.offense_records.all())
+        if len(offense_records) != 2:
+            return False
+
+        same_description = offense_records[0].description == offense_records[1].description
+        same_severity = offense_records[0].severity == offense_records[1].severity
+
+        return same_description and same_severity
+
 
 class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
