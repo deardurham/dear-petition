@@ -98,22 +98,12 @@ def __create_tables_data(offenses):
         key = (county, jurisdiction)
 
         offense_records = list(offense.offense_records.all())
-        if len(offense_records) not in [1, 2]:
-            logger.error(f"Expecting 1 or 2 offense records, but found {len(offense_records)}")
-
-        guilty_to_lesser = False
-        if offense.verdict == VERDICT_GUILTY and len(offense_records) == 2:
-            same_description = offense_records[0].description == offense_records[1].description
-            same_severity = offense_records[0].severity == offense_records[1].severity
-            if same_description and same_severity:
-                # if offense records same, then remove one
-                offense_records.pop()
-            else:
-                # if offense record different, then assume the person was guilty to the lesser offense
-                guilty_to_lesser = True
+        if offense.is_convicted():
+            # remove one of the offense records because the two offense records would appear identical in the output
+            offense_records.pop()
 
         for offense_record in offense_records:
-            offense_record_data = __create_offense_record_data(offense_record, guilty_to_lesser)
+            offense_record_data = __create_offense_record_data(offense_record, offense.is_guilty_to_lesser())
 
             # append offense record data to list for the key, but if key doesn't exist yet, create an empty list first
             table_data.setdefault(key, []).append(offense_record_data)

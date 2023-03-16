@@ -6,7 +6,6 @@ from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory, OffenseRecordFactory, OffenseFactory,
 )
 from dear_petition.petition.constants import (
-    DISPOSITION_METHOD_CODE_MAP,
     DISP_SUPERSEDING_INDICTMENT,
     DISTRICT_COURT,
     SUPERIOR_COURT,

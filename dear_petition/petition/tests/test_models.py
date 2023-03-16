@@ -4,8 +4,18 @@ import pytest
 import pytz
 from django.db import IntegrityError
 
-from dear_petition.petition.constants import DISMISSED, DISTRICT_COURT, DURHAM_COUNTY, FEMALE, MALE
+from dear_petition.petition.constants import (
+    DISMISSED,
+    DISTRICT_COURT,
+    DURHAM_COUNTY,
+    VERDICT_GUILTY,
+    CHARGED,
+    CONVICTED,
+    FEMALE,
+    MALE
+)
 from dear_petition.petition.models import GeneratedPetition
+from dear_petition.petition.tests.factories import OffenseFactory, OffenseRecordFactory
 from dear_petition.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -201,3 +211,119 @@ def test_generated_petition_get_stats_generated_petition_dob_after_today(mocker,
 
         # get stats for generated petition
         generated_petition = GeneratedPetition.get_stats_generated_petition(petition_document.id, user)
+
+
+def test_offense_is_convicted():
+    """
+    Test is_convicted in Offense. Should return true.
+    """
+    offense = OffenseFactory(verdict = VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR",)
+
+    assert(offense.is_convicted())
+
+
+def test_offense_is_convicted_different_descriptions():
+    """
+    Test is_convicted in Offense. Should return false because descriptions are different.
+    """
+    offense = OffenseFactory(verdict = VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR",)
+
+    assert(not offense.is_convicted())
+
+
+def test_offense_is_convicted_different_severities():
+    """
+    Test is_convicted in Offense. Should return false because severities are different.
+    """
+    offense = OffenseFactory(verdict = VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR",)
+
+    assert(not offense.is_convicted())
+
+
+def test_offense_is_convicted_not_guilty():
+    """
+    Test is_convicted in Offense. Should return false because verdict is not GUILTY.
+    """
+    offense = OffenseFactory(verdict = "NOT GUILTY")
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+
+    assert(not offense.is_convicted())
+
+
+def test_offense_is_guilty_to_lesser_different_descriptions():
+    """
+    Test is_guilty_to_lesser in Offense. Should return true because descriptions are different.
+    """
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+
+    assert (offense.is_guilty_to_lesser())
+
+
+def test_offense_is_guilty_to_lesser_different_severities():
+    """
+    Test is_guilty_to_lesser in Offense. Should return true because severities are different.
+    """
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR" )
+
+    assert (offense.is_guilty_to_lesser())
+
+
+def test_offense_is_guilty_to_lesser_equivalent_offenses():
+    """
+    Test is_guilty_to_lesser in Offense. Should return false because offenses are equivalent.
+    """
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR" )
+
+    assert (not offense.is_guilty_to_lesser())
+
+
+def test_offense_is_guilty_to_lesser_not_guilty():
+    """
+    Test is_guilty_to_lesser in Offense. Should return false because verdict is not GUILTY.
+    """
+    offense = OffenseFactory(verdict="NOT GUILTY")
+    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+
+    assert (not offense.is_guilty_to_lesser())
+
+
+def test_offense_has_equivalent_offense_records_equivalent(offense1):
+    """
+    Test has_equivalent_offense_records in Offense. Should return true.
+    """
+    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR",)
+
+    assert(offense1.has_equivalent_offense_records())
+
+
+def test_offense_has_equivalent_offense_records_different_descriptions(offense1):
+    """
+    Test has_equivalent_offense_records in Offense. Should return false because descriptions are different.
+    """
+    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR",)
+
+    assert(not offense1.has_equivalent_offense_records())
+
+
+def test_offense_has_equivalent_offense_records_different_severities(offense1):
+    """
+    Test has_equivalent_offense_records in Offense. Should return false because severities are different.
+    """
+    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
+    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR",)
+
+    assert(not offense1.has_equivalent_offense_records())
