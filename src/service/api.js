@@ -27,10 +27,13 @@ export const api = createApi({
     }),
     createContact: builder.mutation({
       query: ({ data }) => ({ url: `contact/`, method: 'post', data }),
-      invalidatesTags: (_result, _err, { data: { category } }) => [
-        { type: 'ContactList', id: category },
-        { type: 'ContactFilterOptions', id: category },
-      ],
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: 'ContactList', id: result.category },
+              { type: 'ContactFilterOptions', id: result.category },
+            ]
+          : [],
     }),
     updateContact: builder.mutation({
       query: ({ id, data }) => ({ url: `contact/${id}/`, method: 'put', data }),

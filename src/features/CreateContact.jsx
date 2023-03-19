@@ -61,9 +61,9 @@ export const CreateContact = ({
         submitData[field] = formData[field];
       }
     });
-    await triggerCreate({ data: { ...submitData, category } }).unwrap();
+    const data = await triggerCreate({ data: { ...submitData, category } }).unwrap();
     reset();
-    onSubmitSuccess?.(submitData);
+    onSubmitSuccess?.(data);
   };
   const onSubmitAndClose = async (data) => {
     await onSubmit(data);

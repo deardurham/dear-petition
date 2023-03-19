@@ -1,5 +1,7 @@
 import logging
 from django.urls import reverse
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
@@ -12,9 +14,6 @@ from dear_petition.petition.models import (
     PetitionDocument,
 )
 from dear_petition.petition.constants import ATTACHMENT, DISMISSED
-from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from localflavor.us import us_states
 
 
 logger = logging.getLogger(__name__)
@@ -117,6 +116,7 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.ModelSerializer):
     formatted_address = serializers.SerializerMethodField()
+    user = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
 
     def get_formatted_address(self, contact_obj):
         lines = [contact_obj.address1]
@@ -136,6 +136,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "city",
             "state",
             "zipcode",
+            "user",
         ]
 
 class ClientSerializer(ContactSerializer):

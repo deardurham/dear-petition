@@ -10,8 +10,9 @@ from django.conf import settings
 from django.db.models import JSONField
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import IntegerField, Case, When, Value
+from django.db.models import IntegerField, Case, When, Value, signals
 from django.db.models.functions import Cast, Substr, Concat
+from django.dispatch import receiver
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
@@ -177,6 +178,15 @@ class Contact(PrintableModelMixin, models.Model):
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
 
+    user = models.ForeignKey(
+        User,
+        related_name="clients",
+        null=True,
+        default=None,
+        on_delete=models.CASCADE,
+        help_text="The user associated with this contact, if applicable"
+    )
+
     def __str__(self):
         return self.name
 
@@ -199,7 +209,7 @@ class Batch(PrintableModelMixin, models.Model):
     )
     client = models.ForeignKey(
         Contact,
-        related_name='+',
+        related_name="batches",
         null=True,
         default=None,
         limit_choices_to={'category': 'client'},
@@ -279,6 +289,12 @@ class Batch(PrintableModelMixin, models.Model):
         return self.date_uploaded + timedelta(
             hours=settings.CIPRS_RECORD_LIFETIME_HOURS
         )
+
+@receiver(signals.post_delete, sender=Batch)
+def cleanup_batch_client(sender, instance, **kwargs):
+    """ If the client has no relevant batches, delete the client """
+    if instance.client and len(instance.client.batches.all()) == 0:
+        instance.client.delete()
 
 
 def get_batch_file_upload_path(instance, filename):
@@ -469,7 +485,6 @@ class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
     def get_stats_generated_petition(cls, petition_document_id, user):
         petition_document = PetitionDocument.objects.get(id=petition_document_id)
         batch = petition_document.petition.batch
-        user = user
 
         generated_petition = GeneratedPetition.objects.create(
             username=user.username,

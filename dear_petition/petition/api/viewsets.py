@@ -148,6 +148,17 @@ class ContactViewSet(viewsets.ModelViewSet):
             return serializers.ClientSerializer
         return serializers.ContactSerializer
 
+    def get_queryset(self):
+        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+            return pm.Contact.objects.filter(user=self.request.user)
+        return pm.Contact.objects.all()
+
+    def perform_create(self, serializer):
+        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()
+
     @action(detail=False, methods=["get"])
     def get_filter_options(self, request):
         field = request.query_params.get("field", None)

@@ -11,16 +11,6 @@ import { ExistingPetitions } from '../../features/ExistingPetitions';
 import { NewPetition } from '../../features/NewPetition';
 import { Spinner } from '../elements/Spinner';
 
-/*
-  Enhance Help Page
-    - Step by step instructions on generating petion
-    - Steps on how to send CIPRS documents to expunction tool
-      - Allow user to email themselves the instructions?
-  "View" vs "View Petitions"
-      probably an issue with using table format vs something like cards
-      seems to be a width constraint issue
-*/
-
 export const Dashboard = () => {
   const { user } = useAuth();
   const { data, isLoading, isUninitialized } = useGetUserBatchesQuery({ user: user.pk });

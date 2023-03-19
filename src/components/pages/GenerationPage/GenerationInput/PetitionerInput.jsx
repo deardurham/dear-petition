@@ -59,7 +59,7 @@ const getPetitionerData = (petitioner) => {
 export default function PetitionerInput({ petitioner, errors, onClearError }) {
   const { batchId } = useParams();
   const [triggerSuggestionsFetch] = useLazySearchClientsQuery();
-  const [triggerUpdate] = useUpdateBatchMutation();
+  const [triggerBatchUpdate] = useUpdateBatchMutation();
   const [triggerContactUpdate] = useUpdateContactMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [editErrors, setEditErrors] = useState({});
@@ -88,9 +88,21 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
         }
       >
         <CreateClientModal
-          onCreate={(data) => {
+          onCreate={async (clientData) => {
             onClearError('client');
-            setPetitionerData(data);
+            clearError('client');
+            try {
+              await triggerBatchUpdate({
+                id: batchId,
+                data: { client_id: clientData.pk },
+              }).unwrap();
+              setPetitionerData(getPetitionerData(clientData));
+            } catch (e) {
+              addError(
+                'client',
+                'Unable to select new client. Please try searching and selecting the new client.'
+              );
+            }
           }}
         />
       </ModalButton>
@@ -161,7 +173,7 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
               onClearError('client');
               clearError('client');
               try {
-                await triggerUpdate({
+                await triggerBatchUpdate({
                   id: batchId,
                   data: { client_id: pk },
                 }).unwrap();
