@@ -26,7 +26,11 @@ from dear_petition.petition.etl import (
     recalculate_petitions,
     assign_agencies_to_documents,
 )
-from dear_petition.petition.export import generate_petition_pdf
+from dear_petition.petition.export import (
+    generate_petition_pdf,
+    generate_addendum_document_file,
+    create_zip_file,
+)
 from dear_petition.users.models import User
 from dear_petition.petition.export.documents.advice_letter import (
     generate_advice_letter as generate_advice_letter,
@@ -234,13 +238,17 @@ class BatchViewSet(viewsets.ModelViewSet):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/expungable_summary.docx"
-            expungable_summary = generate_expungable_summary(batch, contact, petitioner_info)
+            expungable_summary = generate_expungable_summary(
+                batch, contact, petitioner_info
+            )
             expungable_summary.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
                 "Content-Type"
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            resp["Content-Disposition"] = 'attachment; filename="Expungable Record Summary.docx"'
+            resp[
+                "Content-Disposition"
+            ] = 'attachment; filename="Expungable Record Summary.docx"'
             return resp
 
 
@@ -318,7 +326,9 @@ class PetitionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         petition_documents = pm.PetitionDocument.objects.filter(
-            petition=pk, pk__in=serializer.data["documents"]
+            petition=pk,
+            pk__in=serializer.data["documents"],
+            form_type__in=constants.PETITION_FORM_TYPES._db_values,
         ).order_by("pk")
         assert (
             len(petition_documents) > 0
@@ -330,12 +340,40 @@ class PetitionViewSet(viewsets.ModelViewSet):
         for doc in petition_documents.iterator():
             pm.GeneratedPetition.get_stats_generated_petition(doc.pk, request.user)
 
-        resp = FileResponse(generated_petition_pdf)
-        resp["Content-Type"] = "application/pdf"
+        addendum_documents = pm.PetitionDocument.objects.filter(
+            petition=pk,
+            pk__in=serializer.data["documents"],
+            form_type__in=constants.ADDENDUM_FORM_TYPES._db_values,
+        )
 
         petition = self.get_object()
-        filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
-        resp["Content-Disposition"] = f'inline; filename="{filename}"'
+        petition_filename = (
+            filename
+        ) = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
+        if addendum_documents.exists():
+            docs = [
+                generated_petition_pdf,
+            ]
+            filenames = [
+                petition_filename,
+            ]
+            for addendum_document in addendum_documents:
+                doc = generate_addendum_document_file(
+                    addendum_document, serializer.data
+                )
+                docs.append(doc)
+                filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} {addendum_document.form_type} - {petition.jurisdiction} {petition.county}.docx'
+                filenames.append(filename)
+
+            zip_file = create_zip_file(docs, filenames)
+            resp = FileResponse(zip_file)
+            resp["Content-Type"] = "application/zip"
+            filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.zip'
+            resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+        else:
+            resp = FileResponse(generated_petition_pdf)
+            resp["Content-Type"] = "octet/stream"
+            resp["Content-Disposition"] = f'inline; filename="{petition_filename}"'
 
         return resp
 

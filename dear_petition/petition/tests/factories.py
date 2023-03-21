@@ -89,8 +89,9 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
     county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
     file_no = "99CRAAAAAAAAAAAA"
     race = factory.LazyFunction(lambda: random.choice(["ASIAN", "BLACK", "WHITE"]))
-    sex = factory.LazyFunction(lambda: random.choice([FEMALE, MALE, NOT_AVAILABLE, UNKNOWN]))
-
+    sex = factory.LazyFunction(
+        lambda: random.choice([FEMALE, MALE, NOT_AVAILABLE, UNKNOWN])
+    )
 
     class Meta:
         model = CIPRSRecord
@@ -150,8 +151,23 @@ class DismissedOffenseRecordFactory(factory.DjangoModelFactory):
         model = OffenseRecord
 
 
+class GuiltyOffenseRecordFactory(factory.DjangoModelFactory):
+    offense = factory.SubFactory(
+        OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
+    )
+    law = "20-141(J1)"
+    code = "4450"
+    action = "Guilty"
+    severity = "TRAFFIC"
+    description = "SPEEDING(96 mph in a 70 mph zone) "
+
+    class Meta:
+        model = OffenseRecord
+
+
 class PetitionDocumentFactory(factory.DjangoModelFactory):
     petition = factory.SubFactory(PetitionFactory)
+    form_type = DISMISSED
 
     class Meta:
         model = PetitionDocument

@@ -178,6 +178,18 @@ class AOCFormCR287(PetitionForm):
     def map_additional_forms(self):
         if self.petition.has_attachments():
             self.data["CkBox_Attchmt"] = Checkbox("Yes")
+        if self.petition_document.form_specific_data.get("is_checkmark_3b_checked"):
+            charged_desc_string = self.petition_document.form_specific_data.get(
+                "charged_desc_string"
+            )
+            charged_desc_cont_string = self.petition_document.form_specific_data.get(
+                "charged_desc_cont_string"
+            )
+            self.data["ChargedB"] = Checkbox("Yes")
+            self.data["ChargedDesc"] = charged_desc_string
+            self.data["ChargedDescCont"] = charged_desc_cont_string
+        else:
+            self.data["ChargedA"] = Checkbox("Yes")
 
 
 class AOCFormCR285(AOCFormCR287):

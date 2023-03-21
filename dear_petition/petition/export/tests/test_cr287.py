@@ -3,7 +3,12 @@ import pytest
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.forms import AOCFormCR287
-
+from dear_petition.petition.tests.factories import (
+    DismissedOffenseRecordFactory,
+    GuiltyOffenseRecordFactory,
+)
+from dear_petition.petition.etl.transform import recalculate_petitions
+from dear_petition.petition.export.annotate import Checkbox
 
 pytestmark = pytest.mark.django_db
 
@@ -190,9 +195,7 @@ def test_map_agencies__street_address(form, contact1, contact2, contact3):
         assert contact.address1 in addresses
 
 
-def test_map_agencies__mail_address(
-    form, contact1, contact2, contact3
-):
+def test_map_agencies__mail_address(form, contact1, contact2, contact3):
     agencies = [contact1, contact2, contact3]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
@@ -264,3 +267,16 @@ def test_map_offenses__disposition_date(form, offense1, offense_record1):
     assert form.data["DismissalDate:1"] == utils.format_petition_date(
         offense1.disposed_on
     )
+
+
+#
+# Other
+#
+
+
+def test_checkmark_3b(form, offense1, offense_record1):
+    form.map_additional_forms()
+    assert form.data.get("ChargedA")
+    assert not form.data.get("ChargedB")
+    assert not form.data.get("ChargedDesc")
+    assert not form.data.get("ChargedDescCont")

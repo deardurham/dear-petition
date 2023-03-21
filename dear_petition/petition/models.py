@@ -15,6 +15,7 @@ from django.db.models.functions import Cast, Substr, Concat
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
+from django.utils.functional import cached_property
 from phonenumber_field.modelfields import PhoneNumberField
 
 import ciprs_reader
@@ -380,7 +381,7 @@ class Petition(PrintableModelMixin, TimeStampedModel):
 
         return qs
 
-    @property
+    @cached_property
     def base_document(self):
         return self.documents.get(previous_document__isnull=True)
 
@@ -402,17 +403,12 @@ class PetitionDocument(PrintableModelMixin, models.Model):
         "self", on_delete=models.CASCADE, null=True, related_name="following_document"
     )
     agencies = models.ManyToManyField(Contact, related_name="+")
+    form_type = models.CharField(choices=FORM_TYPES, max_length=255)
+    form_specific_data = models.JSONField(default=dict)
 
     @property
     def is_attachment(self):
         return self.previous_document is not None
-
-    @property
-    def form_type(self):
-        if self.previous_document_id:
-            return pc.ATTACHMENT
-        else:
-            return self.petition.form_type
 
     @property
     def jurisdiction(self):
