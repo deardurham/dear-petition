@@ -157,6 +157,7 @@ class PetitionSerializer(serializers.ModelSerializer):
             "jurisdiction",
             "offense_records",
             "agencies",
+            "documents",
         ]
 
 
@@ -305,21 +306,9 @@ class GeneratePetitionSerializer(serializers.Serializer):
     documents = serializers.PrimaryKeyRelatedField(
         many=True, queryset=PetitionDocument.objects.all()
     )
-    client = serializers.ChoiceField(choices=[])
-    attorney = serializers.ChoiceField(choices=[])
-    agencies = serializers.MultipleChoiceField(choices=[])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["client"].choices = Contact.objects.filter(
-            category="client"
-        ).values_list("pk", "name")
-        self.fields["attorney"].choices = Contact.objects.filter(
-            category="attorney"
-        ).values_list("pk", "name")
-        self.fields["agencies"].choices = Contact.objects.filter(
-            category="agency"
-        ).values_list("pk", "name")
 
     def validate_documents(self, value):
         if len(value) == 0:
@@ -327,15 +316,6 @@ class GeneratePetitionSerializer(serializers.Serializer):
                 "Must select at least one document for pdf generation"
             )
         return value
-        
-    def validate_client(self, value):
-        return Contact.objects.get(pk=value)
-
-    def validate_attorney(self, value):
-        return Contact.objects.get(pk=value)
-
-    def validate_agencies(self, value):
-        return Contact.objects.filter(pk__in=value)
 
 
 class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):

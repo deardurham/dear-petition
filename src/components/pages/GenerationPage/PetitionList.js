@@ -63,14 +63,7 @@ const NO_DOCUMENTS_SELECTED = [
   'There are no documents selected for download for the petition document.',
 ];
 
-function PetitionRow({
-  attorney,
-  petitionData,
-  petitioner,
-  validateInput,
-  backgroundColor,
-  setFormErrors,
-}) {
+function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErrors }) {
   const [error, setError] = useState('');
   const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
   const [prevPetition, setPrevPetition] = useState(petition);
@@ -144,9 +137,6 @@ function PetitionRow({
 
   const _buildPetition = () => ({
     documents: selectedDocuments,
-    client: petitioner.pk,
-    attorney: attorney.pk,
-    agencies: petition.agencies.map((agency) => agency.pk),
   });
 
   const getDisabledMessage = () => {
@@ -272,13 +262,7 @@ function PetitionRow({
   );
 }
 
-export default function PetitionList({
-  attorney,
-  petitions,
-  petitioner,
-  validateInput,
-  setFormErrors,
-}) {
+export default function PetitionList({ petitions, validateInput, setFormErrors }) {
   return (
     <Table className="text-[1.7rem]" columnSizes="4fr 4fr 3fr 3fr 3fr 3fr 2fr">
       <TableHeader>
@@ -297,8 +281,6 @@ export default function PetitionList({
           <PetitionRow
             key={petition.pk}
             petitionData={petition}
-            petitioner={petitioner}
-            attorney={attorney}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}
             setFormErrors={setFormErrors}

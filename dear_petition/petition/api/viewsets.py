@@ -346,14 +346,22 @@ class PetitionViewSet(viewsets.ModelViewSet):
         serializer = serializers.GeneratePetitionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        petition = self.get_object()
+        client = petition.batch.client
+
         petition_documents = pm.PetitionDocument.objects.filter(
             petition=pk, pk__in=serializer.data["documents"]
         ).order_by("pk")
         assert (
             len(petition_documents) > 0
         ), "Petition documents could not be found for petition"
+
+        form_context = serializer.validated_data.copy()
+        form_context['client'] = client
+        form_context['attorney'] = petition.batch.attorney
+        form_context['agencies'] = petition.agencies
         generated_petition_pdf = generate_petition_pdf(
-            petition_documents, serializer.data
+            petition_documents, form_context
         )
 
         for doc in petition_documents.iterator():
@@ -363,7 +371,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
         resp["Content-Type"] = "application/pdf"
 
         petition = self.get_object()
-        filename = f'{serializer.data["client"].name} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
+        filename = f'{client.name} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
         resp["Content-Disposition"] = f'inline; filename="{filename}"'
 
         return resp
