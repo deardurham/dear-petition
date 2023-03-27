@@ -186,8 +186,6 @@ function GenerationPage() {
           {data && (
             <PetitionList
               petitions={data?.petitions || []}
-              attorney={attorney}
-              petitioner={client}
               validateInput={validateInput}
               setFormErrors={setFormErrors}
             />

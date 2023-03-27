@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance } from 'date-fns';
@@ -9,6 +9,8 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../component
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import { useGetUserBatchesQuery } from '../service/api';
 import useAuth from '../hooks/useAuth';
+
+import { SelectDocumentsModal } from './SelectDocuments';
 
 const downloadFile = (blob, filename = '') => {
   const url = window.URL.createObjectURL(blob);
@@ -28,6 +30,10 @@ const downloadFile = (blob, filename = '') => {
 export const ExistingPetitions = () => {
   const { user } = useAuth();
   const { data } = useGetUserBatchesQuery({ user: user.pk });
+
+  const [isSelectDocumentsOpen, setIsSelectDocumentsOpen] = useState(false);
+  const [petitionerDocuments, setPetitionerDocuments] = useState();
+
   return (
     <div className="flex flex-col">
       <h3 className="mb-2">Recent Petitions</h3>
@@ -55,7 +61,7 @@ export const ExistingPetitions = () => {
             <TableCell header />
           </TableHeader>
           <TableBody>
-            {data?.results?.map((batch) => (
+            {data?.results?.map((batch, i) => (
               <TableRow key={batch.pk}>
                 <TableCell>{batch.label}</TableCell>
                 <TableCell>
@@ -71,7 +77,15 @@ export const ExistingPetitions = () => {
                   {formatDistance(new Date(batch.automatic_delete_date), new Date())}
                 </TableCell>
                 <TableCell className="flex gap-2">
-                  <Button>Download</Button>
+                  <Button
+                    onClick={() => {
+                      const documents = data.results[i].petitions;
+                      setPetitionerDocuments(documents);
+                      setIsSelectDocumentsOpen(true);
+                    }}
+                  >
+                    Download
+                  </Button>
                   <Button
                     onClick={() => {
                       Axios.post(
@@ -113,6 +127,12 @@ export const ExistingPetitions = () => {
             ))}
           </TableBody>
         </Table>
+        <SelectDocumentsModal
+          hasExistingDocuments
+          documents={petitionerDocuments}
+          isOpen={isSelectDocumentsOpen}
+          onClose={() => setIsSelectDocumentsOpen(false)}
+        />
       </div>
     </div>
   );
