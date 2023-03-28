@@ -19,6 +19,7 @@ import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import { SelectDocumentsModal } from '../../../features/SelectDocuments';
+import downloadPdf from '../../../util/downloadPdf';
 
 function ActionButton({
   className,
@@ -77,19 +78,6 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
     setSelectedDocuments(allDocuments.map(({ pk }) => pk));
     setPrevPetition(petition);
   }
-
-  const downloadPdf = (pdf, filename) => {
-    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    setTimeout(() => {
-      window.URL.revokeObjectURL(url);
-      link.remove();
-    });
-  };
 
   const handleGenerate = async () => {
     if (!validateInput()) {
@@ -251,6 +239,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
         petitionId={petition.pk}
         documents={allDocuments}
         selectedDocuments={selectedDocuments}
+        hasExistingDocuments={false}
         onAddDocument={(newPk) => setSelectedDocuments((prevList) => [...prevList, newPk])}
         onRemoveDocument={(removePk) =>
           setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))
