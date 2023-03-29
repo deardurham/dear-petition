@@ -16,6 +16,7 @@ import PetitionerInput from './GenerationInput/PetitionerInput';
 import PetitionList from './PetitionList';
 import Button from '../../elements/Button';
 import Axios from '../../../service/axios';
+import { getErrorList } from '../../../util/errors';
 
 const GenerationSection = styled.div`
   padding: 2rem 0;
@@ -171,10 +172,20 @@ function GenerationPage() {
         </InputSection>
         <InputSection label="Documents">
           <div className="flex gap-4">
-            <Button onClick={() => generateExpungableSummary()}>
+            <Button
+              onClick={() => generateExpungableSummary()}
+              disabled={!!data?.can_generate_summary?.batch}
+              title={data?.can_generate_summary?.batch?.join(' ') ?? ''}
+            >
               Create Expungable Record Summary
             </Button>
-            <Button onClick={() => generateAdviceLetter()}>Create Advice Letter</Button>
+            <Button
+              onClick={() => generateAdviceLetter()}
+              disabled={!!data?.can_generate_letter?.batch}
+              title={data?.can_generate_letter?.batch?.join(' ') ?? ''}
+            >
+              Create Advice Letter
+            </Button>
           </div>
         </InputSection>
         <GenerationSection>

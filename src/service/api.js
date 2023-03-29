@@ -68,6 +68,7 @@ export const api = createApi({
     }),
     createBatch: builder.mutation({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
+      invalidatesTags: (result) => (result ? [{ type: 'Batch', id: result.id }] : []),
     }),
     updateBatch: builder.mutation({
       query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
@@ -75,12 +76,12 @@ export const api = createApi({
     }),
     getBatch: builder.query({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
-      providesTags: (_result, _err, { id }) => {
+      providesTags: (result, _err, { id }) => {
         const tags = [{ type: 'Batch', id }];
         // TODO: Add petitions from this result to redux store
-        /* if (result?.petitions) {
+        if (result?.petitions) {
           tags.concat(result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]));
-        } */
+        }
         return tags;
       },
     }),

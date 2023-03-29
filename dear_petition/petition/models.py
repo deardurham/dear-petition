@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import IntegerField, Case, When, Value, signals
@@ -293,8 +294,11 @@ class Batch(PrintableModelMixin, models.Model):
 @receiver(signals.post_delete, sender=Batch)
 def cleanup_batch_client(sender, instance, **kwargs):
     """ If the client has no relevant batches, delete the client """
-    if instance.client and len(instance.client.batches.all()) == 0:
-        instance.client.delete()
+    if hasattr(instance, 'client') and instance.client and len(instance.client.batches.all()) == 0:
+        try:
+            instance.client.delete()
+        except ObjectDoesNotExist:
+            pass
 
 
 def get_batch_file_upload_path(instance, filename):

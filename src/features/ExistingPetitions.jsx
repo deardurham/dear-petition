@@ -87,6 +87,8 @@ export const ExistingPetitions = () => {
                     Download
                   </Button>
                   <Button
+                    disabled={!!batch?.can_generate_letter?.batch}
+                    title={batch?.can_generate_letter?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       Axios.post(
                         `/batch/${batch.pk}/generate_advice_letter/`,
@@ -105,6 +107,8 @@ export const ExistingPetitions = () => {
                     Advice Letter
                   </Button>
                   <Button
+                    disabled={!!batch?.can_generate_summary?.batch}
+                    title={batch?.can_generate_summary?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       Axios.post(
                         `/batch/${batch.pk}/generate_expungable_summary/`,

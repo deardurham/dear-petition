@@ -226,13 +226,8 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     def generate_advice_letter(self, request, pk):
         batch = self.get_object()
-        errors = {}
-        if batch.attorney is None:
-            errors['attorney'] = ['This field is required']
-        if batch.client is None:
-            errors['client'] = ['This field is required']
-        if errors:
-            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/advice_letter.docx"
@@ -253,13 +248,8 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     def generate_expungable_summary(self, request, pk):
         batch = self.get_object()
-        errors = {}
-        if batch.attorney is None:
-            errors['attorney'] = ['This field is required']
-        if batch.client is None:
-            errors['client'] = ['This field is required']
-        if errors:
-            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/expungable_summary.docx"
@@ -289,12 +279,12 @@ class PetitionViewSet(viewsets.ModelViewSet):
     queryset = pm.Petition.objects.all()
     serializer_class = serializers.ParentPetitionSerializer
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        response = self.perform_create(serializer)
+        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(response, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         detail=True,
@@ -343,10 +333,13 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def generate_petition_pdf(self, request, pk=None):
-        serializer = serializers.GeneratePetitionSerializer(data=request.data)
+        petition = self.get_object()
+
+        request_data = request.data.copy()
+        request_data['petition'] = petition.pk
+        serializer = serializers.GeneratePetitionSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
 
-        petition = self.get_object()
         client = petition.batch.client
 
         petition_documents = pm.PetitionDocument.objects.filter(

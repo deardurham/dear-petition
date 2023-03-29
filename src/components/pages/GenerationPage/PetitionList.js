@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDownload,
   faChevronDown,
-  faBook,
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
@@ -20,6 +19,7 @@ import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal'
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import { SelectDocumentsModal } from '../../../features/SelectDocuments';
 import downloadPdf from '../../../util/downloadPdf';
+import { getErrorList } from '../../../util/errors';
 
 function ActionButton({
   className,
@@ -53,15 +53,8 @@ const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10]
   </Tooltip>
 );
 
-const NO_ACTIVE_RECORDS = [
-  'There are no records selected for the petition document.',
-  'Please review the list of offense records and update the petition to include offense records if needed.',
-];
-
-const NO_AGENCIES_SELECTED = ['There are no agencies selected for the petition document.'];
-
 const NO_DOCUMENTS_SELECTED = [
-  'There are no documents selected for download for the petition document.',
+  'Documents: There are no documents selected for download for the petition document.',
 ];
 
 function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErrors }) {
@@ -127,29 +120,18 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
     documents: selectedDocuments,
   });
 
-  const getDisabledMessage = () => {
-    if (petition.active_records.length === 0) {
-      const message = [...NO_ACTIVE_RECORDS];
-      if (petition.form_type === 'AOC-CR-293') {
-        message.push(
-          'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
-        );
-      }
-      return message;
-    }
-    if (petition.agencies.length === 0) {
-      return NO_AGENCIES_SELECTED;
-    }
-    if (selectedDocuments.length === 0) {
-      return NO_DOCUMENTS_SELECTED;
-    }
-    return null;
-  };
-
-  const disabledReason = getDisabledMessage();
+  const disabledReason = getErrorList(petition.can_generate?.petition ?? {});
+  if (selectedDocuments.length === 0) {
+    disabledReason.push(NO_DOCUMENTS_SELECTED);
+  }
+  const isDisabled = disabledReason.length > 0;
   const disabledTooltipContent = (
-    <div className="flex flex-col gap-2">
-      {disabledReason?.map((line) => <span key={line}>{line}</span>) || error}
+    <div className="flex flex-col gap-2 max-w-[750px]">
+      {disabledReason.map((line) => (
+        <span key={line} className="whitespace-normal">
+          {line}
+        </span>
+      )) || error}
     </div>
   );
   const areALlDocumentsSelected = selectedDocuments.length === allDocuments.length;
@@ -199,26 +181,19 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
         </TableCell>
         <TableCell>
           <div className="flex justify-end items-center h-full gap-4 ">
-            <Tooltip
-              tooltipContent={disabledTooltipContent}
-              hideTooltip={!disabledReason && !error}
-            >
+            <Tooltip tooltipContent={disabledTooltipContent} hideTooltip={!isDisabled && !error}>
               <FontAwesomeIcon
-                className={cx('text-[24px] text-red', { invisible: !disabledReason && !error })}
+                className={cx('text-[24px] text-red', { invisible: !isDisabled && !error })}
                 icon={faExclamationTriangle}
               />
             </Tooltip>
-            <button
-              type="button"
-              onClick={() => handleGenerate(petition)}
-              disabled={!!disabledReason}
-            >
+            <button type="button" onClick={() => handleGenerate(petition)} disabled={isDisabled}>
               <FontAwesomeIcon
                 title="Download Documents"
                 icon={faDownload}
                 className={cx('text-[24px]', {
-                  'text-blue-primary': !disabledReason,
-                  'text-gray': !!disabledReason,
+                  'text-blue-primary': !isDisabled,
+                  'text-gray': isDisabled,
                 })}
               />
             </button>
