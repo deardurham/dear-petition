@@ -32,6 +32,9 @@ from .constants import (
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
     FORM_TYPES,
+    CHARGED,
+    VERDICT_GUILTY_TO_LESSER,
+    VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
 from .utils import make_datetime_aware
@@ -114,18 +117,23 @@ class Offense(PrintableModelMixin, models.Model):
     def __str__(self):
         return f"{self.id} ({self.ciprs_record.file_no})"
 
-    def is_convicted(self):
+    def is_convicted_of_charged(self):
         """
-        Return true if the offense is a convicted offense. Note, there is probably a better name for this method, but
-        I'm not exactly sure what it would be yet.
+        Return true if convicted of the charged offense.
         """
-        return self.verdict == pc.VERDICT_GUILTY and self.has_equivalent_offense_records()
+        return self.verdict in [pc.VERDICT_GUILTY, pc.VERDICT_RESPONSIBLE] and self.has_equivalent_offense_records()
 
     def is_guilty_to_lesser(self):
         """
         Return true if the offense is a guilty to lesser offense.
         """
-        return self.verdict == pc.VERDICT_GUILTY and not self.has_equivalent_offense_records()
+        return self.verdict == pc.VERDICT_GUILTY and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
+
+    def is_responsible_to_lesser(self):
+        """
+        Return true if the offense is a responsible to lesser offense.
+        """
+        return self.verdict == pc.VERDICT_RESPONSIBLE and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
 
     def has_equivalent_offense_records(self):
         """
@@ -140,6 +148,30 @@ class Offense(PrintableModelMixin, models.Model):
 
         return same_description and same_severity
 
+    def update_is_visible(self):
+        """
+        Update the value of the is_visible field. It will be false if it is a CHARGED offense record and the offense is
+        a "convicted of charged" offense.
+        """
+        for offense_record in list(self.offense_records.all()):
+            offense_record.is_visible = not (offense_record.action == CHARGED and self.is_convicted_of_charged())
+            offense_record.save()
+
+    def update_disposition(self):
+        """
+        Update the value of the disposition. It will be GUILTY TO LESSER or RESPONSIBLE TO LESSER if it is a
+        CHARGED offense record and the offense meets the "guilty to lesser" or "responsible to lesser" criteria.
+        Otherwise, it will be the offense's verdict if it exists. Otherwise, it will be the offense's disposition
+        method.
+        """
+        for offense_record in list(self.offense_records.all()):
+            offense_record.disposition = self.verdict if self.verdict else self.disposition_method
+            if offense_record.action == CHARGED:
+                if self.is_guilty_to_lesser():
+                    offense_record.disposition = VERDICT_GUILTY_TO_LESSER
+                elif self.is_responsible_to_lesser():
+                    offense_record.disposition = VERDICT_RESPONSIBLE_TO_LESSER
+            offense_record.save()
 
 class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
@@ -150,6 +182,8 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
+    disposition = models.CharField(max_length=256, blank=True)
+    is_visible = models.BooleanField(default=True)
 
     def __str__(self):
         ciprs_record = self.offense.ciprs_record

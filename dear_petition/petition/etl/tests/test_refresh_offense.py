@@ -50,6 +50,7 @@ def data():
                 ],
                 "Disposed On": "2001-03-01",
                 "Disposition Method": "DISPOSED BY JUDGE",
+                "Verdict": "GUILTY"
             },
         ],
         "Superior Court Offense Information": [],
@@ -94,3 +95,25 @@ def test_offense_record(record):
 def test_offense_record__multi(record):
     offense = record.offenses.get(disposed_on="2001-03-01")
     assert offense.offense_records.count() == 2
+
+
+def test_offense_record__is_visible(record):
+    """
+    Make sure is_visible was set (is_visible defaults to True)
+    """
+    offense = record.offenses.get(disposed_on="2001-03-01")
+    assert offense.offense_records.exists()
+    offense_record = offense.offense_records.first()
+
+    assert offense_record.is_visible == False
+
+
+def test_offense_record__disposition(record):
+    """
+    Make sure disposition was set
+    """
+    offense = record.offenses.get(disposed_on="2001-03-01")
+    assert offense.offense_records.exists()
+    offense_record = offense.offense_records.first()
+
+    assert offense_record.disposition == "GUILTY"

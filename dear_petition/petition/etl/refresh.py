@@ -74,3 +74,7 @@ def refresh_offenses(record):
                     severity=data_offense_record.get("Severity", ""),
                     description=data_offense_record.get("Description", ""),
                 )
+
+            # update fields that are calculated from the values in other fields
+            offense.update_is_visible()
+            offense.update_disposition()

@@ -6,13 +6,12 @@ from dear_petition.petition.tests.factories import (
     CIPRSRecordFactory, OffenseRecordFactory, OffenseFactory,
 )
 from dear_petition.petition.constants import (
-    DISP_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_SUPERSEDING_INDICTMENT,
     DISTRICT_COURT,
     SUPERIOR_COURT,
     VERDICT_GUILTY,
     CHARGED,
     CONVICTED,
-    DISP_GUILTY_TO_LESSER,
 )
 
 pytestmark = pytest.mark.django_db
@@ -26,8 +25,8 @@ def test_expungable_summary_context__one_table_one_row(batch, contact1):
     """
     Test generate_context method with one table and one row. Test all data
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31")
+    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
@@ -48,7 +47,7 @@ def test_expungable_summary_context__one_table_one_row(batch, contact1):
     assert first_offense_record["description"] == "SIMPLE ASSAULT"
     assert first_offense_record["severity"] == "M"
     assert first_offense_record["offense_date"] == "2001-09-30"
-    assert first_offense_record["disposition_method"] == "JR"
+    assert first_offense_record["disposition"] == "JR"
     assert first_offense_record["disposed_on"] == date(2003, 10, 2)
 
 
@@ -56,17 +55,17 @@ def test_expungable_summary_context__many_tables(batch, contact1):
     """
     Test generate_context method with many tables. Make sure correct number of tables and in correct order.
     """
-    offense1 = create_offense(batch, "WAKE", SUPERIOR_COURT, "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense1 = create_offense(batch, "WAKE", SUPERIOR_COURT, "11CR000001", "1972-12-31")
+    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31")
+    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense3 = create_offense(batch, "DURHAM", SUPERIOR_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense3 = create_offense(batch, "DURHAM", SUPERIOR_COURT, "10CR000001", "1972-12-31")
+    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000002", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000002", "1972-12-31")
+    create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
@@ -97,17 +96,17 @@ def test_expungable_summary_context__many_offense_records(batch, contact1):
     Test generate_context method with many offense records in a table. Make sure correct number of offense records and
     in correct order.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31")
+    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31")
+    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "11CR000001", "1972-12-31")
+    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
-    offense4 = create_offense(batch, "WAKE", DISTRICT_COURT, "13CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense4 = create_offense(batch, "WAKE", DISTRICT_COURT, "13CR000001", "1972-12-31")
+    create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
@@ -140,17 +139,17 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch, conta
 
     offense_si = OffenseFactory(
         ciprs_record=ciprs_record,
-        disposition_method=DISP_SUPERSEDING_INDICTMENT,
+        disposition_method=DISP_METHOD_SUPERSEDING_INDICTMENT,
         disposed_on="2003-10-02"
     )
-    OffenseRecordFactory(offense=offense_si)
+    OffenseRecordFactory(offense=offense_si, disposition=DISP_METHOD_SUPERSEDING_INDICTMENT)
 
     offense_npc = OffenseFactory(
         ciprs_record=ciprs_record,
         disposition_method="NO PROBABLE CAUSE",
         disposed_on="2004-11-03"
     )
-    OffenseRecordFactory(offense=offense_npc)
+    OffenseRecordFactory(offense=offense_npc, disposition="NO PROBABLE CAUSE")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
@@ -161,75 +160,51 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch, conta
 
     # The offense record should not be the "SUPERSEDING INDICTMENT OR PROCESS" one.
     first_offense_record = first_table["offense_records"][0]
-    assert first_offense_record["disposition_method"] == "NPC"
+    assert first_offense_record["disposition"] == "NPC"
 
 
-def test_expungable_summary_context__duplicate(batch, contact1):
+def test_expungable_summary_context__is_visible(batch, contact1):
     """
-    Test generate_context method with identical charged and convicted offense records that are part of same offense.
-    Only one of the two offense records should be included. It doesn't matter which one since they are identical except
-    for the offense records' action (eg CHARGED, CONVICTED) which isn't included in the result.
+    Test generate_context method where one offense record is visible and the other is not.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
-    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
-    create_offense_record(offense1, CONVICTED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31")
+    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL", True)
+    create_offense_record(offense, CONVICTED, "FELONY POSSESSION OF COCAINE", "MISDEMEANOR", "JURY TRIAL", False)
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
 
+    # the offense record where is_visible is true should be the only offense record included
     assert len(offense_records) == 1
+    assert offense_records[0]["description"] == "SIMPLE ASSAULT"
 
 
-def test_expungable_summary_context__different_descriptions(batch, contact1):
+def test_expungable_summary_context__disposition_codes(batch, contact1):
     """
-    Test generate_context method with different charged and convicted offense records (different descriptions) that are
-    part of same offense. The charged offense record's disposition should be changed to be guilty to lesser.
+    Test generate_context method where the disposition code comes from the disposition map, the verdict map, and isn't
+    found in either map.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
-    create_offense_record(offense1, CHARGED, "PWIMSD SCH II CS", "MISDEMEANOR")
-    create_offense_record(offense1, CONVICTED, "FELONY POSSESSION OF COCAINE", "MISDEMEANOR")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "01CR000001", "1972-12-31")
+    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
+
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "02CR000001", "1972-12-31")
+    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "NOT GUILTY")
+
+    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "03CR000001", "1972-12-31")
+    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "not found")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
 
-    assert len(offense_records) == 2
-
-    # The CHARGED offense record should have a disposition method of guilty to lesser
-    assert offense_records[0]["description"] == "PWIMSD SCH II CS"
-    assert offense_records[0]["disposition_method"] == DISP_GUILTY_TO_LESSER
-
-    # The CONVICTED offense record should have an unchanged disposition method
-    assert offense_records[1]["description"] == "FELONY POSSESSION OF COCAINE"
-    assert offense_records[1]["disposition_method"] == "JR"
-
-
-def test_expungable_summary_context__different_severities(batch, contact1):
-    """
-    Test generate_context method with different charged and convicted offense records (different severities) that are
-    part of same offense. The charged offense record's disposition should be changed to be guilty to lesser.
-    """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
-    create_offense_record(offense1, CHARGED, "FLEE/ELUDE ARREST W/MV", "FELONY")
-    create_offense_record(offense1, CONVICTED, "FLEE/ELUDE ARREST W/MV", "MISDEMEANOR")
-
-    context = generate_context(batch, contact1, PETITIONER_INFO)
-
-    # offense records for Durham District Court
-    offense_records = context["tables"][0]["offense_records"]
-
-    assert len(offense_records) == 2
-
-    # The CHARGED offense record should have a disposition method of guilty to lesser
-    assert offense_records[0]["severity"] == "F"
-    assert offense_records[0]["disposition_method"] == DISP_GUILTY_TO_LESSER
-
-    # The CONVICTED offense record should have an unchanged disposition method
-    assert offense_records[1]["severity"] == "M"
-    assert offense_records[1]["disposition_method"] == "JR"
+    # verify the disposition codes
+    assert len(offense_records) == 3
+    assert offense_records[0]["disposition"] == "JR"
+    assert offense_records[1]["disposition"] == "NG"
+    assert offense_records[2]["disposition"] == "not found"
 
 
 @pytest.mark.parametrize("input_dob, input_18th_bday, input_22nd_bday", [
@@ -241,8 +216,8 @@ def test_expungable_summary_context__birthdays(batch, contact1, input_dob, input
     """
     Test generate_context method with different dates of birth
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", input_dob, "NOT GUILTY", "JURY TRIAL")
-    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", input_dob)
+    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR", "JURY TRIAL")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
@@ -251,7 +226,7 @@ def test_expungable_summary_context__birthdays(batch, contact1, input_dob, input
     assert context["birthday_22nd"] == input_22nd_bday
 
 
-def create_offense_record(offense, action, description, severity):
+def create_offense_record(offense, action, description, severity, disposition="OTHER", is_visible=True):
     """
     Create offense record
     """
@@ -260,12 +235,14 @@ def create_offense_record(offense, action, description, severity):
         action = action,
         description = description,
         severity = severity,
+        disposition = disposition,
+        is_visible = is_visible,
     )
 
     return offense_record
 
 
-def create_offense(batch, county, jursidiction, file_no, dob, verdict, disposition_method):
+def create_offense(batch, county, jursidiction, file_no, dob):
     """
     Create offense
     """
@@ -280,8 +257,6 @@ def create_offense(batch, county, jursidiction, file_no, dob, verdict, dispositi
     )
     offense = OffenseFactory(
         ciprs_record=ciprs_record,
-        verdict = verdict,
-        disposition_method=disposition_method,
         disposed_on="2003-10-02",
     )
 

@@ -6,11 +6,11 @@ from dateutil.relativedelta import relativedelta
 from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
     DISPOSITION_METHOD_CODE_MAP,
+    VERDICT_CODE_MAP,
     JURISDICTION_MAP,
-    DISP_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_SUPERSEDING_INDICTMENT,
     VERDICT_GUILTY,
     CHARGED,
-    DISP_GUILTY_TO_LESSER,
 )
 
 
@@ -77,7 +77,7 @@ def __get_offenses(batch):
     offenses = pm.Offense.objects.filter(
         ciprs_record__batch=batch
     ).exclude(
-        disposition_method=DISP_SUPERSEDING_INDICTMENT
+        disposition_method=DISP_METHOD_SUPERSEDING_INDICTMENT
     ).select_related("ciprs_record__batch")
 
     return offenses
@@ -97,13 +97,10 @@ def __create_tables_data(offenses):
         jurisdiction = JURISDICTION_MAP[offense.ciprs_record.jurisdiction]
         key = (county, jurisdiction)
 
-        offense_records = list(offense.offense_records.all())
-        if offense.is_convicted():
-            # remove one of the offense records because the two offense records would appear identical in the output
-            offense_records.pop()
+        offense_records = list(offense.offense_records.all().filter(is_visible=True))
 
         for offense_record in offense_records:
-            offense_record_data = __create_offense_record_data(offense_record, offense.is_guilty_to_lesser())
+            offense_record_data = __create_offense_record_data(offense_record)
 
             # append offense record data to list for the key, but if key doesn't exist yet, create an empty list first
             table_data.setdefault(key, []).append(offense_record_data)
@@ -111,15 +108,21 @@ def __create_tables_data(offenses):
     return table_data
 
 
-def __create_offense_record_data(offense_record, guilty_to_lesser):
+def __create_offense_record_data(offense_record):
     """
     Create the data that populates the offense record row in the document.
     """
     offense = offense_record.offense
     ciprs_record = offense.ciprs_record
-    disposition_method = DISP_GUILTY_TO_LESSER \
-        if guilty_to_lesser and offense_record.action == CHARGED \
-        else offense.disposition_method
+
+    """
+    First try to get disposition code from disposition method code map and if that fails, then try verdict code
+    map. If that fails, use disposition (not the abbreviation).
+    """
+    disposition = DISPOSITION_METHOD_CODE_MAP.get(
+            offense_record.disposition,
+            VERDICT_CODE_MAP.get(offense_record.disposition, offense_record.disposition)
+        )
 
     offense_record_data = {
         "file_no": ciprs_record.file_no,
@@ -127,8 +130,7 @@ def __create_offense_record_data(offense_record, guilty_to_lesser):
         "description": offense_record.description,
         "severity": offense_record.severity[0:1] if offense_record.severity else None,
         "offense_date": ciprs_record.offense_date.strftime("%Y-%m-%d") if ciprs_record.offense_date else None,
-        # if can't get disposition method abbreviation from map, use disposition method (not the abbreviation)
-        "disposition_method": DISPOSITION_METHOD_CODE_MAP.get(disposition_method, disposition_method),
+        "disposition": disposition,
         "disposed_on": offense.disposed_on
     }
 
