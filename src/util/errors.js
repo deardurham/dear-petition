@@ -8,3 +8,5 @@ export const getErrorList = (validationObject) => {
       `${key.charAt(0).toLocaleUpperCase()}${key.slice(1)}: ${errorList.join(' ')}`
   );
 };
+
+export const hasValidationsErrors = (validationObject) => Object.keys(validationObject).length > 0;

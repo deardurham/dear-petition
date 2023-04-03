@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuestionCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faExclamationTriangle,
+  faQuestionCircle,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons';
 import { Button, CloseButton } from '../components/elements/Button';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { useCreateBatchMutation } from '../service/api';
@@ -18,20 +23,21 @@ const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
 
 const EXPERIMENTAL_PARSER_MESSAGE = (
-  <div className="flex flex-col gap-1 p-[2rem_1.25rem] w-[500px]">
+  <div className="flex flex-col gap-2 p-[1rem] w-[500px]">
+    <p>Check this box to use the Legacy CIPRS Record Reader</p>
+    <p>You should only check this box if you are having difficulty uploading a record.</p>
     <p>
-      Experimental CIPRS Record Reader that can handle records with multi-line offense descriptions.
-    </p>
-    <p>
-      Please try this mode if you are having issues with a CIPRS record that has a long offense
-      description.
+      <span className="text-red font-semibold">Warning: </span>
+      <span>
+        When activated, you may see an issue where offense record descriptions are incorrect.
+      </span>
     </p>
   </div>
 );
 
 const RecordUpload = () => {
   const fileInputRef = React.createRef();
-  const [parserMode, setParserMode] = useState(true);
+  const [parserMode, setParserMode] = useState(false);
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [uploadError, setUploadError] = useState('');
@@ -89,7 +95,7 @@ const RecordUpload = () => {
     let timer = null;
     const filesFormData = new FormData();
     files.forEach((file) => filesFormData.append('files', file));
-    filesFormData.append('parser_mode', JSON.stringify(parserMode ? 2 : 1));
+    filesFormData.append('parser_mode', JSON.stringify(parserMode ? 1 : 2));
     timer = setTimeout(() => {
       if (isMounted) {
         setUploadError(
@@ -159,16 +165,25 @@ const RecordUpload = () => {
       <div className="flex flex-col gap-4">
         <div className="flex gap-4 items-center self-start">
           <span className="flex gap-2">
-            (Beta) Multi-Line Reader Mode
+            Legacy CIPRS Reader Mode
             <Tooltip tooltipContent={EXPERIMENTAL_PARSER_MESSAGE}>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </Tooltip>
           </span>
           <input
             type="checkbox"
-            checked={!!parserMode}
+            checked={parserMode}
             onChange={() => setParserMode((prev) => !prev)}
           />
+          <Tooltip
+            tooltipContent="Warning: Legacy CIPRS Reader Mode may result in incorrect offense descriptions"
+            hideTooltip={!parserMode}
+          >
+            <FontAwesomeIcon
+              icon={faExclamationTriangle}
+              className={cx('text-[24px] text-yellow-500', { invisible: !parserMode })}
+            />
+          </Tooltip>
         </div>
         <div
           key="files_list"

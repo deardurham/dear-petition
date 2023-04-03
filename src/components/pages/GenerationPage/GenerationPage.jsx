@@ -15,8 +15,7 @@ import AttorneyInput from './GenerationInput/AttorneyInput';
 import PetitionerInput from './GenerationInput/PetitionerInput';
 import PetitionList from './PetitionList';
 import Button from '../../elements/Button';
-import Axios from '../../../service/axios';
-import { getErrorList } from '../../../util/errors';
+import { manualAxiosRequest } from '../../../service/axios';
 
 const GenerationSection = styled.div`
   padding: 2rem 0;
@@ -117,13 +116,11 @@ function GenerationPage() {
       return;
     }
 
-    Axios.post(
-      `/batch/${batchId}/generate_advice_letter/`,
-      {},
-      {
-        responseType: 'arraybuffer',
-      }
-    ).then((adviceLetter) => {
+    manualAxiosRequest({
+      url: `/batch/${batchId}/generate_advice_letter/`,
+      responseType: 'arraybuffer',
+      method: 'post',
+    }).then((adviceLetter) => {
       _openDoc(adviceLetter.data, 'Advice Letter.docx');
     });
   };
@@ -133,13 +130,11 @@ function GenerationPage() {
       return;
     }
 
-    Axios.post(
-      `/batch/${batchId}/generate_expungable_summary/`,
-      {},
-      {
-        responseType: 'arraybuffer',
-      }
-    ).then((expungableSummary) => {
+    manualAxiosRequest({
+      url: `/batch/${batchId}/generate_expungable_summary/`,
+      responseType: 'arraybuffer',
+      method: 'post',
+    }).then((expungableSummary) => {
       _openDoc(expungableSummary.data, 'Expungable Record Summary.docx');
     });
   };

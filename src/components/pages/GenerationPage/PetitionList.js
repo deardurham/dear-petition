@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
-import Axios from '../../../service/axios';
+import { manualAxiosRequest } from '../../../service/axios';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import useWindowSize from '../../../hooks/useWindowSize';
@@ -76,16 +76,17 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
     if (!validateInput()) {
       return;
     }
-    const derivedPetition = _buildPetition();
     try {
       setError('');
-      const { data, headers } = await Axios.post(
-        `/petitions/${petitionData.pk}/generate_petition_pdf/`,
-        derivedPetition,
-        {
-          responseType: 'arraybuffer',
-        }
-      );
+      const { data, meta } = await manualAxiosRequest({
+        url: `/petitions/${petitionData.pk}/generate_petition_pdf/`,
+        data: {
+          documents: selectedDocuments,
+        },
+        responseType: 'arraybuffer',
+        method: 'post',
+      });
+      const { headers } = meta.response;
       // content-disposition: 'inline; filename="petition.pdf"'
       const filename =
         headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';

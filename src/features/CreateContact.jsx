@@ -83,7 +83,7 @@ export const CreateContact = ({
         />
         <FormTextArea
           label="Address"
-          className="text-2xl"
+          className="text-xl"
           rows={2}
           inputProps={{
             control,

@@ -13,15 +13,19 @@ const Axios = axios.create({
 export default Axios;
 
 export const axiosBaseQuery =
-  () =>
-  async ({ url, method, timeout, data, params }, api) => {
-    const requestConfig = { url, method, data, params };
+  (initialApi) =>
+  async ({ url, method, timeout, data, params, responseType }, api) => {
+    const currentApi = api ?? initialApi;
+    if (!currentApi) {
+      throw new Error('Must provide api instance');
+    }
+    const requestConfig = { url, method, data, params, responseType };
     if (timeout) {
       requestConfig.timeout = timeout;
     }
     try {
       const result = await Axios(requestConfig);
-      return { data: result.data };
+      return { data: result.data, meta: { request: requestConfig, response: result } };
     } catch (axiosError) {
       const isLoginAttempt =
         url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'base' }) === 0;
@@ -36,13 +40,23 @@ export const axiosBaseQuery =
     try {
       await Axios({ url: 'token/refresh/', method: 'post' });
       const result = await Axios(requestConfig); // retry
-      return { data: result.data };
+      return { data: result.data, meta: { request: requestConfig, response: result } };
     } catch (axiosError) {
-      api.dispatch(loggedOut());
+      currentApi.dispatch(loggedOut());
       return {
         error: { status: axiosError.response?.status, data: axiosError.response?.data },
       };
     }
   };
 
-export const manualAxiosRequest = axiosBaseQuery();
+export const manualAxiosRequest = async ({ url, method, timeout, data, params, responseType }) => {
+  const store = (await import('../store')).default;
+  const result = await axiosBaseQuery()(
+    { url, method, timeout, data, params, responseType },
+    store
+  );
+  if ('error' in result) {
+    throw result.error;
+  }
+  return result;
+};

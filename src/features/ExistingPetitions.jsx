@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance } from 'date-fns';
 import { Link } from 'react-router-dom';
-import Axios from '../service/axios';
+import { manualAxiosRequest } from '../service/axios';
 import { Button } from '../components/elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import { useGetUserBatchesQuery } from '../service/api';
 import useAuth from '../hooks/useAuth';
-
-import { SelectDocumentsModal } from './SelectDocuments';
+import { DownloadDocumentsModal } from './DownloadDocuments';
+import { hasValidationsErrors } from '../util/errors';
 
 const downloadFile = (blob, filename = '') => {
   const url = window.URL.createObjectURL(blob);
@@ -31,8 +31,7 @@ export const ExistingPetitions = () => {
   const { user } = useAuth();
   const { data } = useGetUserBatchesQuery({ user: user.pk });
 
-  const [isSelectDocumentsOpen, setIsSelectDocumentsOpen] = useState(false);
-  const [petitionerDocuments, setPetitionerDocuments] = useState();
+  const [downloadDocumentBatch, setDownloadDocumentBatch] = useState(null);
 
   return (
     <div className="flex flex-col">
@@ -78,10 +77,18 @@ export const ExistingPetitions = () => {
                 </TableCell>
                 <TableCell className="flex gap-2">
                   <Button
+                    disabled={batch.petitions.every((petition) =>
+                      hasValidationsErrors(petition.can_generate)
+                    )}
+                    title={
+                      batch.petitions.every((petition) =>
+                        hasValidationsErrors(petition.can_generate)
+                      )
+                        ? 'No available petitions for download. Click on the petition button to the left to fix.'
+                        : undefined
+                    }
                     onClick={() => {
-                      const documents = data.results[i].petitions;
-                      setPetitionerDocuments(documents);
-                      setIsSelectDocumentsOpen(true);
+                      setDownloadDocumentBatch(batch);
                     }}
                   >
                     Download
@@ -90,13 +97,11 @@ export const ExistingPetitions = () => {
                     disabled={!!batch?.can_generate_letter?.batch}
                     title={batch?.can_generate_letter?.batch?.join(' ') ?? ''}
                     onClick={() => {
-                      Axios.post(
-                        `/batch/${batch.pk}/generate_advice_letter/`,
-                        {},
-                        {
-                          responseType: 'arraybuffer',
-                        }
-                      ).then((adviceLetter) => {
+                      manualAxiosRequest({
+                        url: `/batch/${batch.pk}/generate_advice_letter/`,
+                        responseType: 'arraybuffer',
+                        method: 'post',
+                      }).then((adviceLetter) => {
                         const docBlob = new Blob([adviceLetter.data], {
                           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         });
@@ -110,13 +115,11 @@ export const ExistingPetitions = () => {
                     disabled={!!batch?.can_generate_summary?.batch}
                     title={batch?.can_generate_summary?.batch?.join(' ') ?? ''}
                     onClick={() => {
-                      Axios.post(
-                        `/batch/${batch.pk}/generate_expungable_summary/`,
-                        {},
-                        {
-                          responseType: 'arraybuffer',
-                        }
-                      ).then((expungableSummary) => {
+                      manualAxiosRequest({
+                        url: `/batch/${batch.pk}/generate_expungable_summary/`,
+                        responseType: 'arraybuffer',
+                        method: 'post',
+                      }).then((expungableSummary) => {
                         const docBlob = new Blob([expungableSummary.data], {
                           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         });
@@ -131,11 +134,10 @@ export const ExistingPetitions = () => {
             ))}
           </TableBody>
         </Table>
-        <SelectDocumentsModal
-          hasExistingDocuments
-          documents={petitionerDocuments}
-          isOpen={isSelectDocumentsOpen}
-          onClose={() => setIsSelectDocumentsOpen(false)}
+        <DownloadDocumentsModal
+          petitions={downloadDocumentBatch?.petitions ?? []}
+          isOpen={!!downloadDocumentBatch}
+          onClose={() => setDownloadDocumentBatch(null)}
         />
       </div>
     </div>

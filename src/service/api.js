@@ -68,11 +68,17 @@ export const api = createApi({
     }),
     createBatch: builder.mutation({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
-      invalidatesTags: (result) => (result ? [{ type: 'Batch', id: result.id }] : []),
+      invalidatesTags: (result) => (result ? [{ type: 'Batch' }] : []),
     }),
     updateBatch: builder.mutation({
       query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
-      invalidatesTags: (_result, _err, { id }) => [{ type: 'Batch', id }],
+      invalidatesTags: (result, _err, { id }) => {
+        const tags = [{ type: 'Batch', id }];
+        if (result?.petitions) {
+          tags.concat(result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]));
+        }
+        return tags;
+      },
     }),
     getBatch: builder.query({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
@@ -87,8 +93,7 @@ export const api = createApi({
     }),
     getUserBatches: builder.query({
       query: ({ user }) => ({ url: `batch/`, method: 'get', params: { user, limit: 10 } }),
-      providesTags: (result) =>
-        result ? result.results.map(({ pk }) => [{ type: 'Batch', id: pk }]) : [],
+      providesTags: ['Batch'],
     }),
     login: builder.mutation({
       query: (data) => ({ url: 'token/', method: 'post', data }),
