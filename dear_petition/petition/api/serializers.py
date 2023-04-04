@@ -285,7 +285,6 @@ class GenerateDocumentSerializer(serializers.Serializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    parser_mode = serializers.IntegerField(default=1)
     can_generate_letter = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
     can_generate_summary = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
 
@@ -301,7 +300,6 @@ class BatchSerializer(serializers.ModelSerializer):
             "user",
             "records",
             "petitions",
-            "parser_mode",
             "automatic_delete_date",
             "can_generate_letter",
             "can_generate_summary",

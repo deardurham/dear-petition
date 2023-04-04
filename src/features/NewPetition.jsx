@@ -3,15 +3,10 @@ import cx from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faExclamationTriangle,
-  faQuestionCircle,
-  faTimes,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button, CloseButton } from '../components/elements/Button';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { useCreateBatchMutation } from '../service/api';
-import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import CenteredDialog from '../components/elements/Modal/Dialog';
 import { Spinner } from '../components/elements/Spinner';
 import { POSITIVE } from '../components/elements/Button/Button';
@@ -22,22 +17,8 @@ const MAX_FILES = 10;
 const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
 
-const EXPERIMENTAL_PARSER_MESSAGE = (
-  <div className="flex flex-col gap-2 p-[1rem] w-[500px]">
-    <p>Check this box to use the Legacy CIPRS Record Reader</p>
-    <p>You should only check this box if you are having difficulty uploading a record.</p>
-    <p>
-      <span className="text-red font-semibold">Warning: </span>
-      <span>
-        When activated, you may see an issue where offense record descriptions are incorrect.
-      </span>
-    </p>
-  </div>
-);
-
 const RecordUpload = () => {
   const fileInputRef = React.createRef();
-  const [parserMode, setParserMode] = useState(false);
   const [dragWarnings, setDragWarnings] = useState();
   const [dragErrors, setDragErrors] = useState();
   const [uploadError, setUploadError] = useState('');
@@ -95,7 +76,6 @@ const RecordUpload = () => {
     let timer = null;
     const filesFormData = new FormData();
     files.forEach((file) => filesFormData.append('files', file));
-    filesFormData.append('parser_mode', JSON.stringify(parserMode ? 1 : 2));
     timer = setTimeout(() => {
       if (isMounted) {
         setUploadError(
@@ -163,28 +143,6 @@ const RecordUpload = () => {
         </div>
       </DragNDrop>
       <div className="flex flex-col gap-4">
-        <div className="flex gap-4 items-center self-start">
-          <span className="flex gap-2">
-            Legacy CIPRS Reader Mode
-            <Tooltip tooltipContent={EXPERIMENTAL_PARSER_MESSAGE}>
-              <FontAwesomeIcon icon={faQuestionCircle} />
-            </Tooltip>
-          </span>
-          <input
-            type="checkbox"
-            checked={parserMode}
-            onChange={() => setParserMode((prev) => !prev)}
-          />
-          <Tooltip
-            tooltipContent="Warning: Legacy CIPRS Reader Mode may result in incorrect offense descriptions"
-            hideTooltip={!parserMode}
-          >
-            <FontAwesomeIcon
-              icon={faExclamationTriangle}
-              className={cx('text-[24px] text-yellow-500', { invisible: !parserMode })}
-            />
-          </Tooltip>
-        </div>
         <div
           key="files_list"
           className="flex flex-col justify-between overflow-y-hidden w-[350px]"

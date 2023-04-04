@@ -1,5 +1,7 @@
 from model_utils import Choices
 
+PARSER_MODE = 2
+
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"

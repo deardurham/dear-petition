@@ -212,7 +212,6 @@ class Batch(PrintableModelMixin, models.Model):
         Contact,
         related_name="batches",
         null=True,
-        default=None,
         limit_choices_to={'category': 'client'},
         on_delete=models.SET_NULL
     )
@@ -292,13 +291,27 @@ class Batch(PrintableModelMixin, models.Model):
         )
 
 @receiver(signals.post_delete, sender=Batch)
-def cleanup_batch_client(sender, instance, **kwargs):
+def cleanup_batch_client_on_delete(sender, instance, **kwargs):
     """ If the client has no relevant batches, delete the client """
-    if hasattr(instance, 'client') and instance.client and len(instance.client.batches.all()) == 0:
-        try:
+    try:
+        if instance.client and len(instance.client.batches.all()) == 0:
             instance.client.delete()
-        except ObjectDoesNotExist:
-            pass
+    except Contact.DoesNotExist:
+        pass
+
+@receiver(signals.pre_save, sender=Batch)
+def cleanup_batch_client_pre_save(sender, instance, **kwargs):
+    """ If the previous client on the batch is no longer used, delete the client """
+    if not instance.id:
+        # skip if creating batch
+        return
+    prev_client = Batch.objects.get(pk=instance.id).client
+    if not prev_client:
+        # skip if going from no client to some client
+        return
+    current_client = instance.client
+    if getattr(current_client, 'id', None) != getattr(prev_client, 'id', None) and len(prev_client.batches.all()) == 1:
+        prev_client.delete()
 
 
 def get_batch_file_upload_path(instance, filename):

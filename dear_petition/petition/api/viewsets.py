@@ -209,9 +209,8 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
-        parser_mode = serializer.data["parser_mode"]
         batch = import_ciprs_records(
-            files=files, user=self.request.user, parser_mode=parser_mode
+            files=files, user=self.request.user, parser_mode=constants.PARSER_MODE
         )
         return {"id": batch.pk}
 
@@ -278,6 +277,7 @@ class MyInboxView(generics.ListAPIView):
 class PetitionViewSet(viewsets.ModelViewSet):
     queryset = pm.Petition.objects.all()
     serializer_class = serializers.ParentPetitionSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -373,6 +373,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
 class GenerateDataPetitionView(viewsets.ModelViewSet):
 
     serializer_class = serializers.DataPetitionSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
