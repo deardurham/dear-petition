@@ -172,7 +172,7 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch):
     assert first_offense_record["disposition_method"] == "NPC"
 
 
-def test_expungable_summary_context__duplicate(batch, contact1):
+def test_expungable_summary_context__duplicate(batch, contact1, client):
     """
     Test generate_context method with identical charged and convicted offense records that are part of same offense.
     Only one of the two offense records should be included. It doesn't matter which one since they are identical except
@@ -182,7 +182,7 @@ def test_expungable_summary_context__duplicate(batch, contact1):
     create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
     create_offense_record(offense1, CONVICTED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -190,7 +190,7 @@ def test_expungable_summary_context__duplicate(batch, contact1):
     assert len(offense_records) == 1
 
 
-def test_expungable_summary_context__different_descriptions(batch, contact1):
+def test_expungable_summary_context__different_descriptions(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different descriptions) that are
     part of same offense. The charged offense record's disposition should be changed to be guilty to lesser.
@@ -199,7 +199,7 @@ def test_expungable_summary_context__different_descriptions(batch, contact1):
     create_offense_record(offense1, CHARGED, "PWIMSD SCH II CS", "MISDEMEANOR")
     create_offense_record(offense1, CONVICTED, "FELONY POSSESSION OF COCAINE", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -215,7 +215,7 @@ def test_expungable_summary_context__different_descriptions(batch, contact1):
     assert offense_records[1]["disposition_method"] == "JR"
 
 
-def test_expungable_summary_context__different_severities(batch, contact1):
+def test_expungable_summary_context__different_severities(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different severities) that are
     part of same offense. The charged offense record's disposition should be changed to be guilty to lesser.
@@ -224,7 +224,7 @@ def test_expungable_summary_context__different_severities(batch, contact1):
     create_offense_record(offense1, CHARGED, "FLEE/ELUDE ARREST W/MV", "FELONY")
     create_offense_record(offense1, CONVICTED, "FLEE/ELUDE ARREST W/MV", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
