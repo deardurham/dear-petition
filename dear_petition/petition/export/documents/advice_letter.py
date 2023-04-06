@@ -30,7 +30,7 @@ def get_county_string(counties: list):
 def generate_context(batch, attorney, client):
     context = {}
     context["first_name"], context["last_name"] = helpers.split_first_and_last_name(
-        batch.label
+        client.name
     )
     context["sex"] = batch.sex
     context["address"] = client.address1
