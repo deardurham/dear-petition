@@ -1,4 +1,5 @@
 import pytest
+import logging
 
 from dear_petition.petition import constants
 from dear_petition.petition.models import Batch
@@ -17,6 +18,7 @@ from dear_petition.petition.tests.factories import (
 )
 
 
+logger = logging.getLogger(__name__)
 pytestmark = pytest.mark.django_db
 
 
@@ -36,11 +38,12 @@ def test_import_ciprs_records_multi_files(
     fake_pdf, fake_pdf2, user, mock_ciprs_reader, parser_mode
 ):
     """Test basic import_ciprs_records() with multiple files without testing full ETL."""
-    record = {"Defendant": {"Name": "Jon Doe"}}
-    mock_ciprs_reader.return_value = [record]
+    record1 = {"Defendant": {"Name": "Jon Doe"}, "General": {"File No": "00CR123456"}}
+    record2 = {"Defendant": {"Name": "Jon Doe"}, "General": {"File No": "99CR123456"}}
+    mock_ciprs_reader.side_effect = [[record1], [record2]]
     batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
     assert Batch.objects.count() == 1
-    assert batch.label == record["Defendant"]["Name"]
+    assert batch.label == record1["Defendant"]["Name"]
     assert batch.records.count() == 2
 
 
@@ -53,7 +56,7 @@ def test_created_petition(batch, record1, charged_dismissed_record, mock_ciprs_r
 
 
 @pytest.mark.parametrize("parser_mode", [1, 2])
-def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parser_mode):
+def test_save_pdf(fake_pdf, user, mock_transform_ciprs_document, parser_mode):
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf], user, parser_mode)
@@ -62,12 +65,30 @@ def test_save_pdf(fake_pdf, user, settings, mock_transform_ciprs_document, parse
 
 @pytest.mark.parametrize("parser_mode", [1, 2])
 def test_save_pdf__multiple(
-    fake_pdf, fake_pdf2, user, settings, mock_transform_ciprs_document, parser_mode
+    fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode
 ):
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
     assert batch.files.count() == 2
+
+
+@pytest.mark.parametrize("parser_mode", [1, 2])
+def test_save_pdf__duplicate(
+    fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode
+):
+    """
+    Test that duplicate CIPRS records, both within the same file and in separate files, are not saved. In this case,
+    the same CIPRS record (as determined by the file no) is uploaded twice in the first pdf file and twice in the second
+    pdf file. It should not be saved all four times.  It should only be saved once.
+    """
+    record = [
+        {"Defendant": {"Name": "Dee Fendant"}, "General": {"File No": "00CR123456"}},
+        {"Defendant": {"Name": "Dee Fendant"}, "General": {"File No": "00CR123456"}}
+    ]
+    mock_transform_ciprs_document.return_value = record
+    batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
+    assert batch.records.count() == 1
 
 
 def test_assign_agencies_to_documents(petition, petition_document):

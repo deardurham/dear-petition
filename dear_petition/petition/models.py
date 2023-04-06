@@ -42,22 +42,6 @@ from .utils import make_datetime_aware
 logger = logging.getLogger(__name__)
 
 
-class CIPRSRecordManager(PrintableModelMixin, models.Manager):
-    def create_record(self, batch, label, data):
-        """Extract General, Case, and Defendant details from data
-
-        Parses the raw data from our JSONField (data) and
-        places values in their associated model fields.
-
-        Note: This method is used to create the record that
-        is why we are also passing batch, date_uploaded,
-        report_pdf, and label alongside data. Although data is
-        all that is needed when refresh_record_from_data is called.
-        """
-        ciprs_record = CIPRSRecord(batch=batch, label=label, data=data)
-        ciprs_record.refresh_record_from_data()
-
-
 class CIPRSRecord(PrintableModelMixin, models.Model):
 
     batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
@@ -83,8 +67,6 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
         max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE
     )
 
-    objects = CIPRSRecordManager()
-
     def __str__(self):
         return f"{self.label} {self.file_no} ({self.pk})"
 
@@ -109,10 +91,14 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
                 data = {"error": str(e)}
             return data
 
-    def refresh_record_from_data(self):
+    def refresh_record_from_data(self, exclude_file_nos = []):
+        """
+        Refresh this CIPRS record from its JSON data. Optionally pass in a list of CIPRS record file numbers.
+        If the list of file numbers contains this CIPRS record's file number, then this CIPRS record will not be saved.
+        """
         from dear_petition.petition.etl.refresh import refresh_record_from_data
 
-        refresh_record_from_data(self)
+        refresh_record_from_data(self, exclude_file_nos)
 
 
 class Offense(PrintableModelMixin, models.Model):
@@ -129,6 +115,32 @@ class Offense(PrintableModelMixin, models.Model):
 
     def __str__(self):
         return f"{self.id} ({self.ciprs_record.file_no})"
+
+    def is_convicted(self):
+        """
+        Return true if the offense is a convicted offense. Note, there is probably a better name for this method, but
+        I'm not exactly sure what it would be yet.
+        """
+        return self.verdict == pc.VERDICT_GUILTY and self.has_equivalent_offense_records()
+
+    def is_guilty_to_lesser(self):
+        """
+        Return true if the offense is a guilty to lesser offense.
+        """
+        return self.verdict == pc.VERDICT_GUILTY and not self.has_equivalent_offense_records()
+
+    def has_equivalent_offense_records(self):
+        """
+        Return true if the CHARGED AND CONVICTED offense records are equivalent.
+        """
+        offense_records = list(self.offense_records.all())
+        if len(offense_records) != 2:
+            return False
+
+        same_description = offense_records[0].description == offense_records[1].description
+        same_severity = offense_records[0].severity == offense_records[1].severity
+
+        return same_description and same_severity
 
 
 class OffenseRecord(PrintableModelMixin, models.Model):
