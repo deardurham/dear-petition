@@ -97,9 +97,12 @@ def __create_tables_data(offenses):
         jurisdiction = JURISDICTION_MAP[offense.ciprs_record.jurisdiction]
         key = (county, jurisdiction)
 
-        offense_records = list(offense.offense_records.all().filter(is_visible=True))
+        offense_records = list(offense.offense_records.all())
 
         for offense_record in offense_records:
+            if not offense_record.is_visible:
+                continue
+
             offense_record_data = __create_offense_record_data(offense_record)
 
             # append offense record data to list for the key, but if key doesn't exist yet, create an empty list first

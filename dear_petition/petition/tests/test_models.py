@@ -342,163 +342,190 @@ def test_offense__has_equivalent_offense_records__one_offense_record(offense1):
 
 
 @pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
-def test_offense__update_is_visible__equivalent(verdict):
+def test_offense__is_visible__equivalent(verdict):
     """
-    Test update_is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records are equivalent.
+    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records are equivalent.
     The CHARGED offense record should not be visible and the CONVICTED offense record should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_is_visible()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert not offense_records[0].is_visible
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].is_visible
+    assert not offense_record_charged.is_visible
+    assert offense_record_convicted.is_visible
 
 
 @pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
-def test_offense__update_is_visible__not_equivalent_description(verdict):
+def test_offense__is_visible__not_equivalent_description(verdict):
     """
-    Test update_is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have
+    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have
     descriptions that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_is_visible()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert offense_records[0].is_visible
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].is_visible
+    assert offense_record_charged.is_visible
+    assert offense_record_convicted.is_visible
 
 
 @pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
-def test_offense__update_is_visible__not_equivalent_severity(verdict):
+def test_offense__is_visible__not_equivalent_severity(verdict):
     """
-    Test update_is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have serverities
+    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have serverities
     that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="FELONY"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_is_visible()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert offense_records[0].is_visible
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].is_visible
+    assert offense_record_charged.is_visible
+    assert offense_record_convicted.is_visible
 
 
 @pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
-def test_offense__update_is_visible__one_offense_record(verdict):
+def test_offense__is_visible__one_offense_record(verdict):
     """
-    Test update_is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and there is only one offense record. It
+    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and there is only one offense record. It
     should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_is_visible()
-
-    offense_records = list(offense.offense_records.all())
-
-    assert offense_records[0].is_visible
+    assert offense_record.is_visible
 
 
-def test_offense__update_is_visible__not_convicted():
+def test_offense__is_visible__not_convicted():
     """
-    Test update_is_visible in Offense when the verdict is not GUILTY or RESPONSIBLE. The CHARGED and CONVICTED offense
+    Test is_visible in Offense when the verdict is not GUILTY or RESPONSIBLE. The CHARGED and CONVICTED offense
     records should be visible.
     """
     offense = OffenseFactory(verdict="JUDGMENT ARRESTED")
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_is_visible()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert offense_records[0].is_visible
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].is_visible
+    assert offense_record_charged.is_visible
+    assert offense_record_convicted.is_visible
 
 
-def test_offense__update_disposition__no_verdict():
+def test_offense__disposition__no_verdict():
     """
-    Test update_disposition in Offense when there is no verdict. The offense record's disposition should be the
+    Test disposition in Offense when there is no verdict. The offense record's disposition should be the
     offense's disposition method.
     """
     offense = OffenseFactory(disposition_method="NO PROBABLE CAUSE", verdict="")
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_disposition()
-
-    offense_records = list(offense.offense_records.all())
-
-    assert offense_records[0].disposition == "NO PROBABLE CAUSE"
+    assert offense_record.disposition == "NO PROBABLE CAUSE"
 
 
-def test_offense__update_disposition__verdict():
+def test_offense__disposition__verdict():
     """
-    Test update_disposition in Offense when there is a verdict. The offense record's disposition should be the offense's
+    Test disposition in Offense when there is a verdict. The offense record's disposition should be the offense's
     verdict.
     """
     offense = OffenseFactory(disposition_method="NO PROBABLE CAUSE", verdict="JUDGMENT ARRESTED")
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense_record = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_disposition()
-
-    offense_records = list(offense.offense_records.all())
-
-    assert offense_records[0].disposition == "JUDGMENT ARRESTED"
+    assert offense_record.disposition == "JUDGMENT ARRESTED"
 
 
-def test_offense__update_disposition__guilty_to_lesser():
+def test_offense__disposition__guilty_to_lesser():
     """
-    Test update_disposition in Offense when offense is "guilty to lesser". The CHARGED offense record's disposition
+    Test disposition in Offense when offense is "guilty to lesser". The CHARGED offense record's disposition
     should be GUILTY TO LESSER. The CONVICTED offense record's disposition should be GUILTY.
     """
     offense = OffenseFactory(disposition_method="DISPOSED BY JUDGE", verdict=VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_disposition()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert offense_records[0].disposition == VERDICT_GUILTY_TO_LESSER
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].disposition == VERDICT_GUILTY
+    assert offense_record_charged.disposition == VERDICT_GUILTY_TO_LESSER
+    assert offense_record_convicted.disposition == VERDICT_GUILTY
 
 
-def test_offense__update_disposition__responsible_to_lesser():
+def test_offense__disposition__responsible_to_lesser():
     """
-    Test update_disposition in Offense when offense is "responsible to lesser". The CHARGED offense record's disposition
+    Test disposition in Offense when offense is "responsible to lesser". The CHARGED offense record's disposition
     should be RESPONSIBLE TO LESSER. The CONVICTED offense record's disposition should be RESPONSIBLE.
     """
     offense = OffenseFactory(disposition_method="DISPOSED BY JUDGE", verdict=VERDICT_RESPONSIBLE)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR"
+    )
 
-    offense.update_disposition()
-
-    offense_records = list(offense.offense_records.all().order_by("action"))
-
-    assert offense_records[0].action == CHARGED
-    assert offense_records[0].disposition == VERDICT_RESPONSIBLE_TO_LESSER
-    assert offense_records[1].action == CONVICTED
-    assert offense_records[1].disposition == VERDICT_RESPONSIBLE
+    assert offense_record_charged.disposition == VERDICT_RESPONSIBLE_TO_LESSER
+    assert offense_record_convicted.disposition == VERDICT_RESPONSIBLE

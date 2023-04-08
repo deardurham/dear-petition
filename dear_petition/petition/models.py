@@ -148,30 +148,6 @@ class Offense(PrintableModelMixin, models.Model):
 
         return same_description and same_severity
 
-    def update_is_visible(self):
-        """
-        Update the value of the is_visible field. It will be false if it is a CHARGED offense record and the offense is
-        a "convicted of charged" offense.
-        """
-        for offense_record in list(self.offense_records.all()):
-            offense_record.is_visible = not (offense_record.action == CHARGED and self.is_convicted_of_charged())
-            offense_record.save()
-
-    def update_disposition(self):
-        """
-        Update the value of the disposition. It will be GUILTY TO LESSER or RESPONSIBLE TO LESSER if it is a
-        CHARGED offense record and the offense meets the "guilty to lesser" or "responsible to lesser" criteria.
-        Otherwise, it will be the offense's verdict if it exists. Otherwise, it will be the offense's disposition
-        method.
-        """
-        for offense_record in list(self.offense_records.all()):
-            offense_record.disposition = self.verdict if self.verdict else self.disposition_method
-            if offense_record.action == CHARGED:
-                if self.is_guilty_to_lesser():
-                    offense_record.disposition = VERDICT_GUILTY_TO_LESSER
-                elif self.is_responsible_to_lesser():
-                    offense_record.disposition = VERDICT_RESPONSIBLE_TO_LESSER
-            offense_record.save()
 
 class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
@@ -182,8 +158,6 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
-    disposition = models.CharField(max_length=256, blank=True)
-    is_visible = models.BooleanField(default=True)
 
     def __str__(self):
         ciprs_record = self.offense.ciprs_record
@@ -208,6 +182,30 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     @property
     def disposed_on(self):
         return self.offense.disposed_on
+
+
+    @property
+    def is_visible(self):
+        """
+        Return false if this is a CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise,
+        return true.
+        """
+        return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
+
+
+    @property
+    def disposition(self):
+        """
+        Return GUILTY TO LESSER or RESPONSIBLE TO LESSER if this is a CHARGED offense record and the offense meets the
+        "guilty to lesser" or "responsible to lesser" criteria. Otherwise, return the offense's verdict if it exists.
+        If the offense's verdict doesn't exist, return the offense's disposition method.
+        """
+        if self.action == CHARGED:
+            if self.offense.is_guilty_to_lesser():
+                return VERDICT_GUILTY_TO_LESSER
+            elif self.offense.is_responsible_to_lesser():
+                return VERDICT_RESPONSIBLE_TO_LESSER
+        return self.offense.verdict if self.offense.verdict else self.offense.disposition_method
 
 
 class Contact(PrintableModelMixin, models.Model):
