@@ -54,7 +54,7 @@ def format_petition_date(date):
     """ Format Date Objects for PDF Writer
 
     If date is true then the date object will be formatted
-    according to DATE_FORMAT, else this defintion will return
+    according to DATE_FORMAT, else this definition will return
     empty strings. Both of which can be written to the PDF
     correctly.
     """
