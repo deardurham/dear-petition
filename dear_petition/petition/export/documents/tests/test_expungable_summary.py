@@ -34,9 +34,9 @@ def test_expungable_summary_context__one_table_one_row(batch, contact1):
 
     assert context["attorney"] == contact1.name
     assert context["petitioner"] == PETITIONER_INFO["name"]
-    assert context["dob"] == date(1972, 12, 31)
-    assert context["birthday_18th"] == date(1990, 12, 31)
-    assert context["birthday_22nd"] == date(1994, 12, 31)
+    assert context["dob"] == "12/31/1972"
+    assert context["birthday_18th"] == "12/31/1990"
+    assert context["birthday_22nd"] == "12/31/1994"
 
     first_table = context["tables"][0]
     assert first_table["idx"] == 1
@@ -45,12 +45,12 @@ def test_expungable_summary_context__one_table_one_row(batch, contact1):
 
     first_offense_record = first_table["offense_records"][0]
     assert first_offense_record["file_no"] == "10CR000001"
-    assert first_offense_record["arrest_date"] == date(2001, 10, 1)
+    assert first_offense_record["arrest_date"] == "10/01/2001"
     assert first_offense_record["description"] == "SIMPLE ASSAULT"
     assert first_offense_record["severity"] == "M"
-    assert first_offense_record["offense_date"] == "2001-09-30"
+    assert first_offense_record["offense_date"] == "09/30/2001"
     assert first_offense_record["disposition"] == "NG"
-    assert first_offense_record["disposed_on"] == date(2003, 10, 2)
+    assert first_offense_record["disposed_on"] == "10/02/2003"
 
 
 def test_expungable_summary_context__many_tables(batch, contact1):
@@ -262,23 +262,30 @@ def test_expungable_summary_context__disposition_codes(batch, contact1):
     assert offense_records[2]["disposition"] == "not found"
 
 
-@pytest.mark.parametrize("input_dob, input_18th_bday, input_22nd_bday", [
-    (date(1972, 12, 31), date(1990, 12, 31), date(1994, 12, 31)),
+@pytest.mark.parametrize("dob, formatted_dob, formatted_18th_bday, formatted_22nd_bday", [
+    (date(1972, 12, 31), "12/31/1972", "12/31/1990", "12/31/1994"),
     # born in leap year
-    (date(1988, 2, 29), date(2006, 3, 1), date(2010, 3, 1)),
+    (date(1988, 2, 29), "02/29/1988", "03/01/2006", "03/01/2010"),
 ])
-def test_expungable_summary_context__birthdays(batch, contact1, input_dob, input_18th_bday, input_22nd_bday):
+def test_expungable_summary_context__birthdays(
+    batch,
+    contact1,
+    dob,
+    formatted_dob,
+    formatted_18th_bday,
+    formatted_22nd_bday
+):
     """
     Test generate_context method with different dates of birth
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", input_dob, "NOT GUILTY", "JURY TRIAL")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", dob, "NOT GUILTY", "JURY TRIAL")
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     context = generate_context(batch, contact1, PETITIONER_INFO)
 
-    assert context["dob"] == input_dob
-    assert context["birthday_18th"] == input_18th_bday
-    assert context["birthday_22nd"] == input_22nd_bday
+    assert context["dob"] == formatted_dob
+    assert context["birthday_18th"] == formatted_18th_bday
+    assert context["birthday_22nd"] == formatted_22nd_bday
 
 
 def create_offense_record(offense, action, description, severity):

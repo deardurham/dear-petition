@@ -3,6 +3,7 @@ from django.conf import settings
 from docxtpl import DocxTemplate
 from dateutil.relativedelta import relativedelta
 
+from dear_petition.petition import utils
 from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
     DISPOSITION_METHOD_CODE_MAP,
@@ -63,9 +64,9 @@ def generate_context(batch, contact, petitioner_info):
     return {
         "attorney": contact.name,
         "petitioner": petitioner_info["name"],
-        "dob": dob,
-        "birthday_18th": birthday_18th,
-        "birthday_22nd": birthday_22nd,
+        "dob": __format_date(dob),
+        "birthday_18th": __format_date(birthday_18th),
+        "birthday_22nd": __format_date(birthday_22nd),
         "tables": tables,
     }
 
@@ -129,12 +130,19 @@ def __create_offense_record_data(offense_record):
 
     offense_record_data = {
         "file_no": ciprs_record.file_no,
-        "arrest_date": ciprs_record.arrest_date,
+        "arrest_date": __format_date(ciprs_record.arrest_date),
         "description": offense_record.description,
         "severity": offense_record.severity[0:1] if offense_record.severity else None,
-        "offense_date": ciprs_record.offense_date.strftime("%Y-%m-%d") if ciprs_record.offense_date else None,
+        "offense_date": __format_date(ciprs_record.offense_date),
         "disposition": disposition,
-        "disposed_on": offense.disposed_on
+        "disposed_on": __format_date(offense.disposed_on)
     }
 
     return offense_record_data
+
+
+def __format_date(date):
+    """
+    Format the date for the Summary Document.
+    """
+    return utils.format_petition_date(date)
