@@ -32,7 +32,7 @@ def get_285_form_agency_address(agency):
 
 
 def get_text_pixel_length(text):
-    font = ImageFont.truetype(str(settings.APPS_DIR.path("static/times.ttf")), 12)
+    font = ImageFont.truetype(str(settings.APPS_DIR.path("static/times.ttf")), size=12)
     size = font.getsize(text)
     return size[0]
 
@@ -52,7 +52,8 @@ def get_truncation_point_of_text_by_pixel_size(text, desired_length):
 
     truncated_string_size = 0
     idx = 0
-    while True:
+    text_length = len(text)
+    while idx < text_length:
         next_letter = text[idx]
         letter_length = calculate_letter_length(next_letter)
         truncated_string_size += letter_length

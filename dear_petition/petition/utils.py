@@ -51,7 +51,7 @@ def make_datetime_aware(dt_str):
 
 
 def format_petition_date(date):
-    """ Format Date Objects for PDF Writer
+    """Format Date Objects for PDF Writer
 
     If date is true then the date object will be formatted
     according to DATE_FORMAT, else this defintion will return
@@ -69,3 +69,12 @@ def remove_prefix(text, prefix):
     if text.startswith(prefix):
         return text[len(prefix) :]
     return text
+
+
+def get_petition_filename(petitioner_name, petition, extension, addendum_document=None):
+    form_type = (
+        f"{petition.form_type} {addendum_document.form_type}"
+        if addendum_document is not None
+        else petition.form_type
+    )
+    return f"{petitioner_name} - {form_type} - {petition.jurisdiction} {petition.county}.{extension}"

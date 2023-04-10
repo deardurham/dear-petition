@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from dear_petition.petition.constants import CHARGED, FEMALE
+from dear_petition.petition.constants import CHARGED, CONVICTED, FEMALE
 from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
@@ -43,13 +43,8 @@ def record0(batch):
         For example, create a CIPRS Record with:
         record0(datetime(1994, 12, 31), "ASIAN", "F")
         """
-        CIPRSRecordFactory(
-            batch=batch,
-            label=batch.label,
-            dob=dob,
-            race=race,
-            sex=sex
-        )
+        CIPRSRecordFactory(batch=batch, label=batch.label, dob=dob, race=race, sex=sex)
+
     yield _record0
 
 
@@ -61,7 +56,7 @@ def record1(batch):
         jurisdiction=constants.DISTRICT_COURT,
         dob=datetime(1980, 7, 7),
         race="ASIAN",
-        sex=FEMALE
+        sex=FEMALE,
     )
 
 
@@ -85,6 +80,14 @@ def offense1(record2):
 
 @pytest.fixture
 def offense_record1(offense1, petition, petition_document):
+    record = OffenseRecordFactory(offense=offense1)
+    PetitionOffenseRecordFactory(petition=petition, offense_record=record)
+    record.documents.set([petition_document])
+    yield record
+
+
+@pytest.fixture
+def offense_record2(offense1, petition, petition_document):
     record = OffenseRecordFactory(offense=offense1)
     PetitionOffenseRecordFactory(petition=petition, offense_record=record)
     record.documents.set([petition_document])
@@ -183,6 +186,21 @@ def charged_dismissed_record(dismissed_offense):
 @pytest.fixture
 def charged_not_guilty_record(not_guilty_offense):
     return OffenseRecordFactory(action=CHARGED, offense=not_guilty_offense)
+
+
+@pytest.fixture
+def guilty_offense(record1):
+    return OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=constants.DISTRICT_COURT,
+        verdict="GUILTY",
+        disposition_method="",
+    )
+
+
+@pytest.fixture
+def convicted_guilty_record(guilty_offense):
+    yield OffenseRecordFactory(action=CONVICTED, offense=guilty_offense)
 
 
 @pytest.fixture

@@ -188,8 +188,16 @@ class AOCFormCR287(PetitionForm):
             self.data["ChargedB"] = Checkbox("Yes")
             self.data["ChargedDesc"] = charged_desc_string
             self.data["ChargedDescCont"] = charged_desc_cont_string
-        else:
+        elif (
+            self.petition.offense_records.filter(
+                petitionoffenserecord__active=True
+            ).count()
+            > 1
+        ):
+            # Petition section says to check one of the checkboxes if petitioning to expunge MULTIPLE dismissals
             self.data["ChargedA"] = Checkbox("Yes")
+        else:
+            pass
 
 
 class AOCFormCR285(AOCFormCR287):

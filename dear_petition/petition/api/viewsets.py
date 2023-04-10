@@ -19,6 +19,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
 from dear_petition.petition import utils
+from dear_petition.petition import helpers as ch
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import (
@@ -347,9 +348,9 @@ class PetitionViewSet(viewsets.ModelViewSet):
         )
 
         petition = self.get_object()
-        petition_filename = (
-            filename
-        ) = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
+        petition_filename = utils.get_petition_filename(
+            serializer.data["name_petitioner"], petition, "pdf"
+        )
         if addendum_documents.exists():
             docs = [
                 generated_petition_pdf,
@@ -362,17 +363,24 @@ class PetitionViewSet(viewsets.ModelViewSet):
                     addendum_document, serializer.data
                 )
                 docs.append(doc)
-                filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} {addendum_document.form_type} - {petition.jurisdiction} {petition.county}.docx'
+                filename = utils.get_petition_filename(
+                    serializer.data["name_petitioner"],
+                    petition,
+                    "docx",
+                    addendum_document=addendum_document,
+                )
                 filenames.append(filename)
 
             zip_file = create_zip_file(docs, filenames)
             resp = FileResponse(zip_file)
             resp["Content-Type"] = "application/zip"
-            filename = f'{serializer.data["name_petitioner"]} - {petition.form_type} - {petition.jurisdiction} {petition.county}.zip'
+            filename = utils.get_petition_filename(
+                serializer.data["name_petitioner"], petition, "zip"
+            )
             resp["Content-Disposition"] = f'attachment; filename="{filename}"'
         else:
             resp = FileResponse(generated_petition_pdf)
-            resp["Content-Type"] = "octet/stream"
+            resp["Content-Type"] = "application/pdf"
             resp["Content-Disposition"] = f'inline; filename="{petition_filename}"'
 
         return resp

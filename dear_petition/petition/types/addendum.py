@@ -19,7 +19,7 @@ def calculate_checkmark_3b_string(offense_records):
     return checkmark_3b_string
 
 
-def create_dismissed_addendum_forms(petition, previous_document):
+def create_checkmark_3b_addendum_form(petition, previous_document):
     ADDENDUM_3B_FIRST_LINE_LIMIT = 242
     ADDENDUM_3B_SECOND_LINE_LIMIT = 410
     ADDENDUM_3B_PIXEL_LIMIT = (
@@ -41,7 +41,7 @@ def create_dismissed_addendum_forms(petition, previous_document):
             petition.base_document.form_specific_data["is_checkmark_3b_checked"] = True
             petition.base_document.form_specific_data[
                 "charged_desc_string"
-            ] = "See attachment"
+            ] = "See addendum"
         else:
             petition.base_document.form_specific_data["is_checkmark_3b_checked"] = True
             truncation_point = ph.get_truncation_point_of_text_by_pixel_size(
@@ -57,4 +57,4 @@ def create_dismissed_addendum_forms(petition, previous_document):
     petition.base_document.save()
 
 
-ADDENDUM_FORMS_TYPE_MAP = {pc.DISMISSED: create_dismissed_addendum_forms}
+ADDENDUM_FORMS_TYPE_MAP = {pc.DISMISSED: create_checkmark_3b_addendum_form}
