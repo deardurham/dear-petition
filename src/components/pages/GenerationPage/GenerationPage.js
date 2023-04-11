@@ -4,7 +4,6 @@ import { GenerationPageStyled, GenerationContentStyled } from './GenerationPage.
 import { colorGrey } from '../../../styles/colors';
 import { smallerThanTabletLandscape } from '../../../styles/media';
 import { saveAs } from 'file-saver';
-import cx from 'classnames';
 
 // Router
 import { useParams } from 'react-router-dom';
@@ -194,7 +193,6 @@ function GenerationPage() {
                 {false && (
                     <Button
                       type="button"
-                      className={cx('w-0', { invisible: true })}
                       onClick={() => generateAdviceLetter()}
                     >
                ) }
