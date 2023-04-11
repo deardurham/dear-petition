@@ -189,15 +189,14 @@ function GenerationPage() {
               <div>
                 {/*
                 Legal team requested this be temporarily removed from UI
-                 */}
-                {false && (
+                 
                     <Button
                       type="button"
                       onClick={() => generateAdviceLetter()}
                     >
-               ) }
                   Create Advice Letter
                 </Button>
+                */} 
               </div>
             </ButtonsRow>
           </InputSection>
