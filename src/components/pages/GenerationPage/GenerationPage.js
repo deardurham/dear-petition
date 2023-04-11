@@ -187,9 +187,16 @@ function GenerationPage() {
                 </Button>
               </div>
               <div>
-                <Button type="button" onClick={() => generateAdviceLetter()}>
+                {/*
+                Legal team requested this be temporarily removed from UI
+                 
+                    <Button
+                      type="button"
+                      onClick={() => generateAdviceLetter()}
+                    >
                   Create Advice Letter
                 </Button>
+                */} 
               </div>
             </ButtonsRow>
           </InputSection>
