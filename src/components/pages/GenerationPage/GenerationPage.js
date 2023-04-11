@@ -191,11 +191,13 @@ function GenerationPage() {
                 {/*
                 Legal team requested this be temporarily removed from UI
                  */}
-                <Button
-                  type="button"
-                  className={cx('w-0', { invisible: true })}
-                  onClick={() => generateAdviceLetter()}
-                >
+                {false && (
+                    <Button
+                      type="button"
+                      className={cx('w-0', { invisible: true })}
+                      onClick={() => generateAdviceLetter()}
+                    >
+               ) }
                   Create Advice Letter
                 </Button>
               </div>
