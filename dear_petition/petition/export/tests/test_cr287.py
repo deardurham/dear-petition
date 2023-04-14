@@ -3,7 +3,12 @@ import pytest
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.forms import AOCFormCR287
-
+from dear_petition.petition.tests.factories import (
+    PetitionFactory,
+    PetitionDocumentFactory,
+)
+from dear_petition.petition.etl.transform import recalculate_petitions
+from dear_petition.petition.export.annotate import Checkbox
 
 pytestmark = pytest.mark.django_db
 
@@ -190,9 +195,7 @@ def test_map_agencies__street_address(form, contact1, contact2, contact3):
         assert contact.address1 in addresses
 
 
-def test_map_agencies__mail_address(
-    form, contact1, contact2, contact3
-):
+def test_map_agencies__mail_address(form, contact1, contact2, contact3):
     agencies = [contact1, contact2, contact3]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
@@ -264,3 +267,41 @@ def test_map_offenses__disposition_date(form, offense1, offense_record1):
     assert form.data["DismissalDate:1"] == utils.format_petition_date(
         offense1.disposed_on
     )
+
+
+#
+# Other
+#
+
+
+def test_checkmark_3b_no_checkmark(
+    form,
+):
+    form.map_additional_forms()
+    assert not form.data.get("ChargedA")
+    assert not form.data.get("ChargedB")
+    assert not form.data.get("ChargedDesc")
+    assert not form.data.get("ChargedDescCont")
+
+
+def test_checkmark_3b_checkmark_a_checked(
+    form, petition_document, offense_record1, offense_record2
+):
+    form.map_additional_forms()
+    assert form.data.get("ChargedA")
+    assert not form.data.get("ChargedB")
+    assert not form.data.get("ChargedDesc")
+    assert not form.data.get("ChargedDescCont")
+
+
+def test_checkmark_3b_checkmark_b_checked(form):
+    form.petition_document.form_specific_data["is_checkmark_3b_checked"] = True
+    form.petition_document.form_specific_data["charged_desc_string"] = "Test string"
+    form.petition_document.form_specific_data[
+        "charged_desc_cont_string"
+    ] = "Test string (cont.)"
+    form.map_additional_forms()
+    assert not form.data.get("ChargedA")
+    assert form.data.get("ChargedB")
+    assert form.data.get("ChargedDesc")
+    assert form.data.get("ChargedDescCont")

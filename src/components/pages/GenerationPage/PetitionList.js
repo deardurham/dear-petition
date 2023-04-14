@@ -85,9 +85,9 @@ function PetitionRow({
     setPrevPetition(petition);
   }
 
-  const downloadPdf = (pdf, filename) => {
-    const pdfBlob = new Blob([pdf], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(pdfBlob);
+  const downloadFile = (data, filename, filetype) => {
+    const fileBlob = new Blob([data], { type: filetype });
+    const url = window.URL.createObjectURL(fileBlob);
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
@@ -115,10 +115,11 @@ function PetitionRow({
       // content-disposition: 'inline; filename="petition.pdf"'
       const filename =
         headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
+      const filetype = headers['content-type'];
       // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
       // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
       // const data = await generatePetition(derivedPetition).unwrap();
-      downloadPdf(data, filename);
+      downloadFile(data, filename, filetype);
     } catch (e) {
       if (e?.response?.data) {
         const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
