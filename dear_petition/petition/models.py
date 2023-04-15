@@ -35,6 +35,7 @@ from .constants import (
     FORM_TYPES,
     CHARGED,
     VERDICT_GUILTY_TO_LESSER,
+    VERDICT_PRAYER_FOR_JUDGMENT,
     VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
@@ -122,7 +123,8 @@ class Offense(PrintableModelMixin, models.Model):
         """
         Return true if convicted of the charged offense.
         """
-        return self.verdict in [pc.VERDICT_GUILTY, pc.VERDICT_RESPONSIBLE] and self.has_equivalent_offense_records()
+        convicted_verdicts = [pc.VERDICT_GUILTY, pc.VERDICT_PRAYER_FOR_JUDGMENT, pc.VERDICT_RESPONSIBLE]
+        return self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
 
     def is_guilty_to_lesser(self):
         """
