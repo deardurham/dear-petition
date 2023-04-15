@@ -302,14 +302,14 @@ def create_offense_record(offense, action, description, severity):
     return offense_record
 
 
-def create_offense(batch, county, jursidiction, file_no, dob, verdict, disposition_method):
+def create_offense(batch, county, jurisdiction, file_no, dob, verdict, disposition_method):
     """
     Create offense
     """
     ciprs_record = CIPRSRecordFactory(
         batch=batch,
         county=county,
-        jurisdiction=jursidiction,
+        jurisdiction=jurisdiction,
         file_no=file_no,
         dob=dob,
         offense_date="2001-09-30",
