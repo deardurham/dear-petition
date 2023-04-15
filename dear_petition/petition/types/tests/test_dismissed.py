@@ -20,13 +20,13 @@ def test_charged_disposition_methods(batch, record1, method):
 
 
 def test_non_charged_offense_record(batch, dismissed_offense):
-    """Non-CHARGED dismissed offense records should be exlucded."""
+    """Non-CHARGED dismissed offense records should be excluded."""
     offense_record = OffenseRecordFactory(action="CONVICTED", offense=dismissed_offense)
     assert offense_record not in batch.dismissed_offense_records()
 
 
 def test_non_dismissed_disposition_method(batch, non_dismissed_offense):
-    """Offenses with non-dismissed disposition methods should be exlucded."""
+    """Offenses with non-dismissed disposition methods should be excluded."""
     offense_record = OffenseRecordFactory(
         action="CHARGED", offense=non_dismissed_offense
     )
