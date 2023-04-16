@@ -32,6 +32,11 @@ def get_285_form_agency_address(agency):
 
 
 def get_text_pixel_length(text):
+    """
+    Given a string, will give it's length in pixels.
+    Note that this may vary by operating system due to different font rendering engines.
+    Note also that the length of a multi-character string may not equal the sum of the length of the characters comprising the string. This is again due to font rendering.
+    """
     font = ImageFont.truetype(str(settings.APPS_DIR.path("static/times.ttf")), size=12)
     size = font.getsize(text)
     return size[0]
