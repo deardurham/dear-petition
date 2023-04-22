@@ -7,6 +7,7 @@ from dear_petition.petition.tests.factories import (
 )
 from dear_petition.petition.constants import (
     DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     DISTRICT_COURT,
     SUPERIOR_COURT,
     VERDICT_GUILTY,
@@ -124,10 +125,11 @@ def test_expungable_summary_context__many_offense_records(batch, contact1):
     assert offense_records[2]["file_no"] == "12CR000001"
 
 
-def test_expungable_summary_context__exclude_superseding_indictment(batch, contact1):
+@pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
+def test_expungable_summary_context__excluded_disp_method(batch, contact1, disp_method):
     """
-    Test generate_context method where one offense record has an offense with a disposition "SUPERSEDING INDICTMENT OR
-    PROCESS". That offense record should be excluded.
+    Test generate_context method where one offense record belongs to an offense with an excluded disposition method.
+    That offense record should be excluded.
     """
     ciprs_record = CIPRSRecordFactory(
         county="DURHAM",
@@ -139,12 +141,12 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch, conta
         arrest_date="2001-10-01"
     )
 
-    offense_si = OffenseFactory(
+    offense_excluded = OffenseFactory(
         ciprs_record=ciprs_record,
-        disposition_method=DISP_METHOD_SUPERSEDING_INDICTMENT,
+        disposition_method=disp_method,
         disposed_on="2003-10-02"
     )
-    OffenseRecordFactory(offense=offense_si)
+    OffenseRecordFactory(offense=offense_excluded)
 
     offense_npc = OffenseFactory(
         ciprs_record=ciprs_record,
@@ -160,7 +162,7 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch, conta
     first_table = context["tables"][0]
     assert len(first_table["offense_records"]) == 1
 
-    # The offense record should not be the "SUPERSEDING INDICTMENT OR PROCESS" one.
+    # The offense record should not be the excluded one.
     first_offense_record = first_table["offense_records"][0]
     assert first_offense_record["disposition"] == "NPC"
 

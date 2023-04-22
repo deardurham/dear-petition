@@ -48,7 +48,7 @@ def test_import_ciprs_records_multi_files(
 
 
 def test_created_petition(batch, record1, charged_dismissed_record, mock_ciprs_reader):
-    """ETL should created identified generatable petitions."""
+    """ETL should create identified generatable petitions."""
     create_batch_petitions(batch)
     petition = batch.petitions.first()
     assert petition.jurisdiction == record1.jurisdiction
