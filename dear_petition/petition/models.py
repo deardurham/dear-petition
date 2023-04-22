@@ -34,6 +34,8 @@ from .constants import (
     DATETIME_FORMAT,
     FORM_TYPES,
     CHARGED,
+    DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     VERDICT_GUILTY_TO_LESSER,
     VERDICT_PRAYER_FOR_JUDGMENT,
     VERDICT_RESPONSIBLE_TO_LESSER,
@@ -190,9 +192,12 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     @property
     def is_visible(self):
         """
-        Return false if this is a CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise,
-        return true.
+        Return false if offense's disposition method is an excluded disposition method. Return false if this is a
+        CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise, return true.
         """
+        if self.offense.disposition_method in [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]:
+            return False
+
         return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
 
 

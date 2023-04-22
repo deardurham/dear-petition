@@ -74,14 +74,10 @@ def generate_context(batch, contact, petitioner_info):
 
 def __get_offenses(batch):
     """
-    Get offenses for the batch. Exclude offenses that have a disposition method "SUPERSEDING INDICTMENT OR PROCESS and
-    WAIVER OF PROBABLE CAUSE".
+    Get offenses for the batch.
     """
-    disp_methods_to_exclude = [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]
     offenses = pm.Offense.objects.filter(
         ciprs_record__batch=batch
-    ).exclude(
-        disposition_method__in=disp_methods_to_exclude
     ).select_related("ciprs_record__batch")
 
     return offenses
