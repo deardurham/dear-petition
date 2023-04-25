@@ -11,20 +11,7 @@ import { useGetUserBatchesQuery } from '../service/api';
 import useAuth from '../hooks/useAuth';
 import { DownloadDocumentsModal } from './DownloadDocuments';
 import { hasValidationsErrors } from '../util/errors';
-
-const downloadFile = (blob, filename = '') => {
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  if (filename) {
-    link.download = filename;
-  }
-  link.click();
-  setTimeout(() => {
-    window.URL.revokeObjectURL(url);
-    link.remove();
-  });
-};
+import { downloadFile } from '../util/downloadFile';
 
 // TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
@@ -93,24 +80,28 @@ export const ExistingPetitions = () => {
                   >
                     Download
                   </Button>
-                  <Button
-                    disabled={!!batch?.can_generate_letter?.batch}
-                    title={batch?.can_generate_letter?.batch?.join(' ') ?? ''}
-                    onClick={() => {
-                      manualAxiosRequest({
-                        url: `/batch/${batch.pk}/generate_advice_letter/`,
-                        responseType: 'arraybuffer',
-                        method: 'post',
-                      }).then((adviceLetter) => {
-                        const docBlob = new Blob([adviceLetter.data], {
-                          type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                  {/*
+                    Legal team requested this be temporarily removed from UI
+
+                    <Button
+                      disabled={!!batch?.can_generate_letter?.batch}
+                      title={batch?.can_generate_letter?.batch?.join(' ') ?? ''}
+                      onClick={() => {
+                        manualAxiosRequest({
+                          url: `/batch/${batch.pk}/generate_advice_letter/`,
+                          responseType: 'arraybuffer',
+                          method: 'post',
+                        }).then((adviceLetter) => {
+                          const docBlob = new Blob([adviceLetter.data], {
+                            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          });
+                          downloadFile(docBlob, 'Advice Letter.docx');
                         });
-                        downloadFile(docBlob, 'Advice Letter.docx');
-                      });
-                    }}
-                  >
-                    Advice Letter
-                  </Button>
+                      }}
+                    >
+                      Advice Letter
+                    </Button>
+                  */}
                   <Button
                     disabled={!!batch?.can_generate_summary?.batch}
                     title={batch?.can_generate_summary?.batch?.join(' ') ?? ''}

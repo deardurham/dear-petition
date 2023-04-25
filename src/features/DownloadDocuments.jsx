@@ -5,7 +5,7 @@ import StyledDialog from '../components/elements/Modal/Dialog';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
 import Button from '../components/elements/Button';
 import { POSITIVE } from '../components/elements/Button/Button';
-import downloadPdf from '../util/downloadPdf';
+import { downloadPdf } from '../util/downloadFile';
 import { manualAxiosRequest } from '../service/axios';
 import { getErrorList, hasValidationsErrors } from '../util/errors';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';

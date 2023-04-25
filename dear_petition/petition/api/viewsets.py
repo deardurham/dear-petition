@@ -19,6 +19,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
 from dear_petition.petition import utils
+from dear_petition.petition import helpers as ch
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import (
@@ -26,13 +27,17 @@ from dear_petition.petition.etl import (
     recalculate_petitions,
     assign_agencies_to_documents,
 )
-from dear_petition.petition.export import generate_petition_pdf
+from dear_petition.petition.export import (
+    generate_petition_pdf,
+    generate_addendum_document_file,
+    create_zip_file,
+)
 from dear_petition.users.models import User
 from dear_petition.petition.export.documents.advice_letter import (
-    generate_advice_letter as generate_advice_letter,
+    generate_advice_letter
 )
 from dear_petition.petition.export.documents.expungable_summary import (
-    generate_expungable_summary as generate_expungable_summary,
+    generate_expungable_summary
 )
 
 logger = logging.getLogger(__name__)
@@ -258,7 +263,9 @@ class BatchViewSet(viewsets.ModelViewSet):
             resp[
                 "Content-Type"
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            resp["Content-Disposition"] = 'attachment; filename="Expungable Record Summary.docx"'
+            resp[
+                "Content-Disposition"
+            ] = 'attachment; filename="Expungable Record Summary.docx"'
             return resp
 
 
@@ -343,7 +350,9 @@ class PetitionViewSet(viewsets.ModelViewSet):
         client = petition.batch.client
 
         petition_documents = pm.PetitionDocument.objects.filter(
-            petition=pk, pk__in=serializer.data["documents"]
+            petition=pk,
+            pk__in=serializer.data["documents"],
+            form_type__in=constants.PETITION_FORM_TYPES._db_values,
         ).order_by("pk")
         assert (
             len(petition_documents) > 0
@@ -360,12 +369,47 @@ class PetitionViewSet(viewsets.ModelViewSet):
         for doc in petition_documents.iterator():
             pm.GeneratedPetition.get_stats_generated_petition(doc.pk, request.user)
 
-        resp = FileResponse(generated_petition_pdf)
-        resp["Content-Type"] = "application/pdf"
+        addendum_documents = pm.PetitionDocument.objects.filter(
+            petition=pk,
+            pk__in=serializer.data["documents"],
+            form_type__in=constants.ADDENDUM_FORM_TYPES._db_values,
+        )
 
         petition = self.get_object()
-        filename = f'{client.name} - {petition.form_type} - {petition.jurisdiction} {petition.county}.pdf'
-        resp["Content-Disposition"] = f'inline; filename="{filename}"'
+        petition_filename = utils.get_petition_filename(
+            client.name, petition, "pdf"
+        )
+        if addendum_documents.exists():
+            docs = [
+                generated_petition_pdf,
+            ]
+            filenames = [
+                petition_filename,
+            ]
+            for addendum_document in addendum_documents:
+                doc = generate_addendum_document_file(
+                    addendum_document, serializer.data
+                )
+                docs.append(doc)
+                filename = utils.get_petition_filename(
+                    client.name,
+                    petition,
+                    "docx",
+                    addendum_document=addendum_document,
+                )
+                filenames.append(filename)
+
+            zip_file = create_zip_file(docs, filenames)
+            resp = FileResponse(zip_file)
+            resp["Content-Type"] = "application/zip"
+            filename = utils.get_petition_filename(
+                client.name, petition, "zip"
+            )
+            resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+        else:
+            resp = FileResponse(generated_petition_pdf)
+            resp["Content-Type"] = "application/pdf"
+            resp["Content-Disposition"] = f'inline; filename="{petition_filename}"'
 
         return resp
 

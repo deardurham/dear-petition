@@ -14,6 +14,7 @@ from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
     identify_distinct_petitions,
     petition_offense_records,
+    create_addendum_documents,
 )
 
 __all__ = ("import_ciprs_records",)
@@ -97,7 +98,9 @@ def create_documents(petition):
 
         paginator = petition.get_offense_record_paginator()
 
-        base_document = pm.PetitionDocument.objects.create(petition=petition)
+        base_document = pm.PetitionDocument.objects.create(
+            petition=petition, form_type=petition.form_type
+        )
         base_document.offense_records.add(*paginator.petition_offense_records())
 
         logger.info(
@@ -108,13 +111,18 @@ def create_documents(petition):
 
         for attachment_records in paginator.attachment_offense_records():
             attachment = pm.PetitionDocument.objects.create(
-                petition=petition, previous_document=previous_document
+                petition=petition,
+                previous_document=previous_document,
+                form_type=ATTACHMENT,
             )
             attachment.offense_records.add(*attachment_records)
             previous_document = attachment
             logger.info(
                 f"Created {attachment} with {attachment.offense_records.count()} records"
             )
+
+        create_addendum_documents(petition, previous_document)
+
     return petition
 
 

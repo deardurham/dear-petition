@@ -17,6 +17,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
+from django.utils.functional import cached_property
 from phonenumber_field.modelfields import PhoneNumberField
 
 import ciprs_reader
@@ -34,6 +35,9 @@ from .constants import (
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
     FORM_TYPES,
+    CHARGED,
+    VERDICT_GUILTY_TO_LESSER,
+    VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
 from .utils import make_datetime_aware
@@ -116,18 +120,23 @@ class Offense(PrintableModelMixin, models.Model):
     def __str__(self):
         return f"{self.id} ({self.ciprs_record.file_no})"
 
-    def is_convicted(self):
+    def is_convicted_of_charged(self):
         """
-        Return true if the offense is a convicted offense. Note, there is probably a better name for this method, but
-        I'm not exactly sure what it would be yet.
+        Return true if convicted of the charged offense.
         """
-        return self.verdict == pc.VERDICT_GUILTY and self.has_equivalent_offense_records()
+        return self.verdict in [pc.VERDICT_GUILTY, pc.VERDICT_RESPONSIBLE] and self.has_equivalent_offense_records()
 
     def is_guilty_to_lesser(self):
         """
         Return true if the offense is a guilty to lesser offense.
         """
-        return self.verdict == pc.VERDICT_GUILTY and not self.has_equivalent_offense_records()
+        return self.verdict == pc.VERDICT_GUILTY and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
+
+    def is_responsible_to_lesser(self):
+        """
+        Return true if the offense is a responsible to lesser offense.
+        """
+        return self.verdict == pc.VERDICT_RESPONSIBLE and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
 
     def has_equivalent_offense_records(self):
         """
@@ -176,6 +185,30 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     @property
     def disposed_on(self):
         return self.offense.disposed_on
+
+
+    @property
+    def is_visible(self):
+        """
+        Return false if this is a CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise,
+        return true.
+        """
+        return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
+
+
+    @property
+    def disposition(self):
+        """
+        Return GUILTY TO LESSER or RESPONSIBLE TO LESSER if this is a CHARGED offense record and the offense meets the
+        "guilty to lesser" or "responsible to lesser" criteria. Otherwise, return the offense's verdict if it exists.
+        If the offense's verdict doesn't exist, return the offense's disposition method.
+        """
+        if self.action == CHARGED:
+            if self.offense.is_guilty_to_lesser():
+                return VERDICT_GUILTY_TO_LESSER
+            elif self.offense.is_responsible_to_lesser():
+                return VERDICT_RESPONSIBLE_TO_LESSER
+        return self.offense.verdict if self.offense.verdict else self.offense.disposition_method
 
 
 class Contact(PrintableModelMixin, models.Model):
@@ -441,7 +474,7 @@ class Petition(PrintableModelMixin, TimeStampedModel):
 
         return qs
 
-    @property
+    @cached_property
     def base_document(self):
         return self.documents.get(previous_document__isnull=True)
 
@@ -463,17 +496,12 @@ class PetitionDocument(PrintableModelMixin, models.Model):
         "self", on_delete=models.CASCADE, null=True, related_name="following_document"
     )
     agencies = models.ManyToManyField(Contact, related_name="+")
+    form_type = models.CharField(choices=FORM_TYPES, max_length=255)
+    form_specific_data = models.JSONField(default=dict)
 
     @property
     def is_attachment(self):
         return self.previous_document is not None
-
-    @property
-    def form_type(self):
-        if self.previous_document_id:
-            return pc.ATTACHMENT
-        else:
-            return self.petition.form_type
 
     @property
     def jurisdiction(self):

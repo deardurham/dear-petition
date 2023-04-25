@@ -174,13 +174,17 @@ function GenerationPage() {
             >
               Create Expungable Record Summary
             </Button>
-            <Button
-              onClick={() => generateAdviceLetter()}
-              disabled={!!data?.can_generate_letter?.batch}
-              title={data?.can_generate_letter?.batch?.join(' ') ?? ''}
-            >
+            {/*
+                Legal team requested this be temporarily removed from UI
+
+                 <Button
+                  onClick={() => generateAdviceLetter()}
+                  disabled={!!data?.can_generate_letter?.batch}
+                  title={data?.can_generate_letter?.batch?.join(' ') ?? ''}
+                >
               Create Advice Letter
             </Button>
+            */}
           </div>
         </InputSection>
         <GenerationSection>

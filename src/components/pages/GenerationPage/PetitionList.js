@@ -18,7 +18,7 @@ import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import { SelectDocumentsModal } from '../../../features/SelectDocuments';
-import downloadPdf from '../../../util/downloadPdf';
+import { downloadFile } from '../../../util/downloadFile';
 import { getErrorList } from '../../../util/errors';
 
 function ActionButton({
@@ -90,10 +90,11 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
       // content-disposition: 'inline; filename="petition.pdf"'
       const filename =
         headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
+      const filetype = headers['content-type'];
       // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
       // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
       // const data = await generatePetition(derivedPetition).unwrap();
-      downloadPdf(data, filename);
+      downloadFile(data, filename, filetype);
     } catch (e) {
       if (e?.response?.data) {
         const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
@@ -116,10 +117,6 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
   if (!petition) {
     return null;
   }
-
-  const _buildPetition = () => ({
-    documents: selectedDocuments,
-  });
 
   const disabledReason = getErrorList(petition.can_generate?.petition ?? {});
   if (selectedDocuments.length === 0) {

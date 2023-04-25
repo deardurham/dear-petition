@@ -12,6 +12,7 @@ services:
     depends_on:
       - postgres
     volumes:
+      - ./:/code/
       - ./dear_petition:/code/dear_petition
       - ./config:/code/config
     env_file:
@@ -66,4 +67,6 @@ services:
     depends_on:
       - postgres
       - redis
-    command: jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root --no-browser
+    volumes:
+      - ./:/code/
+    command: jupyter-lab --NotebookApp.token='' --no-browser --allow-root --ip 0.0.0.0

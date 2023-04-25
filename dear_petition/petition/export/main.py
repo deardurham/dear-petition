@@ -1,4 +1,5 @@
 import io
+import zipfile
 from .annotate import add_pdf_template_annotations
 from .forms import (
     AOCFormCR287,
@@ -10,6 +11,7 @@ from .forms import (
 from .writer import concatenate_pdf_streams, write_template_and_annotations_to_stream
 
 from dear_petition.petition import constants
+from dear_petition.petition.export.documents import addendums
 
 
 __all__ = ("generate_petition_pdf",)
@@ -29,7 +31,7 @@ def build_pdf_template_context(petition_document, extra):
         form_type = constants.DATA_PETITION
     else:
         form_type = petition_document.form_type
-    assert form_type in FORM_TYPE_MAP, 'Invalid form type provided'
+    assert form_type in FORM_TYPE_MAP, "Invalid form type provided"
     Form = FORM_TYPE_MAP.get(form_type)
     form = Form(petition_document, extra=extra)
     form.build_form_context()
@@ -43,9 +45,42 @@ def generate_petition_pdf(petition_documents, extra):
         doc_stream = io.BytesIO()
         context = build_pdf_template_context(petition_document, extra)
         add_pdf_template_annotations(context)
-        write_template_and_annotations_to_stream(doc_stream, context, petition_document.form_type)
+        write_template_and_annotations_to_stream(
+            doc_stream, context, petition_document.form_type
+        )
         doc_streams.append(doc_stream)
     concatenate_pdf_streams(doc_streams, pdf_stream)
     for doc_stream in doc_streams:
         doc_stream.close()
     return pdf_stream
+
+
+ADDENDUM_DOCUMENT_GENERATION_MAP = {
+    constants.ADDENDUM_FORM_TYPES[
+        constants.ADDENDUM_3B
+    ]: addendums.generate_3b_addendum,
+}
+
+
+def generate_addendum_document_file(petition_document, extra):
+    assert petition_document.form_type in constants.ADDENDUM_FORM_TYPES
+    addendum_document_file_generator = ADDENDUM_DOCUMENT_GENERATION_MAP[
+        petition_document.form_type
+    ]
+    doc = addendum_document_file_generator(petition_document, extra)
+
+    file_stream = io.BytesIO()
+    doc.save(file_stream)
+
+    return file_stream
+
+
+def create_zip_file(files, filenames):
+    zip_file = io.BytesIO()
+    with zipfile.ZipFile(zip_file, mode="w") as ziparchive:
+        for file, filename in zip(files, filenames):
+            file.seek(0)
+            ziparchive.writestr(filename, file.read())
+
+    zip_file.seek(0)
+    return zip_file
