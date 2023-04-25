@@ -244,7 +244,7 @@ def test_expungable_summary_context__different_severities(batch, contact1, clien
     assert offense_records[1]["disposition"] == VERDICT_CODE_GUILTY
 
 
-def test_expungable_summary_context__disposition_codes(batch, contact1):
+def test_expungable_summary_context__disposition_codes(batch):
     """
     Test generate_context method where the disposition code comes from the disposition map, the verdict map, and isn't
     found in either map.
@@ -258,7 +258,9 @@ def test_expungable_summary_context__disposition_codes(batch, contact1):
     offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "03CR000001", "1972-12-31", "", "not found")
     create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="E. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
