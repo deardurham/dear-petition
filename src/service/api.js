@@ -74,9 +74,7 @@ export const api = createApi({
       query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
       invalidatesTags: (result, _err, { id }) => {
         const tags = [{ type: 'Batch', id }];
-        if (result?.petitions) {
-          tags.concat(result.petitions.map(({ pk }) => [{ type: 'Petition', id: pk }]));
-        }
+        result?.petitions?.forEach(({ pk }) => tags.push({ type: 'Petition', id: pk }));
         return tags;
       },
     }),
