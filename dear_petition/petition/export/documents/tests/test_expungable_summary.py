@@ -7,6 +7,7 @@ from dear_petition.petition.tests.factories import (
 )
 from dear_petition.petition.constants import (
     DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     DISTRICT_COURT,
     SUPERIOR_COURT,
     VERDICT_GUILTY,
@@ -130,10 +131,11 @@ def test_expungable_summary_context__many_offense_records(batch):
     assert offense_records[2]["file_no"] == "12CR000001"
 
 
-def test_expungable_summary_context__exclude_superseding_indictment(batch):
+@pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
+def test_expungable_summary_context__excluded_disp_method(batch, disp_method):
     """
-    Test generate_context method where one offense record has an offense with a disposition "SUPERSEDING INDICTMENT OR
-    PROCESS". That offense record should be excluded.
+    Test generate_context method where one offense record belongs to an offense with an excluded disposition method.
+    That offense record should be excluded.
     """
     ciprs_record = CIPRSRecordFactory(
         county="DURHAM",
@@ -145,12 +147,12 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch):
         arrest_date="2001-10-01"
     )
 
-    offense_si = OffenseFactory(
+    offense_excluded = OffenseFactory(
         ciprs_record=ciprs_record,
-        disposition_method=DISP_METHOD_SUPERSEDING_INDICTMENT,
+        disposition_method=disp_method,
         disposed_on="2003-10-02"
     )
-    OffenseRecordFactory(offense=offense_si)
+    OffenseRecordFactory(offense=offense_excluded)
 
     offense_npc = OffenseFactory(
         ciprs_record=ciprs_record,
@@ -168,7 +170,7 @@ def test_expungable_summary_context__exclude_superseding_indictment(batch):
     first_table = context["tables"][0]
     assert len(first_table["offense_records"]) == 1
 
-    # The offense record should not be the "SUPERSEDING INDICTMENT OR PROCESS" one.
+    # The offense record should not be the excluded one.
     first_offense_record = first_table["offense_records"][0]
     assert first_offense_record["disposition"] == "NPC"
 
@@ -313,14 +315,14 @@ def create_offense_record(offense, action, description, severity):
     return offense_record
 
 
-def create_offense(batch, county, jursidiction, file_no, dob, verdict, disposition_method):
+def create_offense(batch, county, jurisdiction, file_no, dob, verdict, disposition_method):
     """
     Create offense
     """
     ciprs_record = CIPRSRecordFactory(
         batch=batch,
         county=county,
-        jurisdiction=jursidiction,
+        jurisdiction=jurisdiction,
         file_no=file_no,
         dob=dob,
         offense_date="2001-09-30",

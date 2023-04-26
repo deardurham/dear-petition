@@ -10,6 +10,7 @@ from dear_petition.petition.constants import (
     VERDICT_CODE_MAP,
     JURISDICTION_MAP,
     DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     VERDICT_GUILTY,
     CHARGED,
 )
@@ -73,12 +74,10 @@ def generate_context(batch, attorney, client):
 
 def __get_offenses(batch):
     """
-    Get offenses for the batch. Exclude offenses that have a disposition method "SUPERSEDING INDICTMENT OR PROCESS".
+    Get offenses for the batch.
     """
     offenses = pm.Offense.objects.filter(
         ciprs_record__batch=batch
-    ).exclude(
-        disposition_method=DISP_METHOD_SUPERSEDING_INDICTMENT
     ).select_related("ciprs_record__batch")
 
     return offenses

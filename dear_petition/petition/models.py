@@ -36,7 +36,10 @@ from .constants import (
     DATETIME_FORMAT,
     FORM_TYPES,
     CHARGED,
+    DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     VERDICT_GUILTY_TO_LESSER,
+    VERDICT_PRAYER_FOR_JUDGMENT,
     VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
@@ -124,7 +127,8 @@ class Offense(PrintableModelMixin, models.Model):
         """
         Return true if convicted of the charged offense.
         """
-        return self.verdict in [pc.VERDICT_GUILTY, pc.VERDICT_RESPONSIBLE] and self.has_equivalent_offense_records()
+        convicted_verdicts = [pc.VERDICT_GUILTY, pc.VERDICT_PRAYER_FOR_JUDGMENT, pc.VERDICT_RESPONSIBLE]
+        return self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
 
     def is_guilty_to_lesser(self):
         """
@@ -190,9 +194,12 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     @property
     def is_visible(self):
         """
-        Return false if this is a CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise,
-        return true.
+        Return false if offense's disposition method is an excluded disposition method. Return false if this is a
+        CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise, return true.
         """
+        if self.offense.disposition_method in [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]:
+            return False
+
         return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
 
 

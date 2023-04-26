@@ -8,8 +8,11 @@ from dear_petition.petition.constants import (
     DISMISSED,
     DISTRICT_COURT,
     DURHAM_COUNTY,
+    DISP_METHOD_SUPERSEDING_INDICTMENT,
+    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     VERDICT_GUILTY,
     VERDICT_GUILTY_TO_LESSER,
+    VERDICT_PRAYER_FOR_JUDGMENT,
     VERDICT_RESPONSIBLE,
     VERDICT_RESPONSIBLE_TO_LESSER,
     CHARGED,
@@ -341,11 +344,11 @@ def test_offense__has_equivalent_offense_records__one_offense_record(offense1):
     assert(not offense1.has_equivalent_offense_records())
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
 def test_offense__is_visible__equivalent(verdict):
     """
-    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records are equivalent.
-    The CHARGED offense record should not be visible and the CONVICTED offense record should be visible.
+    Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
+    are equivalent. The CHARGED offense record should not be visible and the CONVICTED offense record should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
@@ -365,11 +368,11 @@ def test_offense__is_visible__equivalent(verdict):
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
 def test_offense__is_visible__not_equivalent_description(verdict):
     """
-    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have
-    descriptions that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
+    Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
+    have descriptions that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
@@ -389,11 +392,11 @@ def test_offense__is_visible__not_equivalent_description(verdict):
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
 def test_offense__is_visible__not_equivalent_severity(verdict):
     """
-    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and the offense records have serverities
-    that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
+    Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
+    have severities that are not equivalent. The CHARGED and CONVICTED offense records should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
@@ -413,11 +416,11 @@ def test_offense__is_visible__not_equivalent_severity(verdict):
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
 def test_offense__is_visible__one_offense_record(verdict):
     """
-    Test is_visible in Offense when the verdict is GUILTY or RESPONSIBLE and there is only one offense record. It
-    should be visible.
+    Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and there is only one
+    offense record. It should be visible.
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record = OffenseRecordFactory(
@@ -452,6 +455,28 @@ def test_offense__is_visible__not_convicted():
     assert offense_record_charged.is_visible
     assert offense_record_convicted.is_visible
 
+
+@pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
+def test_offense__is_visible__excluded_disp_method(disp_method):
+    """
+    Test is_visible in Offense when the disposition method is excluded. No offense records should be visible.
+    """
+    offense = OffenseFactory(verdict=VERDICT_GUILTY, disposition_method=disp_method)
+    offense_record_charged = OffenseRecordFactory(
+        offense=offense,
+        action=CHARGED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+    offense_record_convicted = OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+
+    assert not offense_record_charged.is_visible
+    assert not offense_record_convicted.is_visible
 
 def test_offense__disposition__no_verdict():
     """
