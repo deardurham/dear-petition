@@ -1,5 +1,7 @@
 import logging
 from django.urls import reverse
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
@@ -11,10 +13,9 @@ from dear_petition.petition.models import (
     Petition,
     PetitionDocument,
 )
-from dear_petition.petition.constants import ATTACHMENT, DISMISSED
-from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from localflavor.us import us_states
+from dear_petition.petition.constants import ATTACHMENT, DISMISSED, UNDERAGED_CONVICTIONS
+
+from .fields import ValidationField
 
 
 logger = logging.getLogger(__name__)
@@ -117,6 +118,7 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.ModelSerializer):
     formatted_address = serializers.SerializerMethodField()
+    user = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
 
     def get_formatted_address(self, contact_obj):
         lines = [contact_obj.address1]
@@ -136,11 +138,66 @@ class ContactSerializer(serializers.ModelSerializer):
             "city",
             "state",
             "zipcode",
+            "user",
         ]
+
+class ClientSerializer(ContactSerializer):
+    address1 = serializers.CharField(required=True)
+    city = serializers.CharField(required=True)
+    state = serializers.CharField(required=True)
+    zipcode = serializers.CharField(required=True)
+
+
+class GeneratePetitionSerializer(serializers.Serializer):
+
+    documents = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=PetitionDocument.objects.all()
+    )
+
+    petition = serializers.PrimaryKeyRelatedField(queryset=Petition.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def validate_documents(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError(
+                "There are no documents selected for download for the petition document."
+            )
+        petition_id = self.get_initial().get('petition')
+        for doc in value:
+            if doc.petition.pk != petition_id:
+                raise serializers.ValidationError('Documents must be associated with this petition.')
+        return value
+
+    def validate_petition(self, value):
+        errors = {}
+        if not value.batch.client:
+            errors['client'] = ["A client has not been selected for this batch."]
+        if not value.batch.attorney:
+            errors['attorney'] = ["An attorney has not been selected for this batch."]
+        if not value.agencies.exists():
+            errors['agencies'] = ["There are no agencies selected for the petition."]
+        if not value.get_all_offense_records(filter_active=True, include_annotations=False).exists():
+            if value.form_type == UNDERAGED_CONVICTIONS:
+                errors[UNDERAGED_CONVICTIONS] = [
+                    'Additional verification is needed to include offense records in this petition form'
+                ]
+            else:
+                errors['offense records'] = [
+                    'There are no records selected for the petition document.',
+                    'Please review the list of offense records and update the petition to include offense records if needed.'
+                ]
+        if errors:
+            raise serializers.ValidationError(errors)
 
 
 class PetitionSerializer(serializers.ModelSerializer):
     jurisdiction = serializers.CharField(source="get_jurisdiction_display")
+    generation_errors = ValidationField(serializer=GeneratePetitionSerializer)
+
+    def get_generation_errors_data(self, obj):
+        return {'documents': obj.documents.all().values_list('pk', flat=True), 'petition': obj.pk}
 
     class Meta:
         model = Petition
@@ -151,6 +208,8 @@ class PetitionSerializer(serializers.ModelSerializer):
             "jurisdiction",
             "offense_records",
             "agencies",
+            "documents",
+            "generation_errors",
         ]
 
 
@@ -209,10 +268,28 @@ class ParentPetitionSerializer(PetitionSerializer):
         ).values_list("id", flat=True)
 
 
+class GenerateDocumentSerializer(serializers.Serializer):
+
+    batch = serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
+
+    def validate_batch(self, value):
+        errors = []
+        if not value.client:
+            errors.append("A client has not been selected for this batch.")
+        if not value.attorney:
+            errors.append("An attorney has not been selected for this batch.")
+        if errors:
+            raise serializers.ValidationError(errors)
+
+
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    parser_mode = serializers.IntegerField(default=1)
+    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+
+    def get_generate_errors_data(self, obj):
+        return {'batch': obj.pk}
 
     class Meta:
         model = Batch
@@ -223,14 +300,30 @@ class BatchSerializer(serializers.ModelSerializer):
             "user",
             "records",
             "petitions",
-            "parser_mode",
+            "automatic_delete_date",
+            "generate_letter_errors",
+            "generate_summary_errors",
         ]
-        read_only_fields = ["user"]
+        read_only_fields = ["user", "automatic_delete_date"]
 
 
 class BatchDetailSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = serializers.SerializerMethodField()
+    attorney_id = serializers.PrimaryKeyRelatedField(
+        source='attorney', queryset=Contact.objects.filter(category='attorney'), write_only=True, required=False
+    )
+    attorney = ContactSerializer(read_only=True)
+    client_id = serializers.PrimaryKeyRelatedField(
+        source='client', queryset=Contact.objects.filter(category='client'), write_only=True, required=False
+    )
+    client = ClientSerializer(read_only=True)
+
+    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+
+    def get_generate_errors_data(self, obj):
+        return {'batch': obj.pk}
 
     class Meta:
         model = Batch
@@ -241,8 +334,14 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "user",
             "records",
             "petitions",
+            "attorney",
+            "attorney_id",
+            "client",
+            "client_id",
+            "generate_letter_errors",
+            "generate_summary_errors",
         ]
-        read_only_fields = ["user"]
+        read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 
     def get_petitions(self, instance):
         """Return sorted and structured petitions with associated attachments"""
@@ -279,45 +378,6 @@ class MyInboxSerializer(serializers.ModelSerializer):
     def get_total_ciprs_records(self, instance):
         # workaround for multiple table annotation failure: https://code.djangoproject.com/ticket/10060
         return instance.records.count()
-
-
-class GeneratePetitionSerializer(serializers.Serializer):
-
-    documents = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=PetitionDocument.objects.all()
-    )
-    name_petitioner = serializers.CharField(label="Petitioner Name")
-    address1 = serializers.CharField(label="Address Line 1")
-    address2 = serializers.CharField(
-        label="Address Line 2", required=False, allow_blank=True
-    )
-    city = serializers.CharField(label="City")
-    state = serializers.ChoiceField(choices=us_states.US_STATES)
-    zip_code = serializers.CharField(label="Zip Code")
-    attorney = serializers.ChoiceField(choices=[])
-    agencies = serializers.MultipleChoiceField(choices=[])
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["attorney"].choices = Contact.objects.filter(
-            category="attorney"
-        ).values_list("pk", "name")
-        self.fields["agencies"].choices = Contact.objects.filter(
-            category="agency"
-        ).values_list("pk", "name")
-
-    def validate_documents(self, value):
-        if len(value) == 0:
-            raise serializers.ValidationError(
-                "Must select at least one document for pdf generation"
-            )
-        return value
-
-    def validate_attorney(self, value):
-        return Contact.objects.get(pk=value)
-
-    def validate_agencies(self, value):
-        return Contact.objects.filter(pk__in=value)
 
 
 class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):

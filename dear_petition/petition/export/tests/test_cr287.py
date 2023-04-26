@@ -3,19 +3,17 @@ import pytest
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.forms import AOCFormCR287
-from dear_petition.petition.tests.factories import (
-    PetitionFactory,
-    PetitionDocumentFactory,
-)
-from dear_petition.petition.etl.transform import recalculate_petitions
-from dear_petition.petition.export.annotate import Checkbox
+from dear_petition.petition.tests.factories import ClientFactory
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def form(petition_document, extra):
-    return AOCFormCR287(petition_document, extra)
+def form(petition_document, extra, client):
+    form_extra = {}
+    form_extra.update(extra)
+    form_extra['client'] = client
+    return AOCFormCR287(petition_document, form_extra)
 
 
 #
@@ -44,7 +42,7 @@ def test_map_header__district(form):
     assert form.data["Superior"] == ""
 
 
-def test_map_petitioner__file_no(form, record2, offense_record1):
+def test_map_file_no__filenum(form, record2, offense_record1):
     form.map_file_no()
     assert form.data["ConsJdgmntFileNum"] == record2.file_no
 
@@ -53,11 +51,11 @@ def test_map_petitioner__file_no(form, record2, offense_record1):
 # Petitioner
 #
 
-
 def test_map_petitioner__name(form):
-    form.extra["name_petitioner"] = "Test Name"
+    client = ClientFactory(name='Test Name')
+    form.extra['client'] = client
     form.map_petitioner()
-    assert form.data["NamePetitioner"] == form.extra["name_petitioner"]
+    assert form.data["NamePetitioner"] == client.name
 
 
 def test_map_petitioner__race(form, record2, offense_record1):
@@ -78,37 +76,40 @@ def test_map_petitioner__dob(form, record2, offense_record1):
 
 
 def test_map_petitioner__address(form):
-    form.extra["address1"] = "123 Test Pl."
-    form.extra["address2"] = "Apt 404"
+    client = ClientFactory(address1='123 Test St', address2='Apt 404')
+    form.extra['client'] = client
     form.map_petitioner()
-    assert form.data["StreetAddr"] == form.extra["address1"]
-    assert form.data["MailAddr"] == form.extra["address2"]
+    assert form.data["StreetAddr"] == '123 Test St'
+    assert form.data["MailAddr"] == 'Apt 404'
 
 
 def test_map_petitioner__address2_empty(form):
-    form.extra["address1"] = "123 Test Pl."
-    form.extra["address2"] = ""
+    client = ClientFactory(address1='123 Test Pl.', address2='')
+    form.extra["client"] = client
     form.map_petitioner()
-    assert form.data["StreetAddr"] == form.extra["address1"]
-    assert form.data["MailAddr"] == form.extra["address2"]
+    assert form.data["StreetAddr"] == '123 Test Pl.'
+    assert form.data["MailAddr"] == ''
 
 
 def test_map_petitioner__city(form):
-    form.extra["city"] = "Test City"
+    client = ClientFactory(city="Test City")
+    form.extra["client"] = client
     form.map_petitioner()
-    assert form.data["City"] == form.extra["city"]
+    assert form.data["City"] == "Test City"
 
 
 def test_map_petitioner__state(form):
-    form.extra["state"] = constants.NORTH_CAROLINA
+    client = ClientFactory(state=constants.NORTH_CAROLINA)
+    form.extra["client"] = client
     form.map_petitioner()
-    assert form.data["State"] == form.extra["state"]
+    assert form.data["State"] == constants.NORTH_CAROLINA
 
 
 def test_map_petitioner__zip_code(form):
-    form.extra["zip_code"] = "27701"
+    client = ClientFactory(zipcode='27701')
+    form.extra["client"] = client
     form.map_petitioner()
-    assert form.data["ZipCode"] == form.extra["zip_code"]
+    assert form.data["ZipCode"] == '27701'
 
 
 #

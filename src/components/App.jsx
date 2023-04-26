@@ -9,7 +9,6 @@ import ProtectedRoute from './containers/ProtectedRoute';
 
 import { Button } from './elements/Button';
 import Modal from './elements/Modal/Modal';
-import HomePage from './pages/HomePage/HomePage';
 import GenerationPage from './pages/GenerationPage/GenerationPage';
 import FAQPage from './pages/HelpPage/HelpPage';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -17,6 +16,7 @@ import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
 import UsersPage from './pages/UsersPage/UsersPage';
 import AgenciesPage from './pages/AgenciesPage';
+import { Dashboard } from './pages/Dashboard';
 
 const WarningModal = styled(Modal)`
   width: 500px;
@@ -71,7 +71,7 @@ function App() {
             </Route>
             <ProtectedRoute exact path="/">
               <>
-                <HomePage />
+                <Dashboard />
                 <BrowserWarning showWarning={showWarning} hideModal={hideModal} />
               </>
             </ProtectedRoute>

@@ -27,17 +27,17 @@ def get_county_string(counties: list):
         return ", ".join(counties[0:-1]) + ", and " + counties[-1]
 
 
-def generate_context(batch, contact, petitioner_info):
+def generate_context(batch, attorney, client):
     context = {}
     context["first_name"], context["last_name"] = helpers.split_first_and_last_name(
-        batch.label
+        client.name
     )
     context["sex"] = batch.sex
-    context["address"] = petitioner_info["address1"]
-    context["address_second_line"] = petitioner_info["address2"]
-    context["city"] = petitioner_info["city"]
-    context["state"] = petitioner_info["state"]
-    context["zipcode"] = petitioner_info["zipCode"]
+    context["address"] = client.address1
+    context["address_second_line"] = client.address2
+    context["city"] = client.city
+    context["state"] = client.state
+    context["zipcode"] = client.zipcode
 
     felonies = pm.OffenseRecord.objects.filter(
         offense__ciprs_record__batch=batch, severity="FELONY"
@@ -73,16 +73,17 @@ def generate_context(batch, contact, petitioner_info):
     )
     context["dismissed_counties_string"] = get_county_string(dismissed_counties)
 
-    context["phone_number"] = contact.phone_number
-    context["email"] = contact.email
-    context["attorney_name"] = contact.name
+    context["phone_number"] = attorney.phone_number
+    context["email"] = attorney.email
+    context["attorney_name"] = attorney.name
 
     return context
 
 
-def generate_advice_letter(batch, contact, petitioner_info):
+def generate_advice_letter(batch):
+    assert batch.client is not None and batch.attorney is not None, 'Client and attorney must be set for batch before generating document'
 
-    context = generate_context(batch, contact, petitioner_info)
+    context = generate_context(batch, batch.attorney, batch.client)
     doc = DocxTemplate(settings.TEMPLATE_DIR.path(TEMPLATE))
     doc.render(context)
 

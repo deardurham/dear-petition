@@ -9,6 +9,7 @@ from dear_petition.petition.constants import CHARGED, CONVICTED, FEMALE
 from dear_petition.petition.tests.factories import (
     BatchFactory,
     CIPRSRecordFactory,
+    ClientFactory,
     PetitionFactory,
     PetitionOffenseRecordFactory,
     PetitionDocumentFactory,
@@ -161,6 +162,17 @@ def contact3():
         city="Durham",
         state="NC",
         zipcode="27703",
+    )
+
+@pytest.fixture
+def client():
+    return ClientFactory(
+        name='Test Name',
+        address1='123 Test Ct',
+        address2='Apt A',
+        city='Durham',
+        state='NC',
+        zipcode='27701',
     )
 
 

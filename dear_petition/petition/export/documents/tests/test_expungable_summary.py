@@ -3,7 +3,7 @@ from datetime import date
 
 from dear_petition.petition.export.documents.expungable_summary import generate_context
 from dear_petition.petition.tests.factories import (
-    CIPRSRecordFactory, OffenseRecordFactory, OffenseFactory,
+    AttorneyFactory, CIPRSRecordFactory, ClientFactory, OffenseRecordFactory, OffenseFactory,
 )
 from dear_petition.petition.constants import (
     DISP_METHOD_SUPERSEDING_INDICTMENT,
@@ -24,16 +24,18 @@ PETITIONER_INFO = {
 }
 
 
-def test_expungable_summary_context__one_table_one_row(batch, contact1):
+def test_expungable_summary_context__one_table_one_row(batch):
     """
     Test generate_context method with one table and one row. Test all data
     """
     offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="A. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
-    assert context["attorney"] == contact1.name
+    assert context["attorney"] == 'A. Tourney'
     assert context["petitioner"] == PETITIONER_INFO["name"]
     assert context["dob"] == "12/31/1972"
     assert context["birthday_18th"] == "12/31/1990"
@@ -54,7 +56,7 @@ def test_expungable_summary_context__one_table_one_row(batch, contact1):
     assert first_offense_record["disposed_on"] == "10/02/2003"
 
 
-def test_expungable_summary_context__many_tables(batch, contact1):
+def test_expungable_summary_context__many_tables(batch):
     """
     Test generate_context method with many tables. Make sure correct number of tables and in correct order.
     """
@@ -70,7 +72,9 @@ def test_expungable_summary_context__many_tables(batch, contact1):
     offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000002", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
     create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="B. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     # there should be one table per unique county, jurisdiction
 
@@ -94,7 +98,7 @@ def test_expungable_summary_context__many_tables(batch, contact1):
     assert third_table["jurisdiction"] == "SUPERIOR COURT"
 
 
-def test_expungable_summary_context__many_offense_records(batch, contact1):
+def test_expungable_summary_context__many_offense_records(batch):
     """
     Test generate_context method with many offense records in a table. Make sure correct number of offense records and
     in correct order.
@@ -111,7 +115,9 @@ def test_expungable_summary_context__many_offense_records(batch, contact1):
     offense4 = create_offense(batch, "WAKE", DISTRICT_COURT, "13CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
     create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="C. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -126,7 +132,7 @@ def test_expungable_summary_context__many_offense_records(batch, contact1):
 
 
 @pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
-def test_expungable_summary_context__excluded_disp_method(batch, contact1, disp_method):
+def test_expungable_summary_context__excluded_disp_method(batch, disp_method):
     """
     Test generate_context method where one offense record belongs to an offense with an excluded disposition method.
     That offense record should be excluded.
@@ -155,7 +161,9 @@ def test_expungable_summary_context__excluded_disp_method(batch, contact1, disp_
     )
     OffenseRecordFactory(offense=offense_npc)
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="D. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     # There should be one table and one offense record
     assert len(context["tables"]) == 1
@@ -167,7 +175,7 @@ def test_expungable_summary_context__excluded_disp_method(batch, contact1, disp_
     assert first_offense_record["disposition"] == "NPC"
 
 
-def test_expungable_summary_context__duplicate(batch, contact1):
+def test_expungable_summary_context__duplicate(batch, contact1, client):
     """
     Test generate_context method with identical charged and convicted offense records that are part of same offense.
     Only one of the two offense records should be included. It doesn't matter which one since they are identical except
@@ -177,7 +185,7 @@ def test_expungable_summary_context__duplicate(batch, contact1):
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
     create_offense_record(offense, CONVICTED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -186,7 +194,7 @@ def test_expungable_summary_context__duplicate(batch, contact1):
     assert len(offense_records) == 1
 
 
-def test_expungable_summary_context__different_descriptions(batch, contact1):
+def test_expungable_summary_context__different_descriptions(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different descriptions) that are
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
@@ -196,7 +204,7 @@ def test_expungable_summary_context__different_descriptions(batch, contact1):
     create_offense_record(offense1, CHARGED, "PWIMSD SCH II CS", "MISDEMEANOR")
     create_offense_record(offense1, CONVICTED, "FELONY POSSESSION OF COCAINE", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -212,7 +220,7 @@ def test_expungable_summary_context__different_descriptions(batch, contact1):
     assert offense_records[1]["disposition"] == VERDICT_CODE_GUILTY
 
 
-def test_expungable_summary_context__different_severities(batch, contact1):
+def test_expungable_summary_context__different_severities(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different severities) that are
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
@@ -222,7 +230,7 @@ def test_expungable_summary_context__different_severities(batch, contact1):
     create_offense_record(offense1, CHARGED, "FLEE/ELUDE ARREST W/MV", "FELONY")
     create_offense_record(offense1, CONVICTED, "FLEE/ELUDE ARREST W/MV", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    context = generate_context(batch, contact1, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -238,7 +246,7 @@ def test_expungable_summary_context__different_severities(batch, contact1):
     assert offense_records[1]["disposition"] == VERDICT_CODE_GUILTY
 
 
-def test_expungable_summary_context__disposition_codes(batch, contact1):
+def test_expungable_summary_context__disposition_codes(batch):
     """
     Test generate_context method where the disposition code comes from the disposition map, the verdict map, and isn't
     found in either map.
@@ -252,7 +260,9 @@ def test_expungable_summary_context__disposition_codes(batch, contact1):
     offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "03CR000001", "1972-12-31", "", "not found")
     create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="E. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     # offense records for Durham District Court
     offense_records = context["tables"][0]["offense_records"]
@@ -271,7 +281,6 @@ def test_expungable_summary_context__disposition_codes(batch, contact1):
 ])
 def test_expungable_summary_context__birthdays(
     batch,
-    contact1,
     dob,
     formatted_dob,
     formatted_18th_bday,
@@ -283,7 +292,9 @@ def test_expungable_summary_context__birthdays(
     offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", dob, "NOT GUILTY", "JURY TRIAL")
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    context = generate_context(batch, contact1, PETITIONER_INFO)
+    attorney = AttorneyFactory(name="E. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
 
     assert context["dob"] == formatted_dob
     assert context["birthday_18th"] == formatted_18th_bday

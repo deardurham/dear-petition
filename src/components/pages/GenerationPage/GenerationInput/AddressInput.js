@@ -69,8 +69,8 @@ export default function AddressInput({ address, setAddress, disabled, errors, on
           disabled={disabled}
           value={zipcode}
           maxLength={5}
-          onChange={(e) => handleChange('zipCode', e.target.value)}
-          errors={!disabled && errors.zipCode}
+          onChange={(e) => handleChange('zipcode', e.target.value)}
+          errors={!disabled && errors.zipcode}
         />
       </Row>
     </>

@@ -177,6 +177,19 @@ class ContactFactory(factory.DjangoModelFactory):
     class Meta:
         model = Contact
 
+class ClientFactory(factory.DjangoModelFactory):
+    category = 'client'
+
+    class Meta:
+        model = Contact
+
+
+class AttorneyFactory(factory.DjangoModelFactory):
+    category = 'attorney'
+
+    class Meta:
+        model = Contact
+
 
 class GeneratedPetitionFactory(factory.DjangoModelFactory):
     form_type = DISMISSED

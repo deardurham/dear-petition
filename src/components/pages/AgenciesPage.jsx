@@ -5,7 +5,7 @@ import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
 import PageBase from './PageBase';
 import { useAgenciesQuery } from '../../service/api';
 import AgenciesTable from '../../features/AgenciesManagement/AgenciesTable';
-import { CreateAgencyModal } from '../../features/AgenciesManagement/CreateAgency';
+import { CreateAgencyModal } from '../../features/CreateContact';
 import { ModalButton } from '../elements/Button';
 import Select from '../elements/Input/Select';
 import SearchInput from '../elements/ManagementTable/SearchInput';

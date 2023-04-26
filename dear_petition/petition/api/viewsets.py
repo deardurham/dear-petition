@@ -34,10 +34,10 @@ from dear_petition.petition.export import (
 )
 from dear_petition.users.models import User
 from dear_petition.petition.export.documents.advice_letter import (
-    generate_advice_letter as generate_advice_letter,
+    generate_advice_letter
 )
 from dear_petition.petition.export.documents.expungable_summary import (
-    generate_expungable_summary as generate_expungable_summary,
+    generate_expungable_summary
 )
 
 logger = logging.getLogger(__name__)
@@ -137,7 +137,6 @@ class ContactSearchFilter(filters.SearchFilter):
 class ContactViewSet(viewsets.ModelViewSet):
 
     queryset = pm.Contact.objects.all()
-    serializer_class = serializers.ContactSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
     filterset_fields = {
@@ -148,6 +147,22 @@ class ContactViewSet(viewsets.ModelViewSet):
     search_fields = ["name"]
     ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
     ordering = ["name"]
+
+    def get_serializer_class(self):
+        if self.request.data.get('category') == 'client':
+            return serializers.ClientSerializer
+        return serializers.ContactSerializer
+
+    def get_queryset(self):
+        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+            return pm.Contact.objects.filter(user=self.request.user)
+        return pm.Contact.objects.all()
+
+    def perform_create(self, serializer):
+        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()
 
     @action(detail=False, methods=["get"])
     def get_filter_options(self, request):
@@ -172,6 +187,10 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ['user']
+    ordering_fields = ['date_uploaded']
+    ordering = ['-date_uploaded']
 
     def get_serializer_class(self):
         """Use a custom serializer when accessing a specific batch"""
@@ -195,9 +214,8 @@ class BatchViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
-        parser_mode = serializer.data["parser_mode"]
         batch = import_ciprs_records(
-            files=files, user=self.request.user, parser_mode=parser_mode
+            files=files, user=self.request.user, parser_mode=constants.PARSER_MODE
         )
         return {"id": batch.pk}
 
@@ -211,13 +229,13 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def generate_advice_letter(self, request, pk):
-        petitioner_info = request.data["petitionerData"]
-        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
         batch = self.get_object()
+        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/advice_letter.docx"
-            advice_letter = generate_advice_letter(batch, contact, petitioner_info)
+            advice_letter = generate_advice_letter(batch)
             advice_letter.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
@@ -233,15 +251,13 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def generate_expungable_summary(self, request, pk):
-        petitioner_info = request.data["petitionerData"]
-        contact = pm.Contact.objects.get(pk=request.data["attorney"]["pk"])
         batch = self.get_object()
+        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             filepath = tmpdir + "/expungable_summary.docx"
-            expungable_summary = generate_expungable_summary(
-                batch, contact, petitioner_info
-            )
+            expungable_summary = generate_expungable_summary(batch)
             expungable_summary.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
@@ -268,13 +284,14 @@ class MyInboxView(generics.ListAPIView):
 class PetitionViewSet(viewsets.ModelViewSet):
     queryset = pm.Petition.objects.all()
     serializer_class = serializers.ParentPetitionSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        response = self.perform_create(serializer)
+        self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(response, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         detail=True,
@@ -323,8 +340,14 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def generate_petition_pdf(self, request, pk=None):
-        serializer = serializers.GeneratePetitionSerializer(data=request.data)
+        petition = self.get_object()
+
+        request_data = request.data.copy()
+        request_data['petition'] = petition.pk
+        serializer = serializers.GeneratePetitionSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
+
+        client = petition.batch.client
 
         petition_documents = pm.PetitionDocument.objects.filter(
             petition=pk,
@@ -334,8 +357,13 @@ class PetitionViewSet(viewsets.ModelViewSet):
         assert (
             len(petition_documents) > 0
         ), "Petition documents could not be found for petition"
+
+        form_context = serializer.validated_data.copy()
+        form_context['client'] = client
+        form_context['attorney'] = petition.batch.attorney
+        form_context['agencies'] = petition.agencies
         generated_petition_pdf = generate_petition_pdf(
-            petition_documents, serializer.data
+            petition_documents, form_context
         )
 
         for doc in petition_documents.iterator():
@@ -349,7 +377,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
         petition = self.get_object()
         petition_filename = utils.get_petition_filename(
-            serializer.data["name_petitioner"], petition, "pdf"
+            client.name, petition, "pdf"
         )
         if addendum_documents.exists():
             docs = [
@@ -364,7 +392,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
                 )
                 docs.append(doc)
                 filename = utils.get_petition_filename(
-                    serializer.data["name_petitioner"],
+                    client.name,
                     petition,
                     "docx",
                     addendum_document=addendum_document,
@@ -375,7 +403,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
             resp = FileResponse(zip_file)
             resp["Content-Type"] = "application/zip"
             filename = utils.get_petition_filename(
-                serializer.data["name_petitioner"], petition, "zip"
+                client.name, petition, "zip"
             )
             resp["Content-Disposition"] = f'attachment; filename="{filename}"'
         else:
@@ -389,6 +417,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
 class GenerateDataPetitionView(viewsets.ModelViewSet):
 
     serializer_class = serializers.DataPetitionSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

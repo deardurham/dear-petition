@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import Autosuggest from 'react-autosuggest';
-
-import { Badge } from '../Badge/Badge';
 import AutoSuggestInput from '../AutoSuggest/AutoSuggestInput';
 import useDebounce from '../../../hooks/useDebounce';
 
@@ -26,7 +24,7 @@ const SuggestionContainer = ({ containerProps: { className, ...restProps }, chil
   <div
     className={cx(
       className,
-      { 'border-2 border-gray-800 rounded-md absolute z-10': !!children },
+      { 'max-w-[300px] border-2 border-gray-800 rounded-md absolute z-10': !!children },
       '[&>ul]:divide-gray-800 [&>ul]:divide-y w-full'
     )}
     {...restProps}
@@ -40,27 +38,24 @@ const renderSuggestion = (suggestion, { isHighlighted }) => (
 );
 
 const renderAutoSuggestInput = (inputProps, label) => (
-  <div className="flex flex-col w-[250px] items-start mb-1">
+  <div className="flex flex-col items-start mb-1">
     <AutoSuggestInput
       label={label}
-      innerClassName="w-full p-2"
+      innerClassName="w-full p-2 rounded-sm"
       {...inputProps}
-      className="w-[250px]"
       type="search"
     />
   </div>
 );
 
 const AutocompleteInput = ({
-  selections,
+  className,
   onSelect,
-  onRemoveSelection,
   fetchSuggestions,
   highlightFirstSuggestion,
   label,
   getSuggestionLabel,
   placeholder = '',
-  showSelections = false,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionValue, setSuggestionValue] = useState('');
@@ -97,7 +92,7 @@ const AutocompleteInput = ({
   };
   return (
     <div>
-      <div className="flex flex-col w-[300px]">
+      <div className="flex flex-col">
         <Autosuggest
           suggestions={suggestions}
           onSuggestionsFetchRequested={handleSuggestionFetch}
@@ -114,25 +109,17 @@ const AutocompleteInput = ({
           onSuggestionSelected={handleSuggestionSelected}
           highlightFirstSuggestion={highlightFirstSuggestion ?? false}
           renderInputComponent={(autoSuggestInputProps) =>
-            renderAutoSuggestInput(autoSuggestInputProps, label)
+            renderAutoSuggestInput(
+              {
+                ...autoSuggestInputProps,
+                className: cx(autoSuggestInputProps?.className, className),
+              },
+              label
+            )
           }
           renderSuggestionsContainer={(props) => <SuggestionContainer {...props} />}
         />
       </div>
-      {showSelections && (
-        <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
-          {selections.map((selection, i) => {
-            const selectionLabel = getSuggestionLabel ? getSuggestionLabel(selection) : selection;
-            return (
-              <Badge
-                key={`${i}_${selectionLabel}`}
-                name={selectionLabel}
-                remove={() => onRemoveSelection(selection)}
-              />
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };

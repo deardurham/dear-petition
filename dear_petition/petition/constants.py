@@ -1,5 +1,7 @@
 from model_utils import Choices
 
+PARSER_MODE = 2
+
 DISTRICT_COURT = "D"
 SUPERIOR_COURT = "S"
 NOT_AVAILABLE = "N/A"
@@ -27,7 +29,7 @@ SEX_CHOICES = Choices(
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
-CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"))
+CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"

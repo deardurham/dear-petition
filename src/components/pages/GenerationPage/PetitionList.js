@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
-import Axios from '../../../service/axios';
+import { manualAxiosRequest } from '../../../service/axios';
 import { TABLET_LANDSCAPE_SIZE } from '../../../styles/media';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elements/Table';
 import useWindowSize from '../../../hooks/useWindowSize';
@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDownload,
   faChevronDown,
-  faBook,
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
@@ -19,6 +18,8 @@ import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
 import { SelectDocumentsModal } from '../../../features/SelectDocuments';
+import { downloadFile } from '../../../util/downloadFile';
+import { getErrorList } from '../../../util/errors';
 
 function ActionButton({
   className,
@@ -52,25 +53,11 @@ const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10]
   </Tooltip>
 );
 
-const NO_ACTIVE_RECORDS = [
-  'There are no records selected for the petition document.',
-  'Please review the list of offense records and update the petition to include offense records if needed.',
-];
-
-const NO_AGENCIES_SELECTED = ['There are no agencies selected for the petition document.'];
-
 const NO_DOCUMENTS_SELECTED = [
-  'There are no documents selected for download for the petition document.',
+  'Documents: There are no documents selected for download for the petition document.',
 ];
 
-function PetitionRow({
-  attorney,
-  petitionData,
-  petitionerData,
-  validateInput,
-  backgroundColor,
-  setFormErrors,
-}) {
+function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErrors }) {
   const [error, setError] = useState('');
   const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
   const [prevPetition, setPrevPetition] = useState(petition);
@@ -85,33 +72,21 @@ function PetitionRow({
     setPrevPetition(petition);
   }
 
-  const downloadFile = (data, filename, filetype) => {
-    const fileBlob = new Blob([data], { type: filetype });
-    const url = window.URL.createObjectURL(fileBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    setTimeout(() => {
-      window.URL.revokeObjectURL(url);
-      link.remove();
-    });
-  };
-
   const handleGenerate = async () => {
     if (!validateInput()) {
       return;
     }
-    const derivedPetition = _buildPetition();
     try {
       setError('');
-      const { data, headers } = await Axios.post(
-        `/petitions/${petitionData.pk}/generate_petition_pdf/`,
-        derivedPetition,
-        {
-          responseType: 'arraybuffer',
-        }
-      );
+      const { data, meta } = await manualAxiosRequest({
+        url: `/petitions/${petitionData.pk}/generate_petition_pdf/`,
+        data: {
+          documents: selectedDocuments,
+        },
+        responseType: 'arraybuffer',
+        method: 'post',
+      });
+      const { headers } = meta.response;
       // content-disposition: 'inline; filename="petition.pdf"'
       const filename =
         headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
@@ -123,7 +98,7 @@ function PetitionRow({
     } catch (e) {
       if (e?.response?.data) {
         const errorData = await JSON.parse(new TextDecoder().decode(e.response.data));
-        const { attorney: attorneyError, name, address1, city, state, zipCode } = errorData;
+        const { attorney: attorneyError, name, address1, city, state, zipcode } = errorData;
         setFormErrors((prevErrors) => ({
           ...prevErrors,
           attorney: attorneyError,
@@ -131,7 +106,7 @@ function PetitionRow({
           address1,
           city,
           state,
-          zipCode,
+          zipcode,
         }));
         return;
       }
@@ -143,41 +118,18 @@ function PetitionRow({
     return null;
   }
 
-  const _buildPetition = () => ({
-    documents: selectedDocuments,
-    name_petitioner: petitionerData.name,
-    address1: petitionerData.address1,
-    address2: petitionerData.address2,
-    city: petitionerData.city,
-    state: petitionerData.state.value,
-    zip_code: petitionerData.zipCode,
-    attorney: attorney.pk,
-    agencies: petition.agencies.map((agency) => agency.pk),
-  });
-
-  const getDisabledMessage = () => {
-    if (petition.active_records.length === 0) {
-      const message = [...NO_ACTIVE_RECORDS];
-      if (petition.form_type === 'AOC-CR-293') {
-        message.push(
-          'AOC-CR-293: Additional verification is needed to include offense records in this petition form'
-        );
-      }
-      return message;
-    }
-    if (petition.agencies.length === 0) {
-      return NO_AGENCIES_SELECTED;
-    }
-    if (selectedDocuments.length === 0) {
-      return NO_DOCUMENTS_SELECTED;
-    }
-    return null;
-  };
-
-  const disabledReason = getDisabledMessage();
+  const disabledReason = getErrorList(petition.generation_errors?.petition ?? {});
+  if (selectedDocuments.length === 0) {
+    disabledReason.push(NO_DOCUMENTS_SELECTED);
+  }
+  const isDisabled = disabledReason.length > 0;
   const disabledTooltipContent = (
-    <div className="flex flex-col gap-2">
-      {disabledReason?.map((line) => <span key={line}>{line}</span>) || error}
+    <div className="flex flex-col gap-2 max-w-[750px]">
+      {disabledReason.map((line) => (
+        <span key={line} className="whitespace-normal">
+          {line}
+        </span>
+      )) || error}
     </div>
   );
   const areALlDocumentsSelected = selectedDocuments.length === allDocuments.length;
@@ -215,7 +167,6 @@ function PetitionRow({
         <TableCell>
           {/* TODO: Add a flag icon when agencies are not added or underaged convictions are present */}
           <ActionButton
-            collapsedIcon={faBook}
             className="w-[120px]"
             label={
               areALlDocumentsSelected
@@ -228,26 +179,19 @@ function PetitionRow({
         </TableCell>
         <TableCell>
           <div className="flex justify-end items-center h-full gap-4 ">
-            <Tooltip
-              tooltipContent={disabledTooltipContent}
-              hideTooltip={!disabledReason && !error}
-            >
+            <Tooltip tooltipContent={disabledTooltipContent} hideTooltip={!isDisabled && !error}>
               <FontAwesomeIcon
-                className={cx('text-[24px] text-red', { invisible: !disabledReason && !error })}
+                className={cx('text-[24px] text-red', { invisible: !isDisabled && !error })}
                 icon={faExclamationTriangle}
               />
             </Tooltip>
-            <button
-              type="button"
-              onClick={() => handleGenerate(petition)}
-              disabled={!!disabledReason}
-            >
+            <button type="button" onClick={() => handleGenerate(petition)} disabled={isDisabled}>
               <FontAwesomeIcon
                 title="Download Documents"
                 icon={faDownload}
                 className={cx('text-[24px]', {
-                  'text-blue-primary': !disabledReason,
-                  'text-gray': !!disabledReason,
+                  'text-blue-primary': !isDisabled,
+                  'text-gray': isDisabled,
                 })}
               />
             </button>
@@ -268,6 +212,7 @@ function PetitionRow({
         petitionId={petition.pk}
         documents={allDocuments}
         selectedDocuments={selectedDocuments}
+        hasExistingDocuments={false}
         onAddDocument={(newPk) => setSelectedDocuments((prevList) => [...prevList, newPk])}
         onRemoveDocument={(removePk) =>
           setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))
@@ -279,13 +224,7 @@ function PetitionRow({
   );
 }
 
-export default function PetitionList({
-  attorney,
-  petitions,
-  petitionerData,
-  validateInput,
-  setFormErrors,
-}) {
+export default function PetitionList({ petitions, validateInput, setFormErrors }) {
   return (
     <Table className="text-[1.7rem]" columnSizes="4fr 4fr 3fr 3fr 3fr 3fr 2fr">
       <TableHeader>
@@ -304,8 +243,6 @@ export default function PetitionList({
           <PetitionRow
             key={petition.pk}
             petitionData={petition}
-            petitionerData={petitionerData}
-            attorney={attorney}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}
             setFormErrors={setFormErrors}

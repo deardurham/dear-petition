@@ -8,10 +8,12 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import JSONField
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import IntegerField, Case, When, Value
+from django.db.models import IntegerField, Case, When, Value, signals
 from django.db.models.functions import Cast, Substr, Concat
+from django.dispatch import receiver
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from django.utils import timezone
@@ -219,7 +221,7 @@ class OffenseRecord(PrintableModelMixin, models.Model):
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(
-        max_length=16, choices=CONTACT_CATEGORIES, default="agency"
+        max_length=16, choices=CONTACT_CATEGORIES
     )
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
@@ -228,6 +230,15 @@ class Contact(PrintableModelMixin, models.Model):
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
+
+    user = models.ForeignKey(
+        User,
+        related_name="clients",
+        null=True,
+        default=None,
+        on_delete=models.CASCADE,
+        help_text="The user associated with this contact, if applicable"
+    )
 
     def __str__(self):
         return self.name
@@ -240,6 +251,21 @@ class Batch(PrintableModelMixin, models.Model):
     user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
     emails = models.ManyToManyField(
         "sendgrid.Email", related_name="batches", blank=True
+    )
+    attorney = models.ForeignKey(
+        Contact,
+        related_name='+',
+        null=True,
+        default=None,
+        limit_choices_to={'category': 'attorney'},
+        on_delete=models.SET_NULL
+    )
+    client = models.ForeignKey(
+        Contact,
+        related_name="batches",
+        null=True,
+        limit_choices_to={'category': 'client'},
+        on_delete=models.SET_NULL
     )
 
     class Meta:
@@ -315,6 +341,29 @@ class Batch(PrintableModelMixin, models.Model):
         return self.date_uploaded + timedelta(
             hours=settings.CIPRS_RECORD_LIFETIME_HOURS
         )
+
+@receiver(signals.post_delete, sender=Batch)
+def cleanup_batch_client_on_delete(sender, instance, **kwargs):
+    """ If the client has no relevant batches, delete the client """
+    try:
+        if instance.client and len(instance.client.batches.all()) == 0:
+            instance.client.delete()
+    except Contact.DoesNotExist:
+        pass
+
+@receiver(signals.pre_save, sender=Batch)
+def cleanup_batch_client_pre_save(sender, instance, **kwargs):
+    """ If the previous client on the batch is no longer used, delete the client """
+    if not instance.id:
+        # skip if creating batch
+        return
+    prev_client = Batch.objects.get(pk=instance.id).client
+    if not prev_client:
+        # skip if going from no client to some client
+        return
+    current_client = instance.client
+    if getattr(current_client, 'id', None) != getattr(prev_client, 'id', None) and len(prev_client.batches.all()) == 1:
+        prev_client.delete()
 
 
 def get_batch_file_upload_path(instance, filename):
@@ -500,7 +549,6 @@ class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
     def get_stats_generated_petition(cls, petition_document_id, user):
         petition_document = PetitionDocument.objects.get(id=petition_document_id)
         batch = petition_document.petition.batch
-        user = user
 
         generated_petition = GeneratedPetition.objects.create(
             username=user.username,
