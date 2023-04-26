@@ -194,9 +194,9 @@ class GeneratePetitionSerializer(serializers.Serializer):
 
 class PetitionSerializer(serializers.ModelSerializer):
     jurisdiction = serializers.CharField(source="get_jurisdiction_display")
-    can_generate = ValidationField(serializer=GeneratePetitionSerializer)
+    generation_errors = ValidationField(serializer=GeneratePetitionSerializer)
 
-    def get_can_generate_data(self, obj):
+    def get_generation_errors_data(self, obj):
         return {'documents': obj.documents.all().values_list('pk', flat=True), 'petition': obj.pk}
 
     class Meta:
@@ -209,7 +209,7 @@ class PetitionSerializer(serializers.ModelSerializer):
             "offense_records",
             "agencies",
             "documents",
-            "can_generate",
+            "generation_errors",
         ]
 
 
@@ -285,10 +285,10 @@ class GenerateDocumentSerializer(serializers.Serializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    can_generate_letter = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
-    can_generate_summary = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
+    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
 
-    def get_can_generate_data(self, obj):
+    def get_generate_errors_data(self, obj):
         return {'batch': obj.pk}
 
     class Meta:
@@ -301,8 +301,8 @@ class BatchSerializer(serializers.ModelSerializer):
             "records",
             "petitions",
             "automatic_delete_date",
-            "can_generate_letter",
-            "can_generate_summary",
+            "generate_letter_errors",
+            "generate_summary_errors",
         ]
         read_only_fields = ["user", "automatic_delete_date"]
 
@@ -319,10 +319,10 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     )
     client = ClientSerializer(read_only=True)
 
-    can_generate_letter = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
-    can_generate_summary = ValidationField(method_name='get_can_generate_data', serializer=GenerateDocumentSerializer)
+    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
 
-    def get_can_generate_data(self, obj):
+    def get_generate_errors_data(self, obj):
         return {'batch': obj.pk}
 
     class Meta:
@@ -338,8 +338,8 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "attorney_id",
             "client",
             "client_id",
-            "can_generate_letter",
-            "can_generate_summary",
+            "generate_letter_errors",
+            "generate_summary_errors",
         ]
         read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 

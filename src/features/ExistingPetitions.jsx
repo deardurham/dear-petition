@@ -65,11 +65,11 @@ export const ExistingPetitions = () => {
                 <TableCell className="flex gap-2">
                   <Button
                     disabled={batch.petitions.every((petition) =>
-                      hasValidationsErrors(petition.can_generate)
+                      hasValidationsErrors(petition.generation_errors)
                     )}
                     title={
                       batch.petitions.every((petition) =>
-                        hasValidationsErrors(petition.can_generate)
+                        hasValidationsErrors(petition.generation_errors)
                       )
                         ? 'No available petitions for download. Click on the petition button to the left to fix.'
                         : undefined
@@ -84,8 +84,8 @@ export const ExistingPetitions = () => {
                     Legal team requested this be temporarily removed from UI
 
                     <Button
-                      disabled={!!batch?.can_generate_letter?.batch}
-                      title={batch?.can_generate_letter?.batch?.join(' ') ?? ''}
+                      disabled={!!batch?.generate_letter_errors?.batch}
+                      title={batch?.generate_letter_errors?.batch?.join(' ') ?? ''}
                       onClick={() => {
                         manualAxiosRequest({
                           url: `/batch/${batch.pk}/generate_advice_letter/`,
@@ -103,8 +103,8 @@ export const ExistingPetitions = () => {
                     </Button>
                   */}
                   <Button
-                    disabled={!!batch?.can_generate_summary?.batch}
-                    title={batch?.can_generate_summary?.batch?.join(' ') ?? ''}
+                    disabled={!!batch?.generate_summary_errors?.batch}
+                    title={batch?.generate_summary_errors?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       manualAxiosRequest({
                         url: `/batch/${batch.pk}/generate_expungable_summary/`,

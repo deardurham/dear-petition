@@ -118,7 +118,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
     return null;
   }
 
-  const disabledReason = getErrorList(petition.can_generate?.petition ?? {});
+  const disabledReason = getErrorList(petition.generation_errors?.petition ?? {});
   if (selectedDocuments.length === 0) {
     disabledReason.push(NO_DOCUMENTS_SELECTED);
   }

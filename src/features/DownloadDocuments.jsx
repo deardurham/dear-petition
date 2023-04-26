@@ -78,10 +78,10 @@ const DownloadExistingDocuments = ({ petitions }) => {
                   type="button"
                   colorClass={POSITIVE}
                   className="px-4 py-2 self-center"
-                  disabled={hasValidationsErrors(petition.can_generate)}
+                  disabled={hasValidationsErrors(petition.generation_errors)}
                   title={
-                    hasValidationsErrors(petition.can_generate)
-                      ? getErrorList(petition.can_generate?.petition ?? {}).join(' ')
+                    hasValidationsErrors(petition.generation_errors)
+                      ? getErrorList(petition.generation_errors?.petition ?? {}).join(' ')
                       : undefined
                   }
                   onClick={async () => {

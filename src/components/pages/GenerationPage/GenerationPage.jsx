@@ -169,8 +169,8 @@ function GenerationPage() {
           <div className="flex gap-4">
             <Button
               onClick={() => generateExpungableSummary()}
-              disabled={!!data?.can_generate_summary?.batch}
-              title={data?.can_generate_summary?.batch?.join(' ') ?? ''}
+              disabled={!!data?.generate_summary_errors?.batch}
+              title={data?.generate_summary_errors?.batch?.join(' ') ?? ''}
             >
               Create Expungable Record Summary
             </Button>
@@ -179,8 +179,8 @@ function GenerationPage() {
 
                  <Button
                   onClick={() => generateAdviceLetter()}
-                  disabled={!!data?.can_generate_letter?.batch}
-                  title={data?.can_generate_letter?.batch?.join(' ') ?? ''}
+                  disabled={!!data?.generate_letter_errors?.batch}
+                  title={data?.generate_letter_errors?.batch?.join(' ') ?? ''}
                 >
               Create Advice Letter
             </Button>
