@@ -19,7 +19,6 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
 from dear_petition.petition import utils
-from dear_petition.petition import helpers as ch
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
 from dear_petition.petition.etl import (
