@@ -29,4 +29,4 @@ djangorestframework==3.13.1  # https://github.com/encode/django-rest-framework
 djangorestframework-simplejwt==5.2.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
 
 pdfrw==0.4
-git+https://github.com/deardurham/ciprs-reader.git@main#egg=ciprs-reader
+git+https://github.com/deardurham/ciprs-reader.git@v1.7.0#egg=ciprs-reader
