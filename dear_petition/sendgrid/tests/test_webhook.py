@@ -69,6 +69,24 @@ class TestEmails:
         assert Email.objects.count() == 1
 
     @pytest.mark.django_db
+    def test_email_with_empty_subject(self, payload, rf):
+        payload['subject'] = ''
+        request = rf.post(reverse("sendgrid-webhook"), data=payload)
+        form = EmailForm(request)
+        assert form.is_valid(), form.errors
+        form.save()
+        assert Email.objects.count() == 1
+
+    @pytest.mark.django_db
+    def test_email_without_subject(self, payload, rf):
+        payload.pop('subject')
+        request = rf.post(reverse("sendgrid-webhook"), data=payload)
+        form = EmailForm(request)
+        assert form.is_valid(), form.errors
+        form.save()
+        assert Email.objects.count() == 1
+
+    @pytest.mark.django_db
     def test_sender_allowed(self, settings, rf, payload):
         """Emails should be saved from allowed senders"""
         payload["from"] = "user@example.com"

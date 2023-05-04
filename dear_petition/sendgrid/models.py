@@ -11,7 +11,7 @@ class Email(PrintableModelMixin, models.Model):
     https://docs.sendgrid.com/for-developers/parsing-email/setting-up-the-inbound-parse-webhook#default-parameters
     """
 
-    subject = models.CharField(max_length=4096, default="") # It's possible to have no subject in email
+    subject = models.CharField(max_length=4096, default="", blank=True) # It's possible to have no subject in email
     recipient = models.CharField(max_length=4096)  # aka "To"
     sender = models.CharField(max_length=4096)  # aka "From"
     headers = models.TextField()
