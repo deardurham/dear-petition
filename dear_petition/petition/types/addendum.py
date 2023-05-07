@@ -9,10 +9,17 @@ def create_addendum_documents(petition, previous_document):
         addendum_document_creator = ADDENDUM_FORMS_TYPE_MAP[petition.form_type]
         addendum_document_creator(petition, previous_document)
 
+def calculate_offense_record_string(offense_record):
+    offense_record_string = f"{offense_record.file_no} {offense_record.description}"
+
+    if offense_record.count:
+        offense_record_string = f"Count {offense_record.count}: " + offense_record_string
+
+    return offense_record_string
 
 def calculate_checkmark_3b_string(offense_records):
     offense_record_strings = [
-        f"{offense_record.file_no} {offense_record.description}"
+        calculate_offense_record_string(offense_record)
         for offense_record in offense_records
     ]
     checkmark_3b_string = ", ".join(offense_record_strings)

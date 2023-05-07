@@ -62,12 +62,12 @@ ADDENDUM_DOCUMENT_GENERATION_MAP = {
 }
 
 
-def generate_addendum_document_file(petition_document, extra):
+def generate_addendum_document_file(petition_document):
     assert petition_document.form_type in constants.ADDENDUM_FORM_TYPES
     addendum_document_file_generator = ADDENDUM_DOCUMENT_GENERATION_MAP[
         petition_document.form_type
     ]
-    doc = addendum_document_file_generator(petition_document, extra)
+    doc = addendum_document_file_generator(petition_document)
 
     file_stream = io.BytesIO()
     doc.save(file_stream)
