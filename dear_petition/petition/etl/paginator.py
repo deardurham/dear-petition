@@ -22,7 +22,6 @@ class OffenseRecordPaginator:
         petition,
         initial_page_size=None,
         attachment_page_size=None,
-        filter_active=True,
     ):
         default_page_size = UNDERAGE_CONVICTIONS_PAGE_SIZE if petition.form_type == UNDERAGED_CONVICTIONS else INITIAL_PAGE_SIZE
         self.initial_page_size = (

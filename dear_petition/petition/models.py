@@ -418,10 +418,10 @@ class Petition(PrintableModelMixin, TimeStampedModel):
     def __str__(self):
         return f"{self.form_type} {self.get_jurisdiction_display()} in {self.county}"
 
-    def get_offense_record_paginator(self, filter_active=True):
+    def get_offense_record_paginator(self):
         from dear_petition.petition.etl.paginator import OffenseRecordPaginator
 
-        return OffenseRecordPaginator(self, filter_active=filter_active)
+        return OffenseRecordPaginator(self)
 
     def get_all_offense_records(self, include_annotations=True, filter_active=False):
         """
