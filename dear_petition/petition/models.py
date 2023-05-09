@@ -160,6 +160,7 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
         "Offense", related_name="offense_records", on_delete=models.CASCADE
     )
+    count = models.IntegerField(blank=True, null=True)
     law = models.CharField(max_length=256, blank=True)
     code = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=256)

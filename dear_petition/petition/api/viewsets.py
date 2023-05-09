@@ -388,7 +388,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
             ]
             for addendum_document in addendum_documents:
                 doc = generate_addendum_document_file(
-                    addendum_document, serializer.data
+                    addendum_document
                 )
                 docs.append(doc)
                 filename = utils.get_petition_filename(

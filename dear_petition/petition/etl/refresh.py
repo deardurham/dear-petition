@@ -69,6 +69,7 @@ def refresh_offenses(record):
             )
             for data_offense_record in data_offense.get("Records", []):
                 offense.offense_records.create(
+                    count=data_offense_record.get("Count"),
                     law=data_offense_record.get("Law", ""),
                     action=data_offense_record.get("Action", ""),
                     severity=data_offense_record.get("Severity", ""),
