@@ -17,6 +17,7 @@ from dear_petition.users.tests.factories import UserFactory
         ("user+mylabel@example.com", "user", "mylabel"),
         ("first.last@example.com", "first.last", ""),
         ("first.last+mylabel@example.com", "first.last", "mylabel"),
+        ("first.last+Test_Client_name@example.com", "first.last", "Test Client name"),
     ],
 )
 def test_extract(attr, username, label):

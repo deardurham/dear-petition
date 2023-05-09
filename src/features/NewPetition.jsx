@@ -223,9 +223,13 @@ export const NewPetition = () => {
               </li>
               <li>
                 <span>
-                  You may optionally add a label for the CIPRS records by adding a `+`. For example:{' '}
+                  {`You may optionally add a label for the CIPRS records by adding a '+'. For example, to create a label called 'Test' use the following email address: `}
                 </span>
-                <b>{user.username}+JohnDoeDurhamRecords@inbox.durhamexpunction.org</b>
+                <b>{user.username}+Test@inbox.durhamexpunction.org</b>
+              </li>
+              <li>
+                <span>{`You can add spaces in the label by using '_'. For example, to create label called 'John Doe Records' use the following email address: `}</span>
+                <b>{user.username}+John_Doe_Records@inbox.durhamexpunction.org</b>
               </li>
             </ul>
             <div className="mt-6 flex gap-4" media="print" style={{ display: 'none' }}>
