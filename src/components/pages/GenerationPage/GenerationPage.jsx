@@ -135,7 +135,7 @@ function GenerationPage() {
       responseType: 'arraybuffer',
       method: 'post',
     }).then((expungableSummary) => {
-      _openDoc(expungableSummary.data, 'Expungable Record Summary.docx');
+      _openDoc(expungableSummary.data, 'Records Summary.docx');
     });
   };
 
@@ -172,7 +172,7 @@ function GenerationPage() {
               disabled={!!data?.generate_summary_errors?.batch}
               title={data?.generate_summary_errors?.batch?.join(' ') ?? ''}
             >
-              Create Expungable Record Summary
+              Create Records Summary
             </Button>
             {/*
                 Legal team requested this be temporarily removed from UI

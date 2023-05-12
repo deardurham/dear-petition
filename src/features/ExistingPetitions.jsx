@@ -114,11 +114,11 @@ export const ExistingPetitions = () => {
                         const docBlob = new Blob([expungableSummary.data], {
                           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         });
-                        downloadFile(docBlob, 'Expungable Record Summary.docx');
+                        downloadFile(docBlob, 'Records Summary.docx');
                       });
                     }}
                   >
-                    Record Summary
+                    Records Summary
                   </Button>
                 </TableCell>
               </TableRow>
