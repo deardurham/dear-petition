@@ -18,7 +18,7 @@ from dear_petition.petition.constants import (
 
 logger = logging.getLogger(__name__)
 
-TEMPLATE = "expungable_summary.docx"
+TEMPLATE = "records_summary.docx"
 
 
 def generate_summary(batch):
