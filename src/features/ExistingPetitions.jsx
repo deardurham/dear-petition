@@ -107,11 +107,11 @@ export const ExistingPetitions = () => {
                     title={batch?.generate_summary_errors?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       manualAxiosRequest({
-                        url: `/batch/${batch.pk}/generate_expungable_summary/`,
+                        url: `/batch/${batch.pk}/generate_summary/`,
                         responseType: 'arraybuffer',
                         method: 'post',
-                      }).then((expungableSummary) => {
-                        const docBlob = new Blob([expungableSummary.data], {
+                      }).then((recordsSummary) => {
+                        const docBlob = new Blob([recordsSummary.data], {
                           type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                         });
                         downloadFile(docBlob, 'Records Summary.docx');

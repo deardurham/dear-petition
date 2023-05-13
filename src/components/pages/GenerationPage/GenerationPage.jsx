@@ -125,17 +125,17 @@ function GenerationPage() {
     });
   };
 
-  const generateExpungableSummary = async () => {
+  const generateRecordsSummary = async () => {
     if (!validateInput()) {
       return;
     }
 
     manualAxiosRequest({
-      url: `/batch/${batchId}/generate_expungable_summary/`,
+      url: `/batch/${batchId}/generate_summary/`,
       responseType: 'arraybuffer',
       method: 'post',
-    }).then((expungableSummary) => {
-      _openDoc(expungableSummary.data, 'Records Summary.docx');
+    }).then((recordsSummary) => {
+      _openDoc(recordsSummary.data, 'Records Summary.docx');
     });
   };
 
@@ -168,7 +168,7 @@ function GenerationPage() {
         <InputSection label="Documents">
           <div className="flex gap-4">
             <Button
-              onClick={() => generateExpungableSummary()}
+              onClick={() => generateRecordsSummary()}
               disabled={!!data?.generate_summary_errors?.batch}
               title={data?.generate_summary_errors?.batch?.join(' ') ?? ''}
             >

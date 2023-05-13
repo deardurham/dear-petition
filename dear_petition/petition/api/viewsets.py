@@ -36,8 +36,8 @@ from dear_petition.users.models import User
 from dear_petition.petition.export.documents.advice_letter import (
     generate_advice_letter
 )
-from dear_petition.petition.export.documents.expungable_summary import (
-    generate_expungable_summary
+from dear_petition.petition.export.documents.records_summary import (
+    generate_summary
 )
 
 logger = logging.getLogger(__name__)
@@ -250,22 +250,22 @@ class BatchViewSet(viewsets.ModelViewSet):
             "post",
         ],
     )
-    def generate_expungable_summary(self, request, pk):
+    def generate_summary(self, request, pk):
         batch = self.get_object()
         serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
         serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            filepath = tmpdir + "/expungable_summary.docx"
-            expungable_summary = generate_expungable_summary(batch)
-            expungable_summary.save(filepath)
+            filepath = tmpdir + "/records_summary.docx"
+            reoc_summary = generate_summary(batch)
+            reoc_summary.save(filepath)
             resp = FileResponse(open(filepath, "rb"))
             resp[
                 "Content-Type"
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             resp[
                 "Content-Disposition"
-            ] = 'attachment; filename="Expungable Record Summary.docx"'
+            ] = 'attachment; filename="Records Summary.docx"'
             return resp
 
 
