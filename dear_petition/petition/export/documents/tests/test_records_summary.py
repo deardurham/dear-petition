@@ -1,7 +1,7 @@
 import pytest
 from datetime import date
 
-from dear_petition.petition.export.documents.expungable_summary import generate_context
+from dear_petition.petition.export.documents.records_summary import generate_context
 from dear_petition.petition.tests.factories import (
     AttorneyFactory, CIPRSRecordFactory, ClientFactory, OffenseRecordFactory, OffenseFactory,
 )
@@ -24,7 +24,7 @@ PETITIONER_INFO = {
 }
 
 
-def test_expungable_summary_context__one_table_one_row(batch):
+def test_records_summary_context__one_table_one_row(batch):
     """
     Test generate_context method with one table and one row. Test all data
     """
@@ -56,7 +56,7 @@ def test_expungable_summary_context__one_table_one_row(batch):
     assert first_offense_record["disposed_on"] == "10/02/2003"
 
 
-def test_expungable_summary_context__many_tables(batch):
+def test_records_summary_context__many_tables(batch):
     """
     Test generate_context method with many tables. Make sure correct number of tables and in correct order.
     """
@@ -98,7 +98,7 @@ def test_expungable_summary_context__many_tables(batch):
     assert third_table["jurisdiction"] == "SUPERIOR COURT"
 
 
-def test_expungable_summary_context__many_offense_records(batch):
+def test_records_summary_context__many_offense_records(batch):
     """
     Test generate_context method with many offense records in a table. Make sure correct number of offense records and
     in correct order.
@@ -132,7 +132,7 @@ def test_expungable_summary_context__many_offense_records(batch):
 
 
 @pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
-def test_expungable_summary_context__excluded_disp_method(batch, disp_method):
+def test_records_summary_context__excluded_disp_method(batch, disp_method):
     """
     Test generate_context method where one offense record belongs to an offense with an excluded disposition method.
     That offense record should be excluded.
@@ -175,7 +175,7 @@ def test_expungable_summary_context__excluded_disp_method(batch, disp_method):
     assert first_offense_record["disposition"] == "NPC"
 
 
-def test_expungable_summary_context__duplicate(batch, contact1, client):
+def test_records_summary_context__duplicate(batch, contact1, client):
     """
     Test generate_context method with identical charged and convicted offense records that are part of same offense.
     Only one of the two offense records should be included. It doesn't matter which one since they are identical except
@@ -194,7 +194,7 @@ def test_expungable_summary_context__duplicate(batch, contact1, client):
     assert len(offense_records) == 1
 
 
-def test_expungable_summary_context__different_descriptions(batch, contact1, client):
+def test_records_summary_context__different_descriptions(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different descriptions) that are
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
@@ -220,7 +220,7 @@ def test_expungable_summary_context__different_descriptions(batch, contact1, cli
     assert offense_records[1]["disposition"] == VERDICT_CODE_GUILTY
 
 
-def test_expungable_summary_context__different_severities(batch, contact1, client):
+def test_records_summary_context__different_severities(batch, contact1, client):
     """
     Test generate_context method with different charged and convicted offense records (different severities) that are
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
@@ -246,7 +246,7 @@ def test_expungable_summary_context__different_severities(batch, contact1, clien
     assert offense_records[1]["disposition"] == VERDICT_CODE_GUILTY
 
 
-def test_expungable_summary_context__disposition_codes(batch):
+def test_records_summary_context__disposition_codes(batch):
     """
     Test generate_context method where the disposition code comes from the disposition map, the verdict map, and isn't
     found in either map.
@@ -279,7 +279,7 @@ def test_expungable_summary_context__disposition_codes(batch):
     # born in leap year
     (date(1988, 2, 29), "02/29/1988", "03/01/2006", "03/01/2010"),
 ])
-def test_expungable_summary_context__birthdays(
+def test_records_summary_context__birthdays(
     batch,
     dob,
     formatted_dob,

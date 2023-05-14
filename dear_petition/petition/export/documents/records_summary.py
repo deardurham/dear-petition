@@ -18,10 +18,10 @@ from dear_petition.petition.constants import (
 
 logger = logging.getLogger(__name__)
 
-TEMPLATE = "expungable_summary.docx"
+TEMPLATE = "records_summary.docx"
 
 
-def generate_expungable_summary(batch):
+def generate_summary(batch):
     assert batch.client is not None and batch.attorney is not None, 'Client and attorney must be set for batch before generating document'
 
     context = generate_context(batch, batch.attorney, batch.client)
