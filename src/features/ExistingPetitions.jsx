@@ -47,7 +47,7 @@ export const ExistingPetitions = () => {
             <TableCell header />
           </TableHeader>
           <TableBody>
-            {data?.results?.map((batch, i) => (
+            {data?.results?.map((batch) => (
               <TableRow key={batch.pk}>
                 <TableCell>{batch.label}</TableCell>
                 <TableCell>
