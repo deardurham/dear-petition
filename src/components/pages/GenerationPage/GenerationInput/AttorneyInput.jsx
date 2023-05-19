@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
 import { useLazySearchAttorniesQuery } from '../../../../service/api';

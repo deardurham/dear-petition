@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { useController } from 'react-hook-form';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';

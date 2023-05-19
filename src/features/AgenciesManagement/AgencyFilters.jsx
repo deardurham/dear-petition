@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useLazyGetContactFilterOptionsQuery } from '../../service/api';
 import { useModalContext } from '../../components/elements/Button/ModalButton';
 import { Button } from '../../components/elements/Button';

@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { SelectWrapper, SelectStyled, ActualSelectStyled, InputErrors } from './Select.styled';
 import { AnimatePresence } from 'framer-motion';

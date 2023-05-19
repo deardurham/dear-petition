@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { GenerationPageStyled, GenerationContentStyled } from './GenerationPage.styled';
 import { colorGrey } from '../../../styles/colors';
@@ -111,7 +111,7 @@ function GenerationPage() {
     }
   };
 
-  const generateAdviceLetter = async () => {
+  const _generateAdviceLetter = async () => {
     if (!validateInput()) {
       return;
     }

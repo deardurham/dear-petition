@@ -1,7 +1,5 @@
-import cx from 'classnames';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
 import { AutoCompleteBadgeStyled } from './Badge.styled';
 
 const AutoCompleteBadge = ({ name, ...props }) => (

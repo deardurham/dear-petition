@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePetitionQuery, useRecalculatePetitionsMutation } from '../../service/api';
 import StyledDialog from '../../components/elements/Modal/Dialog';
 import OffenseTable from './OffenseTable';
 import { Button } from '../../components/elements/Button';
 import { Spinner } from '../../components/elements/Spinner';
-import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
 import { DISABLED, POSITIVE } from '../../components/elements/Button/Button';
 
 const OffenseTableModal = ({ isOpen, onClose, petitionId }) => (

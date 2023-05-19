@@ -1,4 +1,3 @@
-import React from 'react';
 import cx from 'classnames';
 import { NEUTRAL, POSITIVE } from './Button/Button';
 

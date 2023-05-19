@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../components/elements/Button';
 import StyledDialog from '../components/elements/Modal/Dialog';
 import AutocompleteInput from '../components/elements/Input/AutocompleteInput';
