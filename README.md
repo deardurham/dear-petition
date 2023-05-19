@@ -30,12 +30,12 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 ```bash
 git clone git@github.com:deardurham/dear-petition.git
 cd dear-petition/
-docker-compose up -d django
+docker-compose up -d
 docker-compose run --rm django python manage.py migrate
 docker-compose run --rm django python manage.py createsuperuser
 ```
 
-Try out DEAR Petition Generator by logging in as the superuser you created and uploading test CIPRS records (in pdf format) which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
+Try out DEAR Petition Generator by navigating to `http://localhost:3000`, logging in as the superuser you created, and uploading an example CIPRS pdf which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
 
 ## 🐳 Development Container
 
@@ -80,6 +80,7 @@ The user facing  side of the DEAR Petition Generator is a React single page app 
 ### 🚀 Quick Setup
 
 ```bash
+docker compose up -d django # run the backend via docker in the background
 npm i
 npm run start
 ```
