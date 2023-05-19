@@ -22,7 +22,7 @@ export const ModalButton = ({
 }) => {
   const modalElement = useRef();
   const [showModal, setShowModal] = useState(false);
-  const closeModal = useCallback(() => setShowModal(false));
+  const closeModal = useCallback(() => setShowModal(false), []);
   useOnClickOutside(modalElement, () => {
     if (!allowCloseOnEscape) {
       closeModal();

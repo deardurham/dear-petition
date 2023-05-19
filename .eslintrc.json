@@ -30,7 +30,7 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "react/jsx-filename-extension": [1, { "allow": "as-needed" }],
+    "react/jsx-filename-extension": [1, { "allow": "always" }], // TODO: as-needed
     "prefer-template": "off", // TODO: warn
     "react/prop-types": "off",
     "no-param-reassign": [

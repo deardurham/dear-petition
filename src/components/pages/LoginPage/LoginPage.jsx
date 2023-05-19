@@ -35,7 +35,7 @@ function Login() {
     if (authenticatedUser) {
       history.replace('/');
     }
-  }, [authenticatedUser]);
+  }, [authenticatedUser, history]);
 
   const { control, handleSubmit } = useForm({
     defaultValues: {

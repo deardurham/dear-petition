@@ -45,7 +45,7 @@ export default function HelpPage() {
     fetch(markdownSource)
       .then((res) => res.text())
       .then((text) => setSource(text));
-  }, [markdownSource]);
+  }, []);
   return (
     <HelpPageStyled>
       <HelpPageContent>
