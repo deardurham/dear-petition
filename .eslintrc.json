@@ -39,6 +39,7 @@
 
     // warnings
     "prefer-template": "off", // TODO: warn
+    "prettier/prettier": "warn",
     "react/no-array-index-key": "warn",
 
     // customized rules
