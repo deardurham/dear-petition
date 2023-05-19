@@ -51,6 +51,8 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
       <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
         {filterSelections.map((selection, i) => (
           <Badge
+            // TODO: Use pk here and standardize selection badges across components
+            // eslint-disable-next-line react/no-array-index-key
             key={`${i}_${selection}`}
             name={selection}
             remove={() => removeSelection(selection)}

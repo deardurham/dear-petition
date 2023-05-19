@@ -142,8 +142,8 @@ export const PageSelection = ({ currentPage, numPages, onPageSelect }) => {
         const isNotConsecutive = idx > 0 && visiblePageNumbers?.[idx - 1] !== pageNum - 1;
         return (
           <>
-            {isNotConsecutive && <span key={idx}>...</span>}
-            <button key={idx} type="button" onClick={() => onPageSelect(pageNum)}>
+            {isNotConsecutive && <span key={pageNum}>...</span>}
+            <button key={pageNum} type="button" onClick={() => onPageSelect(pageNum)}>
               {pageNum}
             </button>
           </>

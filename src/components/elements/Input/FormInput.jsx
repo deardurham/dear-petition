@@ -18,6 +18,7 @@ const FormInput = ({ className, label, errors, inputProps, ...restProps }) => {
   const error = inputError ? (
     <p>Invalid value</p>
   ) : (
+    // eslint-disable-next-line react/no-array-index-key
     errors?.map((errMsg, i) => <p key={`${i}${errMsg}`}>{errMsg}</p>)
   );
   return (

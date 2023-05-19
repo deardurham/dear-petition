@@ -89,9 +89,9 @@ const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
           }}
         />
         <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">
-          {selections.map((selection, i) => (
+          {selections.map((selection) => (
             <Badge
-              key={`${i}_${selection.name}`}
+              key={selection.pk}
               name={selection.name}
               remove={() => setSelections((prev) => prev.filter((a) => a.pk !== selection.pk))}
             />
