@@ -55,11 +55,23 @@ def generate_context(batch, attorney, client):
     # sort tables first by county, then by jurisdiction
     tables_keys.sort()
     tables = []
-    for i, k in enumerate(tables_keys, start=1):
-        offense_records = tables_data[k]
+    for table_index, table_key in enumerate(tables_keys, start=1):
+        # get offense records for county and jurisdiction
+        offense_records = tables_data[table_key]
+
         # sort offense records by file number
         offense_records.sort(key=lambda x: x["file_no"])
-        table = {"county": k[0], "jurisdiction": k[1], "idx": i, "offense_records": offense_records}
+
+        # assign index for each offense record
+        for offense_record_index, offense_record in enumerate(offense_records, start=1):
+            offense_record["idx"] = offense_record_index
+
+        table = {
+            "county": table_key[0],
+            "jurisdiction": table_key[1],
+            "idx": table_index,
+            "offense_records": offense_records
+        }
         tables.append(table)
 
     return {

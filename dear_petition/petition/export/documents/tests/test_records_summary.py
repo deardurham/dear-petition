@@ -47,6 +47,7 @@ def test_records_summary_context__one_table_one_row(batch):
     assert first_table["jurisdiction"] == "DISTRICT COURT"
 
     first_offense_record = first_table["offense_records"][0]
+    assert first_offense_record["idx"] == 1
     assert first_offense_record["file_no"] == "10CR000001"
     assert first_offense_record["arrest_date"] == "10/01/2001"
     assert first_offense_record["description"] == "SIMPLE ASSAULT"
@@ -129,6 +130,11 @@ def test_records_summary_context__many_offense_records(batch):
     assert offense_records[0]["file_no"] == "10CR000001"
     assert offense_records[1]["file_no"] == "11CR000001"
     assert offense_records[2]["file_no"] == "12CR000001"
+
+    # the index values should have been assigned after sorting and they should start with 1
+    assert offense_records[0]["idx"] == 1
+    assert offense_records[1]["idx"] == 2
+    assert offense_records[2]["idx"] == 3
 
 
 @pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
