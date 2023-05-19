@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import cx from 'classnames';
 import { greyScale } from '../../../styles/colors';
 import { manualAxiosRequest } from '../../../service/axios';

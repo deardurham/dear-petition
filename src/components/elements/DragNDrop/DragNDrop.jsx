@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
 const BAD_TYPE_MSG = 'One or more of your files is not the right type';
 
-const DragNDrop = React.forwardRef((props, ref) => {
+const DragNDrop = (props) => {
   const { children, className, mimeTypes, maxFiles, onDrop, onDragEnter, onDragLeave } = props;
   const [draggedOver, setDraggedOver] = useState(false);
 
@@ -106,7 +106,7 @@ const DragNDrop = React.forwardRef((props, ref) => {
       </motion.label>
     </>
   );
-});
+};
 
 DragNDrop.propTypes = {
   /** Respond to a file drop or input */
@@ -124,4 +124,4 @@ DragNDrop.defaultProps = {
   onDragLeave: undefined,
 };
 
-export default DragNDrop;
+export default React.forwardRef(DragNDrop);
