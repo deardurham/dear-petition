@@ -25,7 +25,7 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
     - [Sign up for Sentry](#sign-up-for-sentry)
 - [Production testing](#production-testing)
 
-## 🚀 Docker Quick Start (recommended)
+## 🚀 Docker Quick Start
 
 ```bash
 git clone git@github.com:deardurham/dear-petition.git
@@ -97,6 +97,12 @@ You can override the this proxy url by setting `OVERRIDE_API_PROXY`:
 
 ```bash
 OVERRIDE_API_PROXY=http://localhost:8888 docker-compose up -d
+```
+
+Note that there's an issue with the `node_modules` volume not updating when you add new dependencies. When this happens, run the following:
+
+```bash
+docker compose up --renew-anon-volumes -d frontend
 ```
 
 #### Local Frontend
