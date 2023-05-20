@@ -18,6 +18,7 @@ PROXY_PATHS.forEach((path) => {
 export default defineConfig(() => ({
   build: {
     outDir: 'build',
+    assetsDir: 'static',
   },
   server: {
     host: '0.0.0.0',
