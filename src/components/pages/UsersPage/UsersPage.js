@@ -75,18 +75,22 @@ const calculatePageIndices = (current, numPages) => {
   return [Math.max(1, startIndex), Math.min(endIndex, numPages)];
 };
 
+const getOrdering = ({ field, dir }) => {
+  const sortDir = dir === 'asc' ? '-' : '';
+  return `${sortDir}${field}`;
+};
+
 const UsersPage = () => {
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
-  const [ordering, setOrdering] = useState('username');
-  const [sortBy, setSortBy] = useState({ field: 'username', dir: 'dsc' });
+  const [sortBy, setSortBy] = useState({ field: 'username', dir: 'asc' });
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
   const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
   const { data } = useUsersQuery({
     queryString: new URLSearchParams([
       ['search', search],
-      ['ordering', ordering],
+      ['ordering', getOrdering(sortBy)],
       ['offset', offset],
       ['limit', limit.value],
     ]).toString(),

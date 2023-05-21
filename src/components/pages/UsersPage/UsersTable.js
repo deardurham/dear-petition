@@ -214,7 +214,6 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-// TODO change props to users, sortBy, onSortBy
 const UsersTable = ({ users, sortBy, onSortBy }) => (
   <UsersTableStyled numColumns={5}>
     <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
