@@ -83,12 +83,17 @@ const UsersPage = () => {
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
   const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
-  const { data } = useUsersQuery({ params: { limit: limit.value, offset, ordering, search } });
+  const { data } = useUsersQuery({
+    queryString: new URLSearchParams([
+      ['search', search],
+      ['ordering', ordering],
+      ['offset', offset],
+      ['limit', limit.value],
+    ]).toString(),
+  });
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
-  console.log(`here's sortBy state:`);
-  console.log(sortBy);
 
   const numUsers = data?.count ?? 0;
   useEffect(() => {
@@ -186,7 +191,6 @@ const UsersPage = () => {
               </button>
             </div>
           </TableFlexRow>
-          {/* added sortBy={sortBy} & onSortBy={onSortBy} /> */}
           <UsersTable
             users={data?.results || []}
             sortBy={sortBy}
