@@ -214,24 +214,14 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-// in AgenciesTable, the ordering stuff is set in the TableHeader
 // TODO change props to users, sortBy, onSortBy
-const UsersTable = ({ users, sortBy, onSortBy, ordering, setOrdering }) => (
+const UsersTable = ({ users, sortBy, onSortBy }) => (
   <UsersTableStyled numColumns={5}>
     <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
-      {/* <TableHeader> */}
-      <SortableHeader field="username" ordering={ordering} setOrdering={setOrdering}>
-        Username
-      </SortableHeader>
-      <SortableHeader field="email" ordering={ordering} setOrdering={setOrdering}>
-        Email
-      </SortableHeader>
-      <SortableHeader field="admin" setOrdering={setOrdering}>
-        Admin?
-      </SortableHeader>
-      <SortableHeader field="last_login" ordering={ordering} setOrdering={setOrdering}>
-        Last Login
-      </SortableHeader>
+      <SortableHeader field="username">Username</SortableHeader>
+      <SortableHeader field="email">Email</SortableHeader>
+      <SortableHeader field="admin">Admin?</SortableHeader>
+      <SortableHeader field="last_login">Last Login</SortableHeader>
       <TableCell header>Actions</TableCell>
     </TableHeader>
     <TableBody>

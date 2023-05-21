@@ -191,13 +191,7 @@ const UsersPage = () => {
               </button>
             </div>
           </TableFlexRow>
-          <UsersTable
-            users={data?.results || []}
-            sortBy={sortBy}
-            onSortBy={onSortBy}
-            ordering={ordering}
-            setOrdering={setOrdering}
-          />
+          <UsersTable users={data?.results || []} sortBy={sortBy} onSortBy={onSortBy} />
         </FlexColumn>
       </UsersSection>
     </PageBase>
