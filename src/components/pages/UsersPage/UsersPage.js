@@ -83,7 +83,7 @@ const getOrdering = ({ field, dir }) => {
 const UsersPage = () => {
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
-  const [sortBy, setSortBy] = useState({ field: 'username', dir: 'asc' });
+  const [sortBy, setSortBy] = useState({ field: 'username', dir: 'dsc' });
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
   const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
