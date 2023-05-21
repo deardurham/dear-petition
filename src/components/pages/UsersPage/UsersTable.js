@@ -219,7 +219,7 @@ const UsersTable = ({ users, sortBy, onSortBy }) => (
     <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
       <SortableHeader field="username">Username</SortableHeader>
       <SortableHeader field="email">Email</SortableHeader>
-      <SortableHeader field="admin">Admin?</SortableHeader>
+      <TableCell header>Admin?</TableCell>
       <SortableHeader field="last_login">Last Login</SortableHeader>
       <TableCell header>Actions</TableCell>
     </TableHeader>
