@@ -214,19 +214,13 @@ const UserRow = ({ user, setModalVisible }) => {
   );
 };
 
-const UsersTable = ({ ordering, users, setOrdering }) => (
+const UsersTable = ({ users, sortBy, onSortBy }) => (
   <UsersTableStyled numColumns={5}>
-    <TableHeader>
-      <SortableHeader field="username" ordering={ordering} setOrdering={setOrdering}>
-        Username
-      </SortableHeader>
-      <SortableHeader field="email" ordering={ordering} setOrdering={setOrdering}>
-        Email
-      </SortableHeader>
+    <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
+      <SortableHeader field="username">Username</SortableHeader>
+      <SortableHeader field="email">Email</SortableHeader>
       <TableCell header>Admin?</TableCell>
-      <SortableHeader field="last_login" ordering={ordering} setOrdering={setOrdering}>
-        Last Login
-      </SortableHeader>
+      <SortableHeader field="last_login">Last Login</SortableHeader>
       <TableCell header>Actions</TableCell>
     </TableHeader>
     <TableBody>

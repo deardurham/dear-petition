@@ -75,14 +75,29 @@ const calculatePageIndices = (current, numPages) => {
   return [Math.max(1, startIndex), Math.min(endIndex, numPages)];
 };
 
+const getOrdering = ({ field, dir }) => {
+  const sortDir = dir === 'asc' ? '-' : '';
+  return `${sortDir}${field}`;
+};
+
 const UsersPage = () => {
   const [limit, setLimit] = useState(limitSizes[0]);
   const [offset, setOffset] = useState(0);
-  const [ordering, setOrdering] = useState('username');
+  const [sortBy, setSortBy] = useState({ field: 'username', dir: 'dsc' });
   const [search, setSearch] = useState('');
   const [formValue, setFormValue] = useState('');
   const debounceSearch = useDebounce((value) => setSearch(value), { timeout: 400 });
-  const { data } = useUsersQuery({ params: { limit: limit.value, offset, ordering, search } });
+  const { data } = useUsersQuery({
+    queryString: new URLSearchParams([
+      ['search', search],
+      ['ordering', getOrdering(sortBy)],
+      ['offset', offset],
+      ['limit', limit.value],
+    ]).toString(),
+  });
+  const onSortBy = (field, dir) => {
+    setSortBy({ field, dir });
+  };
 
   const numUsers = data?.count ?? 0;
   useEffect(() => {
@@ -180,7 +195,7 @@ const UsersPage = () => {
               </button>
             </div>
           </TableFlexRow>
-          <UsersTable users={data?.results || []} ordering={ordering} setOrdering={setOrdering} />
+          <UsersTable users={data?.results || []} sortBy={sortBy} onSortBy={onSortBy} />
         </FlexColumn>
       </UsersSection>
     </PageBase>

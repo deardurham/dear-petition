@@ -100,12 +100,13 @@ export const api = createApi({
       query: () => ({ url: 'token/', method: 'delete' }),
     }),
     users: builder.query({
-      query: ({ params, id }) => {
+      query: ({ queryString, id }) => {
         let url = 'users/';
         if (id) {
           url = `${url}/${id}/`;
         }
-        return { url, method: 'get', params };
+        url = `${url}?${queryString}`;
+        return { url, method: 'get' };
       },
       providesTags: ['User'],
     }),
