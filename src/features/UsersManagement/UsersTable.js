@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from 'react-hook-form';
-import { useModifyUserMutation } from '../../../service/api';
-import useAuth from '../../../hooks/useAuth';
-import { Button } from '../../elements/Button';
+import { useModifyUserMutation } from '../../service/api';
+import useAuth from '../../hooks/useAuth';
+import { Button } from '../../components/elements/Button';
 import {
   SortableHeader,
   Table,
@@ -13,9 +13,9 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from '../../elements/Table';
-import Modal from '../../elements/Modal/Modal';
-import FormInput from '../../elements/Input/FormInput';
+} from '../../components/elements/Table';
+import FormInput from '../../components/elements/Input/FormInput';
+import Modal from '../../components/elements/Modal/Modal';
 
 const PassthroughForm = styled.form`
   display: contents;
