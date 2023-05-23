@@ -31,6 +31,8 @@ RUN set -ex \
     vim \
     wget \
     curl \
+    cmake \
+    libfreetype6 \
     " \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
@@ -52,11 +54,15 @@ RUN set -ex \
     && make install \
     && cp /tmp/poppler/bin/pdftotext /usr/local/bin/pdftotext
 
-# Install pdftotext
+# install xpdfreader pdftotext, which supports multiline description parsing
 RUN set -ex \
-    && wget --no-check-certificate https://dl.xpdfreader.com/xpdf-tools-linux-4.04.tar.gz \
-    && tar -xvf xpdf-tools-linux-4.04.tar.gz \
-    && cp xpdf-tools-linux-4.04/bin64/pdftotext /usr/local/bin/pdftotext-4
+    && curl -k https://dl.xpdfreader.com/xpdf-4.04.tar.gz | tar zxf - \
+    && chmod -R 755 ./xpdf-4.04 \
+    && cd ./xpdf-4.04/ \
+    && mkdir build \
+	&& cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_Qt4=1 -DCMAKE_DISABLE_FIND_PACKAGE_Qt5Widgets=1 \
+    && make \
+    && cp xpdf/pdftotext /usr/local/bin/pdftotext-4
 
 # Copy in your requirements file
 # ADD requirements.txt /requirements.txt
