@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import cx from 'classnames';
 import styled from 'styled-components';
-import UsersTable from '../../features/UsersManagement/UsersTable';
-import PageBase from './PageBase';
-import useDebounce from '../../hooks/useDebounce';
-import { useUsersQuery } from '../../service/api';
-import Select from '../elements/Input/Select';
-import UsersActions from '../../features/UsersManagement/UsersActions';
-import { colorGrey } from '../../styles/colors';
+import UsersTable from '../../../features/UsersManagement/UsersTable';
+import PageBase from '../PageBase';
+import useDebounce from '../../../hooks/useDebounce';
+import { useUsersQuery } from '../../../service/api';
+import Select from '../../elements/Input/Select';
+import UsersActions from '../../../features/UsersManagement/UsersActions';
+import { colorGrey } from '../../../styles/colors';
 
 const UsersSection = styled.div`
   &:not(:last-child) {
