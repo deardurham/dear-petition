@@ -14,7 +14,7 @@ import FAQPage from './pages/HelpPage/HelpPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
-import UsersPage from './pages/UsersPage/UsersPage';
+import UsersPage from './pages/UsersPage';
 import AgenciesPage from './pages/AgenciesPage';
 import { Dashboard } from './pages/Dashboard';
 

@@ -3,10 +3,10 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
-import { useCreateUserMutation } from '../../../service/api';
-import { Button } from '../../elements/Button';
-import FormInput from '../../elements/Input/FormInput';
-import Modal from '../../elements/Modal/Modal';
+import { useCreateUserMutation } from '../../service/api';
+import { Button } from '../../components/elements/Button';
+import FormInput from '../../components/elements/Input/FormInput';
+import Modal from '../../components/elements/Modal/Modal';
 
 const FlexRow = styled.div`
   display: flex;
