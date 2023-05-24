@@ -22,6 +22,7 @@ class OffenseRecordPaginator:
         petition,
         initial_page_size=None,
         attachment_page_size=None,
+        filter_active=True,
     ):
         default_page_size = UNDERAGE_CONVICTIONS_PAGE_SIZE if petition.form_type == UNDERAGED_CONVICTIONS else INITIAL_PAGE_SIZE
         self.initial_page_size = (
@@ -35,7 +36,7 @@ class OffenseRecordPaginator:
             else ATTACHMENT_PAGE_SIZE
         )
         self.petition = petition
-        self.queryset = self.petition.get_all_offense_records(filter_active=True)
+        self.queryset = self.petition.get_all_offense_records(filter_active=filter_active)
 
     def query(self, start, size):
         """Slice query aginst petition offense records."""
