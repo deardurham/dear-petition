@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { SplashLogo, FormErrors, InputStyled, PasswordInputStyled } from './LoginPage.styled';
@@ -35,7 +35,7 @@ function Login() {
     if (authenticatedUser) {
       history.replace('/');
     }
-  }, [authenticatedUser]);
+  }, [authenticatedUser, history]);
 
   const { control, handleSubmit } = useForm({
     defaultValues: {

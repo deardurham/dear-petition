@@ -1,4 +1,3 @@
-import React from 'react';
 import { useModalContext } from '../Button/ModalButton';
 import { Button } from '../Button';
 

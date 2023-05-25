@@ -1,4 +1,3 @@
-import React from 'react';
 import StyledDialog from '../components/elements/Modal/Dialog';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
 import Button from '../components/elements/Button';

@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import Select from '../../../elements/Input/Select';

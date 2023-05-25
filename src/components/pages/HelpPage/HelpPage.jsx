@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import PageBase from '../PageBase';
 import markdownSource from './help.md';
@@ -26,7 +26,12 @@ const ExpandableSection = ({ children }) => {
         if (child?.type === 'h6') {
           expandable = true;
           return (
-            <ExpandableHeader key={i} onClick={() => expandable && setIsExpanded((prev) => !prev)}>
+            <ExpandableHeader
+              // TODO: investigate other possible keys. but this is likely a non-issue
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              onClick={() => expandable && setIsExpanded((prev) => !prev)}
+            >
               {child}
               <FontAwesomeIcon icon={isExpanded ? faCaretRight : faCaretDown} />
             </ExpandableHeader>
@@ -45,7 +50,7 @@ export default function HelpPage() {
     fetch(markdownSource)
       .then((res) => res.text())
       .then((text) => setSource(text));
-  }, [markdownSource]);
+  }, []);
   return (
     <HelpPageStyled>
       <HelpPageContent>

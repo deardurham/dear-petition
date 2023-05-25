@@ -1,9 +1,15 @@
 {
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2020,
+    "sourceType": "module"
   },
   "env": {
     "browser": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
   "overrides": [
     {
@@ -16,45 +22,39 @@
       }
     }
   ],
-  "extends": ["airbnb", "prettier"],
-  "plugins": ["prettier"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
-    "prettier/prettier": ["error"],
-    "react/jsx-filename-extension": [
-      1,
-      {
-        "extensions": [".js", ".jsx"]
-      }
-    ],
-    "prefer-template": "off",
-    "react/prop-types": "off",
+    // Disabled default rules
+    "no-plusplus": "off",
+    "no-continue": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/destructuring-assignment": "off",
+    "react/prop-types": "off", // TODO: on when we add typescript
+
+    // warnings
+    "prefer-template": "off", // TODO: warn
+    "prettier/prettier": "warn",
+    "react/no-array-index-key": "warn",
+
+    // customized rules
+    "react/jsx-filename-extension": [1, { "allow": "always" }], // TODO: as-needed
     "no-param-reassign": [
       "error", {
         "props": true,
         "ignorePropertyModificationsFor": ["state"]
       }
     ],
-    "no-use-before-define": "off",
-    "no-underscore-dangle": "off",
-    "no-unused-vars": ["warn", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
-    "no-plusplus": "off",
-    "no-continue": "off",
-    "no-prototype-builtins": "off",
-    "react/jsx-props-no-spreading": "off",
-    "react/jsx-one-expression-per-line": "off",
-    "react/no-array-index-key": "off",
-    "react/destructuring-assignment": "off",
-    "react/no-danger": "off",
-    "import/no-cycle": "off",
-    "import/order": "off",
-    "import/prefer-default-export": "off",
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": ["src/setupTests.js", "**/*.test.js", "**/*.test.jsx"]
+    "no-use-before-define": ["error", {
+      "functions": false,
+      "variables": false
     }],
-    "jsx-a11y/label-has-associated-control": ["error", { "assert": "either" } ],
-    "camelcase": "warn",
-    "consistent-return": "warn",
-    "import/no-named-as-default": 0,
-    "import/no-named-as-default-member": 0
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+    "jsx-a11y/label-has-associated-control": ["error", { "assert": "either" } ]
   }
 }

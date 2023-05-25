@@ -1,4 +1,3 @@
-import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -68,13 +67,13 @@ function PageBase({ children, className, ...props }) {
             {user?.is_admin ? (
               <DropdownMenu
                 items={[
-                  <Link to="/agencies">
+                  <Link key="agencies" to="/agencies">
                     <LinkWrapper>Agencies</LinkWrapper>
                   </Link>,
-                  <Link to="/users">
+                  <Link key="users" to="/users">
                     <LinkWrapper>Users</LinkWrapper>
                   </Link>,
-                  <a href={user.admin_url} target="_blank" rel="noreferrer">
+                  <a key="admin" href={user.admin_url} target="_blank" rel="noreferrer">
                     <LinkWrapper>
                       <div className="flex gap-2 items-baseline">
                         <span>Admin</span>

@@ -1,4 +1,3 @@
-import React from 'react';
 import cx from 'classnames';
 import { useController } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
@@ -11,6 +10,7 @@ const FormTextArea = ({ className, label, rows, errors, inputProps }) => {
   const error = inputError ? (
     <p>Invalid value</p>
   ) : (
+    // eslint-disable-next-line react/no-array-index-key
     errors?.map((errMsg, i) => <p key={`${i}${errMsg}`}>{errMsg}</p>)
   );
   const textAreaOnChange = (e) => {

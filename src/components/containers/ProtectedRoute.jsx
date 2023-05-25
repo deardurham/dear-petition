@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
 
@@ -16,13 +16,13 @@ function ProtectedRoute({ children, isAdminOnly, ...props }) {
     if (!user && isUninitialized) {
       checkLogin();
     }
-  }, [user, isUninitialized]);
+  }, [checkLogin, user, isUninitialized]);
 
   useEffect(() => {
     if (data?.user) {
       dispatch(loggedIn(data.user));
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   // Spin until user information provided or we are redirected
   // Note: extra render needed before loggedIn dispatch is propogated to useAuth()

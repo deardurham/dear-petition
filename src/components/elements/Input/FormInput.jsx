@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { useController } from 'react-hook-form';
 import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
@@ -19,6 +18,7 @@ const FormInput = ({ className, label, errors, inputProps, ...restProps }) => {
   const error = inputError ? (
     <p>Invalid value</p>
   ) : (
+    // eslint-disable-next-line react/no-array-index-key
     errors?.map((errMsg, i) => <p key={`${i}${errMsg}`}>{errMsg}</p>)
   );
   return (

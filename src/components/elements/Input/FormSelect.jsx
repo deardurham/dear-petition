@@ -1,4 +1,3 @@
-import React from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useController } from 'react-hook-form';
 
@@ -10,6 +9,7 @@ const FormSelect = ({ className, disabled, label, options, errors, inputProps })
   const error = inputError ? (
     <p>Invalid value</p>
   ) : (
+    // eslint-disable-next-line react/no-array-index-key
     errors?.map((errMsg, i) => <p key={`${i}${errMsg}`}>{errMsg}</p>)
   );
   return (

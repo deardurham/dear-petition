@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import cx from 'classnames';
 import Autosuggest from 'react-autosuggest';
 import AutoSuggestInput from '../AutoSuggest/AutoSuggestInput';

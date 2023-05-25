@@ -1,12 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { motion } from 'framer-motion';
-import PropTypes from 'prop-types';
 
 const EXCEED_LIMIT_MSG = 'Maximum file limit exceeded';
 const BAD_TYPE_MSG = 'One or more of your files is not the right type';
 
-const DragNDrop = React.forwardRef((props, ref) => {
+/*
+DragNDrop.propTypes = {
+  // Respond to a file drop or input
+  onDrop: PropTypes.func.isRequired,
+  mimeTypes: PropTypes.arrayOf(PropTypes.string),
+  maxFiles: PropTypes.number,
+  onDragEnter: PropTypes.func,
+  onDragLeave: PropTypes.func,
+};
+
+DragNDrop.defaultProps = {
+  mimeTypes: [],
+  maxFiles: 10,
+  onDragEnter: undefined,
+  onDragLeave: undefined,
+};
+*/
+
+const DragNDrop = (props, ref) => {
   const { children, className, mimeTypes, maxFiles, onDrop, onDragEnter, onDragLeave } = props;
   const [draggedOver, setDraggedOver] = useState(false);
 
@@ -106,22 +123,6 @@ const DragNDrop = React.forwardRef((props, ref) => {
       </motion.label>
     </>
   );
-});
-
-DragNDrop.propTypes = {
-  /** Respond to a file drop or input */
-  onDrop: PropTypes.func.isRequired,
-  mimeTypes: PropTypes.arrayOf(PropTypes.string),
-  maxFiles: PropTypes.number,
-  onDragEnter: PropTypes.func,
-  onDragLeave: PropTypes.func,
 };
 
-DragNDrop.defaultProps = {
-  mimeTypes: [],
-  maxFiles: 10,
-  onDragEnter: undefined,
-  onDragLeave: undefined,
-};
-
-export default DragNDrop;
+export default React.forwardRef(DragNDrop);
