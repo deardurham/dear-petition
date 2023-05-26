@@ -1,7 +1,7 @@
 from django.conf import settings
 from docxtpl import DocxTemplate
 
-from dear_petition.petition import helpers
+from dear_petition.petition import utils
 from dear_petition.petition import models as pm
 from dear_petition.petition.types.dismissed import (
     get_offense_records as get_dismissed_records,
@@ -29,7 +29,7 @@ def get_county_string(counties: list):
 
 def generate_context(batch, attorney, client):
     context = {}
-    context["first_name"], context["last_name"] = helpers.split_first_and_last_name(
+    context["first_name"], context["last_name"] = utils.split_first_and_last_name(
         client.name
     )
     context["sex"] = batch.sex

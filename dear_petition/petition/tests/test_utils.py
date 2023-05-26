@@ -4,7 +4,9 @@ import pytz
 from django.conf import settings
 from django.utils.timezone import make_aware, utc
 from datetime import datetime, date
-from ..utils import dt_obj_to_date, make_datetime_aware, format_petition_date
+
+from dear_petition.petition import utils as pu
+
 from ..constants import DATETIME_FORMAT
 
 
@@ -25,27 +27,27 @@ def test_dt_obj_to_date(settings):
         datetime(year=2018, month=1, day=2, hour=1, minute=0, second=0),
         timezone=pytz.utc,
     )
-    # Calling dt_obj_to_date() returns the date at each of these moments in the
+    # Calling pu.dt_obj_to_date() returns the date at each of these moments in the
     # "America/New_York" timezone, which was "2018-01-01".
-    assert dt_obj_to_date(datetime_2018_01_01_2000_ny) == date(
+    assert pu.dt_obj_to_date(datetime_2018_01_01_2000_ny) == date(
         year=2018, month=1, day=1
     )
-    assert dt_obj_to_date(datetime_2018_01_02_0100_utc) == date(
+    assert pu.dt_obj_to_date(datetime_2018_01_02_0100_utc) == date(
         year=2018, month=1, day=1
     )
 
-    # Calling dt_obj_to_date() for non datetime objects returns None.
+    # Calling pu.dt_obj_to_date() for non datetime objects returns None.
     dt_obj = "A random string."
-    date_obj = dt_obj_to_date(dt_obj)
+    date_obj = pu.dt_obj_to_date(dt_obj)
     assert date_obj == None
     dt_obj = 123438
-    date_obj = dt_obj_to_date(dt_obj)
+    date_obj = pu.dt_obj_to_date(dt_obj)
     assert date_obj == None
     dt_obj = {"dict": "random dict"}
-    date_obj = dt_obj_to_date(dt_obj)
+    date_obj = pu.dt_obj_to_date(dt_obj)
     assert date_obj == None
     dt_obj = None
-    date_obj = dt_obj_to_date(dt_obj)
+    date_obj = pu.dt_obj_to_date(dt_obj)
     assert date_obj == None
 
 
@@ -55,21 +57,21 @@ def test_make_datetime_aware(settings):
     # Set the TIME_ZONE in the settings.
     settings.TIME_ZONE = "America/New_York"
 
-    # Calling make_datetime_aware() returns a timezone-aware datetime referring
+    # Calling pu.make_datetime_aware() returns a timezone-aware datetime referring
     # to the moment from the naive_datetime_obj, in the appropriate time zone.
     naive_datetime_str = "2018-01-01T20:00:00"
     expected_datetime_obj = make_aware(
         datetime(year=2018, month=1, day=1, hour=20, minute=0, second=0),
         timezone=pytz.timezone("America/New_York"),
     )
-    assert make_datetime_aware(naive_datetime_str) == expected_datetime_obj
+    assert pu.make_datetime_aware(naive_datetime_str) == expected_datetime_obj
 
-    # Calling make_datetime_aware() for non-datetime strings returns None.
+    # Calling pu.make_datetime_aware() for non-datetime strings returns None.
     dt_str = ""
-    aware_dt = make_datetime_aware(dt_str)
+    aware_dt = pu.make_datetime_aware(dt_str)
     assert aware_dt == None
     dt_str = None
-    aware_dt = make_datetime_aware(dt_str)
+    aware_dt = pu.make_datetime_aware(dt_str)
     assert aware_dt == None
 
 
@@ -77,4 +79,22 @@ def test_format_petition_date(settings):
     """Should return %m/%d/%Y date. If it is non-EST datetime, it will convert to EST first."""
 
     date = datetime(year=2020, month=1, day=1, hour=11, minute=59, second=0, tzinfo=utc)
-    assert format_petition_date(date) == "01/01/2020"
+    assert pu.format_petition_date(date) == "01/01/2020"
+
+
+def test_get_text_pixel_length():
+    text = "m"
+    assert pu.get_text_pixel_length(text) == 10
+
+
+def test_get_truncation_point_of_text_by_pixel_size():
+    text = "This is an example line of text...er...I mean...lorem ipsum?"
+    truncation_point = pu.get_truncation_point_of_text_by_pixel_size(text, 200)
+    assert truncation_point == 42
+
+
+def test_get_truncation_point_of_short_text_by_pixel_size():
+    """When the full text is shorter than the desired truncation point, it should just return the whole string."""
+    text = "Lorem ipsum"
+    truncation_point = pu.get_truncation_point_of_text_by_pixel_size(text, 20000)
+    assert truncation_point == len(text)

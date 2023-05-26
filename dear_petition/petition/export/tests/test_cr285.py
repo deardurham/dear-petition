@@ -4,7 +4,7 @@ from dear_petition.petition import constants, utils
 from dear_petition.petition.etl.load import assign_agencies_to_documents
 from dear_petition.petition.export.forms import AOCFormCR285
 from dear_petition.petition.tests.factories import PetitionDocumentFactory
-from dear_petition.petition.helpers import get_285_form_agency_address
+from dear_petition.petition.utils import get_285_form_agency_address
 
 
 pytestmark = pytest.mark.django_db

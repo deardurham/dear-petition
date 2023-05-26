@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.annotate import Checkbox
-from dear_petition.petition.helpers import get_285_form_agency_address
+from dear_petition.petition.utils import get_285_form_agency_address
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
