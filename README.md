@@ -4,11 +4,11 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
  project for creating petition forms.
 
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg)](https://github.com/pydanny/cookiecutter-django/)
-[![Build Status](https://travis-ci.org/deardurham/dear-petition.svg?branch=master)](https://travis-ci.org/deardurham/dear-petition)
+![Build Status](https://github.com/deardurham/dear-petition/actions/workflows/test.yml/badge.svg)
 [![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 - [DEAR Petition](#dear-petition)
-  - [🚀 Docker Quick Start (recommended)](#-docker-quick-start-recommended)
+  - [🚀 Docker Quick Start](#-docker-quick-start)
   - [🐳 Development Container](#-development-container)
   - [Frontend Development](#frontend-development)
     - [🚀 Quick Setup](#-quick-setup)
@@ -27,7 +27,7 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
 
 ## 🚀 Docker Quick Start
 
-```bash
+```sh
 git clone git@github.com:deardurham/dear-petition.git
 cd dear-petition/
 docker-compose up -d
@@ -35,7 +35,7 @@ docker-compose run --rm django python manage.py migrate
 docker-compose run --rm django python manage.py createsuperuser
 ```
 
-Try out DEAR Petition Generator by navigating to `http://localhost:3000`, logging in as the superuser you created, and uploading an example CIPRS pdf which can be downloaded from https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records
+Try out DEAR Petition Generator by navigating to `http://localhost:3000`, logging in as the superuser you created, and uploading an example CIPRS pdf which can be downloaded from [the ciprs-reader test record directory](https://github.com/deardurham/ciprs-reader/tree/main/tests/test_records).
 
 ## 🐳 Development Container
 
@@ -44,47 +44,54 @@ This project supports using a [Development Container](https://containers.dev/), 
 Before getting started, install [Visual Studio Code](https://code.visualstudio.com/) with the [Remote Development extension pack](https://aka.ms/vscode-remote/download/extension). See [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers) for additional information.
 
 1. **Build and start dev container:** Using the [VS Code Command Pallete (`⇧⌘P`)](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette), select `Dev Containers: Reopen in Container`.
-2. **Install Python and Node requirements:** 
-   ```sh
-   # Update pip
-   python -m pip install --upgrade pip
-   # Install Python packages
-   pip install --user -r requirements/local.txt
-   # Install node packages
-   npm install
-   ```
+2. **Install Python and Node requirements:**
+
+    ```sh
+    # Update pip
+    python -m pip install --upgrade pip
+    # Install Python packages
+    pip install --user -r requirements/local.txt
+    # Install node packages
+    npm install
+    ```
+
 3. **Setup pre-commit:** Install pre-commit to enforce a variety of community standards:
-   ```sh
-   pre-commit clean
-   pre-commit install
-   ```
+
+    ```sh
+    pre-commit clean
+    pre-commit install
+    ```
+
 4. **Prepare your environment**: Run migrate and create a user for yourself:
-   ```sh
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
+
+    ```sh
+    python manage.py migrate
+    python manage.py createsuperuser
+    ```
+
 5. **Start dev server:** Start the Django development server:
-   ```sh
-   python manage.py runserver
-   ```
+
+    ```sh
+    python manage.py runserver
+    ```
+
 6. **Start Node dev server:** Start the Node development server in a separate terminal:
-   ```sh
-   npm run start
-   ```
+
+    ```sh
+    npm run start
+    ```
 
 ## Frontend Development
 
 The user facing  side of the DEAR Petition Generator is a React single page app (SPA). It is common to run the frontend locally while running the backend on docker.
 
-
 ### 🚀 Quick Setup
 
-```bash
+```sh
 docker compose up -d django # run the backend via docker in the background
 npm i
 npm run start
 ```
-
 
 ### API Proxy Configuration
 
@@ -96,13 +103,13 @@ When the frontend is run using docker, the `API_PROXY` environment variable is s
 
 You can override the this proxy url by setting `OVERRIDE_API_PROXY`:
 
-```bash
+```sh
 OVERRIDE_API_PROXY=http://localhost:8888 docker-compose up -d
 ```
 
 Note that there's an issue with the `node_modules` volume not updating when you add new dependencies. When this happens, run the following:
 
-```bash
+```sh
 docker compose up --renew-anon-volumes -d frontend
 ```
 
@@ -112,7 +119,7 @@ When using `npm run start` to run the frontend, the `API_PROXY` environment vari
 
 You can set the proxy url by either setting `OVERRIDE_API_PROXY` or `API_PROXY`:
 
-```bash
+```sh
 API_PROXY=http://localhost:8888 npm start
 ```
 
@@ -125,27 +132,34 @@ Mac](https://docs.docker.com/docker-for-mac/install/).
 
 Build the project containers:
 
+  ```sh
     docker-compose build
+  ```
 
 Run the containers:
 
+  ```sh
     docker-compose up -d django
+  ```
 
 Migrate DB:
 
+  ```sh
     docker-compose run --rm django python manage.py migrate
+  ```
 
 Create a superuser:
 
+  ```sh
     docker-compose run --rm django python manage.py createsuperuser
+  ```
 
-When asked for a username and password, enter values of your choosing.  Email address may be left empty.    
+When asked for a username and password, enter values of your choosing.  Email address may be left empty.
 
-Visit http://localhost:8000/petition/api/ in your browser.  If you get authentication errors, you may login as the superuser you created at http://localhost:8000/ and try again.
+Visit `http://localhost:8000/petition/api/` in your browser.  If you get authentication errors, you may login as the superuser you created at `http://localhost:8000/` and try again.
 
 See detailed [cookiecutter-django Docker
 documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
-
 
 ### Restore database
 
@@ -153,10 +167,10 @@ If you have a database dump you wish to restore, you can run:
 
 ```sh
 docker-compose run --rm django sh
-$ dropdb dear_petition
-$ createdb dear_petition
-$ pg_restore -Ox -d dear_petition latest.dump
-$ python manage.py migrate
+dropdb dear_petition
+createdb dear_petition
+pg_restore -Ox -d dear_petition latest.dump
+python manage.py migrate
 ```
 
 ### Configuring the containers using docker-compose.override.yml (optional)
@@ -185,8 +199,10 @@ root$ python manage.py runserver 0.0.0.0:8000
 
 ### Running tests with py.test
 
-    $ docker-compose run --rm django pytest
-    
+  ```sh
+    docker-compose run --rm django pytest
+  ```
+
 ### Test coverage
 
 Test coverage is automatically generated as part of `pytest`.
@@ -194,16 +210,17 @@ Test coverage is automatically generated as part of `pytest`.
 To manually run the tests, check your test coverage, and generate an HTML
 coverage report:
 
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
+  ```sh
+    coverage run -m pytest
+    coverage html
+    open htmlcov/index.html
+  ```
 
 ### Sign up for Sentry
 
 The dear-petition project is now on Sentry. Visit sentry.io and make an account or sign in with Github. Reach out to an existing member for an invite to the project.
 
-
-# Production testing
+## Production testing
 
 To test the production Dockerfile locally, run:
 
