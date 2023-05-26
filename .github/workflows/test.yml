@@ -63,3 +63,6 @@ jobs:
         run: pytest
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/dear_petition
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v10.0.1
+
