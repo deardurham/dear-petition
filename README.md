@@ -85,6 +85,8 @@ Before getting started, install [Visual Studio Code](https://code.visualstudio.c
 
 The user facing  side of the DEAR Petition Generator is a React single page app (SPA). It is common to run the frontend locally while running the backend on docker.
 
+Note: **Node 18 is the minimum supported version for local frontend development**
+
 ### 🚀 Quick Setup
 
 ```sh
