@@ -50,6 +50,7 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx"
   },
   "browserslist": {
