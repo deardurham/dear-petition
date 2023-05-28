@@ -46,6 +46,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docker-
             ${{ runner.os }}-
+      - name: Run eslint + format
+        run: |
+          npm run lint
+          npx prettier --check .
       - name: Build Docker Deploy Image
         uses: docker/build-push-action@v2
         with:
