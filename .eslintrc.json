@@ -43,6 +43,7 @@
     "react/no-array-index-key": "warn",
 
     // customized rules
+    "react/no-unknown-property": ["error", { "ignore": ["initial", "animate", "exit"] }],
     "react/jsx-filename-extension": [1, { "allow": "always" }], // TODO: as-needed
     "no-param-reassign": [
       "error", {
