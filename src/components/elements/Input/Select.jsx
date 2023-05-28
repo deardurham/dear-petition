@@ -7,12 +7,7 @@ function Select({ value, onChange, label, errors, options, disabled, className }
     <SelectWrapper className={className}>
       <SelectStyled>
         {label}
-        <ActualSelectStyled
-          value={value}
-          options={options}
-          onChange={onChange}
-          isDisabled={disabled}
-        />
+        <ActualSelectStyled value={value} options={options} onChange={onChange} isDisabled={disabled} />
       </SelectStyled>
       <AnimatePresence>
         <InputErrors
@@ -39,7 +34,7 @@ Select.propTypes = {
     PropTypes.shape({
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       label: PropTypes.string,
-    })
+    }),
   ).isRequired,
 };
 

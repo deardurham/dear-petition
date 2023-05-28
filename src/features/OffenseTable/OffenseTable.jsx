@@ -1,18 +1,8 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faChevronRight,
-  faChevronDown,
-  faExclamationTriangle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faChevronDown, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance, isBefore, isValid } from 'date-fns';
-import {
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-  TableStyle,
-} from '../../components/elements/Table';
+import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../../components/elements/Table';
 import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
 
 function StyledTable({ children, className, columnSizes, numColumns }) {
@@ -34,44 +24,27 @@ const toNormalCase = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1).toLo
 function OffenseRow({ offenseRecord, selected, onSelect, dob }) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const dateAt18YearsOld =
-    isValid(dob) && new Date(dob.getFullYear() + 18, dob.getMonth() + dob.getDay());
+  const dateAt18YearsOld = isValid(dob) && new Date(dob.getFullYear() + 18, dob.getMonth() + dob.getDay());
 
   return (
     <TableRow key={offenseRecord.pk}>
       <TableCell>
-        <input
-          type="checkbox"
-          className="cursor-pointer"
-          checked={!!selected}
-          onChange={() => onSelect()}
-        />
+        <input type="checkbox" className="cursor-pointer" checked={!!selected} onChange={() => onSelect()} />
       </TableCell>
       <TableCell tooltip={offenseRecord.offense_date}>{offenseRecord.offense_date}</TableCell>
       <TableCell tooltip={offenseRecord.description}>{offenseRecord.description}</TableCell>
-      <TableCell tooltip={offenseRecord.action}>
-        {toNormalCaseEachWord(offenseRecord.action)}
-      </TableCell>
-      <TableCell tooltip={offenseRecord.severity}>
-        {toNormalCaseEachWord(offenseRecord.severity)}
-      </TableCell>
+      <TableCell tooltip={offenseRecord.action}>{toNormalCaseEachWord(offenseRecord.action)}</TableCell>
+      <TableCell tooltip={offenseRecord.severity}>{toNormalCaseEachWord(offenseRecord.severity)}</TableCell>
       <TableCell>
         {isValid(dob) && isBefore(new Date(offenseRecord.offense_date), dateAt18YearsOld) && (
-          <Tooltip
-            tooltipContent="This offense may be a candidate for the AOC-CR-293 petition form"
-            offset={[0, 10]}
-          >
+          <Tooltip tooltipContent="This offense may be a candidate for the AOC-CR-293 petition form" offset={[0, 10]}>
             <FontAwesomeIcon className="text-xl text-red-600" icon={faExclamationTriangle} />
           </Tooltip>
         )}
       </TableCell>
       <TableCell>
         <button type="button" onClick={() => setShowDetails((prev) => !prev)}>
-          {showDetails ? (
-            <FontAwesomeIcon icon={faChevronDown} />
-          ) : (
-            <FontAwesomeIcon icon={faChevronRight} />
-          )}
+          {showDetails ? <FontAwesomeIcon icon={faChevronDown} /> : <FontAwesomeIcon icon={faChevronRight} />}
         </button>
       </TableCell>
       {showDetails && (

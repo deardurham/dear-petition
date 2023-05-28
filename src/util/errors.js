@@ -4,8 +4,7 @@ export const getErrorList = (validationObject) => {
     return [];
   }
   return errorEntries.map(
-    ([key, errorList]) =>
-      `${key.charAt(0).toLocaleUpperCase()}${key.slice(1)}: ${errorList.join(' ')}`
+    ([key, errorList]) => `${key.charAt(0).toLocaleUpperCase()}${key.slice(1)}: ${errorList.join(' ')}`,
   );
 };
 

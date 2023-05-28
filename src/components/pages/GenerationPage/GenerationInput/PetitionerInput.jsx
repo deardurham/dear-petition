@@ -6,11 +6,7 @@ import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import AddressInput from './AddressInput';
 import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
-import {
-  useLazySearchClientsQuery,
-  useUpdateBatchMutation,
-  useUpdateContactMutation,
-} from '../../../../service/api';
+import { useLazySearchClientsQuery, useUpdateBatchMutation, useUpdateContactMutation } from '../../../../service/api';
 import Button, { ModalButton } from '../../../elements/Button';
 import { useModalContext } from '../../../elements/Button/ModalButton';
 import { CreateContact } from '../../../../features/CreateContact';
@@ -31,11 +27,7 @@ export const CreateClientModal = ({ onCreate }) => {
   const { closeModal } = useModalContext();
   return (
     <div className="w-[550px] px-40 py-20" ref={modalElement}>
-      <CreateContact
-        onClose={closeModal}
-        category="client"
-        onSubmitSuccess={(submitData) => onCreate(submitData)}
-      />
+      <CreateContact onClose={closeModal} category="client" onSubmitSuccess={(submitData) => onCreate(submitData)} />
     </div>
   );
 };
@@ -98,10 +90,7 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
               }).unwrap();
               setPetitionerData(getPetitionerData(clientData));
             } catch (e) {
-              addError(
-                'client',
-                'Unable to select new client. Please try searching and selecting the new client.'
-              );
+              addError('client', 'Unable to select new client. Please try searching and selecting the new client.');
             }
           }}
         />
@@ -189,7 +178,7 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
                 {
                   search: searchValue,
                 },
-                true
+                true,
               ).unwrap();
               return data.results;
             }}

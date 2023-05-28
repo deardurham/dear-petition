@@ -13,13 +13,7 @@ export const useModalContext = () => {
   return context;
 };
 
-export const ModalButton = ({
-  children,
-  className,
-  colorClass,
-  title,
-  allowCloseOnEscape = false,
-}) => {
+export const ModalButton = ({ children, className, colorClass, title, allowCloseOnEscape = false }) => {
   const modalElement = useRef();
   const [showModal, setShowModal] = useState(false);
   const closeModal = useCallback(() => setShowModal(false), []);
@@ -29,11 +23,7 @@ export const ModalButton = ({
     }
   });
   return (
-    <Button
-      className={className}
-      colorClass={colorClass ?? 'neutral'}
-      onClick={() => setShowModal(true)}
-    >
+    <Button className={className} colorClass={colorClass ?? 'neutral'} onClick={() => setShowModal(true)}>
       {title}
       <ModalContext.Provider value={{ closeModal }}>
         <StyledDialog isOpen={showModal} onClose={allowCloseOnEscape ? closeModal : undefined}>

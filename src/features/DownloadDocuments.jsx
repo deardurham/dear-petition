@@ -19,12 +19,7 @@ export const DownloadDocumentsModal = ({ isOpen, onClose, petitions }) => (
       <DownloadExistingDocuments petitions={petitions} />
 
       <div className="p-10 flex flex-row justify-center gap-8">
-        <Button
-          type="button"
-          colorClass={POSITIVE}
-          className="px-4 py-2 self-center"
-          onClick={() => onClose()}
-        >
+        <Button type="button" colorClass={POSITIVE} className="px-4 py-2 self-center" onClick={() => onClose()}>
           Close
         </Button>
       </div>
@@ -60,15 +55,10 @@ const DownloadExistingDocuments = ({ petitions }) => {
           <TableRow key={petition.pk}>
             <TableCell>{petition.form_type}</TableCell>
             <TableCell>{petition.jurisdiction}</TableCell>
-            <TableCell>
-              {petition.documents.length > 0 ? petition.documents.length - 1 : 0}
-            </TableCell>
+            <TableCell>{petition.documents.length > 0 ? petition.documents.length - 1 : 0}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
-                <Tooltip
-                  tooltipContent={errors?.[petition.pk]}
-                  hideTooltip={!errors?.[petition.pk]}
-                >
+                <Tooltip tooltipContent={errors?.[petition.pk]} hideTooltip={!errors?.[petition.pk]}>
                   <FontAwesomeIcon
                     className={cx('text-[24px] text-red', { invisible: !errors?.[petition.pk] })}
                     icon={faExclamationTriangle}

@@ -13,7 +13,7 @@ const Suggestion = ({ isHighlighted, name }) => (
       'bg-white text-gray-900 cursor-pointer',
       {
         'outline outline-2 outline-yellow-400': isHighlighted,
-      }
+      },
     )}
   >
     <p className="text-lg text-inherit">{name}</p>
@@ -25,7 +25,7 @@ const SuggestionContainer = ({ containerProps: { className, ...restProps }, chil
     className={cx(
       className,
       { 'max-w-[300px] border-2 border-gray-800 rounded-md absolute z-10': !!children },
-      '[&>ul]:divide-gray-800 [&>ul]:divide-y w-full'
+      '[&>ul]:divide-gray-800 [&>ul]:divide-y w-full',
     )}
     {...restProps}
   >
@@ -39,12 +39,7 @@ const renderSuggestion = (suggestion, { isHighlighted }) => (
 
 const renderAutoSuggestInput = (inputProps, label) => (
   <div className="flex flex-col items-start mb-1">
-    <AutoSuggestInput
-      label={label}
-      innerClassName="w-full p-2 rounded-sm"
-      {...inputProps}
-      type="search"
-    />
+    <AutoSuggestInput label={label} innerClassName="w-full p-2 rounded-sm" {...inputProps} type="search" />
   </div>
 );
 
@@ -66,7 +61,7 @@ const AutocompleteInput = ({
     },
     {
       timeout: 300,
-    }
+    },
   );
 
   const handleSuggestionChange = (_event, { newValue, method }) => {
@@ -99,10 +94,7 @@ const AutocompleteInput = ({
           onSuggestionsClearRequested={() => setSuggestions([])}
           getSuggestionValue={(suggestion) => suggestion.name}
           renderSuggestion={(suggestion, params) =>
-            renderSuggestion(
-              getSuggestionLabel ? getSuggestionLabel(suggestion) : suggestion,
-              params
-            )
+            renderSuggestion(getSuggestionLabel ? getSuggestionLabel(suggestion) : suggestion, params)
           }
           inputProps={inputProps}
           containerProps={{ className: 'relative' }}
@@ -114,7 +106,7 @@ const AutocompleteInput = ({
                 ...autoSuggestInputProps,
                 className: cx(autoSuggestInputProps?.className, className),
               },
-              label
+              label,
             )
           }
           renderSuggestionsContainer={(props) => <SuggestionContainer {...props} />}

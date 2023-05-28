@@ -53,24 +53,16 @@ export const ExistingPetitions = () => {
                 <TableCell>
                   <Link to={`/generate/${batch.pk}`}>
                     <Button className="w-[105px]">
-                      {`${batch.petitions.length} Petition${
-                        batch.petitions.length === 1 ? '' : 's'
-                      }`}
+                      {`${batch.petitions.length} Petition${batch.petitions.length === 1 ? '' : 's'}`}
                     </Button>
                   </Link>
                 </TableCell>
-                <TableCell>
-                  {formatDistance(new Date(batch.automatic_delete_date), new Date())}
-                </TableCell>
+                <TableCell>{formatDistance(new Date(batch.automatic_delete_date), new Date())}</TableCell>
                 <TableCell className="flex gap-2">
                   <Button
-                    disabled={batch.petitions.every((petition) =>
-                      hasValidationsErrors(petition.generation_errors)
-                    )}
+                    disabled={batch.petitions.every((petition) => hasValidationsErrors(petition.generation_errors))}
                     title={
-                      batch.petitions.every((petition) =>
-                        hasValidationsErrors(petition.generation_errors)
-                      )
+                      batch.petitions.every((petition) => hasValidationsErrors(petition.generation_errors))
                         ? 'No available petitions for download. Click on the petition button to the left to fix.'
                         : undefined
                     }

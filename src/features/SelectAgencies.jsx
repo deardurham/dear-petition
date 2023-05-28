@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { Button } from '../components/elements/Button';
 import StyledDialog from '../components/elements/Modal/Dialog';
 import AutocompleteInput from '../components/elements/Input/AutocompleteInput';
-import {
-  useLazySearchAgenciesQuery,
-  useAssignAgenciesToDocumentsMutation,
-  usePetitionQuery,
-} from '../service/api';
+import { useLazySearchAgenciesQuery, useAssignAgenciesToDocumentsMutation, usePetitionQuery } from '../service/api';
 import { Spinner } from '../components/elements/Spinner';
 import { Badge } from '../components/elements/Badge/Badge';
 
@@ -36,11 +32,7 @@ export const SelectAgenciesModal = ({ isOpen, onClose, petitionId }) => {
   const { data: petitionData } = usePetitionQuery({ petitionId });
 
   const content = petitionData ? (
-    <SelectAgencies
-      petitionId={petitionId}
-      selectedAgencies={petitionData.agencies}
-      onClose={onClose}
-    />
+    <SelectAgencies petitionId={petitionId} selectedAgencies={petitionData.agencies} onClose={onClose} />
   ) : (
     <Spinner />
   );
@@ -61,31 +53,24 @@ const SelectAgencies = ({ selectedAgencies, onClose, petitionId }) => {
     <div className="flex flex-col gap-8 w-[600px] p-10">
       <h3>View / Select Agencies</h3>
       <p className="text-[1.6rem]">
-        Please select or de-select agencies here if you wish to include or exclude them from the
-        petition.
+        Please select or de-select agencies here if you wish to include or exclude them from the petition.
       </p>
       <div>
         <AutocompleteInput
           placeholder="Search for an agency..."
           selections={selections}
           showSelections
-          onSelect={(agency) =>
-            setSelections((prev) => [...prev, agency].sort(sortAgencyArrayByPk))
-          }
-          onRemoveSelection={(agency) =>
-            setSelections((prev) => prev.filter((a) => a.pk !== agency.pk))
-          }
+          onSelect={(agency) => setSelections((prev) => [...prev, agency].sort(sortAgencyArrayByPk))}
+          onRemoveSelection={(agency) => setSelections((prev) => prev.filter((a) => a.pk !== agency.pk))}
           getSuggestionLabel={({ name }) => name}
           fetchSuggestions={async (searchValue) => {
             const data = await triggerSuggestionsFetch(
               {
                 search: searchValue,
               },
-              true
+              true,
             ).unwrap();
-            return data.results.filter(
-              (suggestion) => !selections.map(({ pk }) => pk).includes(suggestion.pk)
-            );
+            return data.results.filter((suggestion) => !selections.map(({ pk }) => pk).includes(suggestion.pk));
           }}
         />
         <div className="flex flex-wrap max-h-[70px] mt-2 overflow-auto gap-2 select-none">

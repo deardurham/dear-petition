@@ -15,8 +15,7 @@ import FormInput from '../../components/elements/Input/FormInput';
 import FormTextArea from '../../components/elements/Input/FormTextArea';
 import StyledDialog from '../../components/elements/Modal/Dialog';
 
-const getFormattedAddress = (address1, address2) =>
-  address2 ? `${address1}\n${address2}` : address1;
+const getFormattedAddress = (address1, address2) => (address2 ? `${address1}\n${address2}` : address1);
 
 const AgencyInputRow = ({ agencyData, onStopEditing }) => {
   const [triggerUpdate, { error }] = useUpdateContactMutation();
@@ -164,31 +163,20 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
           <EditableRow
             key={agencyData.pk}
             isEditing={editingId === agencyData.pk}
-            editingRow={
-              <AgencyInputRow agencyData={agencyData} onStopEditing={() => setEditingId(null)} />
-            }
+            editingRow={<AgencyInputRow agencyData={agencyData} onStopEditing={() => setEditingId(null)} />}
           >
             <TableCell tooltip={agencyData.name}>{agencyData.name}</TableCell>
-            <TableCell tooltip={agencyData.formatted_address}>
-              {agencyData.formatted_address}
-            </TableCell>
+            <TableCell tooltip={agencyData.formatted_address}>{agencyData.formatted_address}</TableCell>
             <TableCell>{agencyData.city}</TableCell>
             <TableCell>{agencyData.zipcode}</TableCell>
             <TableCell className="flex gap-2">
               <Button type="button" onClick={() => setEditingId(agencyData.pk)}>
                 Edit
               </Button>
-              <Button
-                type="button"
-                colorClass="caution"
-                onClick={() => setDeleteModalId(agencyData.pk)}
-              >
+              <Button type="button" colorClass="caution" onClick={() => setDeleteModalId(agencyData.pk)}>
                 Delete
               </Button>
-              <StyledDialog
-                isOpen={deleteModalId === agencyData.pk}
-                onClose={() => onCloseDeleteModal()}
-              >
+              <StyledDialog isOpen={deleteModalId === agencyData.pk} onClose={() => onCloseDeleteModal()}>
                 <div className="max-w-[600px] p-24 flex flex-col gap-8">
                   <p className="self-center text-3xl font-bold">WARNING</p>
                   <p className="text-[1.6rem] flex flex-wrap gap-x-2 gap-y-4">
@@ -196,20 +184,10 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
                     <span className="font-semibold">{agencyData.name}</span>
                   </p>
                   <div className="self-end flex gap-4 text-lg">
-                    <Button
-                      type="button"
-                      className="p-2"
-                      colorClass="neutral"
-                      onClick={() => onCloseDeleteModal()}
-                    >
+                    <Button type="button" className="p-2" colorClass="neutral" onClick={() => onCloseDeleteModal()}>
                       Cancel
                     </Button>
-                    <Button
-                      type="button"
-                      className="p-2"
-                      colorClass="caution"
-                      onClick={() => onDelete(agencyData)}
-                    >
+                    <Button type="button" className="p-2" colorClass="caution" onClick={() => onDelete(agencyData)}>
                       Delete
                     </Button>
                   </div>

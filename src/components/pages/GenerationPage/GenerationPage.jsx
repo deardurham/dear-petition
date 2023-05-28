@@ -190,8 +190,8 @@ function GenerationPage() {
         <GenerationSection>
           <h2>Petition List</h2>
           <p>
-            Click on the buttons below to generate petition forms and their attachments. Click on
-            the &rsquo;View&rsquo; button to reveal a list of offense records.
+            Click on the buttons below to generate petition forms and their attachments. Click on the &rsquo;View&rsquo;
+            button to reveal a list of offense records.
           </p>
           {data && (
             <PetitionList

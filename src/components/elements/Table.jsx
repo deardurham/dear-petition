@@ -1,12 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCaretDown,
-  faCaretUp,
-  faChevronLeft,
-  faChevronRight,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCaretUp, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import { colorPrimary, greyScale } from '../../styles/colors';
 
@@ -126,9 +121,7 @@ const calculateVisiblePages = (currentPage, numPages, maxVisiblePages = 7) => {
     return [...startingPages, lastPageNumber];
   }
   if (currentPage + offset >= lastPageNumber) {
-    return [1, ...Array(maxVisiblePages - 2).keys()].map(
-      (index) => lastPageNumber - maxVisiblePages + index + 1
-    );
+    return [1, ...Array(maxVisiblePages - 2).keys()].map((index) => lastPageNumber - maxVisiblePages + index + 1);
   }
   return [1, currentPage - offset, currentPage, currentPage + offset, lastPageNumber];
 };
@@ -226,7 +219,7 @@ export const SortableHeader = ({ children, field, onSelect, isSelected, sortDir 
       <div
         className={cx(
           'flex gap-2 cursor-pointer active:underline-none focus:underline focus:decoration-1 focus:underline-offset-4',
-          { 'underline decoration-1 underline-offset-4': isSelected }
+          { 'underline decoration-1 underline-offset-4': isSelected },
         )}
         role="button"
         tabIndex={0}

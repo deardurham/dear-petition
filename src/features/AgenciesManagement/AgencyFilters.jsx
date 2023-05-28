@@ -27,7 +27,7 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
   const removeSelection = (selection) => {
     onFilter(
       field,
-      filterSelections.filter((element) => element !== selection)
+      filterSelections.filter((element) => element !== selection),
     );
   };
   return (
@@ -43,7 +43,7 @@ const ContactFilter = ({ field, category, label, onFilter, filterSelections }) =
             {
               params: { field, category, search: searchValue },
             },
-            true
+            true,
           ).unwrap();
           return data.filter((suggestion) => !filterSelections.includes(suggestion));
         }}
@@ -75,17 +75,7 @@ const AgencyContactFilter = ({ field, label, onFilter, filterSelections }) => (
 
 const AgencyFilters = ({ onFilter, filterSelections }) => (
   <>
-    <AgencyContactFilter
-      field="city"
-      label="City"
-      onFilter={onFilter}
-      filterSelections={filterSelections.city}
-    />
-    <AgencyContactFilter
-      field="zipcode"
-      label="Zip"
-      onFilter={onFilter}
-      filterSelections={filterSelections.zipcode}
-    />
+    <AgencyContactFilter field="city" label="City" onFilter={onFilter} filterSelections={filterSelections.city} />
+    <AgencyContactFilter field="zipcode" label="Zip" onFilter={onFilter} filterSelections={filterSelections.zipcode} />
   </>
 );

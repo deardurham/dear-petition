@@ -1,14 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import {
-  LinkWrapper,
-  LinksGroup,
-  PageBaseStyled,
-  PageHeader,
-  PageLogo,
-  PageContentWrapper,
-} from './PageBase.styled';
+import { LinkWrapper, LinksGroup, PageBaseStyled, PageHeader, PageLogo, PageContentWrapper } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 

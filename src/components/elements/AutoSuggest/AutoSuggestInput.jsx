@@ -6,10 +6,7 @@ import Input from '../Input/Input';
 
 const AutoSuggestInput = (inputProps, ref) => (
   <div className="flex gap-2">
-    <FontAwesomeIcon
-      className={cx('self-center text-primary', { 'mt-6': inputProps?.label })}
-      icon={faSearch}
-    />
+    <FontAwesomeIcon className={cx('self-center text-primary', { 'mt-6': inputProps?.label })} icon={faSearch} />
     <Input {...inputProps} ref={ref} />
   </div>
 );

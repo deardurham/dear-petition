@@ -40,16 +40,12 @@ const ModalContent = ({ petitionId, onClose }) => {
     return null;
   }
   const { offense_records: offenseRecords } = petition;
-  const sortedOffenseRecords = [...offenseRecords].sort((a, b) =>
-    a.offense_date > b.offense_date ? 1 : -1
-  );
+  const sortedOffenseRecords = [...offenseRecords].sort((a, b) => (a.offense_date > b.offense_date ? 1 : -1));
 
   const onSelect = (offenseRecordId) => {
     setSelectedRows((prevSelectedRows) => {
       const newArray = [...prevSelectedRows];
-      const selectedRowIndex = newArray.findIndex(
-        (selectedRowId) => selectedRowId === offenseRecordId
-      );
+      const selectedRowIndex = newArray.findIndex((selectedRowId) => selectedRowId === offenseRecordId);
 
       // de-select row id if already in list
       if (selectedRowIndex >= 0) {
@@ -79,8 +75,7 @@ const ModalContent = ({ petitionId, onClose }) => {
     <>
       <h3>View / Modify Offenses</h3>
       <p className="text-[1.6rem]">
-        Please select or de-select offenses here if you wish to include or exclude them from the
-        petition.
+        Please select or de-select offenses here if you wish to include or exclude them from the petition.
       </p>
       {petitionerDOB && (
         <p className="flex gap-2">

@@ -90,22 +90,11 @@ const CreateUserAction = ({ onCloseModal }) => {
     <>
       <h2>Add User</h2>
       <SubmitForm onSubmit={handleSubmit(onSubmit)}>
-        <FormInput
-          label="Username"
-          inputProps={{ name: 'username', control }}
-          errors={[error?.data?.username] ?? []}
-        />
-        <FormInput
-          label="Email"
-          inputProps={{ name: 'email', control }}
-          errors={[error?.data?.email] ?? []}
-        />
+        <FormInput label="Username" inputProps={{ name: 'username', control }} errors={[error?.data?.username] ?? []} />
+        <FormInput label="Email" inputProps={{ name: 'email', control }} errors={[error?.data?.email] ?? []} />
         <div>
           <span>User Role</span>
-          <select
-            className="border border-gray-700 rounded-md bg-gray-200"
-            {...register('is_admin')}
-          >
+          <select className="border border-gray-700 rounded-md bg-gray-200" {...register('is_admin')}>
             {Object.values(USER_ROLES).map(({ label, value }) => (
               <option key={value} value={value}>
                 {label}

@@ -38,7 +38,7 @@ export const Dashboard = () => {
                     type="button"
                     className={cx(
                       'px-4 py-2 rounded-md border-0',
-                      selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]'
+                      selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]',
                     )}
                   >
                     New Petition
@@ -51,7 +51,7 @@ export const Dashboard = () => {
                     type="button"
                     className={cx(
                       'px-4 py-2 rounded-md border-0',
-                      selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]'
+                      selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]',
                     )}
                   >
                     Existing Petitions
