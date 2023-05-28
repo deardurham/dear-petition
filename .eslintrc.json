@@ -1,14 +1,21 @@
 {
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
   },
   "settings": {
     "react": {
       "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "paths": ["src"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
     }
   },
   "overrides": [
@@ -23,11 +30,13 @@
     }
   ],
   "extends": [
+    "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
     "plugin:jsx-a11y/recommended",
-    "plugin:prettier/recommended"
+    "prettier"
   ],
   "rules": {
     // Disabled default rules
@@ -37,25 +46,20 @@
     "react/destructuring-assignment": "off",
     "react/prop-types": "off", // TODO: on when we add typescript
 
-    // warnings
-    "prefer-template": "off", // TODO: warn
-    "prettier/prettier": "warn",
-    "react/no-array-index-key": "warn",
-
     // customized rules
-    "react/no-unknown-property": ["error", { "ignore": ["initial", "animate", "exit"] }],
-    "react/jsx-filename-extension": [1, { "allow": "always" }], // TODO: as-needed
     "no-param-reassign": [
       "error", {
         "props": true,
         "ignorePropertyModificationsFor": ["state"]
       }
     ],
+    "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
     "no-use-before-define": ["error", {
       "functions": false,
       "variables": false
     }],
-    "no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+    "react/no-unknown-property": ["error", { "ignore": ["initial", "animate", "exit"] }], // TODO: Replace framer-motion with css animate
+    "react/jsx-filename-extension": [1, { "allow": "always" }], // TODO: as-needed
     "jsx-a11y/label-has-associated-control": ["error", { "assert": "either" } ]
   }
 }

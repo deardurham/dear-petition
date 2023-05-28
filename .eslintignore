@@ -1,0 +1,7 @@
+node_modules/
+build/
+env.d.ts
+vite.config.js
+tailwind.config.js
+staticfiles/
+htmlcov/

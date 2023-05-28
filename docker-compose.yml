@@ -34,7 +34,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      target: dear_frontend
     stdin_open: true
     depends_on:
       - django
