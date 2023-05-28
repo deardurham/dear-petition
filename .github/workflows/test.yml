@@ -51,6 +51,7 @@ jobs:
             ${{ runner.os }}-
       - name: Run eslint + format
         run: |
+          npm i
           npm run lint
           npx prettier --check .
       - name: Build Docker Deploy Image
