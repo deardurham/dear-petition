@@ -12,7 +12,7 @@ import {
   PageContentWrapper,
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
-import codeWithDurhamLogo from '../../assets/img/Code_with_Durham_logo.png';
+import codeWithDurhamLogo from '../../assets/img/CWD_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 
 import useAuth from '../../hooks/useAuth';
