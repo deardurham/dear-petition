@@ -116,7 +116,9 @@ function PageBase({ children, className, ...props }) {
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
           <DurmLink>
-            <FooterLogo src={codeWithDurhamLogo} alt="Code with Durham logo" />
+            <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
+              <FooterLogo src={codeWithDurhamLogo} alt="Code with Durham logo" />
+            </a>
           </DurmLink>
         </PageFooter>
       </PageBaseCentered>
