@@ -8,9 +8,11 @@ import {
   PageHeader,
   PageFooter,
   PageLogo,
+  FooterLogo,
   PageContentWrapper,
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
+import codeWithDurhamLogo from '../../assets/img/Code_with_Durham_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 
 import useAuth from '../../hooks/useAuth';
@@ -30,6 +32,12 @@ const LogoLink = styled(LinkWrapper)`
     width: 400px;
     height: auto;
   }
+`;
+const DurmLink = styled(LinkWrapper)`
+  border: none;
+  padding: 0;
+  width: 75px;
+  heigh: auto;
 `;
 
 const LogoutLink = styled(LinkWrapper)`
@@ -107,7 +115,9 @@ function PageBase({ children, className, ...props }) {
         </PageHeader>
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
-          <p>made by CwD</p>
+          <DurmLink>
+            <FooterLogo src={codeWithDurhamLogo} alt="Code with Durham logo" />
+          </DurmLink>
         </PageFooter>
       </PageBaseCentered>
     </PageBaseStyled>

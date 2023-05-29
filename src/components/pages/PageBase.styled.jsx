@@ -31,6 +31,11 @@ export const PageLogo = styled.img`
   height: 100%;
 `;
 
+export const FooterLogo = styled.img`
+  width: 100%;
+  height: 100%;
+`;
+
 export const LinksGroup = styled.div`
   flex: 1;
   display: flex;
