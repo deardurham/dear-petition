@@ -66,7 +66,7 @@ export const PageContentWrapper = styled.section`
 
 export const PageFooter = styled.footer`
   height: 50px;
-  margin-bottom: 1rem;
+  margin: 8rem 0 0.5rem 0;
   display: flex;
   justify-content: center;
   align-items: center;
