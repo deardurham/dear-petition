@@ -7,8 +7,7 @@ import {
   PageBaseStyled,
   PageHeader,
   PageFooter,
-  PageLogo,
-  FooterLogo,
+  Logo,
   PageContentWrapper,
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
@@ -61,7 +60,7 @@ function PageBase({ children, className, ...props }) {
         <PageHeader>
           <LogoLink>
             <Link to="/">
-              <PageLogo src={dearLogo} alt="DEAR logo" />
+              <Logo src={dearLogo} alt="DEAR logo" />
             </Link>
           </LogoLink>
           <LinksGroup>
@@ -118,7 +117,7 @@ function PageBase({ children, className, ...props }) {
           <FooterLogoLink>
             <p className="m-0 relative top-6 text-[1.25rem] text-center">created by</p>
             <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
-              <FooterLogo src={codeWithDurhamLogo} alt="Code with Durham logo" />
+              <Logo src={codeWithDurhamLogo} alt="Code with Durham logo" />
             </a>
           </FooterLogoLink>
         </PageFooter>
