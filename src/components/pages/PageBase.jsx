@@ -21,7 +21,7 @@ import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
-const LogoLink = styled(LinkWrapper)`
+const HeaderLogoLink = styled(LinkWrapper)`
   border: none;
   padding: 0;
   height: 80px;
@@ -58,11 +58,11 @@ function PageBase({ children, className, ...props }) {
     <PageBaseStyled {...props}>
       <PageBaseCentered>
         <PageHeader>
-          <LogoLink>
+          <HeaderLogoLink>
             <Link to="/">
               <Logo src={dearLogo} alt="DEAR logo" />
             </Link>
-          </LogoLink>
+          </HeaderLogoLink>
           <LinksGroup>
             {user && (
               <LinkWrapper>
