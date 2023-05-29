@@ -58,7 +58,16 @@ export const LinkWrapper = styled.div`
 export const PageContentWrapper = styled.section`
   padding: 2rem 4rem;
   flex: 1;
+  min-height: calc(85vh - 50px);
   @media (${smallerThanTabletLandscape}) {
     padding: 2rem;
   }
+`;
+
+export const PageFooter = styled.footer`
+  height: 50px;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

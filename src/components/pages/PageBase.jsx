@@ -6,6 +6,7 @@ import {
   LinksGroup,
   PageBaseStyled,
   PageHeader,
+  PageFooter,
   PageLogo,
   PageContentWrapper,
 } from './PageBase.styled';
@@ -105,6 +106,9 @@ function PageBase({ children, className, ...props }) {
           </LinksGroup>
         </PageHeader>
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
+        <PageFooter>
+          <p>made by CwD</p>
+        </PageFooter>
       </PageBaseCentered>
     </PageBaseStyled>
   );
