@@ -35,7 +35,7 @@ const HeaderLogoLink = styled(LinkWrapper)`
 const FooterLogoLink = styled(LinkWrapper)`
   border: none;
   padding: 0;
-  width: 75px;
+  width: 80px;
   heigh: auto;
 `;
 
@@ -115,7 +115,7 @@ function PageBase({ children, className, ...props }) {
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
           <FooterLogoLink>
-            <p className="m-0 relative top-6 text-[1.25rem] text-center">created by</p>
+            <p className="m-0 relative top-6 text-[1.25rem] text-center">developed by</p>
             <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
               <Logo src={codeWithDurhamLogo} alt="Code with Durham logo" />
             </a>
