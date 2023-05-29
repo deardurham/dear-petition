@@ -33,7 +33,7 @@ const LogoLink = styled(LinkWrapper)`
     height: auto;
   }
 `;
-const DurmLink = styled(LinkWrapper)`
+const FooterLogoLink = styled(LinkWrapper)`
   border: none;
   padding: 0;
   width: 75px;
@@ -115,12 +115,12 @@ function PageBase({ children, className, ...props }) {
         </PageHeader>
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
-          <DurmLink>
+          <FooterLogoLink>
             <p className="m-0 relative top-6 text-[1.25rem] text-center">created by</p>
             <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
               <FooterLogo src={codeWithDurhamLogo} alt="Code with Durham logo" />
             </a>
-          </DurmLink>
+          </FooterLogoLink>
         </PageFooter>
       </PageBaseCentered>
     </PageBaseStyled>
