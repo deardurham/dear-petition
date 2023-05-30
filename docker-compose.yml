@@ -12,7 +12,6 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./:/code/
       - ./dear_petition:/code/dear_petition
       - ./config:/code/config
     env_file:
