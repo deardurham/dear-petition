@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     admin_url = serializers.SerializerMethodField()
+    has_user_create_permission = serializers.SerializerMethodField()
     is_admin = serializers.BooleanField(source="is_staff", default=False)
 
     class Meta:
@@ -35,6 +36,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "is_staff",
             "admin_url",
             "last_login",
+            "has_user_create_permission"
         ]
         extra_kwargs = {"email": {"required": True, "allow_blank": False}}
 
@@ -43,6 +45,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         if user_obj and user_obj.is_staff:
             url = reverse("admin:index")
         return url
+    
+    def get_has_user_create_permission(self, user_obj):
+        return user_obj.has_perm("petition.add_user")
 
     def create(self, validated_data):
         random_pw = User.objects.make_random_password()

@@ -46,6 +46,39 @@ function PageBase({ children, className, ...props }) {
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
+  const calculateManageDropDownMenuItems = () => {
+    let manageDropDownItems = [];
+
+    if (user?.is_admin) {
+      manageDropDownItems = [
+        ...manageDropDownItems,
+        <Link key="agencies" to="/agencies">
+          <LinkWrapper>Agencies</LinkWrapper>
+        </Link>,
+        <a key="admin" href={user.admin_url} target="_blank" rel="noreferrer">
+          <LinkWrapper>
+            <div className="flex gap-2 items-baseline">
+              <span>Admin</span>
+              <FontAwesomeIcon className="text-[14px]" icon={faExternalLinkAlt} />
+            </div>
+          </LinkWrapper>
+        </a>,
+      ];
+    }
+    if (user?.has_user_create_permission) {
+      manageDropDownItems = [
+        ...manageDropDownItems,
+        <Link key="users" to="/users">
+          <LinkWrapper>Users</LinkWrapper>
+        </Link>,
+      ];
+    }
+
+    return manageDropDownItems;
+  };
+
+  const manageDropDownMenuItems = calculateManageDropDownMenuItems();
+
   return (
     <PageBaseStyled {...props}>
       <PageBaseCentered>
@@ -64,25 +97,8 @@ function PageBase({ children, className, ...props }) {
             <LinkWrapper>
               <Link to="/help">Help</Link>
             </LinkWrapper>
-            {user?.is_admin ? (
-              <DropdownMenu
-                items={[
-                  <Link key="agencies" to="/agencies">
-                    <LinkWrapper>Agencies</LinkWrapper>
-                  </Link>,
-                  <Link key="users" to="/users">
-                    <LinkWrapper>Users</LinkWrapper>
-                  </Link>,
-                  <a key="admin" href={user.admin_url} target="_blank" rel="noreferrer">
-                    <LinkWrapper>
-                      <div className="flex gap-2 items-baseline">
-                        <span>Admin</span>
-                        <FontAwesomeIcon className="text-[14px]" icon={faExternalLinkAlt} />
-                      </div>
-                    </LinkWrapper>
-                  </a>,
-                ]}
-              >
+            {manageDropDownMenuItems ? (
+              <DropdownMenu items={manageDropDownMenuItems}>
                 <LinkWrapper>
                   <div className="flex gap-2">
                     <span>Manage</span>
