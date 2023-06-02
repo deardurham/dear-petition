@@ -46,6 +46,9 @@ const LogoutLink = styled(LinkWrapper)`
 const PageBaseCentered = styled.div`
   max-width: 1200px;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 `;
 
 function PageBase({ children, className, ...props }) {

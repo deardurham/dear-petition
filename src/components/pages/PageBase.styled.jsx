@@ -58,7 +58,6 @@ export const LinkWrapper = styled.div`
 export const PageContentWrapper = styled.section`
   padding: 2rem 4rem;
   flex: 1;
-  min-height: 85vh;
   @media (${smallerThanTabletLandscape}) {
     padding: 2rem;
   }
