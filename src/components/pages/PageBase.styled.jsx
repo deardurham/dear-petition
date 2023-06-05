@@ -64,7 +64,7 @@ export const PageContentWrapper = styled.section`
 `;
 
 export const PageFooter = styled.footer`
-  margin: 3rem 0 0.5rem 0;
+  margin-top: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
