@@ -22,7 +22,7 @@ export const Spinner = ({ size, color }) => (
       'p-0',
       'border-t-2 border-l-2 rounded-full',
       SPINNER_SIZES?.[size] ? SPINNER_SIZES[size] : SPINNER_SIZES.base,
-      SPINNER_COLORS?.[color] ? SPINNER_COLORS[color] : SPINNER_COLORS[NEUTRAL]
+      SPINNER_COLORS?.[color] ? SPINNER_COLORS[color] : SPINNER_COLORS[NEUTRAL],
     )}
   />
 );

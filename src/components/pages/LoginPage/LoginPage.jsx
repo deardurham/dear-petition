@@ -66,10 +66,7 @@ function Login() {
       <div className="max-w-[950px] p-2">
         <SplashLogo src={dearLogo} alt="DEAR logo" />
       </div>
-      <form
-        className="flex flex-col items-center gap-4 w-[190px]"
-        onSubmit={handleSubmit(handleLogin)}
-      >
+      <form className="flex flex-col items-center gap-4 w-[190px]" onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
           className="m-0"
           label="username"

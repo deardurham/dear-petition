@@ -12,7 +12,7 @@ const useDebounce = (callback, { timeout }) => {
       }
       timer.current = setTimeout(() => callback(args), timeout ?? 500);
     },
-    [callback, timeout]
+    [callback, timeout],
   );
 };
 

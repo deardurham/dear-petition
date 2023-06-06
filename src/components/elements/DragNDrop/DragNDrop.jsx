@@ -110,7 +110,7 @@ const DragNDrop = (props, ref) => {
         className={cx(
           className,
           'select-none cursor-pointer min-h-[5px] min-w-[5px] rounded-[2px] border-[5px] border-dashed',
-          draggedOver ? 'border-primary' : 'border-gray'
+          draggedOver ? 'border-primary' : 'border-gray',
         )}
         onDragOver={(e) => e.preventDefault()}
         onDragEnter={handleDragEnter}

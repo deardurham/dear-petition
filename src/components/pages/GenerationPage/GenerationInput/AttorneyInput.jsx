@@ -33,7 +33,7 @@ export default function AttorneyInput({ attorney, onSelectAttorney, errors, onCl
             {
               search: searchValue,
             },
-            true
+            true,
           ).unwrap();
           return data.results;
         }}

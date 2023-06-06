@@ -1,11 +1,18 @@
-FROM node:16-slim as static_files
+FROM node:18-slim as dear_frontend
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
 COPY package.json package-lock.json /code/
 RUN npm install --silent
-COPY index.html favicon.ico vite.config.js tailwind.config.js .postcssrc .eslintrc.json /code/
+COPY index.html favicon.ico vite.config.js tailwind.config.js .postcssrc .eslintrc.json .eslintignore /code/
 COPY ./src /code/src/
+
+WORKDIR /code/
+
+CMD ["npm", "run", "start"]
+
+FROM dear_frontend as static_files
+
 RUN npm run build
 
 FROM python:3.8-slim-bullseye as base
@@ -94,10 +101,11 @@ COPY docker-entrypoint.sh /code/docker-entrypoint.sh
 COPY postdeploy.sh /code/postdeploy.sh
 # Silence missing .env notices
 RUN touch /code/.env
-# Copy in node-built files
-COPY --from=static_files /code/build /code/build
 
 FROM base AS deploy
+
+# Copy in node-built files
+COPY --from=static_files /code/build /code/build
 
 # Create a group and user to run our app
 ARG APP_USER=appuser

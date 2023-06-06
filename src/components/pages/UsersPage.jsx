@@ -153,11 +153,7 @@ const UsersPage = () => {
               )}
             </SearchRow>
             <div className="max-w-[400px] ml-auto self-end flex items-baseline gap-8">
-              <button
-                type="button"
-                onClick={() => setOffset((prev) => prev - limit.value)}
-                disabled={!data?.previous}
-              >
+              <button type="button" onClick={() => setOffset((prev) => prev - limit.value)} disabled={!data?.previous}>
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
               <div className="flex items-baseline gap-4">
@@ -186,11 +182,7 @@ const UsersPage = () => {
                   );
                 })}
               </div>
-              <button
-                type="button"
-                onClick={() => setOffset((prev) => prev + limit.value)}
-                disabled={!data?.next}
-              >
+              <button type="button" onClick={() => setOffset((prev) => prev + limit.value)} disabled={!data?.next}>
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
             </div>

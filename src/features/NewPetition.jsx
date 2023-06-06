@@ -77,9 +77,7 @@ const RecordUpload = () => {
     files.forEach((file) => filesFormData.append('files', file));
     timer = setTimeout(() => {
       if (isMounted) {
-        setUploadError(
-          'It is taking longer than expected to process the uploaded records. Please wait...'
-        );
+        setUploadError('It is taking longer than expected to process the uploaded records. Please wait...');
       }
     }, LONG_WAIT_TIMEOUT * 1000);
 
@@ -115,9 +113,7 @@ const RecordUpload = () => {
         <div className="flex flex-col justify-between items-center gap-4 px-3 py-10">
           <div className="">
             <h2>Upload CIPRS PDF Files</h2>
-            <p className="whitespace-normal">
-              Drag and Drop files here or click to open file finder
-            </p>
+            <p className="whitespace-normal">Drag and Drop files here or click to open file finder</p>
           </div>
           <div className="flex flex-col gap-4 self-start">
             {dragWarnings && (
@@ -169,9 +165,7 @@ const RecordUpload = () => {
                   exit={{ opacity: 0, y: '-50' }}
                   positionTransition
                 >
-                  <p className="flex-1 pr-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {file.name}
-                  </p>
+                  <p className="flex-1 pr-2 whitespace-nowrap overflow-hidden text-ellipsis">{file.name}</p>
                   <CloseButton onClick={() => handleRemoveFile(file)}>
                     <FontAwesomeIcon icon={faTimes} />
                   </CloseButton>
@@ -195,11 +189,7 @@ export const NewPetition = () => {
         <p>There are two methods of starting a new expunction petition</p>
         <p className="flex gap-2">
           1. Email the documents directly from the CIPRS computer.
-          <button
-            type="button"
-            className="text-blue font-semibold"
-            onClick={() => setShowEmailModal(true)}
-          >
+          <button type="button" className="text-blue font-semibold" onClick={() => setShowEmailModal(true)}>
             Click here for instructions
           </button>
         </p>

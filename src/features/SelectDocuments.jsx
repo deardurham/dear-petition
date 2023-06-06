@@ -23,12 +23,7 @@ export const SelectDocumentsModal = ({
       />
 
       <div className="p-10 flex flex-row justify-center gap-8">
-        <Button
-          type="button"
-          colorClass={POSITIVE}
-          className="px-4 py-2 self-center"
-          onClick={() => onClose()}
-        >
+        <Button type="button" colorClass={POSITIVE} className="px-4 py-2 self-center" onClick={() => onClose()}>
           Close
         </Button>
       </div>
@@ -50,9 +45,7 @@ const SelectDocuments = ({ onAddDocument, onRemoveDocument, documents, selectedD
               type="checkbox"
               className="cursor-pointer"
               checked={selectedDocuments.includes(document.pk)}
-              onChange={(e) =>
-                e.target.checked ? onAddDocument(document.pk) : onRemoveDocument(document.pk)
-              }
+              onChange={(e) => (e.target.checked ? onAddDocument(document.pk) : onRemoveDocument(document.pk))}
             />
           </TableCell>
           <TableCell>{document.form_type}</TableCell>

@@ -25,7 +25,7 @@ function Modal({ children, isVisible, closeModal, ...props }) {
         </ModalStyled>,
       ]}
     </>,
-    modalPortal
+    modalPortal,
   );
 }
 

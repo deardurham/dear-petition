@@ -7,11 +7,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from '../../elemen
 import useWindowSize from '../../../hooks/useWindowSize';
 import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDownload,
-  faChevronDown,
-  faExclamationTriangle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faChevronDown, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
 import { usePetitionQuery } from '../../../service/api';
 import { SelectAgenciesModal } from '../../../features/SelectAgencies';
@@ -35,12 +31,7 @@ function ActionButton({
   const isCollapsed = windowSize.width <= TABLET_LANDSCAPE_SIZE;
   return (
     <TooltipWrapper tooltipMessage={tooltipMessage} tooltipOffset={tooltipOffset}>
-      <Button
-        className={cx(className, 'text-[1.55rem]')}
-        onClick={onClick}
-        disabled={isDisabled}
-        title={title}
-      >
+      <Button className={cx(className, 'text-[1.55rem]')} onClick={onClick} disabled={isDisabled} title={title}>
         {isCollapsed && collapsedIcon ? <FontAwesomeIcon icon={collapsedIcon} /> : label}
       </Button>
     </TooltipWrapper>
@@ -53,9 +44,7 @@ const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10]
   </Tooltip>
 );
 
-const NO_DOCUMENTS_SELECTED = [
-  'Documents: There are no documents selected for download for the petition document.',
-];
+const NO_DOCUMENTS_SELECTED = ['Documents: There are no documents selected for download for the petition document.'];
 
 function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErrors }) {
   const [error, setError] = useState('');
@@ -88,8 +77,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
       });
       const { headers } = meta.response;
       // content-disposition: 'inline; filename="petition.pdf"'
-      const filename =
-        headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
+      const filename = headers['content-disposition']?.match(/filename="(.*)"/)?.[1] ?? 'petition.pdf';
       const filetype = headers['content-type'];
       // TODO: Figure out RTK Query non-serializable ArrayBuffer issue?
       // Note: might not be worthwhile because RTK Query expects to handle only serializable response data
@@ -155,9 +143,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
         </TableCell>
         <TableCell>
           <ActionButton
-            label={`${petition.active_records.length} Offense${
-              petition.active_records.length === 1 ? '' : 's'
-            }`}
+            label={`${petition.active_records.length} Offense${petition.active_records.length === 1 ? '' : 's'}`}
             className="w-[105px]"
             isCollapsed={<FontAwesomeIcon icon={faChevronDown} />}
             onClick={() => setIsOffenseModalOpen(true)}
@@ -214,9 +200,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
         selectedDocuments={selectedDocuments}
         hasExistingDocuments={false}
         onAddDocument={(newPk) => setSelectedDocuments((prevList) => [...prevList, newPk])}
-        onRemoveDocument={(removePk) =>
-          setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))
-        }
+        onRemoveDocument={(removePk) => setSelectedDocuments((prevList) => prevList.filter((pk) => pk !== removePk))}
         isOpen={isSelectDocumentsOpen}
         onClose={() => setIsSelectDocumentsOpen(false)}
       />

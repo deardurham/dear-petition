@@ -1,0 +1,10 @@
+node_modules/
+build/
+staticfiles/
+htmlcov/
+dear_petition/
+*.yml
+*.yaml
+*.json
+*.md
+

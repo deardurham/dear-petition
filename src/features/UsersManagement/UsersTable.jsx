@@ -6,14 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useModifyUserMutation } from '../../service/api';
 import useAuth from '../../hooks/useAuth';
 import { Button } from '../../components/elements/Button';
-import {
-  SortableHeader,
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from '../../components/elements/Table';
+import { SortableHeader, Table, TableBody, TableCell, TableHeader, TableRow } from '../../components/elements/Table';
 import FormInput from '../../components/elements/Input/FormInput';
 import Modal from '../../components/elements/Modal/Modal';
 
@@ -26,10 +19,7 @@ const PassthroughTD = styled.td`
 `;
 
 const UsersTableStyled = styled(Table)`
-  grid-template-columns: minmax(125px, 3fr) minmax(125px, 3fr) minmax(50px, 1fr) minmax(100px, 1fr) minmax(
-      50px,
-      2fr
-    );
+  grid-template-columns: minmax(125px, 3fr) minmax(125px, 3fr) minmax(50px, 1fr) minmax(100px, 1fr) minmax(50px, 2fr);
   align-items: center;
   & td {
     height: 100%;
@@ -125,10 +115,7 @@ const DisplayCells = ({ user, onStartEdit }) => {
             </p>
             <p>{user.username}</p>
             <ActionsRow>
-              <Button
-                colorClass="caution"
-                onClick={() => triggerUpdate({ id: user.pk, method: 'delete' })}
-              >
+              <Button colorClass="caution" onClick={() => triggerUpdate({ id: user.pk, method: 'delete' })}>
                 Confirm
               </Button>
               <Button onClick={() => setModalVisible(false)} colorClass="neutral">
@@ -169,16 +156,10 @@ const InputCells = ({ user, onStopEdit }) => {
     <PassthroughTD>
       <PassthroughForm onSubmit={handleSubmit(onSubmit)}>
         <TableCell>
-          <TextboxInput
-            inputProps={{ control, name: 'username' }}
-            errors={[error?.data?.username] ?? []}
-          />
+          <TextboxInput inputProps={{ control, name: 'username' }} errors={[error?.data?.username] ?? []} />
         </TableCell>
         <TableCell>
-          <TextboxInput
-            inputProps={{ control, name: 'email' }}
-            errors={[error?.data?.email] ?? []}
-          />
+          <TextboxInput inputProps={{ control, name: 'email' }} errors={[error?.data?.email] ?? []} />
         </TableCell>
         <TableCell>
           <input type="checkbox" disabled={myUser.pk === user.pk} {...register('is_admin')} />
@@ -202,11 +183,7 @@ const UserRow = ({ user, setModalVisible }) => {
   return (
     <TableRow key={user.pk}>
       {!isEditing ? (
-        <DisplayCells
-          user={user}
-          onStartEdit={() => setEditing(true)}
-          setModalVisible={setModalVisible}
-        />
+        <DisplayCells user={user} onStartEdit={() => setEditing(true)} setModalVisible={setModalVisible} />
       ) : (
         <InputCells user={user} onStopEdit={() => setEditing(false)} />
       )}

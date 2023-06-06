@@ -27,8 +27,7 @@ export const axiosBaseQuery =
       const result = await Axios(requestConfig);
       return { data: result.data, meta: { request: requestConfig, response: result } };
     } catch (axiosError) {
-      const isLoginAttempt =
-        url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'base' }) === 0;
+      const isLoginAttempt = url === 'token/' && method.localeCompare('post', 'en', { sensitivity: 'base' }) === 0;
       if (axiosError?.response?.status !== 401 || isLoginAttempt) {
         return {
           error: { status: axiosError.response?.status, data: axiosError.response?.data },
@@ -51,10 +50,7 @@ export const axiosBaseQuery =
 
 export const manualAxiosRequest = async ({ url, method, timeout, data, params, responseType }) => {
   const store = (await import('../store')).default;
-  const result = await axiosBaseQuery()(
-    { url, method, timeout, data, params, responseType },
-    store
-  );
+  const result = await axiosBaseQuery()({ url, method, timeout, data, params, responseType }, store);
   if ('error' in result) {
     throw result.error;
   }
