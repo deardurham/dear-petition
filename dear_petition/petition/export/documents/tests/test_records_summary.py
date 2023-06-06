@@ -28,7 +28,7 @@ def test_records_summary_context__one_table_one_row(batch):
     """
     Test generate_context method with one table and one row. Test all data
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     attorney = AttorneyFactory(name="A. Tourney")
@@ -45,6 +45,7 @@ def test_records_summary_context__one_table_one_row(batch):
     assert first_table["idx"] == 1
     assert first_table["county"] == "DURHAM"
     assert first_table["jurisdiction"] == "DISTRICT COURT"
+    assert first_table["addl_offense_file_nos"] == ""
 
     first_offense_record = first_table["offense_records"][0]
     assert first_offense_record["idx"] == 1
@@ -55,22 +56,27 @@ def test_records_summary_context__one_table_one_row(batch):
     assert first_offense_record["offense_date"] == "09/30/2001"
     assert first_offense_record["disposition"] == "NG"
     assert first_offense_record["disposed_on"] == "10/02/2003"
+    assert first_offense_record["has_additional_offenses"] == False
 
 
 def test_records_summary_context__many_tables(batch):
     """
     Test generate_context method with many tables. Make sure correct number of tables and in correct order.
     """
-    offense1 = create_offense(batch, "WAKE", SUPERIOR_COURT, "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense1 = create_offense(batch, "WAKE", SUPERIOR_COURT,
+                              "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense3 = create_offense(batch, "DURHAM", SUPERIOR_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense3 = create_offense(batch, "DURHAM", SUPERIOR_COURT,
+                              "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000002", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "12CR000002", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     attorney = AttorneyFactory(name="B. Tourney")
@@ -104,16 +110,20 @@ def test_records_summary_context__many_offense_records(batch):
     Test generate_context method with many offense records in a table. Make sure correct number of offense records and
     in correct order.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense4 = create_offense(batch, "WAKE", DISTRICT_COURT, "13CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense4 = create_offense(batch, "WAKE", DISTRICT_COURT,
+                              "13CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     attorney = AttorneyFactory(name="C. Tourney")
@@ -187,7 +197,8 @@ def test_records_summary_context__duplicate(batch, contact1, client):
     Only one of the two offense records should be included. It doesn't matter which one since they are identical except
     for the offense records' action (eg CHARGED, CONVICTED) which isn't included in the result.
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                             "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL", False)
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
     create_offense_record(offense, CONVICTED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
@@ -206,7 +217,8 @@ def test_records_summary_context__different_descriptions(batch, contact1, client
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
     record's disposition should be guilty.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL", False)
     create_offense_record(offense1, CHARGED, "PWIMSD SCH II CS", "MISDEMEANOR")
     create_offense_record(offense1, CONVICTED, "FELONY POSSESSION OF COCAINE", "MISDEMEANOR")
 
@@ -232,7 +244,8 @@ def test_records_summary_context__different_severities(batch, contact1, client):
     part of same offense. The charged offense record's disposition should be guilty to lesser and the convicted offense
     record's disposition should be guilty.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "10CR000001", "1972-12-31", VERDICT_GUILTY, "JURY TRIAL", False)
     create_offense_record(offense1, CHARGED, "FLEE/ELUDE ARREST W/MV", "FELONY")
     create_offense_record(offense1, CONVICTED, "FLEE/ELUDE ARREST W/MV", "MISDEMEANOR")
 
@@ -257,13 +270,16 @@ def test_records_summary_context__disposition_codes(batch):
     Test generate_context method where the disposition code comes from the disposition map, the verdict map, and isn't
     found in either map.
     """
-    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT, "01CR000001", "1972-12-31", "", "JURY TRIAL")
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "01CR000001", "1972-12-31", "", "JURY TRIAL", False)
     create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT, "02CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL")
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "02CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
-    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT, "03CR000001", "1972-12-31", "", "not found")
+    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "03CR000001", "1972-12-31", "", "not found", False)
     create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     attorney = AttorneyFactory(name="E. Tourney")
@@ -295,7 +311,7 @@ def test_records_summary_context__birthdays(
     """
     Test generate_context method with different dates of birth
     """
-    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", dob, "NOT GUILTY", "JURY TRIAL")
+    offense = create_offense(batch, "DURHAM", DISTRICT_COURT, "10CR000001", dob, "NOT GUILTY", "JURY TRIAL", False)
     create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
 
     attorney = AttorneyFactory(name="E. Tourney")
@@ -305,6 +321,52 @@ def test_records_summary_context__birthdays(
     assert context["dob"] == formatted_dob
     assert context["birthday_18th"] == formatted_18th_bday
     assert context["birthday_22nd"] == formatted_22nd_bday
+
+
+def test_records_summary_context__additional_offenses(batch):
+    """
+    Test generate_context method with many offense records in a table. Check that addl_offense_file_nos in the table has
+    the correct file numbers in alphabetical order with no duplicates. Check that has_additional_offenses in each
+    offense record is true if additional offenses exist and false otherwise.
+    """
+    offense1 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "12CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", True)
+    create_offense_record(offense1, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    offense2 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", True)
+    create_offense_record(offense2, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    offense3 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "10CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", True)
+    create_offense_record(offense3, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    offense4 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "11CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", True)
+    create_offense_record(offense4, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    offense5 = create_offense(batch, "DURHAM", DISTRICT_COURT,
+                              "13CR000001", "1972-12-31", "NOT GUILTY", "JURY TRIAL", False)
+    create_offense_record(offense5, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    attorney = AttorneyFactory(name="C. Tourney")
+    client = ClientFactory(**PETITIONER_INFO)
+    context = generate_context(batch, attorney, client)
+
+    # check addl_offense_file_nos
+    assert len(context["tables"]) == 1
+    assert context["tables"][0]["addl_offense_file_nos"] == "10CR000001, 11CR000001, 12CR000001"
+
+    # offense records for Durham District Court
+    offense_records = context["tables"][0]["offense_records"]
+
+    # check has_additional_offenses
+    assert len(offense_records) == 5
+    assert offense_records[0]["has_additional_offenses"]
+    assert offense_records[1]["has_additional_offenses"]
+    assert offense_records[2]["has_additional_offenses"]
+    assert offense_records[3]["has_additional_offenses"]
+    assert not offense_records[4]["has_additional_offenses"]
 
 
 def create_offense_record(offense, action, description, severity):
@@ -321,7 +383,7 @@ def create_offense_record(offense, action, description, severity):
     return offense_record
 
 
-def create_offense(batch, county, jurisdiction, file_no, dob, verdict, disposition_method):
+def create_offense(batch, county, jurisdiction, file_no, dob, verdict, disposition_method, has_additional_offenses):
     """
     Create offense
     """
@@ -333,6 +395,7 @@ def create_offense(batch, county, jurisdiction, file_no, dob, verdict, dispositi
         dob=dob,
         offense_date="2001-09-30",
         arrest_date="2001-10-01",
+        has_additional_offenses=has_additional_offenses
     )
     offense = OffenseFactory(
         ciprs_record=ciprs_record,

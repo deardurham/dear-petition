@@ -42,6 +42,7 @@ def refresh_record_from_data(record, exclude_file_nos = []):
         "Arrest Date", dt_obj_to_date(record.offense_date)
     )
     record.jurisdiction = get_jurisdiction(record)
+    record.has_additional_offenses = "Additional offenses exist" in record.data.get("_meta", {}).get("source", {})
 
     if exclude_file_nos and record.file_no in exclude_file_nos:
         logger.warning(f"Not saving ciprs record {record.file_no} (most likely because it's a duplicate).")

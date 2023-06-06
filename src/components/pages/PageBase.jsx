@@ -1,8 +1,17 @@
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { LinkWrapper, LinksGroup, PageBaseStyled, PageHeader, PageLogo, PageContentWrapper } from './PageBase.styled';
+import {
+  LinkWrapper,
+  LinksGroup,
+  PageBaseStyled,
+  PageHeader,
+  PageFooter,
+  Logo,
+  PageContentWrapper,
+} from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
+import codeWithDurhamHorizontalLogo from '../../assets/img/CWD_horizontal_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 
 import useAuth from '../../hooks/useAuth';
@@ -12,7 +21,7 @@ import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
-const LogoLink = styled(LinkWrapper)`
+const HeaderLogoLink = styled(LinkWrapper)`
   border: none;
   padding: 0;
   height: 80px;
@@ -23,6 +32,12 @@ const LogoLink = styled(LinkWrapper)`
     height: auto;
   }
 `;
+const FooterLogoLink = styled(LinkWrapper)`
+  border: none;
+  padding: 0;
+  width: 200px;
+  height: auto;
+`;
 
 const LogoutLink = styled(LinkWrapper)`
   cursor: pointer;
@@ -31,6 +46,9 @@ const LogoutLink = styled(LinkWrapper)`
 const PageBaseCentered = styled.div`
   max-width: 1200px;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 `;
 
 function PageBase({ children, className, ...props }) {
@@ -43,11 +61,11 @@ function PageBase({ children, className, ...props }) {
     <PageBaseStyled {...props}>
       <PageBaseCentered>
         <PageHeader>
-          <LogoLink>
+          <HeaderLogoLink>
             <Link to="/">
-              <PageLogo src={dearLogo} alt="DEAR logo" />
+              <Logo src={dearLogo} alt="DEAR logo" />
             </Link>
-          </LogoLink>
+          </HeaderLogoLink>
           <LinksGroup>
             {user && (
               <LinkWrapper>
@@ -98,6 +116,14 @@ function PageBase({ children, className, ...props }) {
           </LinksGroup>
         </PageHeader>
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
+        <PageFooter>
+          <FooterLogoLink>
+            <p className="m-0 relative top-14 text-[1.25rem] text-center">developed by</p>
+            <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
+              <Logo src={codeWithDurhamHorizontalLogo} alt="Code with Durham logo" />
+            </a>
+          </FooterLogoLink>
+        </PageFooter>
       </PageBaseCentered>
     </PageBaseStyled>
   );

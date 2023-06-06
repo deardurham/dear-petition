@@ -5,7 +5,7 @@ from django.db.models import IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
 from django.utils import timezone
 
-from dear_petition.petition import constants, utils
+from dear_petition.petition import constants, utils, models
 from dear_petition.petition.export.annotate import Checkbox
 from dear_petition.petition.utils import get_285_form_agency_address
 
@@ -109,7 +109,8 @@ class AOCFormCR287(PetitionForm):
             self.data["Superior"] = Checkbox("")
 
     def map_file_no(self):
-        if self.petition_document.offense_records.count() > 1:
+        ciprs_records = models.CIPRSRecord.objects.filter(offenses__offense_records__documents__id=self.petition_document.id).distinct()
+        if ciprs_records.count() > 1:
             self.data["ConsJdgmntFileNum"] = self.MULTIPLE_FILE_NO_MSG
         else:
             offense_record = self.get_most_recent_record()

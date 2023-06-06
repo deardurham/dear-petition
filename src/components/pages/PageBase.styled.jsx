@@ -26,7 +26,7 @@ export const PageHeader = styled.header`
   }
 `;
 
-export const PageLogo = styled.img`
+export const Logo = styled.img`
   width: 100%;
   height: 100%;
 `;
@@ -61,4 +61,11 @@ export const PageContentWrapper = styled.section`
   @media (${smallerThanTabletLandscape}) {
     padding: 2rem;
   }
+`;
+
+export const PageFooter = styled.footer`
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

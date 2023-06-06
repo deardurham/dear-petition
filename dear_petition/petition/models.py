@@ -70,9 +70,8 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
     case_status = models.CharField(max_length=256, blank=True)
     offense_date = models.DateTimeField(null=True, blank=True)
     arrest_date = models.DateField(null=True, blank=True)
-    jurisdiction = models.CharField(
-        max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE
-    )
+    jurisdiction = models.CharField(max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE)
+    has_additional_offenses = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.label} {self.file_no} ({self.pk})"
