@@ -68,6 +68,26 @@ def test_case_information_arrest_date(record1):
     )
 
 
+def test_refresh_record_from_data___has_additional_offenses_true(record1):
+    """
+    Since the text "Additional offenses exist" is present, has_additional_offenses should be true.
+    """
+    record1.data = {"_meta": {"source": "Lorem ipsum. Additional offenses exist. Lorem ipsum."}}
+    record1.refresh_record_from_data()
+    record1.refresh_from_db()
+    assert record1.has_additional_offenses
+
+
+def test_refresh_record_from_data___has_additional_offenses_false(record1):
+    """
+    Since the text "Additional offenses exist" is not present, has_additional_offenses should be false.
+    """
+    record1.data = {"_meta": {"source": "Lorem ipsum."}}
+    record1.refresh_record_from_data()
+    record1.refresh_from_db()
+    assert not record1.has_additional_offenses
+
+
 def test_refresh_record_from_data__exclude_file_numbers_contains(record1):
     """
     CIPRS record file number is in the list of excluded file numbers.

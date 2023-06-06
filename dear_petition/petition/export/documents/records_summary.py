@@ -8,11 +8,7 @@ from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
     DISPOSITION_METHOD_CODE_MAP,
     VERDICT_CODE_MAP,
-    JURISDICTION_MAP,
-    DISP_METHOD_SUPERSEDING_INDICTMENT,
-    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
-    VERDICT_GUILTY,
-    CHARGED,
+    JURISDICTION_MAP
 )
 
 
@@ -62,15 +58,19 @@ def generate_context(batch, attorney, client):
         # sort offense records by file number
         offense_records.sort(key=lambda x: x["file_no"])
 
-        # assign index for each offense record
+        # assign index for each offense record and create set of file numbers with "additional offenses exist"
+        addl_offense_file_nos = set()
         for offense_record_index, offense_record in enumerate(offense_records, start=1):
             offense_record["idx"] = offense_record_index
+            if offense_record["has_additional_offenses"]:
+                addl_offense_file_nos.add(offense_record["file_no"])
 
         table = {
             "county": table_key[0],
             "jurisdiction": table_key[1],
             "idx": table_index,
-            "offense_records": offense_records
+            "offense_records": offense_records,
+            "addl_offense_file_nos": ', '.join(sorted(addl_offense_file_nos))
         }
         tables.append(table)
 
@@ -146,7 +146,8 @@ def __create_offense_record_data(offense_record):
         "severity": offense_record.severity[0:1] if offense_record.severity else None,
         "offense_date": __format_date(ciprs_record.offense_date),
         "disposition": disposition,
-        "disposed_on": __format_date(offense.disposed_on)
+        "disposed_on": __format_date(offense.disposed_on),
+        "has_additional_offenses": ciprs_record.has_additional_offenses
     }
 
     return offense_record_data
