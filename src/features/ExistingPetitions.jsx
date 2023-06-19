@@ -17,8 +17,8 @@ import { downloadFile } from '../util/downloadFile';
 export const ExistingPetitions = () => {
   const { user } = useAuth();
   const { data } = useGetUserBatchesQuery({ user: user.pk });
-
   const [downloadDocumentBatch, setDownloadDocumentBatch] = useState(null);
+  const [rows, setRows] = useState(data?.results);
 
   return (
     <div className="flex flex-col">
@@ -47,7 +47,7 @@ export const ExistingPetitions = () => {
             <TableCell header />
           </TableHeader>
           <TableBody>
-            {data?.results?.map((batch) => (
+            {rows?.map((batch) => (
               <TableRow key={batch.pk}>
                 <TableCell>{batch.label}</TableCell>
                 <TableCell>
@@ -111,6 +111,24 @@ export const ExistingPetitions = () => {
                     }}
                   >
                     Records Summary
+                  </Button>
+                  <Button
+                    title={'Delete the batch.'}
+                    onClick={() => {
+                      manualAxiosRequest({
+                        url: `/batch/${batch.pk}/`,
+                        responseType: 'arraybuffer',
+                        method: 'delete',
+                      }).then(() => {
+                        setRows(
+                          rows.filter((row) => {
+                            row.pk !== batch.pk;
+                          }),
+                        );
+                      });
+                    }}
+                  >
+                    Delete
                   </Button>
                 </TableCell>
               </TableRow>
