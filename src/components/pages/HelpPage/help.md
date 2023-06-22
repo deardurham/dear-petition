@@ -23,6 +23,10 @@ This website is a tool, and not a substitute for legal analysis by a trained hum
 
 Google Chrome is currently the only supported browser.
 
+## Retention Policy
+
+All uploaded CIPRS records will be retained by the system for 48 hours, at which point it will be deleted from the system.
+
 # FAQ
 
 ###### What is the maximum number of CIPRS records I can upload at one time?
