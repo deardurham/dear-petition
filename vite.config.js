@@ -27,4 +27,9 @@ export default defineConfig(() => ({
   },
   assetsInclude: '**/*.md',
   plugins: [react(), eslint()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: 'src/setupTests.js',
+  },
 }));
