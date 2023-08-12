@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { getErrorList, hasValidationsErrors } from '../util/errors';
+import { getErrorList, hasValidationsErrors } from '../../util/errors';
 
 const mockGetErrorList = {
   mockErrors: {
