@@ -33,11 +33,12 @@ describe('Utils: errors.js', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  // using vitest 'mock'
+  // FIXME
+  // declaring func and calling with {} returns [] in node REPL
+  // probably doing something wrong with vitest
   it('getErrorList returns [] if no errors passed', () => {
-    const mock = vi.fn().mockImplementation(mockGetErrorList.getErrorList);
-
-    expect(mock({})).toEqual([]);
-    expect(mock).toHaveBeenCalledTimes(1);
+    const spy = vi.spyOn(mockGetErrorList, 'getErrorList');
+    expect(spy.getMockName()).toEqual('getErrorList');
+    expect(mockGetErrorList.getErrorList({})).toEqual([]);
   });
 });
