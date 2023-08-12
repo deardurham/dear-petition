@@ -4,6 +4,7 @@ import { getErrorList, hasValidationsErrors } from '../../util/errors';
 const mockGetErrorList = {
   mockErrors: {
     errorOne: ['Error 1 message'],
+    errorTwo: ['Error 2 message'],
   },
   getErrorList,
   hasValidationsErrors,
@@ -22,22 +23,21 @@ describe('Utils: errors.js', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it('getErrorList should return a list of passed errors', () => {
+  it('getErrorList returns a list of passed errors', () => {
     const spy = vi.spyOn(mockGetErrorList, 'getErrorList');
     expect(spy.getMockName()).toEqual('getErrorList');
 
-    expect(mockGetErrorList.getErrorList(mockGetErrorList.mockErrors)).toEqual([`ErrorOne: Error 1 message`]);
+    const errorList = [`ErrorOne: Error 1 message`, `ErrorTwo: Error 2 message`];
+    expect(mockGetErrorList.getErrorList(mockGetErrorList.mockErrors)).toEqual(errorList);
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  //   it('should return [] if no errors passed', () => {
-  //     const spy = vi.spyOn(mockGetErrorList, 'getErrorList');
-  //     expect(spy.getMockName()).toEqual('getErrorList');
+  // using vitest 'mock'
+  it('getErrorList returns [] if no errors passed', () => {
+    const mock = vi.fn().mockImplementation(mockGetErrorList.getErrorList);
 
-  //     const mockValidationObj = Object.entries({});
-  //     expect(mockGetErrorList.getErrorList(mockValidationObj)).toEqual([]);
-
-  //     expect(spy).toHaveBeenCalledTimes(1);
-  //   });
+    expect(mock({})).toEqual([]);
+    expect(mock).toHaveBeenCalledTimes(1);
+  });
 });
