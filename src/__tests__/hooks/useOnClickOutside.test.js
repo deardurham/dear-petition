@@ -26,11 +26,16 @@ import useOnClickOutside from '../../hooks/useOnClickOutside';
 
 // how to simulate a click outside the window
 describe('useOnClickOutside', () => {
-  const mockRefRoot = document.createElement('div').setAttribute('id', 'mock-ref-root');
-  const mockModal = document.createElement('div').setAttribute('id', 'mock-modal');
+  // const mockModal = document.createElement('div').setAttribute('id', 'mock-modal');
   const click = new MouseEvent('mousedown');
+  const mockRefRoot = document.createElement('div').setAttribute('id', 'mock-ref-root');
   const mockEventTarget = document.createElement('div').setAttribute('id', 'mock-outside-modal');
   const mockHandler = vi.fn();
+  const { result } = renderHook(() => useOnClickOutside(mockRefRoot, mockHandler));
 
-  renderHook(() => useOnClickOutside(mockRefRoot, mockHandler));
+  // if click outside, mockHandler is called
+  it('hanlder callback is called if event target is outside the ref node', () => {
+    mockEventTarget.dispatchEvent(click);
+    expect(result.current.Function).toHaveBeenCalled();
+  });
 });
