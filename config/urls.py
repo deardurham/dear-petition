@@ -37,6 +37,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("sendgrid/", include("dear_petition.sendgrid.urls")),
+    path("portal/", include("dear_petition.portal.urls")),
     # React SPA:
     path(r"", index, name="index"),
     re_path(r"^(?:.*)/?$", index, name="index-others"),
