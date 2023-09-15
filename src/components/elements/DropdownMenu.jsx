@@ -10,7 +10,9 @@ export const DropdownMenu = ({ children, items }) => {
     placement: 'bottom',
   });
   return (
-    <Menu as="div" className="relative" onMouseLeave={() => setIsHovering(false)}>
+    <Menu as="div" className="relative"
+          onClick={() => setIsHovering(!isHovering)}
+          onMouseLeave={() => setIsHovering(false)}>
       <Menu.Button>
         <div
           ref={hoverDiv}
@@ -30,7 +32,7 @@ export const DropdownMenu = ({ children, items }) => {
         className="absolute z-10 bg-white min-w-full"
       >
         {isHovering && (
-          <div>
+          <div className={"drop"}>
             {React.Children.map(items, (item) => (
               <Menu.Item as="div">{() => item}</Menu.Item>
             ))}

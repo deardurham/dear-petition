@@ -28,8 +28,8 @@ const HeaderLogoLink = styled(LinkWrapper)`
   width: 300px;
   margin: 0;
   @media (${smallerThanTabletLandscape}) {
-    width: 400px;
-    height: auto;
+	  width: 100%;
+    height: 100%;
   }
 `;
 const FooterLogoLink = styled(LinkWrapper)`
@@ -37,6 +37,7 @@ const FooterLogoLink = styled(LinkWrapper)`
   padding: 0;
   width: 200px;
   height: auto;
+	max-width: 100vw;
 `;
 
 const LogoutLink = styled(LinkWrapper)`
