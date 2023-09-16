@@ -3,7 +3,7 @@ import * as jdsom from 'jsdom';
 describe('isChrome test', () => {
   const { JSDOM, ResourceLoader } = jdsom;
 
-  it('testing imported isChrome', () => {
+  it('Mock Chrome userAgent, vendor in JSDOM', () => {
     const loader = new ResourceLoader({
       userAgent: 'Chrome/116.0.5845.187 (Official Build) <platform> (<platform-details>)',
     });
@@ -12,7 +12,7 @@ describe('isChrome test', () => {
 
     const isChromium = dom.window.chrome;
     const winNav = dom.window.navigator;
-    // unable to set vendor on window object in JSDOM (yet?)
+    // unable to set vendor on window object in JSDOM, readonly
     // const vendorName = winNav.vendor;
     const vendorName = 'Google Inc.';
     const isOpera = typeof window.opr !== 'undefined';
