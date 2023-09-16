@@ -3,18 +3,20 @@ import * as jdsom from 'jsdom';
 describe('isChrome test', () => {
   const { JSDOM, ResourceLoader } = jdsom;
 
-  it('Mock Chrome userAgent, vendor in JSDOM', () => {
+  const setWindowProps = ({ userAgent, vendor }) => {
     const loader = new ResourceLoader({
-      userAgent: 'Chrome/116.0.5845.187 (Official Build) <platform> (<platform-details>)',
+      userAgent: userAgent,
     });
     const dom = new JSDOM(``, { resources: loader });
     dom.window.chrome = true;
 
     const isChromium = dom.window.chrome;
     const winNav = dom.window.navigator;
+    // window.navigator.vendor is deprecated
+    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/vendor
     // unable to set vendor on window object in JSDOM, readonly
     // const vendorName = winNav.vendor;
-    const vendorName = 'Google Inc.';
+    const vendorName = vendor;
     const isOpera = typeof window.opr !== 'undefined';
     const isIEedge = winNav.userAgent.indexOf('Edge') > -1;
     const isIOSChrome = winNav.userAgent.match('CriOS');
@@ -27,7 +29,25 @@ describe('isChrome test', () => {
       isOpera === false &&
       isIEedge === false;
 
+    return isChrome;
+  };
+
+  it('Mock Chrome userAgent, vendor in JSDOM', () => {
+    const isChrome = setWindowProps({
+      userAgent: 'Chrome/116.0.5845.187 (Official Build) <platform> (<platform-details>)',
+      vendor: 'Google Inc.',
+    });
+
     expect(isChrome).toBe(true);
+  });
+
+  it('Mock Mozilla userAgent, vendor in JSDOM', () => {
+    const isChrome = setWindowProps({
+      userAgent: 'Mozilla/5.0 (win32) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/19.0.0',
+      vendor: '',
+    });
+
+    expect(isChrome).toBe(false);
   });
 
   it('userAgent includes Chrome, returns true', () => {
