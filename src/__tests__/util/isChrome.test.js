@@ -3,12 +3,12 @@ import * as jdsom from 'jsdom';
 describe('isChrome test', () => {
   const { JSDOM, ResourceLoader } = jdsom;
 
-  const setWindowProps = ({ userAgent, vendor }) => {
+  const setWindowProps = ({ userAgent, vendor, chrome }) => {
     const loader = new ResourceLoader({
       userAgent: userAgent,
     });
     const dom = new JSDOM(``, { resources: loader });
-    dom.window.chrome = true;
+    dom.window.chrome = chrome;
 
     const isChromium = dom.window.chrome;
     const winNav = dom.window.navigator;
@@ -36,6 +36,7 @@ describe('isChrome test', () => {
     const isChrome = setWindowProps({
       userAgent: 'Chrome/116.0.5845.187 (Official Build) <platform> (<platform-details>)',
       vendor: 'Google Inc.',
+      chrome: true,
     });
 
     expect(isChrome).toBe(true);
@@ -45,6 +46,7 @@ describe('isChrome test', () => {
     const isChrome = setWindowProps({
       userAgent: 'Mozilla/5.0 (win32) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/19.0.0',
       vendor: '',
+      chrome: false,
     });
 
     expect(isChrome).toBe(false);
