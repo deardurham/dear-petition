@@ -52,28 +52,14 @@ describe('isChrome test', () => {
     expect(isChrome).toBe(false);
   });
 
-  it('userAgent includes Chrome, returns true', () => {
-    const loader = new ResourceLoader({
-      userAgent: 'Chrome/116.0.5845.187 (Official Build) <platform> (<platform-details>)',
+  it('Mock iPhoneSafari userAgent, vendor in JSDOM', () => {
+    const isChrome = setWindowProps({
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1',
+      vendor: 'Apple Computer, Inc.',
+      chrome: false,
     });
 
-    const dom = new JSDOM(``, { resources: loader });
-    const userAgent = dom.window.navigator.userAgent;
-
-    const includesChrome = userAgent.search(/\bchrome\b/i) > -1;
-
-    expect(includesChrome).toBe(true);
-  });
-
-  it('userAgent Mozilla returns false', () => {
-    const loader = new ResourceLoader({
-      userAgent: 'Mozilla/5.0 (win32) AppleWebKit/537.36 (KHTML, like Gecko) jsdom/19.0.0',
-    });
-    const dom = new JSDOM(``, { resources: loader });
-    const userAgent = dom.window.navigator.userAgent;
-
-    const includesChrome = userAgent.search(/\bchrome\b/i) > -1;
-
-    expect(includesChrome).toBe(false);
+    expect(isChrome).toBe(false);
   });
 });
