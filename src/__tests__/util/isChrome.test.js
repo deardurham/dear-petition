@@ -1,9 +1,8 @@
 import * as jdsom from 'jsdom';
 
 describe('isChrome test', () => {
-  const { JSDOM, ResourceLoader } = jdsom;
-
   const setWindowProps = ({ userAgent, vendor, chrome }) => {
+    const { JSDOM, ResourceLoader } = jdsom;
     const loader = new ResourceLoader({
       userAgent: userAgent,
     });
