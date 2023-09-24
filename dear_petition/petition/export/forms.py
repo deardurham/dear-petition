@@ -65,6 +65,9 @@ class PetitionForm(metaclass=abc.ABCMeta):
 
         return qs
 
+    def get_first_record(self):
+        return self.get_ordered_offense_records().first()
+
     def get_most_recent_record(self):
         return self.get_ordered_offense_records().last()
 
@@ -109,15 +112,9 @@ class AOCFormCR287(PetitionForm):
             self.data["Superior"] = Checkbox("")
 
     def map_file_no(self):
-        ciprs_records = models.CIPRSRecord.objects.filter(offenses__offense_records__documents__id=self.petition_document.id).distinct()
-        if ciprs_records.count() > 1:
-            self.data["ConsJdgmntFileNum"] = self.MULTIPLE_FILE_NO_MSG
-        else:
-            offense_record = self.get_most_recent_record()
-            if offense_record:
-                self.data[
-                    "ConsJdgmntFileNum"
-                ] = offense_record.offense.ciprs_record.file_no
+        first_record = self.get_first_record()
+        if first_record:
+            self.data["ConsJdgmntFileNum"] = first_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
         client = self.extra["client"]
@@ -218,12 +215,14 @@ class AOCFormCR285(AOCFormCR287):
         self.map_agencies()
         self.map_offenses()
 
-    def map_file_no(self):
-        self.data["FileNo"] = self.MULTIPLE_FILE_NO_MSG
-
     def map_header(self):
         super().map_header()
         self.data["CountyName"] = self.petition_document.county
+
+    def map_file_no(self):
+        first_record = self.get_first_record()
+        if first_record:
+            self.data["FileNo"] = first_record.offense.ciprs_record.file_no
 
     def map_petitioner(self):
         client = self.extra["client"]
