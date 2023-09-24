@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import usePortal from '../../hooks/usePortal';
 
 describe('usePortal', () => {
-  it('makes a div', () => {
+  it('inserts an empty div into DOM with correct ID', () => {
     const sibling = document.createElement('section');
     document.body.insertAdjacentElement('beforeend', sibling);
 
