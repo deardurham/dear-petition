@@ -11,18 +11,29 @@ describe('useDebounce', () => {
   });
 
   it('should debounce the callback function', async () => {
-    const callback = vi.fn(() => console.log('callback called'));
-    const { result, rerender } = renderHook(() => useDebounce(callback, { timeout: 500 }));
+    const callback = vi.fn(() => console.log());
+    const { result } = renderHook(() => useDebounce(callback, { timeout: 500 }));
 
     // Call the debounced function multiple times within a short period
     result.current('call 1');
     result.current('call 2');
     result.current('call 3');
 
-    rerender({ timeout: 1000 });
     vi.runAllTimers();
+
     // Ensure that the callback has been called only once with the last argument
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith('call 3');
+  });
+
+  it('should not execute the function', () => {
+    const callback = vi.fn(() => console.log());
+    const { result } = renderHook(() => useDebounce(callback, { timeout: 500 }));
+
+    result.current('call 1');
+
+    // advancing by 2ms won't trigger the func
+    vi.advanceTimersByTime(2);
+    expect(callback).not.toHaveBeenCalled();
   });
 });
