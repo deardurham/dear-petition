@@ -4,4 +4,6 @@ export const PETITION_FORM_NAMES = {
   'AOC-CR-293': 'Underaged Convictions Form',
   'AOC-CR-281': 'Misdemeanor Form',
   'AOC-CR-285': 'Attachment Form',
+  'AOC-CR-297': 'Adult Felonies Form',
+  'AOC-CR-298': 'Adult Misdemeanors Form',
 };

@@ -230,3 +230,11 @@ class AOCFormCR288(AOCFormCR287):
 
 class AOCFormCR293(AOCFormCR287):
     pass
+
+
+class AOCFormCR297(AOCFormCR287):
+    pass
+
+
+class AOCFormCR298(AOCFormCR287):
+    pass

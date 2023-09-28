@@ -5,6 +5,8 @@ from django.db import transaction
 
 from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
+    ADULT_FELONIES,
+    ADULT_MISDEMEANORS,
     ATTACHMENT,
     DISMISSED,
     NOT_GUILTY,
@@ -59,7 +61,10 @@ def create_batch_petitions(batch):
     create_petitions_from_records(batch, NOT_GUILTY)
     # Convictions
     create_petitions_from_records(batch, UNDERAGED_CONVICTIONS)
-    # TODO: Misdemeanor
+    # Adult felonies
+    create_petitions_from_records(batch, ADULT_FELONIES)
+    # Adult misdemeanors
+    create_petitions_from_records(batch, ADULT_MISDEMEANORS)
 
 
 def create_petitions_from_records(batch, form_type):
