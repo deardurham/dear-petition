@@ -28,7 +28,7 @@ export const ModalButton = ({ children, className, colorClass, title, allowClose
       return;
     }
     setShowModal(true);
-  }
+  };
   return (
     <Button className={className} colorClass={colorClass ?? 'neutral'} onClick={handleClick}>
       {title}

@@ -19,18 +19,24 @@ const DeleteBatchModal = ({ batch }) => {
   const [triggerDelete] = useDeleteBatchMutation();
   const { closeModal } = useModalContext();
   return (
-    <div className='flex flex-col gap-10 justify-center w-[450px] h-[200px]'>
-    <p className="text-[1.6rem] flex flex-wrap gap-x-2 gap-y-4 px-16">
-      <span><span className='text-red'>Warning:</span>This action will PERMANENTLY delete the petition group:</span>
-      <span className="font-semibold">{batch.label}</span>
-    </p>
-      <div className='flex gap-8 justify-center'>
-        <Button colorClass={CAUTION} className='w-[100px]' onClick={() => triggerDelete({ id: batch.pk} )}>Delete</Button>
-        <Button colorClass={NEUTRAL} className='w-[100px]' onClick={() => closeModal()}>Cancel</Button>
+    <div className="flex flex-col gap-10 justify-center w-[450px] h-[200px]">
+      <p className="text-[1.6rem] flex flex-wrap gap-x-2 gap-y-4 px-16">
+        <span>
+          <span className="text-red">Warning:</span>This action will PERMANENTLY delete the petition group:
+        </span>
+        <span className="font-semibold">{batch.label}</span>
+      </p>
+      <div className="flex gap-8 justify-center">
+        <Button colorClass={CAUTION} className="w-[100px]" onClick={() => triggerDelete({ id: batch.pk })}>
+          Delete
+        </Button>
+        <Button colorClass={NEUTRAL} className="w-[100px]" onClick={() => closeModal()}>
+          Cancel
+        </Button>
       </div>
     </div>
   );
-}
+};
 
 // TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
@@ -130,10 +136,7 @@ export const ExistingPetitions = () => {
                   >
                     Records Summary
                   </Button>
-                  <ModalButton
-                    title="Delete"
-                    colorClass={CAUTION}
-                  >
+                  <ModalButton title="Delete" colorClass={CAUTION}>
                     <DeleteBatchModal batch={batch} />
                   </ModalButton>
                 </TableCell>
