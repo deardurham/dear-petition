@@ -3,6 +3,8 @@ from datetime import datetime
 from django.conf import settings
 from django.utils.timezone import make_aware
 from django.utils import timezone
+from django.db.models import IntegerField, Case, When, Value
+from django.db.models.functions import Cast, Substr, Concat
 from .constants import DATE_FORMAT
 
 from PIL import ImageFont
@@ -145,3 +147,41 @@ def get_truncation_point_of_text_by_pixel_size(text, desired_length):
             idx += 1
 
     return idx
+
+
+def get_ordered_offense_records(petition_document):
+    # When sorting these, need to interpret first 2 digits of file number as year and sort based on that
+    two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
+    qs = (
+        petition_document.offense_records.filter(petitionoffenserecord__active=True)
+        .select_related("offense__ciprs_record")
+        .annotate(
+            first_two_digits_file_number_chars=Substr(
+                "offense__ciprs_record__file_no", 1, 2
+            )
+        )
+        .annotate(
+            first_two_digits_file_number=Cast(
+                "first_two_digits_file_number_chars", output_field=IntegerField()
+            )
+        )
+        .annotate(
+            file_number_year=Case(
+                When(
+                    first_two_digits_file_number__gt=two_digit_current_year,
+                    then=Concat(Value("19"), "first_two_digits_file_number_chars"),
+                ),
+                When(
+                    first_two_digits_file_number__lte=two_digit_current_year,
+                    then=Concat(Value("20"), "first_two_digits_file_number_chars"),
+                ),
+            )
+        )
+        .order_by(
+            "file_number_year",
+            "offense__ciprs_record__file_no",
+            "pk",
+        )
+    )
+
+    return qs
