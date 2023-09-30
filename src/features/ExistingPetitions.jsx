@@ -4,21 +4,39 @@ import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { formatDistance } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { manualAxiosRequest } from '../service/axios';
-import { Button } from '../components/elements/Button';
+import { Button, ModalButton } from '../components/elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
-import { useGetUserBatchesQuery } from '../service/api';
+import { useDeleteBatchMutation, useGetUserBatchesQuery } from '../service/api';
 import useAuth from '../hooks/useAuth';
 import { DownloadDocumentsModal } from './DownloadDocuments';
 import { hasValidationsErrors } from '../util/errors';
 import { downloadFile } from '../util/downloadFile';
+import { CAUTION, NEUTRAL } from '../components/elements/Button/Button';
+import { useModalContext } from '../components/elements/Button/ModalButton';
+
+const DeleteBatchModal = ({ batch }) => {
+  const [triggerDelete] = useDeleteBatchMutation();
+  const { closeModal } = useModalContext();
+  return (
+    <div className='flex flex-col gap-10 justify-center w-[450px] h-[200px]'>
+    <p className="text-[1.6rem] flex flex-wrap gap-x-2 gap-y-4 px-16">
+      <span><span className='text-red'>Warning:</span>This action will PERMANENTLY delete the petition group:</span>
+      <span className="font-semibold">{batch.label}</span>
+    </p>
+      <div className='flex gap-8 justify-center'>
+        <Button colorClass={CAUTION} className='w-[100px]' onClick={() => triggerDelete({ id: batch.pk} )}>Delete</Button>
+        <Button colorClass={NEUTRAL} className='w-[100px]' onClick={() => closeModal()}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
 
 // TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
   const { user } = useAuth();
   const { data } = useGetUserBatchesQuery({ user: user.pk });
   const [downloadDocumentBatch, setDownloadDocumentBatch] = useState(null);
-  const [rows, setRows] = useState(data?.results);
 
   return (
     <div className="flex flex-col">
@@ -47,7 +65,7 @@ export const ExistingPetitions = () => {
             <TableCell header />
           </TableHeader>
           <TableBody>
-            {rows?.map((batch) => (
+            {data?.results?.map((batch) => (
               <TableRow key={batch.pk}>
                 <TableCell>{batch.label}</TableCell>
                 <TableCell>
@@ -112,24 +130,12 @@ export const ExistingPetitions = () => {
                   >
                     Records Summary
                   </Button>
-                  <Button
-                    title={'Delete the batch.'}
-                    onClick={() => {
-                      manualAxiosRequest({
-                        url: `/batch/${batch.pk}/`,
-                        responseType: 'arraybuffer',
-                        method: 'delete',
-                      }).then(() => {
-                        setRows(
-                          rows.filter((row) => {
-                            row.pk !== batch.pk;
-                          }),
-                        );
-                      });
-                    }}
+                  <ModalButton
+                    title="Delete"
+                    colorClass={CAUTION}
                   >
-                    Delete
-                  </Button>
+                    <DeleteBatchModal batch={batch} />
+                  </ModalButton>
                 </TableCell>
               </TableRow>
             ))}

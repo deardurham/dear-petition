@@ -70,6 +70,10 @@ export const api = createApi({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
       invalidatesTags: (result) => (result ? [{ type: 'Batch' }] : []),
     }),
+    deleteBatch: builder.mutation({
+      query: ({ id }) => ({ url: `batch/${id}/`, method: 'delete' }),
+      invalidatesTags: ['Batch'],
+    }),
     updateBatch: builder.mutation({
       query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
       invalidatesTags: (result, _err, { id }) => {
@@ -153,6 +157,7 @@ export const {
   useAssignAgenciesToDocumentsMutation,
   useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
+  useDeleteBatchMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,
   useGetUserBatchesQuery,
