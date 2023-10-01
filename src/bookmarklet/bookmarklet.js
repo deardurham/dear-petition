@@ -1,7 +1,13 @@
-const POST_URL = import.meta.env.MODE === 'development' ? 'https://93d2-107-15-47-235.ngrok.io' : 'https://dear-petition.herokuapp.com/portal/bookmarklet/';
-import { minify } from "terser";
+const POST_URL =
+  import.meta.env.MODE === 'development'
+    ? 'https://93d2-107-15-47-235.ngrok.io'
+    : 'https://dear-petition.herokuapp.com/portal/bookmarklet/';
+import { minify } from 'terser';
 
-export const generateBookmarklet = async (username) => (await minify(`
+export const generateBookmarklet = async (username) =>
+  (
+    await minify(
+      `
     var html = document.documentElement.innerHTML;
     var loaded = 0;
     
@@ -38,4 +44,7 @@ export const generateBookmarklet = async (username) => (await minify(`
     document.body.appendChild(iframe);
     
     form.submit();    
-`, { mangle: false })).code;
+`,
+      { mangle: false },
+    )
+  ).code;

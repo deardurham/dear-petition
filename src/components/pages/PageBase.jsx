@@ -63,8 +63,8 @@ function PageBase({ children, className, ...props }) {
   useEffect(() => {
     const generate = async () => {
       const bookmarkletCode = await generateBookmarklet(user.username);
-      setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`)
-    }
+      setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
+    };
     generate();
   }, [user.username]);
 
@@ -87,7 +87,9 @@ function PageBase({ children, className, ...props }) {
               <Link to="/help">Help</Link>
             </LinkWrapper>
             <LinkWrapper>
-              <a href={bookmarklet} title="Drag to your bookmarks bar">Portal Importer (beta)</a>
+              <a href={bookmarklet} title="Drag to your bookmarks bar">
+                Portal Importer (beta)
+              </a>
             </LinkWrapper>
             {user?.is_admin ? (
               <DropdownMenu
