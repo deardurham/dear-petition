@@ -9,6 +9,7 @@ flower==0.9.5  # https://github.com/mher/flower
 pyjwt==2.1.0
 docxtpl==0.16.4 # https://docxtpl.readthedocs.io/en/latest/
 docx2pdf==0.1.8
+django-import-export==3.3.1
 
 # Django
 # ------------------------------------------------------------------------------
