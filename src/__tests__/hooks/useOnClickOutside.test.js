@@ -42,4 +42,25 @@ describe('useOnClickOutside', () => {
 
     expect(handler).not.toHaveBeenCalled();
   });
+
+  it('should not call the handler after hook is unmounted', () => {
+    const ref = { current: document.createElement('div') };
+    const handler = vi.fn();
+
+    const { unmount } = renderHook(() => useOnClickOutside(ref, handler));
+
+    act(() => {
+      const insideElement = document.createElement('div');
+      ref.current.appendChild(insideElement);
+
+      const event = new MouseEvent('mousedown', {
+        bubbles: true,
+        cancelable: true,
+      });
+      unmount();
+      insideElement.dispatchEvent(event);
+    });
+
+    expect(handler).not.toHaveBeenCalled();
+  });
 });
