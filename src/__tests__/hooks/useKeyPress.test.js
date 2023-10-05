@@ -24,4 +24,16 @@ describe('useKeyPress', () => {
 
     expect(action).not.toHaveBeenCalled();
   });
+
+  it('action is not triggered after hook is unmounted', () => {
+    const key = 'Enter';
+    const action = vi.fn();
+
+    const { unmount } = renderHook(() => useKeyPress(key, action));
+    unmount();
+    const event = new KeyboardEvent('keyup', { key });
+    window.dispatchEvent(event);
+
+    expect(action).not.toHaveBeenCalled();
+  });
 });
