@@ -15,7 +15,6 @@ describe('Utils: errors.js', () => {
     const hasErrors = hasValidationsErrorsSpy(mockErrors);
     expect(hasErrors).toBe(true);
     expect(hasValidationsErrorsSpy).toHaveBeenCalledTimes(1);
-    expect(hasValidationsErrorsSpy).toHaveReturned();
   });
 
   it('hasValidationsErrors returns false if no errors exist', () => {
@@ -23,7 +22,6 @@ describe('Utils: errors.js', () => {
     const noErrors = hasValidationsErrorsSpy({});
     expect(noErrors).toBe(false);
     expect(hasValidationsErrorsSpy).toHaveBeenCalledTimes(1);
-    expect(hasValidationsErrorsSpy).toHaveReturned();
   });
 
   it('getErrorList returns a list of passed errors', () => {
@@ -37,7 +35,6 @@ describe('Utils: errors.js', () => {
 
     expect(result).toEqual(expectedResult);
     expect(getErrorListSpy).toHaveBeenCalledTimes(1);
-    expect(getErrorListSpy).toHaveReturned();
   });
 
   it('getErrorList returns [] if no errors passed', () => {
@@ -45,6 +42,5 @@ describe('Utils: errors.js', () => {
     const noErrors = getErrorListSpy({});
     expect(noErrors).toStrictEqual([]);
     expect(getErrorListSpy).toHaveBeenCalledTimes(1);
-    expect(getErrorListSpy).toHaveReturned();
   });
 });
