@@ -11,7 +11,7 @@ describe('useDebounce', () => {
   });
 
   it('should debounce the callback function', async () => {
-    const callback = vi.fn(() => console.log());
+    const callback = vi.fn((_arg) => console.log());
     const { result } = renderHook(() => useDebounce(callback, { timeout: 500 }));
 
     // Call the debounced function multiple times within a short period
@@ -27,7 +27,7 @@ describe('useDebounce', () => {
   });
 
   it('should not execute the function until timer exceeds timeout', () => {
-    const callback = vi.fn(() => console.log());
+    const callback = vi.fn((_arg) => console.log());
     const { result } = renderHook(() => useDebounce(callback, { timeout: 500 }));
 
     result.current('call 1');
