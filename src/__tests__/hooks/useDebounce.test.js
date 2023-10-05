@@ -26,7 +26,7 @@ describe('useDebounce', () => {
     expect(callback).toHaveBeenCalledWith('call 3');
   });
 
-  it('should not execute the function', () => {
+  it('should not execute the function until timer exceeds timeout', () => {
     const callback = vi.fn(() => console.log());
     const { result } = renderHook(() => useDebounce(callback, { timeout: 500 }));
 
