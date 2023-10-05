@@ -32,8 +32,11 @@ describe('useDebounce', () => {
 
     result.current('call 1');
 
-    // advancing by 2ms won't trigger the func
+    // advancing by 2ms won't trigger callback
     vi.advanceTimersByTime(2);
     expect(callback).not.toHaveBeenCalled();
+    // advancing by 500ms total will trigger callback
+    vi.advanceTimersByTime(498);
+    expect(callback).toHaveBeenCalled();
   });
 });
