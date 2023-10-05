@@ -37,6 +37,6 @@ describe('useDebounce', () => {
     expect(callback).not.toHaveBeenCalled();
     // advancing by 500ms total will trigger callback
     vi.advanceTimersByTime(498);
-    expect(callback).toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledWith('call 1');
   });
 });
