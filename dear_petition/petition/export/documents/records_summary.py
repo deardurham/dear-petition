@@ -106,7 +106,7 @@ def __create_tables_data(offenses):
     for offense in offenses:
 
         county = offense.ciprs_record.county
-        jurisdiction = JURISDICTION_MAP[offense.ciprs_record.jurisdiction]
+        jurisdiction = JURISDICTION_MAP[offense.jurisdiction]
         key = (county, jurisdiction)
 
         offense_records = list(offense.offense_records.all())
