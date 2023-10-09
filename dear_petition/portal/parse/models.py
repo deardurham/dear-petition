@@ -1,6 +1,6 @@
 import datetime as dt
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, field_validator
 
@@ -24,3 +24,8 @@ class Charge(BaseModel):
 
     class Config:
         validate_assignment = True
+
+
+class CaseInfo(BaseModel):
+    charges: List[Charge]
+    case_type: str

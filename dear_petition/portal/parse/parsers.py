@@ -4,7 +4,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from .models import Charge
+from .models import CaseInfo, Charge
 
 # From Jessica:
 # 1. File numbers have changed: Instead of 05CRS****** we have 05CR****-910.
@@ -31,10 +31,9 @@ def catch_parse_error(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except Exception:
             logger.exception(f"Exception occurred in {func}")
-            print("exception found")
 
     return wrapper
 
@@ -81,6 +80,8 @@ def parse_district_court(soup):
 
 
 def parse_case_information(soup):
+    # Only select tr.hide-sm rows since HTML includes two versions of the same
+    # offenses (one for phone, one for large screens).
     trs = soup.select("div[ng-if*=ShowOffenses] tr.hide-sm")
     charges = []
     for tr in trs:
@@ -92,7 +93,26 @@ def parse_case_information(soup):
         parse_charge_offense_date(tr=tr, charge=charge)
         parse_charge_filed_date(tr=tr, charge=charge)
         charges.append(charge)
-    return charges
+    ci = CaseInfo(
+        charges=charges,
+        case_type=parse_case_type(soup) or "",
+    )
+    return ci
+
+
+@catch_parse_error
+def parse_case_type(soup):
+    """
+    Parse charge number (first column from row)
+
+    Sample HTML:
+        <tr class="ng-scope" ng-if="::roaSection.caseInfo.CaseType.Description" style="">
+            <td class="roa-label">Case Type:</td>
+            <td class="roa-value ng-binding">Criminal</td>
+    """
+    return soup.select_one(
+        "tr[ng-if*=CaseType\\.Description] td.roa-value"
+    ).text.strip()
 
 
 @catch_parse_error
