@@ -1,17 +1,18 @@
 import { vi } from 'vitest';
+import isChrome from '../../util/isChrome.js';
 
 describe('isChrome test', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.resetAllMocks();
-  });
-
-  afterEach(() => {
     vi.stubGlobal('chrome', null);
     vi.stubGlobal('navigator', {
       userAgent: '',
       vendor: '',
     });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('browser is Chrome, isChrome=true', async () => {
@@ -21,8 +22,7 @@ describe('isChrome test', () => {
       vendor: 'Google Inc.',
     });
 
-    const result = (await import('../../util/isChrome.js')).default;
-    expect(result).toEqual(true);
+    expect(isChrome()).toEqual(true);
   });
 
   it('browser is Mozilla, isChrome=false', async () => {
@@ -32,7 +32,6 @@ describe('isChrome test', () => {
       vendor: '',
     });
 
-    const result = (await import('../../util/isChrome.js')).default;
-    expect(result).toEqual(false);
+    expect(isChrome()).toEqual(false);
   });
 });
