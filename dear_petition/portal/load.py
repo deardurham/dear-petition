@@ -2,7 +2,7 @@ import logging
 
 from dear_petition.petition.models import Batch, CIPRSRecord
 
-from .parse import parse_portal_document
+from .etl import parse_portal_document
 
 __all__ = ("import_portal_record",)
 

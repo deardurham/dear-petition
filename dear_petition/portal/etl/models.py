@@ -1,19 +1,25 @@
 import datetime as dt
 import logging
-from typing import List, Optional
+from typing import List, Union
 
 from pydantic import BaseModel, field_validator
 
 logger = logging.getLogger(__name__)
 
 
+class CaseSummary(BaseModel):
+    case_number: str
+    county: str
+    court: str
+
+
 class Charge(BaseModel):
-    number: int = None
-    offense: Optional[str] = ""
-    statute: Optional[str] = ""
-    degree: Optional[str] = ""
-    offense_date: dt.date = None
-    filed_date: dt.date = None
+    number: Union[int, None]
+    offense: str
+    statute: str
+    degree: str
+    offense_date: Union[dt.date, None]
+    filed_date: Union[dt.date, None]
 
     @field_validator("offense_date", "filed_date", mode="before")
     @classmethod
@@ -22,15 +28,12 @@ class Charge(BaseModel):
             return dt.datetime.strptime(v, "%m/%d/%Y")
         return v
 
-    class Config:
-        validate_assignment = True
-
 
 class CaseInfo(BaseModel):
-    charges: List[Charge]
     case_type: str
     case_status: str
-    case_status_date: dt.date
+    case_status_date: Union[dt.date, None]
+    charges: List[Charge]
 
     @field_validator("case_status_date", mode="before")
     @classmethod
@@ -38,3 +41,13 @@ class CaseInfo(BaseModel):
         if isinstance(v, str):
             return dt.datetime.strptime(v, "%m/%d/%Y")
         return v
+
+
+class PartyInfo(BaseModel):
+    defendant_name: str
+
+
+class PortalRecord(BaseModel):
+    case_summary: CaseSummary
+    case_info: CaseInfo
+    party_info: PartyInfo
