@@ -4,7 +4,21 @@ from .models import CaseSummary, CaseInfo, Charge, PartyInfo, PortalRecord
 from .parsers import case_summary, case_info, party_info
 
 
-def parse_portal_document(source):
+def transform_portal_record(source):
+    """Transform eCourts Portal record to CIPRS-looking record."""
+    portal_record = extract_portal_record(source)
+    return {
+        "General": {
+            "County": portal_record.case_summary.county,
+            "File No": portal_record.case_summary.case_number,
+            "District": portal_record.case_summary.court == "District",
+        },
+        "Defendant": {"Name": portal_record.party_info.defendant_name},
+    }
+
+
+def extract_portal_record(source):
+    """Parse HTML source to extract eCourts Portal record"""
     soup = BeautifulSoup(source, features="html.parser")
     return PortalRecord(
         case_summary=parse_case_summary(soup),
@@ -14,20 +28,16 @@ def parse_portal_document(source):
 
 
 def parse_case_summary(soup):
-    """
-    Case Summary section
-    """
+    """Case Summary section"""
     return CaseSummary(
-        case_number=case_summary.parse_fileno(soup),
-        county=case_summary.parse_county(soup),
-        court=case_summary.parse_district_court(soup),
+        case_number=case_summary.parse_case_number(soup) or "",
+        county=case_summary.parse_county(soup) or "",
+        court=case_summary.parse_district_court(soup) or "",
     )
 
 
 def parse_case_information(soup):
-    """
-    Case Information section
-    """
+    """Case Information section"""
     # Only select tr.hide-sm rows since HTML includes two versions of the same
     # offenses (one for phone, one for large screens).
     trs = soup.select("div[ng-if*=ShowOffenses] tr.hide-sm")
@@ -53,7 +63,5 @@ def parse_case_information(soup):
 
 
 def parse_party_information(soup):
-    """
-    Party Information section
-    """
+    """Party Information section"""
     return PartyInfo(defendant_name=party_info.parse_defendant_name(soup))

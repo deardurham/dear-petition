@@ -11,7 +11,7 @@ FILENO_REGEX = re.compile(r"\d\dCR\d\d\d\d\d\d-\d\d\d")
 
 
 @catch_parse_error
-def parse_fileno(soup):
+def parse_case_number(soup):
     div = soup.find("div", string=re.compile(r"\s?Case Number\s?"))
     match = FILENO_REGEX.search(div.parent.text)
     return match.group() if match else ""
@@ -28,5 +28,4 @@ def parse_county(soup):
 def parse_district_court(soup):
     div = soup.find("div", string=re.compile(r"\sLocation:\s"))
     full_court = div.parent.css.select_one("div.roa-value").text.strip()
-    court = COUNTY_COURT_REGEX.match(full_court).group(2).strip()
-    return "Yes" if court == "District" else "No"
+    return COUNTY_COURT_REGEX.match(full_court).group(2).strip()
