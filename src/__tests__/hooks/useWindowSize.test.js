@@ -3,10 +3,12 @@ import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react-hooks';
 
 describe('useWindowSize', () => {
-  it('sets state to an initial window size', () => {
+  beforeEach(() => {
     vi.stubGlobal('innerWidth', 1920);
     vi.stubGlobal('innerHeight', 1080);
+  });
 
+  it('sets state to an initial window size', () => {
     const { result } = renderHook(() => useWindowSize());
 
     expect(result.current.width).toBe(1920);
@@ -16,9 +18,6 @@ describe('useWindowSize', () => {
   });
 
   it('adjusts after window resize event', () => {
-    vi.stubGlobal('innerWidth', 1920);
-    vi.stubGlobal('innerHeight', 1080);
-
     const { result } = renderHook(() => useWindowSize());
 
     expect(result.current.width).toBe(1920);
