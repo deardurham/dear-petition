@@ -29,3 +29,12 @@ class Charge(BaseModel):
 class CaseInfo(BaseModel):
     charges: List[Charge]
     case_type: str
+    case_status: str
+    case_status_date: dt.date
+
+    @field_validator("case_status_date", mode="before")
+    @classmethod
+    def parse_date(cls, v):
+        if isinstance(v, str):
+            return dt.datetime.strptime(v, "%m/%d/%Y")
+        return v

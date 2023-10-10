@@ -96,6 +96,8 @@ def parse_case_information(soup):
     ci = CaseInfo(
         charges=charges,
         case_type=parse_case_type(soup) or "",
+        case_status=parse_case_status(soup) or None,
+        case_status_date=parse_case_status_date(soup) or None,
     )
     return ci
 
@@ -113,6 +115,42 @@ def parse_case_type(soup):
     return soup.select_one(
         "tr[ng-if*=CaseType\\.Description] td.roa-value"
     ).text.strip()
+
+
+@catch_parse_error
+def parse_case_status_date(soup):
+    """
+    Parse case status date
+
+    Sample HTML:
+        <tr ng-if="::roaSection.caseInfo.CaseStatuses.length" class="ng-scope">
+            <td class="roa-value">
+                <div ng-repeat="status in ::roaSection.caseInfo.CaseStatuses" class="ng-scope">
+                    <div ng-class="{'roa-text-bold':$first}" class="roa-text-bold">
+                        <span class="ng-binding">05/11/2007</span>
+                        <span>&nbsp;</span>
+                        <span class="ng-binding">Disposed</span>
+    """
+    # date is always first, so just use select_one
+    return soup.select_one("tr[ng-if*=caseInfo\\.CaseStatuses] span").text.strip()
+
+
+@catch_parse_error
+def parse_case_status(soup):
+    """
+    Parse case status
+
+    Sample HTML:
+        <tr ng-if="::roaSection.caseInfo.CaseStatuses.length" class="ng-scope">
+            <td class="roa-value">
+                <div ng-repeat="status in ::roaSection.caseInfo.CaseStatuses" class="ng-scope">
+                    <div ng-class="{'roa-text-bold':$first}" class="roa-text-bold">
+                        <span class="ng-binding">05/11/2007</span>
+                        <span>&nbsp;</span>
+                        <span class="ng-binding">Disposed</span>
+    """
+    # date is always first, so just use select_one
+    return soup.select("tr[ng-if*=caseInfo\\.CaseStatuses] span")[-1].text.strip()
 
 
 @catch_parse_error
