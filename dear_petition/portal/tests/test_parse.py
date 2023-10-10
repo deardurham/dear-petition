@@ -3,7 +3,7 @@ import pathlib
 from bs4 import BeautifulSoup
 import pytest
 
-from dear_petition.portal import etl
+from dear_petition.portal.etl.parsers import case_summary, party_info
 
 
 @pytest.fixture
@@ -18,16 +18,16 @@ def soup(sample_record):
 
 
 def test_parse_defendant_name(soup):
-    assert etl.parse_defendant_name(soup) == "DOE, JANE EMMA"
+    assert party_info.parse_defendant_name(soup) == "DOE, JANE EMMA"
 
 
 def test_parse_filno(soup):
-    assert etl.parse_fileno(soup) == "01CR012345-678"
+    assert case_summary.parse_case_number(soup) == "01CR012345-678"
 
 
 def test_parse_county(soup):
-    assert etl.parse_county(soup) == "Wake"
+    assert case_summary.parse_county(soup) == "Wake"
 
 
 def test_district_court(soup):
-    assert etl.parse_district_court(soup) == "Yes"
+    assert case_summary.parse_court(soup) == "District"

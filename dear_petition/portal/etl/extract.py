@@ -32,7 +32,7 @@ def parse_case_summary(soup):
     return CaseSummary(
         case_number=case_summary.parse_case_number(soup) or "",
         county=case_summary.parse_county(soup) or "",
-        court=case_summary.parse_district_court(soup) or "",
+        court=case_summary.parse_court(soup) or "",
     )
 
 

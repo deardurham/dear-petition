@@ -25,7 +25,7 @@ def parse_county(soup):
 
 
 @catch_parse_error
-def parse_district_court(soup):
+def parse_court(soup):
     div = soup.find("div", string=re.compile(r"\sLocation:\s"))
     full_court = div.parent.css.select_one("div.roa-value").text.strip()
     return COUNTY_COURT_REGEX.match(full_court).group(2).strip()
