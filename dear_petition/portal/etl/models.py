@@ -1,10 +1,7 @@
 import datetime as dt
-import logging
 from typing import List, Union
 
 from pydantic import BaseModel, field_validator
-
-logger = logging.getLogger(__name__)
 
 
 class CaseSummary(BaseModel):

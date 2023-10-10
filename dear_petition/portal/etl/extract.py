@@ -1,11 +1,7 @@
-import logging
-
 from bs4 import BeautifulSoup
 
 from .models import CaseSummary, CaseInfo, Charge, PartyInfo, PortalRecord
 from .parsers import case_summary, case_info, party_info
-
-logger = logging.getLogger(__name__)
 
 
 def parse_portal_document(source):
