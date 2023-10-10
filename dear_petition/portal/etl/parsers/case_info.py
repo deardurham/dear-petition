@@ -50,7 +50,7 @@ def parse_case_status(soup):
                         <span>&nbsp;</span>
                         <span class="ng-binding">Disposed</span>
     """
-    # date is always first, so just use select_one
+    # status is always last, so select last one
     return soup.select("tr[ng-if*=caseInfo\\.CaseStatuses] span")[-1].text.strip()
 
 
