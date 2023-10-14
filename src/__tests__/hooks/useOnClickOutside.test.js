@@ -49,17 +49,15 @@ describe('useOnClickOutside', () => {
 
     const { unmount } = renderHook(() => useOnClickOutside(ref, handler));
 
-    act(() => {
-      const insideElement = document.createElement('div');
-      ref.current.appendChild(insideElement);
+    const outsideElement = document.createElement('div');
+    document.body.appendChild(outsideElement);
 
-      const event = new MouseEvent('mousedown', {
-        bubbles: true,
-        cancelable: true,
-      });
-      unmount();
-      insideElement.dispatchEvent(event);
+    const event = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
     });
+    unmount();
+    outsideElement.dispatchEvent(event);
 
     expect(handler).not.toHaveBeenCalled();
   });
