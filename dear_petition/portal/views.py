@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .forms import BookmarkletDataForm
-from .load import import_portal_record
+from .etl.load import import_portal_record
 
 
 logger = logging.getLogger(__name__)
