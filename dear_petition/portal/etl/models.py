@@ -44,7 +44,23 @@ class PartyInfo(BaseModel):
     defendant_name: str
 
 
+class Disposition(BaseModel):
+    event_date: Union[dt.date, None]
+    event: str
+    charge_number: int
+    charge_offense: str
+    criminal_disposition: str
+
+    @field_validator("event_date", mode="before")
+    @classmethod
+    def parse_date(cls, v):
+        if isinstance(v, str):
+            return dt.datetime.strptime(v, "%m/%d/%Y")
+        return v
+
+
 class PortalRecord(BaseModel):
     case_summary: CaseSummary
     case_info: CaseInfo
     party_info: PartyInfo
+    dispositions: List[Disposition]

@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 from .models import CaseSummary, CaseInfo, Charge, PartyInfo, PortalRecord
-from .parsers import case_summary, case_info, party_info
+from .parsers import case_summary, dispositions, case_info, party_info
 
 
 def transform_portal_record(source):
@@ -24,6 +24,7 @@ def extract_portal_record(source):
         case_summary=parse_case_summary(soup),
         case_info=parse_case_information(soup),
         party_info=parse_party_information(soup),
+        dispositions=dispositions.parse_dispositions(soup),
     )
 
 
