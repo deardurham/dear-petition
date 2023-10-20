@@ -4,19 +4,6 @@ from .models import CaseSummary, CaseInfo, Charge, PartyInfo, PortalRecord
 from .parsers import case_summary, dispositions, case_info, party_info
 
 
-def transform_portal_record(source):
-    """Transform eCourts Portal record to CIPRS-looking record."""
-    portal_record = extract_portal_record(source)
-    return {
-        "General": {
-            "County": portal_record.case_summary.county,
-            "File No": portal_record.case_summary.case_number,
-            "District": portal_record.case_summary.court == "District",
-        },
-        "Defendant": {"Name": portal_record.party_info.defendant_name},
-    }
-
-
 def extract_portal_record(source):
     """Parse HTML source to extract eCourts Portal record"""
     soup = BeautifulSoup(source, features="html.parser")

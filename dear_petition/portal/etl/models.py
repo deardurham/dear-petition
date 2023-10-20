@@ -25,6 +25,16 @@ class Charge(BaseModel):
             return dt.datetime.strptime(v, "%m/%d/%Y")
         return v
 
+    @property
+    def severity(self):
+        """Attempt to convert Portal's degree to CIPRS severity"""
+        severity = self.degree
+        if self.degree in ("FH", "FNC"):
+            severity = "FELONY"
+        elif self.degree in ("MNC",):
+            severity = "MISDEMEANOR"
+        return severity
+
 
 class CaseInfo(BaseModel):
     case_type: str
@@ -64,3 +74,9 @@ class PortalRecord(BaseModel):
     case_info: CaseInfo
     party_info: PartyInfo
     dispositions: List[Disposition]
+
+    def get_charge_by_number(self, charge_number: int):
+        """Return matching CaseInfo.charges Charge by charge_number"""
+        for charge in self.case_info.charges:
+            if charge.number == charge_number:
+                return charge
