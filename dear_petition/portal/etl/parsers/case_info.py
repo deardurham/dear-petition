@@ -1,6 +1,37 @@
 import re
 
+from dear_petition.portal.etl.models import CaseInfo, Charge
+
 from .utils import catch_parse_error
+
+
+SELECT_OFFENSES = "div[ng-if*=ShowOffenses] tr.hide-sm"
+
+
+def parse_case_information(soup):
+    """Case Information section"""
+    # Only select tr.hide-sm rows since HTML includes two versions of the same
+    # offenses (one for phone, one for large screens).
+    trs = soup.select(SELECT_OFFENSES)
+    charges = []
+    for tr in trs:
+        charges.append(
+            Charge(
+                statute=parse_statute(tr=tr) or "",
+                number=parse_charge_number(tr=tr) or None,
+                offense=parse_charge_offense(tr=tr) or "",
+                degree=parse_charge_degree(tr=tr) or "",
+                offense_date=parse_charge_offense_date(tr=tr) or None,
+                filed_date=parse_charge_filed_date(tr=tr) or None,
+            )
+        )
+    ci = CaseInfo(
+        charges=charges,
+        case_type=parse_case_type(soup) or "",
+        case_status=parse_case_status(soup) or None,
+        case_status_date=parse_case_status_date(soup) or None,
+    )
+    return ci
 
 
 @catch_parse_error

@@ -1,15 +1,14 @@
-import re
-
 from dear_petition.portal.etl.models import Disposition
 
 from .utils import catch_parse_error
 
 
+SELECT_DISPOSITIONS = "div[ng-if*=data\\.roaSections\\.dispositionEvents] div.roa-event-info-criminal-disposition-event"
+
+
 def parse_dispositions(soup):
     """Case Information section"""
-    divs = soup.select(
-        "div[ng-if*=data\\.roaSections\\.dispositionEvents] div.roa-event-info-criminal-disposition-event"
-    )
+    divs = soup.select(SELECT_DISPOSITIONS)
     dispositions = []
     for div in divs:
         dispositions.append(
@@ -36,7 +35,7 @@ def parse_event_date(div):
                     <span class="ng-binding ng-scope"> 01/04/2006 </span>
                 </div>
             </div>
-    """
+    """  # noqa
     return div.select_one("div.roa-event-date-col").text.strip()
 
 
@@ -70,7 +69,7 @@ def parse_charge_number(div):
                     <div class="roa-outdent-first-line ng-binding">
                         52. MISDEMEANOR LARCENY
                     </div>
-    """
+    """  # noqa
     charge = div.select_one("div[ng-if*=ChargeOffense] div").text.strip()
     return charge.split(".", maxsplit=1)[0].strip()
 
@@ -87,7 +86,7 @@ def parse_charge_offense(div):
                     <div class="roa-outdent-first-line ng-binding">
                         52. MISDEMEANOR LARCENY
                     </div>
-    """
+    """  # noqa
     charge = div.select_one("div[ng-if*=ChargeOffense] div").text.strip()
     return charge.split(".", maxsplit=1)[1].strip()
 
@@ -103,5 +102,11 @@ def parse_criminal_disposition(div):
                 <div ng-if="::criminalDisposition.CriminalDispositionTypeId.Description" class="roa-indent-3 ng-binding ng-scope">
                     VD-Superior Dismissals w/o Leave by DA - No Plea Agreement
                 </div>
-    """
-    return div.select_one("div[ng-if*=CriminalDispositionTypeId]").text.strip()
+    """  # noqa
+    disposition = (
+        div.select_one("div[ng-if*=CriminalDispositionTypeId]")
+        .text.strip()
+        .replace("\n", "")
+    )
+    # Remove double spaces
+    return " ".join(disposition.split())
