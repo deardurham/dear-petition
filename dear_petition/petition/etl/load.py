@@ -11,6 +11,7 @@ from dear_petition.petition.constants import (
     DISMISSED,
     NOT_GUILTY,
     UNDERAGED_CONVICTIONS,
+    INACTIVE_BY_DEFAULT_FORM_TYPES,
 )
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
@@ -88,7 +89,7 @@ def create_petitions_from_records(batch, form_type):
         create_documents(petition)
         logger.info(f"Associated {petition.offense_records.count()} total records")
 
-        if form_type == UNDERAGED_CONVICTIONS:
+        if form_type in INACTIVE_BY_DEFAULT_FORM_TYPES:
             pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
                 active=False
             )
