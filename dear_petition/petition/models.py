@@ -224,12 +224,13 @@ class Contact(PrintableModelMixin, models.Model):
         max_length=16, choices=CONTACT_CATEGORIES
     )
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
-    address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
     city = models.CharField(max_length=64, blank=True)
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
+    county = models.CharField(max_length=100, null=True, blank=True)
 
     user = models.ForeignKey(
         User,
@@ -241,7 +242,7 @@ class Contact(PrintableModelMixin, models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else ''
 
 
 class Batch(PrintableModelMixin, models.Model):

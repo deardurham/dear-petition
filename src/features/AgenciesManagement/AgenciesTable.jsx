@@ -123,6 +123,17 @@ const AgencyInputRow = ({ agencyData, onStopEditing }) => {
           errors={errorData?.zipcode}
         />
       </TableCell>
+      <TableCell>
+        <FormInput
+          className="w-full"
+          maxLength={5}
+          inputProps={{
+            control,
+            name: 'county',
+          }}
+          errors={errorData?.county}
+        />
+      </TableCell>
       <TableCell className="flex flex-col gap-4">
         <div className="flex gap-2">
           <Button type="button" colorClass="neutral" className="h-fit" onClick={onStopEditing}>
@@ -150,12 +161,13 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
     setDeleteModalId(null);
   };
   return (
-    <Table className="grid-cols-[6fr_4fr_3fr_2fr_3fr]">
+    <Table className="grid-cols-[5fr_4fr_3fr_2fr_2fr_2fr]">
       <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
         <SortableHeader field="name">Name</SortableHeader>
         <SortableHeader field="address">Address</SortableHeader>
         <SortableHeader field="city">City</SortableHeader>
         <SortableHeader field="zipcode">Zip</SortableHeader>
+        <SortableHeader field="zipcode">County</SortableHeader>
         <HeaderCell>Actions</HeaderCell>
       </TableHeader>
       <TableBody>
@@ -169,6 +181,7 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
             <TableCell tooltip={agencyData.formatted_address}>{agencyData.formatted_address}</TableCell>
             <TableCell>{agencyData.city}</TableCell>
             <TableCell>{agencyData.zipcode}</TableCell>
+            <TableCell>{agencyData.county}</TableCell>
             <TableCell className="flex gap-2">
               <Button type="button" onClick={() => setEditingId(agencyData.pk)}>
                 Edit

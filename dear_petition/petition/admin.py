@@ -1,10 +1,8 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.db.models import Count
-from django.shortcuts import get_object_or_404, redirect
-from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from dear_petition.petition import models
+from dear_petition.petition import models, resources
 from dear_petition.petition import constants
 
 
@@ -156,13 +154,9 @@ class BatchFileAdmin(admin.ModelAdmin):
     ordering = ("-date_uploaded",)
 
 
-class ContactResource(resources.ModelResource):
-    class Meta:
-        model = models.Contact
-
 @admin.register(models.Contact)
 class ContactAdmin(ImportExportModelAdmin):
-    resource_classes = [ContactResource]
+    resource_classes = [resources.AgencyResource]
 
     list_display = ("pk", "name", "category", "address1")
     list_filter = ("category",)

@@ -12,6 +12,7 @@ import SearchInput from '../elements/ManagementTable/SearchInput';
 import { calculateNumberOfPages, LegacyPageSelection } from '../elements/Table';
 import { DisplaySettingsModal } from '../elements/ManagementTable/DisplaySettings';
 import { AgencyFiltersModal } from '../../features/AgenciesManagement/AgencyFilters';
+import { AgenciesImportModal } from '../../features/AgenciesImport';
 
 const DEFAULT_NUM_AGENCIES = 10;
 const NUM_AGENCIES_OPTIONS = [10, 25, 50].map((value) => ({ value, label: value }));
@@ -93,6 +94,9 @@ const AgenciesPage = () => {
             }
           >
             <AgencyFiltersModal onFilter={onFilter} filterSelections={filterSelections} />
+          </ModalButton>
+          <ModalButton title="Import">
+            <AgenciesImportModal />
           </ModalButton>
           <SearchInput
             className="w-[300px]"
