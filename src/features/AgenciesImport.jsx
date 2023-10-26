@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useImportAgenciesMutation, usePreviewImportAgenciesMutation } from '../service/api';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { Button } from '../components/elements/Button';
@@ -15,14 +15,14 @@ const ALLOWED_MIME_TYPES = [
 const ImportErrors = ({ errors }) => {
   return (
     <div className="p-6 flex flex-col gap-4 h-full">
-      <h3 className="text-red">Error: Unable to import</h3>
+      <h3 className="text-red">Error: Unable to Import</h3>
       <Table className="flex-1 grid grid-cols-[60px_1fr] overflow-auto h-full auto-rows-max">
         <TableHeader>
           <HeaderCell>Row</HeaderCell>
           <HeaderCell>Error</HeaderCell>
         </TableHeader>
         {Object.entries(errors).map(([rowNumber, rowErrors]) => (
-          <TableRow key={rowErrors.join('\n')}>
+          <TableRow key={rowNumber}>
             <TableCell>{rowNumber}</TableCell>
             <TableCell>{rowErrors.join('\n')}</TableCell>
           </TableRow>
@@ -33,6 +33,14 @@ const ImportErrors = ({ errors }) => {
 };
 
 const ImportPreview = ({ rowDiffs }) => {
+  if (rowDiffs.length === 0) {
+    return (
+      <div className="p-6 flex flex-col gap-4 h-full">
+        <h3>Preview Changes</h3>
+        <p>No changes detected in submitted spreadsheet.</p>
+      </div>
+    );
+  }
   return (
     <div className="p-6 flex flex-col gap-4 h-full">
       <h3>Preview Changes</h3>
@@ -62,14 +70,22 @@ const ImportPreview = ({ rowDiffs }) => {
 
 const AgenciesImport = () => {
   const [file, setFile] = useState();
-  const [_triggerPreview, { data: previewResult }] = usePreviewImportAgenciesMutation({ fixedCacheKey: file?.name });
-  console.log({ previewResult });
+  const [_triggerPreview, { data: previewResult, reset }] = usePreviewImportAgenciesMutation({
+    fixedCacheKey: file?.name,
+  });
+
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [reset]);
+
   if (!previewResult) {
-    return <AgenciesPreviewImport file={file} onSetFile={(file) => setFile(file)} />;
+    return <AgenciesPreviewImport file={file} onSetFile={(file) => setFile(file)} onClose={() => reset()} />;
   } else if (previewResult.has_errors) {
     return <ImportErrors errors={previewResult.row_errors} />;
   }
-  return <ImportPreview rowDiffs={previewResult.row_diffs} />;
+  return <ImportPreview rowDiffs={previewResult.row_diffs} file={file} />;
 };
 
 const AgenciesPreviewImport = ({ file, onSetFile }) => {
@@ -78,6 +94,7 @@ const AgenciesPreviewImport = ({ file, onSetFile }) => {
   const [_triggerPreviewImport, { isLoading: isSubmitting }] = usePreviewImportAgenciesMutation({
     fixedCacheKey: file?.name,
   });
+
   const message = !file ? 'Drag and Drop files here or click to open file finder' : `Selection: ${file.name}`;
   return (
     <div className="flex flex-col gap-6 p-6">

@@ -38,7 +38,7 @@ class AgencyResource(resources.ModelResource):
     def before_import_row(self, row, **kwargs):
         if is_empty_row(row):
             return
-        
+
         row['Arresting Agency'] = row['Arresting Agency'].strip()
         row['County'] = row['County'].strip()
         
