@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-hooks';
 import useOnClickOutside from '../../hooks/useOnClickOutside';
 
 describe('useOnClickOutside', () => {
@@ -9,16 +9,14 @@ describe('useOnClickOutside', () => {
 
     renderHook(() => useOnClickOutside(ref, handler));
 
-    act(() => {
-      const outsideElement = document.createElement('div');
-      document.body.appendChild(outsideElement);
+    const outsideElement = document.createElement('div');
+    document.body.appendChild(outsideElement);
 
-      const event = new MouseEvent('mousedown', {
-        bubbles: true,
-        cancelable: true,
-      });
-      outsideElement.dispatchEvent(event);
+    const event = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
     });
+    outsideElement.dispatchEvent(event);
 
     expect(handler).toHaveBeenCalled();
   });
@@ -29,16 +27,14 @@ describe('useOnClickOutside', () => {
 
     renderHook(() => useOnClickOutside(ref, handler));
 
-    act(() => {
-      const insideElement = document.createElement('div');
-      ref.current.appendChild(insideElement);
+    const insideElement = document.createElement('div');
+    ref.current.appendChild(insideElement);
 
-      const event = new MouseEvent('mousedown', {
-        bubbles: true,
-        cancelable: true,
-      });
-      insideElement.dispatchEvent(event);
+    const event = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
     });
+    insideElement.dispatchEvent(event);
 
     expect(handler).not.toHaveBeenCalled();
   });
@@ -56,9 +52,14 @@ describe('useOnClickOutside', () => {
       bubbles: true,
       cancelable: true,
     });
-    unmount();
-    outsideElement.dispatchEvent(event);
 
-    expect(handler).not.toHaveBeenCalled();
+    outsideElement.dispatchEvent(event);
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    unmount();
+
+    outsideElement.dispatchEvent(event);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).not.toHaveBeenCalledTimes(2);
   });
 });
