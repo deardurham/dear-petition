@@ -60,6 +60,5 @@ describe('useOnClickOutside', () => {
 
     outsideElement.dispatchEvent(event);
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).not.toHaveBeenCalledTimes(2);
   });
 });
