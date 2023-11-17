@@ -7,11 +7,13 @@ from django.db import IntegrityError
 from dear_petition.petition.constants import (
     DISMISSED,
     DISTRICT_COURT,
+    SUPERIOR_COURT,
     DURHAM_COUNTY,
     DISP_METHOD_SUPERSEDING_INDICTMENT,
     DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
     VERDICT_GUILTY,
     VERDICT_GUILTY_TO_LESSER,
+    VERDICT_NOT_GUILTY,
     VERDICT_PRAYER_FOR_JUDGMENT,
     VERDICT_RESPONSIBLE,
     VERDICT_RESPONSIBLE_TO_LESSER,
@@ -477,6 +479,92 @@ def test_offense__is_visible__excluded_disp_method(disp_method):
 
     assert not offense_record_charged.is_visible
     assert not offense_record_convicted.is_visible
+
+
+def test_offense_record__is_visible__yes_has_de_novo(batch, record1):
+    """
+    Test is_visible in OffenseRecord when there is a de novo review. The DISTRICT_COURT offence record should not be
+    visible. The SUPERIOR_COURT offense record should be visible.
+    """
+    offense_district = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=DISTRICT_COURT,
+        verdict=VERDICT_GUILTY,
+        disposition_method="JURY TRIAL"
+    )
+    offense_record_district = OffenseRecordFactory(
+        offense=offense_district,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+
+    offense_superior = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=SUPERIOR_COURT,
+        verdict=VERDICT_PRAYER_FOR_JUDGMENT,
+        disposition_method="JURY TRIAL"
+    )
+    offense_record_superior = OffenseRecordFactory(
+        offense=offense_superior,
+        description="SIMPLE ASSAULT",
+        severity="MISDEMEANOR"
+    )
+
+    assert not offense_record_district.is_visible
+    assert offense_record_superior.is_visible
+
+
+@pytest.mark.parametrize(
+    "verdict_d, description_d, severity_d, verdict_s, description_s, severity_s ",
+    [
+        (
+            VERDICT_PRAYER_FOR_JUDGMENT, "SIMPLE ASSAULT", "MISDEMEANOR",
+            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR"
+        ),
+        (
+            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR",
+            VERDICT_PRAYER_FOR_JUDGMENT, "NOT SIMPLE ASSAULT", "MISDEMEANOR"
+        ),
+        (
+            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR",
+            VERDICT_PRAYER_FOR_JUDGMENT, "SIMPLE ASSAULT", "NOT MISDEMEANOR"
+        ),
+    ]
+)
+def test_offense_record__is_visible__no_has_de_novo(
+    batch, record1, verdict_d, description_d, severity_d, verdict_s, description_s, severity_s):
+    """
+    Test is_visible in OffenseRecord when there is no de novo review. There is no de novo review when 1) it is not a
+    guilty district court offense or 2) when there is no matching (description and severity) offense record in superior
+    court. The DISTRICT_COURT offense record and the SUPERIOR_COURT offense record should be visible.
+    """
+    offense_district = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=DISTRICT_COURT,
+        verdict=verdict_d,
+        disposition_method="JURY TRIAL",
+    )
+    offense_record_district = OffenseRecordFactory(
+        offense=offense_district,
+        description=description_d,
+        severity=severity_d
+    )
+
+    offense_superior = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=SUPERIOR_COURT,
+        verdict=verdict_s,
+        disposition_method="JURY TRIAL",
+    )
+    offense_record_superior = OffenseRecordFactory(
+        offense=offense_superior,
+        description=description_s,
+        severity=severity_s
+    )
+
+    assert offense_record_district.is_visible
+    assert offense_record_superior.is_visible
+
 
 def test_offense__disposition__no_verdict():
     """

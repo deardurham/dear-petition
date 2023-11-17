@@ -7,8 +7,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.db.models import JSONField
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import JSONField, Q
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import IntegerField, Case, When, Value, signals
@@ -29,18 +28,11 @@ from . import constants as pc
 
 from .constants import (
     JURISDICTION_CHOICES,
-    DISTRICT_COURT,
     NOT_AVAILABLE,
     SEX_CHOICES,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
     FORM_TYPES,
-    CHARGED,
-    DISP_METHOD_SUPERSEDING_INDICTMENT,
-    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
-    VERDICT_GUILTY_TO_LESSER,
-    VERDICT_PRAYER_FOR_JUDGMENT,
-    VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
 from .utils import make_datetime_aware
@@ -112,7 +104,7 @@ class Offense(PrintableModelMixin, models.Model):
         "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
     jurisdiction = models.CharField(
-        choices=JURISDICTION_CHOICES, max_length=255, default=DISTRICT_COURT
+        choices=JURISDICTION_CHOICES, max_length=255, default=pc.DISTRICT_COURT
     )
     disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)
@@ -190,18 +182,40 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     def disposed_on(self):
         return self.offense.disposed_on
 
-
     @property
     def is_visible(self):
         """
-        Return false if offense's disposition method is an excluded disposition method. Return false if this is a
-        CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise, return true.
+        Return false if offense's disposition method is an excluded disposition method. Return false if offense record
+        has a de novo review. Return false if this is a CHARGED offense record and the offense is a "convicted of
+        charged" offense. Otherwise, return true.
         """
-        if self.offense.disposition_method in [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]:
+
+        # check if any conditions are met that would cause offense record to be hidden
+        has_excluded_disp_method = self.offense.disposition_method in \
+                                  [pc.DISP_METHOD_SUPERSEDING_INDICTMENT, pc.DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]
+        has_de_novo_review = self.has_de_novo_review
+        is_convicted_of_charged = self.action == pc.CHARGED and self.offense.is_convicted_of_charged()
+
+        # determine if the offense record should be visible
+        return not (has_excluded_disp_method or has_de_novo_review or is_convicted_of_charged)
+
+    @property
+    def has_de_novo_review(self):
+        """
+        Return true if offense's verdict is guilty and jurisdiction is district court and there is a superior court
+        offense record on the ciprs record with the same description and severity.
+        """
+
+        # return false if this is not a district court, guilty offense
+        if self.offense.verdict != pc.VERDICT_GUILTY or self.offense.jurisdiction != pc.DISTRICT_COURT:
             return False
 
-        return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
-
+        # determine if there are matching (same description and severity) superior court offenses on this ciprs record
+        return self.offense.ciprs_record.offenses.filter(
+            jurisdiction=pc.SUPERIOR_COURT,
+            offense_records__description=self.description,
+            offense_records__severity=self.severity
+        ).exists()
 
     @property
     def disposition(self):
@@ -210,11 +224,11 @@ class OffenseRecord(PrintableModelMixin, models.Model):
         "guilty to lesser" or "responsible to lesser" criteria. Otherwise, return the offense's verdict if it exists.
         If the offense's verdict doesn't exist, return the offense's disposition method.
         """
-        if self.action == CHARGED:
+        if self.action == pc.CHARGED:
             if self.offense.is_guilty_to_lesser():
-                return VERDICT_GUILTY_TO_LESSER
+                return pc.VERDICT_GUILTY_TO_LESSER
             elif self.offense.is_responsible_to_lesser():
-                return VERDICT_RESPONSIBLE_TO_LESSER
+                return pc.VERDICT_RESPONSIBLE_TO_LESSER
         return self.offense.verdict if self.offense.verdict else self.offense.disposition_method
 
 
