@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -38,12 +38,14 @@ const AgenciesPage = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numAgenciesPerPage, setNumAgenciesPerPage] = useState(DEFAULT_NUM_AGENCIES);
   const [filterSelections, setFilterSelections] = useState({ city: [], zipcode: [] });
+
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
   const onFilter = (field, selections) => {
     setFilterSelections((prev) => ({ ...prev, [field]: selections }));
   };
+
   const { data } = useAgenciesQuery({
     queryString: new URLSearchParams([
       ['search', search],
@@ -53,6 +55,13 @@ const AgenciesPage = () => {
       ...getFilters(filterSelections),
     ]).toString(),
   });
+
+  useEffect(() => {
+    if (calculateNumberOfPages(data?.count ?? 0, numAgenciesPerPage) < pageNumber) {
+      setPageNumber(1);
+    }
+  }, [data?.count, numAgenciesPerPage, pageNumber]);
+
   return (
     <PageBase>
       <div className="flex flex-col gap-4">

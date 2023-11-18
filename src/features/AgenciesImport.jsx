@@ -24,7 +24,7 @@ const ImportErrors = ({ errors }) => {
         {Object.entries(errors).map(([rowNumber, rowErrors]) => (
           <TableRow key={rowNumber}>
             <TableCell>{rowNumber}</TableCell>
-            <TableCell>{rowErrors.join('\n')}</TableCell>
+            <TableCell className="whitespace-normal">{rowErrors.join('\n')}</TableCell>
           </TableRow>
         ))}
       </Table>
@@ -64,6 +64,10 @@ const ImportPreview = ({ rowDiffs }) => {
           </TableRow>
         ))}
       </Table>
+      <div className="flex gap-2">
+        <Button>Accept Changes</Button>
+        <Button>Cancel</Button>
+      </div>
     </div>
   );
 };
@@ -127,7 +131,7 @@ const AgenciesPreviewImport = ({ file, onSetFile }) => {
 };
 
 export const AgenciesImportModal = () => (
-  <div className="w-[700px] h-[500px] bg-white">
+  <div className="max-w-[1000px] max-h-[700px] bg-white overflow-auto">
     <AgenciesImport />
   </div>
 );

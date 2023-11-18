@@ -1,5 +1,6 @@
 import re
 import typing
+from django.db import ProgrammingError
 from import_export import fields, resources
 
 from dear_petition.petition import constants, models
@@ -34,6 +35,12 @@ class AgencyResource(resources.ModelResource):
         instance.address1 = row['address1']
         instance.address2 = row['address2']
         return instance
+    
+    def get_instance(self, instance_loader, row):
+        try:
+            super().get_instance(instance_loader, row)
+        except models.Contact.MultipleObjectsReturned as e:
+            raise models.Contact.MultipleObjectsReturned(f"There are multiple agencies named '{row['Arresting Agency']}'. Please ensure there is only 1 agency with that name.")
 
     def before_import_row(self, row, **kwargs):
         if is_empty_row(row):
@@ -59,5 +66,5 @@ class AgencyResource(resources.ModelResource):
 
     class Meta:
         model = models.Contact
-        import_id_fields = ('name', 'county')
+        import_id_fields = ('name',)
         store_instance = True
