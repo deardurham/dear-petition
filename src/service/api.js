@@ -53,11 +53,11 @@ export const api = createApi({
       ],
     }),
     previewImportAgencies: builder.mutation({
-      query: ({ data }) => ({ url: `contact/preview_import_agencies/`, method: 'put', data })
+      query: ({ data }) => ({ url: `contact/preview_import_agencies/`, method: 'put', data }),
     }),
     importAgencies: builder.mutation({
       query: ({ data }) => ({ url: `contact/import_agencies/`, method: 'put', data }),
-      invalidatesTags: ['ContactList'],
+      invalidatesTags: [{ type: 'ContactList', id: 'agency' }],
     }),
     searchClients: builder.query({
       query: ({ search }) => ({

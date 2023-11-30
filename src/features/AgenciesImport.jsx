@@ -5,6 +5,8 @@ import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { Button } from '../components/elements/Button';
 import { Spinner } from '../components/elements/Spinner';
 import { Table, TableHeader, HeaderCell, TableCell, TableRow } from '../components/elements/Table';
+import { useModalContext } from '../components/elements/Button/ModalButton';
+import { NEUTRAL } from '../components/elements/Button/Button';
 
 // xls, xlsx
 const ALLOWED_MIME_TYPES = [
@@ -12,11 +14,14 @@ const ALLOWED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 
-const ImportErrors = ({ errors }) => {
+const ImportErrors = ({ errors, file, onClearFile }) => {
+  const [triggerPreviewImport, { isLoading: isSubmitting }] = usePreviewImportAgenciesMutation({
+    fixedCacheKey: file?.name,
+  });
   return (
-    <div className="p-6 flex flex-col gap-4 h-full">
+    <div className="p-6 flex flex-col gap-4 w-[800px] h-[500px]">
       <h3 className="text-red">Error: Unable to Import</h3>
-      <Table className="flex-1 grid grid-cols-[60px_1fr] overflow-auto h-full auto-rows-max">
+      <Table className="flex-1 grid grid-cols-[60px_1fr] max-h-[500px] overflow-auto h-full auto-rows-max">
         <TableHeader>
           <HeaderCell>Row</HeaderCell>
           <HeaderCell>Error</HeaderCell>
@@ -28,11 +33,30 @@ const ImportErrors = ({ errors }) => {
           </TableRow>
         ))}
       </Table>
+      <div className="flex items-start gap-2">
+        <Button disabled={!file} className="px-4" colorClass={NEUTRAL} onClick={() => onClearFile()}>
+          Select New File
+        </Button>
+        <Button
+          disabled={!file}
+          className="px-4"
+          onClick={() => {
+            const formData = new FormData();
+            formData.append('file', file);
+            triggerPreviewImport({ data: formData });
+          }}
+        >
+          Resubmit
+        </Button>
+        {isSubmitting && <Spinner />}
+      </div>
     </div>
   );
 };
 
-const ImportPreview = ({ rowDiffs }) => {
+const ImportPreview = ({ rowDiffs, file }) => {
+  const [triggerImport] = useImportAgenciesMutation();
+  const { closeModal } = useModalContext();
   if (rowDiffs.length === 0) {
     return (
       <div className="p-6 flex flex-col gap-4 h-full">
@@ -42,9 +66,9 @@ const ImportPreview = ({ rowDiffs }) => {
     );
   }
   return (
-    <div className="p-6 flex flex-col gap-4 h-full">
+    <div className="p-6 flex flex-col gap-4 w-[800px] h-[500px]">
       <h3>Preview Changes</h3>
-      <Table className="flex-1 grid grid-cols-[2fr_2fr_1fr_60px_1fr_1fr] overflow-auto h-full auto-rows-max">
+      <Table className="flex-1 grid grid-cols-[2fr_2fr_1fr_60px_1fr_1fr] max-h-[500px] overflow-auto h-full auto-rows-max">
         <TableHeader>
           <HeaderCell>Arresting Agency</HeaderCell>
           <HeaderCell>Address</HeaderCell>
@@ -65,37 +89,25 @@ const ImportPreview = ({ rowDiffs }) => {
         ))}
       </Table>
       <div className="flex gap-2">
-        <Button>Accept Changes</Button>
+        <Button
+          onClick={async () => {
+            const formData = new FormData();
+            formData.append('file', file);
+            await triggerImport({ data: formData }).unwrap();
+            closeModal();
+          }}
+        >
+          Accept Changes
+        </Button>
         <Button>Cancel</Button>
       </div>
     </div>
   );
 };
 
-const AgenciesImport = () => {
-  const [file, setFile] = useState();
-  const [_triggerPreview, { data: previewResult, reset }] = usePreviewImportAgenciesMutation({
-    fixedCacheKey: file?.name,
-  });
-
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-  }, [reset]);
-
-  if (!previewResult) {
-    return <AgenciesPreviewImport file={file} onSetFile={(file) => setFile(file)} onClose={() => reset()} />;
-  } else if (previewResult.has_errors) {
-    return <ImportErrors errors={previewResult.row_errors} />;
-  }
-  return <ImportPreview rowDiffs={previewResult.row_diffs} file={file} />;
-};
-
-const AgenciesPreviewImport = ({ file, onSetFile }) => {
+const AgenciesFileSelect = ({ file, onSetFile }) => {
   const fileInputRef = useRef();
-  const [_triggerImport] = useImportAgenciesMutation();
-  const [_triggerPreviewImport, { isLoading: isSubmitting }] = usePreviewImportAgenciesMutation({
+  const [triggerPreviewImport, { isLoading: isSubmitting }] = usePreviewImportAgenciesMutation({
     fixedCacheKey: file?.name,
   });
 
@@ -119,7 +131,7 @@ const AgenciesPreviewImport = ({ file, onSetFile }) => {
           onClick={() => {
             const formData = new FormData();
             formData.append('file', file);
-            _triggerPreviewImport({ data: formData });
+            triggerPreviewImport({ data: formData });
           }}
         >
           Submit
@@ -130,8 +142,42 @@ const AgenciesPreviewImport = ({ file, onSetFile }) => {
   );
 };
 
+const AgenciesImport = () => {
+  const [file, setFile] = useState();
+  const [previewResult, setPreviewResult] = useState();
+  const [_triggerPreview, { data, reset }] = usePreviewImportAgenciesMutation({
+    fixedCacheKey: file?.name,
+  });
+
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [reset]);
+
+  if (data && previewResult !== data) {
+    setPreviewResult(data);
+  }
+
+  if (!previewResult) {
+    return <AgenciesFileSelect file={file} onSetFile={(file) => setFile(file)} onClose={() => reset()} />;
+  } else if (previewResult.has_errors) {
+    return (
+      <ImportErrors
+        errors={previewResult.row_errors}
+        file={file}
+        onClearFile={() => {
+          reset();
+          setPreviewResult(null);
+        }}
+      />
+    );
+  }
+  return <ImportPreview rowDiffs={previewResult.row_diffs} file={file} />;
+};
+
 export const AgenciesImportModal = () => (
-  <div className="max-w-[1000px] max-h-[700px] bg-white overflow-auto">
+  <div className="max-w-[800px] max-h-[500px] bg-white">
     <AgenciesImport />
   </div>
 );

@@ -38,16 +38,16 @@ class AgencyResource(resources.ModelResource):
     
     def get_instance(self, instance_loader, row):
         try:
-            super().get_instance(instance_loader, row)
+            return super().get_instance(instance_loader, row)
         except models.Contact.MultipleObjectsReturned as e:
-            raise models.Contact.MultipleObjectsReturned(f"There are multiple agencies named '{row['Arresting Agency']}'. Please ensure there is only 1 agency with that name.")
+            raise models.Contact.MultipleObjectsReturned(f"There are multiple agencies named '{row['Arresting Agency']}' in county '{row['County']}. Ensure there is only 1.")
 
     def before_import_row(self, row, **kwargs):
         if is_empty_row(row):
             return
 
-        row['Arresting Agency'] = row['Arresting Agency'].strip()
-        row['County'] = row['County'].strip()
+        row['name'] = row['Arresting Agency'].strip()
+        row['county'] = row['County'].strip()
         
         (address1, address2, city, state, zipcode) = parse_agency_full_address(row['Address'])
         row['city'] = city.strip()
@@ -66,5 +66,5 @@ class AgencyResource(resources.ModelResource):
 
     class Meta:
         model = models.Contact
-        import_id_fields = ('name',)
+        import_id_fields = ('name', 'county')
         store_instance = True
