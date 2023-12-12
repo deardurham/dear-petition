@@ -99,7 +99,7 @@ const ImportPreview = ({ rowDiffs, file }) => {
         >
           Accept Changes
         </Button>
-        <Button>Cancel</Button>
+        <Button onClick={() => closeModal()}>Cancel</Button>
       </div>
     </div>
   );
