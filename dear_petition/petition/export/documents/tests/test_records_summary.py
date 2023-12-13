@@ -390,7 +390,6 @@ def create_offense(batch, county, jurisdiction, file_no, dob, verdict, dispositi
     ciprs_record = CIPRSRecordFactory(
         batch=batch,
         county=county,
-        jurisdiction=jurisdiction,
         file_no=file_no,
         dob=dob,
         offense_date="2001-09-30",
@@ -399,6 +398,7 @@ def create_offense(batch, county, jurisdiction, file_no, dob, verdict, dispositi
     )
     offense = OffenseFactory(
         ciprs_record=ciprs_record,
+        jurisdiction=jurisdiction,
         verdict=verdict,
         disposition_method=disposition_method,
         disposed_on="2003-10-02",

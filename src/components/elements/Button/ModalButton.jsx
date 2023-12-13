@@ -15,6 +15,8 @@ export const useModalContext = () => {
 
 export const ModalButton = ({ children, className, colorClass, title, allowCloseOnEscape = false }) => {
   const modalElement = useRef();
+  const buttonElement = useRef();
+
   const [showModal, setShowModal] = useState(false);
   const closeModal = useCallback(() => setShowModal(false), []);
   useOnClickOutside(modalElement, () => {
@@ -24,13 +26,13 @@ export const ModalButton = ({ children, className, colorClass, title, allowClose
   });
   const handleClick = (e) => {
     // ignore click if it's been propogated from child
-    if (e.currentTarget !== e.target) {
+    if (!buttonElement.current?.contains(e.target)) {
       return;
     }
     setShowModal(true);
   };
   return (
-    <Button className={className} colorClass={colorClass ?? 'neutral'} onClick={handleClick}>
+    <Button ref={buttonElement} className={className} colorClass={colorClass ?? 'neutral'} onClick={handleClick}>
       {title}
       <ModalContext.Provider value={{ closeModal }}>
         <StyledDialog isOpen={showModal} onClose={allowCloseOnEscape ? closeModal : undefined}>

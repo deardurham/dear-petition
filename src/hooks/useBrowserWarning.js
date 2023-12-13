@@ -6,7 +6,7 @@ const ENABLE_BROWSER_WARNING = false;
 const useBrowserWarning = () => {
   const [shouldDisplay, setShouldDisplay] = useState(false);
   useEffect(() => {
-    if (!isChrome) {
+    if (!isChrome()) {
       setShouldDisplay(true);
     }
   }, []);
