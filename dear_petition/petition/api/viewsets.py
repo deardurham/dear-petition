@@ -144,7 +144,7 @@ class ContactViewSet(viewsets.ModelViewSet):
         "zipcode": ["exact", "in"],
     }
     search_fields = ["name"]
-    ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode", "county"]
     ordering = ["name"]
 
     def get_serializer_class(self):

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faList, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 
 import PageBase from './PageBase';
 import { useAgenciesQuery } from '../../service/api';
@@ -71,7 +71,7 @@ const AgenciesPage = () => {
             className="flex gap-2 font-semibold px-2 py-1"
             title={
               <span>
-                <FontAwesomeIcon icon={faPlus} /> Add New Agency
+                <FontAwesomeIcon icon={faPlus} /> New Agency
               </span>
             }
           >
@@ -104,7 +104,14 @@ const AgenciesPage = () => {
           >
             <AgencyFiltersModal onFilter={onFilter} filterSelections={filterSelections} />
           </ModalButton>
-          <ModalButton title="Import">
+          <ModalButton
+            className="flex gap-2 font-semibold px-2 py-1"
+            title={
+              <span>
+                <FontAwesomeIcon icon={faUpload} /> Import
+              </span>
+            }
+          >
             <AgenciesImportModal />
           </ModalButton>
           <SearchInput

@@ -167,7 +167,7 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
         <SortableHeader field="address">Address</SortableHeader>
         <SortableHeader field="city">City</SortableHeader>
         <SortableHeader field="zipcode">Zip</SortableHeader>
-        <SortableHeader field="zipcode">County</SortableHeader>
+        <SortableHeader field="county">County</SortableHeader>
         <HeaderCell>Actions</HeaderCell>
       </TableHeader>
       <TableBody>
