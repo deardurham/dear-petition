@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import subprocess
 import tempfile
 from collections import namedtuple
@@ -232,18 +233,39 @@ class OffenseRecord(PrintableModelMixin, models.Model):
         return self.offense.verdict if self.offense.verdict else self.offense.disposition_method
 
 
+AGENCY_SHERRIFF_OFFICE_PATTERN = r"Sheriff'?s? Office\s*$"
+AGENCY_SHERRIFF_DEPARTMENT_PATTERN = r"Sheriff'?s? Department\s*$"
+class AgencyWithSherriffOfficeManager(models.Manager):
+    def get_queryset(self):
+        """Annotation version of is_sheriff_office to be used from database"""
+        return (
+            super(AgencyWithSherriffOfficeManager, self)
+            .get_queryset()
+            .filter(category='agency')
+            .annotate(is_sheriff_office=Case(
+                When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
+                When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
+                default=Value(False),
+                output_field=models.BooleanField(),
+            ))
+        )
+
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(
         max_length=16, choices=CONTACT_CATEGORIES
     )
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
-    address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
     city = models.CharField(max_length=64, blank=True)
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
+    county = models.CharField(max_length=100, null=True, blank=True)
+
+    objects = models.Manager()
+    agencies_with_sherriff_office = AgencyWithSherriffOfficeManager()
 
     user = models.ForeignKey(
         User,
@@ -255,8 +277,15 @@ class Contact(PrintableModelMixin, models.Model):
     )
 
     def __str__(self):
-        return self.name
-
+        return self.name if self.name else ''
+    
+    @classmethod
+    def get_sherriff_office_by_county(cls, county: str):
+        print(county)
+        qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
+        if qs.count() > 1:
+            logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
+        return qs.first() if qs.exists() else None
 
 class Batch(PrintableModelMixin, models.Model):
 

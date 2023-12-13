@@ -1,5 +1,7 @@
 import csv
+from import_export.results import RowResult
 import logging
+import tablib
 import tempfile
 
 from django.db import transaction
@@ -18,6 +20,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
+from dear_petition.petition import resources
 from dear_petition.petition import utils
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
@@ -129,6 +132,7 @@ class ContactSearchFilter(filters.SearchFilter):
         return super().get_search_fields(view, request)
 
 
+temp_files = {}
 class ContactViewSet(viewsets.ModelViewSet):
 
     queryset = pm.Contact.objects.all()
@@ -140,7 +144,7 @@ class ContactViewSet(viewsets.ModelViewSet):
         "zipcode": ["exact", "in"],
     }
     search_fields = ["name"]
-    ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode", "county"]
     ordering = ["name"]
 
     def get_serializer_class(self):
@@ -180,6 +184,57 @@ class ContactViewSet(viewsets.ModelViewSet):
             .order_by()
         )
         return Response(field_options)
+    
+    @action(detail=False, methods=["put"])
+    def preview_import_agencies(self, request):
+        file_data = request.data.get('file')
+        dataset = tablib.Dataset().load(file_data)
+        resource = resources.AgencyResource()
+        result = resource.import_data(dataset, dry_run=True)
+
+        row_errors_dict = {}
+        for row_index, row_errors in result.row_errors():
+            row_number = row_index + 1
+            row_errors_dict[row_number] = [str(e.error) for e in row_errors]
+        
+        row_diffs = []
+        for row_result in result.valid_rows():
+            address = f"{row_result.instance.address1}, {row_result.instance.address2}" if row_result.instance.address2 else row_result.instance.address1
+            row_diff = {
+                'name': row_result.instance.name,
+                'address': address,
+                'city': row_result.instance.city,
+                'state': row_result.instance.state,
+                'zipcode': row_result.instance.zipcode,
+                'county': row_result.instance.county,
+            }
+            if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
+                continue
+            elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
+                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county']
+            else:
+                original_address = f"{row_result.original.address1}, {row_result.original.address2}" if row_result.instance.address2 else row_result.original.address1
+                row_diff['new_fields'] = []
+
+                if original_address != address:
+                    row_diff['new_fields'].append('address')
+
+                for field in ['name', 'city', 'state', 'zipcode', 'county']:                    
+                    if getattr(row_result.original, field) != getattr(row_result.instance, field):
+                        row_diff['new_fields'].append(field)
+            
+            if len(row_diff['new_fields']) > 0:
+                row_diffs.append(row_diff)
+
+        return Response({'has_errors': result.has_errors(), 'row_errors': row_errors_dict, 'row_diffs': row_diffs})
+
+    @action(detail=False, methods=["put"])
+    def import_agencies(self, request):
+        file_data = request.data.get('file')
+        dataset = tablib.Dataset().load(file_data)
+        resources.AgencyResource().import_data(dataset, raise_errors=True)
+        return Response({})
+
 
 
 class BatchViewSet(viewsets.ModelViewSet):

@@ -139,6 +139,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "state",
             "zipcode",
             "user",
+            "county",
         ]
 
 class ClientSerializer(ContactSerializer):

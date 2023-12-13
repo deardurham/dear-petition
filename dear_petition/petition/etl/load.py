@@ -72,6 +72,10 @@ def create_petitions_from_records(batch, form_type):
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
+        sheriff_agency = pm.Contact.get_sherriff_office_by_county(petition_type["county"])
+        if sheriff_agency is not None:
+            logger.info(f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency.")
+            petition.agencies.add(sheriff_agency)
         link_offense_records(petition)
         logger.info(
             f"Creating documents for {petition_type['county']} ({petition_type['jurisdiction']}) records"
