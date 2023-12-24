@@ -81,6 +81,7 @@ def create_petitions_from_records(batch, form_type):
             f"Creating documents for {petition_type['county']} ({petition_type['jurisdiction']}) records"
         )
         create_documents(petition)
+        assign_agencies_to_documents(petition)
         logger.info(f"Associated {petition.offense_records.count()} total records")
 
         if form_type == UNDERAGED_CONVICTIONS:
