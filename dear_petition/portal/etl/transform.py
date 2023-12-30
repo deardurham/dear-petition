@@ -19,6 +19,10 @@ def transform_portal_record(source):
         "Superior Court Offense Information": (
             transform_offenses(portal_record) if court == "Superior" else []
         ),
+        "_meta": {
+            "portal_record": portal_record.model_dump_json(),
+            "source": source,
+        },
     }
 
 
