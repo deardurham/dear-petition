@@ -88,7 +88,7 @@ function PageBase({ children, className, ...props }) {
             </LinkWrapper>
             <LinkWrapper>
               <a href={bookmarklet} title="Drag to your bookmarks bar">
-                Portal Importer (beta)
+                Portal Importer ({import.meta.env.MODE})
               </a>
             </LinkWrapper>
             {user?.is_admin ? (
