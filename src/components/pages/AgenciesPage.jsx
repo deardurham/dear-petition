@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faList, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faList, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons';
 
 import PageBase from './PageBase';
 import { useAgenciesQuery } from '../../service/api';
@@ -12,6 +12,7 @@ import SearchInput from '../elements/ManagementTable/SearchInput';
 import { calculateNumberOfPages, LegacyPageSelection } from '../elements/Table';
 import { DisplaySettingsModal } from '../elements/ManagementTable/DisplaySettings';
 import { AgencyFiltersModal } from '../../features/AgenciesManagement/AgencyFilters';
+import { AgenciesImportModal } from '../../features/AgenciesImport';
 
 const DEFAULT_NUM_AGENCIES = 10;
 const NUM_AGENCIES_OPTIONS = [10, 25, 50].map((value) => ({ value, label: value }));
@@ -37,12 +38,14 @@ const AgenciesPage = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [numAgenciesPerPage, setNumAgenciesPerPage] = useState(DEFAULT_NUM_AGENCIES);
   const [filterSelections, setFilterSelections] = useState({ city: [], zipcode: [] });
+
   const onSortBy = (field, dir) => {
     setSortBy({ field, dir });
   };
   const onFilter = (field, selections) => {
     setFilterSelections((prev) => ({ ...prev, [field]: selections }));
   };
+
   const { data } = useAgenciesQuery({
     queryString: new URLSearchParams([
       ['search', search],
@@ -52,6 +55,13 @@ const AgenciesPage = () => {
       ...getFilters(filterSelections),
     ]).toString(),
   });
+
+  useEffect(() => {
+    if (calculateNumberOfPages(data?.count ?? 0, numAgenciesPerPage) < pageNumber) {
+      setPageNumber(1);
+    }
+  }, [data?.count, numAgenciesPerPage, pageNumber]);
+
   return (
     <PageBase>
       <div className="flex flex-col gap-4">
@@ -61,7 +71,7 @@ const AgenciesPage = () => {
             className="flex gap-2 font-semibold px-2 py-1"
             title={
               <span>
-                <FontAwesomeIcon icon={faPlus} /> Add New Agency
+                <FontAwesomeIcon icon={faPlus} /> New Agency
               </span>
             }
           >
@@ -93,6 +103,16 @@ const AgenciesPage = () => {
             }
           >
             <AgencyFiltersModal onFilter={onFilter} filterSelections={filterSelections} />
+          </ModalButton>
+          <ModalButton
+            className="flex gap-2 font-semibold px-2 py-1"
+            title={
+              <span>
+                <FontAwesomeIcon icon={faUpload} /> Import
+              </span>
+            }
+          >
+            <AgenciesImportModal />
           </ModalButton>
           <SearchInput
             className="w-[300px]"

@@ -52,6 +52,13 @@ export const api = createApi({
         { type: 'ContactFilterOptions', id: 'agency' },
       ],
     }),
+    previewImportAgencies: builder.mutation({
+      query: ({ data }) => ({ url: `contact/preview_import_agencies/`, method: 'put', data }),
+    }),
+    importAgencies: builder.mutation({
+      query: ({ data }) => ({ url: `contact/import_agencies/`, method: 'put', data }),
+      invalidatesTags: [{ type: 'ContactList', id: 'agency' }],
+    }),
     searchClients: builder.query({
       query: ({ search }) => ({
         url: `contact/?category=client&search=${search}`,
@@ -69,6 +76,10 @@ export const api = createApi({
     createBatch: builder.mutation({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
       invalidatesTags: (result) => (result ? [{ type: 'Batch' }] : []),
+    }),
+    deleteBatch: builder.mutation({
+      query: ({ id }) => ({ url: `batch/${id}/`, method: 'delete' }),
+      invalidatesTags: ['Batch'],
     }),
     updateBatch: builder.mutation({
       query: ({ id, data }) => ({ url: `batch/${id}/`, method: 'put', data }),
@@ -150,9 +161,12 @@ export const {
   useCreateContactMutation,
   useUpdateContactMutation,
   useDeleteAgencyMutation,
+  useImportAgenciesMutation,
+  usePreviewImportAgenciesMutation,
   useAssignAgenciesToDocumentsMutation,
   useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
+  useDeleteBatchMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,
   useGetUserBatchesQuery,

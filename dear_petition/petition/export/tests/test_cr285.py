@@ -22,9 +22,9 @@ def attachment(batch, petition, petition_document, offense_record1):
 
 @pytest.fixture
 def form(attachment, extra, client):
-    form_extra = {}
+    form_extra = {"file_no": "Test File No"}
     form_extra.update(extra)
-    form_extra['client'] = client
+    form_extra["client"] = client
     return AOCFormCR285(petition_document=attachment, extra=form_extra)
 
 
@@ -54,14 +54,15 @@ def test_map_header__district(form):
     assert form.data["Superior"] == ""
 
 
-def test_map_petitioner__file_no(form):
+def test_map_file_no__filenum(form, offense_record1, attachment):
     form.map_file_no()
-    assert form.data["FileNo"] == form.MULTIPLE_FILE_NO_MSG
+    assert form.data["FileNo"] == form.extra["file_no"]
 
 
 #
 # Petitioner
 #
+
 
 def test_map_petitioner__name(form, client):
     form.map_petitioner()

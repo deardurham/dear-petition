@@ -1,13 +1,12 @@
 import abc
 import datetime as dt
 
-from django.db.models import IntegerField, Case, When, Value
-from django.db.models.functions import Cast, Substr, Concat
-from django.utils import timezone
-
 from dear_petition.petition import constants, utils, models
 from dear_petition.petition.export.annotate import Checkbox
-from dear_petition.petition.utils import get_285_form_agency_address
+from dear_petition.petition.utils import (
+    get_285_form_agency_address,
+    get_ordered_offense_records,
+)
 
 
 class PetitionForm(metaclass=abc.ABCMeta):
@@ -27,43 +26,7 @@ class PetitionForm(metaclass=abc.ABCMeta):
         return constants.DISPOSITION_METHOD_CODE_MAP.get(method.upper(), method)
 
     def get_ordered_offense_records(self):
-        # When sorting these, need to interpret first 2 digits of file number as year and sort based on that
-        two_digit_current_year = timezone.now().year % 2000  # Returns 21 given 2021
-        qs = (
-            self.petition_document.offense_records.filter(
-                petitionoffenserecord__active=True
-            )
-            .select_related("offense__ciprs_record")
-            .annotate(
-                first_two_digits_file_number_chars=Substr(
-                    "offense__ciprs_record__file_no", 1, 2
-                )
-            )
-            .annotate(
-                first_two_digits_file_number=Cast(
-                    "first_two_digits_file_number_chars", output_field=IntegerField()
-                )
-            )
-            .annotate(
-                file_number_year=Case(
-                    When(
-                        first_two_digits_file_number__gt=two_digit_current_year,
-                        then=Concat(Value("19"), "first_two_digits_file_number_chars"),
-                    ),
-                    When(
-                        first_two_digits_file_number__lte=two_digit_current_year,
-                        then=Concat(Value("20"), "first_two_digits_file_number_chars"),
-                    ),
-                )
-            )
-            .order_by(
-                "file_number_year",
-                "offense__ciprs_record__file_no",
-                "pk",
-            )
-        )
-
-        return qs
+        return get_ordered_offense_records(self.petition_document)
 
     def get_most_recent_record(self):
         return self.get_ordered_offense_records().last()
@@ -109,15 +72,7 @@ class AOCFormCR287(PetitionForm):
             self.data["Superior"] = Checkbox("")
 
     def map_file_no(self):
-        ciprs_records = models.CIPRSRecord.objects.filter(offenses__offense_records__documents__id=self.petition_document.id).distinct()
-        if ciprs_records.count() > 1:
-            self.data["ConsJdgmntFileNum"] = self.MULTIPLE_FILE_NO_MSG
-        else:
-            offense_record = self.get_most_recent_record()
-            if offense_record:
-                self.data[
-                    "ConsJdgmntFileNum"
-                ] = offense_record.offense.ciprs_record.file_no
+        self.data["ConsJdgmntFileNum"] = self.extra["file_no"]
 
     def map_petitioner(self):
         client = self.extra["client"]
@@ -218,12 +173,12 @@ class AOCFormCR285(AOCFormCR287):
         self.map_agencies()
         self.map_offenses()
 
-    def map_file_no(self):
-        self.data["FileNo"] = self.MULTIPLE_FILE_NO_MSG
-
     def map_header(self):
         super().map_header()
         self.data["CountyName"] = self.petition_document.county
+
+    def map_file_no(self):
+        self.data["FileNo"] = self.extra["file_no"]
 
     def map_petitioner(self):
         client = self.extra["client"]

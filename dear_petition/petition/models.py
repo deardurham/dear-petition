@@ -1,14 +1,14 @@
 import json
 import logging
 import os
+import re
 import subprocess
 import tempfile
 from collections import namedtuple
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.db.models import JSONField
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import JSONField, Q
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import IntegerField, Case, When, Value, signals
@@ -29,18 +29,11 @@ from . import constants as pc
 
 from .constants import (
     JURISDICTION_CHOICES,
-    DISTRICT_COURT,
     NOT_AVAILABLE,
     SEX_CHOICES,
     CONTACT_CATEGORIES,
     DATETIME_FORMAT,
     FORM_TYPES,
-    CHARGED,
-    DISP_METHOD_SUPERSEDING_INDICTMENT,
-    DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
-    VERDICT_GUILTY_TO_LESSER,
-    VERDICT_PRAYER_FOR_JUDGMENT,
-    VERDICT_RESPONSIBLE_TO_LESSER,
 )
 
 from .utils import make_datetime_aware
@@ -112,7 +105,7 @@ class Offense(PrintableModelMixin, models.Model):
         "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
     jurisdiction = models.CharField(
-        choices=JURISDICTION_CHOICES, max_length=255, default=DISTRICT_COURT
+        choices=JURISDICTION_CHOICES, max_length=255, default=pc.DISTRICT_COURT
     )
     disposed_on = models.DateField(blank=True, null=True)
     disposition_method = models.CharField(max_length=256)
@@ -190,18 +183,40 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     def disposed_on(self):
         return self.offense.disposed_on
 
-
     @property
     def is_visible(self):
         """
-        Return false if offense's disposition method is an excluded disposition method. Return false if this is a
-        CHARGED offense record and the offense is a "convicted of charged" offense. Otherwise, return true.
+        Return false if offense's disposition method is an excluded disposition method. Return false if offense record
+        has a de novo review. Return false if this is a CHARGED offense record and the offense is a "convicted of
+        charged" offense. Otherwise, return true.
         """
-        if self.offense.disposition_method in [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]:
+
+        # check if any conditions are met that would cause offense record to be hidden
+        has_excluded_disp_method = self.offense.disposition_method in \
+                                  [pc.DISP_METHOD_SUPERSEDING_INDICTMENT, pc.DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]
+        has_de_novo_review = self.has_de_novo_review
+        is_convicted_of_charged = self.action == pc.CHARGED and self.offense.is_convicted_of_charged()
+
+        # determine if the offense record should be visible
+        return not (has_excluded_disp_method or has_de_novo_review or is_convicted_of_charged)
+
+    @property
+    def has_de_novo_review(self):
+        """
+        Return true if offense's verdict is guilty and jurisdiction is district court and there is a superior court
+        offense record on the ciprs record with the same description and severity.
+        """
+
+        # return false if this is not a district court, guilty offense
+        if self.offense.verdict != pc.VERDICT_GUILTY or self.offense.jurisdiction != pc.DISTRICT_COURT:
             return False
 
-        return not (self.action == CHARGED and self.offense.is_convicted_of_charged())
-
+        # determine if there are matching (same description and severity) superior court offenses on this ciprs record
+        return self.offense.ciprs_record.offenses.filter(
+            jurisdiction=pc.SUPERIOR_COURT,
+            offense_records__description=self.description,
+            offense_records__severity=self.severity
+        ).exists()
 
     @property
     def disposition(self):
@@ -210,13 +225,30 @@ class OffenseRecord(PrintableModelMixin, models.Model):
         "guilty to lesser" or "responsible to lesser" criteria. Otherwise, return the offense's verdict if it exists.
         If the offense's verdict doesn't exist, return the offense's disposition method.
         """
-        if self.action == CHARGED:
+        if self.action == pc.CHARGED:
             if self.offense.is_guilty_to_lesser():
-                return VERDICT_GUILTY_TO_LESSER
+                return pc.VERDICT_GUILTY_TO_LESSER
             elif self.offense.is_responsible_to_lesser():
-                return VERDICT_RESPONSIBLE_TO_LESSER
+                return pc.VERDICT_RESPONSIBLE_TO_LESSER
         return self.offense.verdict if self.offense.verdict else self.offense.disposition_method
 
+
+AGENCY_SHERRIFF_OFFICE_PATTERN = r"Sheriff'?s? Office\s*$"
+AGENCY_SHERRIFF_DEPARTMENT_PATTERN = r"Sheriff'?s? Department\s*$"
+class AgencyWithSherriffOfficeManager(models.Manager):
+    def get_queryset(self):
+        """Annotation version of is_sheriff_office to be used from database"""
+        return (
+            super(AgencyWithSherriffOfficeManager, self)
+            .get_queryset()
+            .filter(category='agency')
+            .annotate(is_sheriff_office=Case(
+                When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
+                When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
+                default=Value(False),
+                output_field=models.BooleanField(),
+            ))
+        )
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
@@ -224,12 +256,16 @@ class Contact(PrintableModelMixin, models.Model):
         max_length=16, choices=CONTACT_CATEGORIES
     )
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
-    address2 = models.CharField("Address (Line 2)", max_length=512, blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
     city = models.CharField(max_length=64, blank=True)
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
+    county = models.CharField(max_length=100, null=True, blank=True)
+
+    objects = models.Manager()
+    agencies_with_sherriff_office = AgencyWithSherriffOfficeManager()
 
     user = models.ForeignKey(
         User,
@@ -241,8 +277,15 @@ class Contact(PrintableModelMixin, models.Model):
     )
 
     def __str__(self):
-        return self.name
-
+        return self.name if self.name else ''
+    
+    @classmethod
+    def get_sherriff_office_by_county(cls, county: str):
+        print(county)
+        qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
+        if qs.count() > 1:
+            logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
+        return qs.first() if qs.exists() else None
 
 class Batch(PrintableModelMixin, models.Model):
 

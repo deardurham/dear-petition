@@ -1,5 +1,7 @@
 import csv
+from import_export.results import RowResult
 import logging
+import tablib
 import tempfile
 
 from django.db import transaction
@@ -18,6 +20,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
+from dear_petition.petition import resources
 from dear_petition.petition import utils
 from dear_petition.petition.api import serializers
 from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentication
@@ -32,12 +35,8 @@ from dear_petition.petition.export import (
     create_zip_file,
 )
 from dear_petition.users.models import User
-from dear_petition.petition.export.documents.advice_letter import (
-    generate_advice_letter
-)
-from dear_petition.petition.export.documents.records_summary import (
-    generate_summary
-)
+from dear_petition.petition.export.documents.advice_letter import generate_advice_letter
+from dear_petition.petition.export.documents.records_summary import generate_summary
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +132,7 @@ class ContactSearchFilter(filters.SearchFilter):
         return super().get_search_fields(view, request)
 
 
+temp_files = {}
 class ContactViewSet(viewsets.ModelViewSet):
 
     queryset = pm.Contact.objects.all()
@@ -144,21 +144,27 @@ class ContactViewSet(viewsets.ModelViewSet):
         "zipcode": ["exact", "in"],
     }
     search_fields = ["name"]
-    ordering_fields = ["name", "address1", "address2", "city", "zipcode"]
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode", "county"]
     ordering = ["name"]
 
     def get_serializer_class(self):
-        if self.request.data.get('category') == 'client':
+        if self.request.data.get("category") == "client":
             return serializers.ClientSerializer
         return serializers.ContactSerializer
 
     def get_queryset(self):
-        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+        if (
+            self.request.query_params.get("category") == "client"
+            or self.request.data.get("category") == "client"
+        ):
             return pm.Contact.objects.filter(user=self.request.user)
         return pm.Contact.objects.all()
 
     def perform_create(self, serializer):
-        if self.request.query_params.get('category') == 'client' or self.request.data.get('category') == 'client':
+        if (
+            self.request.query_params.get("category") == "client"
+            or self.request.data.get("category") == "client"
+        ):
             serializer.save(user=self.request.user)
         else:
             serializer.save()
@@ -178,6 +184,57 @@ class ContactViewSet(viewsets.ModelViewSet):
             .order_by()
         )
         return Response(field_options)
+    
+    @action(detail=False, methods=["put"])
+    def preview_import_agencies(self, request):
+        file_data = request.data.get('file')
+        dataset = tablib.Dataset().load(file_data)
+        resource = resources.AgencyResource()
+        result = resource.import_data(dataset, dry_run=True)
+
+        row_errors_dict = {}
+        for row_index, row_errors in result.row_errors():
+            row_number = row_index + 1
+            row_errors_dict[row_number] = [str(e.error) for e in row_errors]
+        
+        row_diffs = []
+        for row_result in result.valid_rows():
+            address = f"{row_result.instance.address1}, {row_result.instance.address2}" if row_result.instance.address2 else row_result.instance.address1
+            row_diff = {
+                'name': row_result.instance.name,
+                'address': address,
+                'city': row_result.instance.city,
+                'state': row_result.instance.state,
+                'zipcode': row_result.instance.zipcode,
+                'county': row_result.instance.county,
+            }
+            if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
+                continue
+            elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
+                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county']
+            else:
+                original_address = f"{row_result.original.address1}, {row_result.original.address2}" if row_result.instance.address2 else row_result.original.address1
+                row_diff['new_fields'] = []
+
+                if original_address != address:
+                    row_diff['new_fields'].append('address')
+
+                for field in ['name', 'city', 'state', 'zipcode', 'county']:                    
+                    if getattr(row_result.original, field) != getattr(row_result.instance, field):
+                        row_diff['new_fields'].append(field)
+            
+            if len(row_diff['new_fields']) > 0:
+                row_diffs.append(row_diff)
+
+        return Response({'has_errors': result.has_errors(), 'row_errors': row_errors_dict, 'row_diffs': row_diffs})
+
+    @action(detail=False, methods=["put"])
+    def import_agencies(self, request):
+        file_data = request.data.get('file')
+        dataset = tablib.Dataset().load(file_data)
+        resources.AgencyResource().import_data(dataset, raise_errors=True)
+        return Response({})
+
 
 
 class BatchViewSet(viewsets.ModelViewSet):
@@ -187,9 +244,9 @@ class BatchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ['user']
-    ordering_fields = ['date_uploaded']
-    ordering = ['-date_uploaded']
+    filterset_fields = ["user"]
+    ordering_fields = ["date_uploaded"]
+    ordering = ["-date_uploaded"]
 
     def get_serializer_class(self):
         """Use a custom serializer when accessing a specific batch"""
@@ -211,6 +268,13 @@ class BatchViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(response, status=status.HTTP_201_CREATED, headers=headers)
 
+    def destroy(self, request, pk=None):
+        user = request.user
+        batch = self.queryset.get(pk=pk)
+        if batch and batch.user == user:
+            batch.delete()
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
         batch = import_ciprs_records(
@@ -229,7 +293,7 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     def generate_advice_letter(self, request, pk):
         batch = self.get_object()
-        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer = serializers.GenerateDocumentSerializer(data={"batch": pk})
         serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -251,7 +315,7 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     def generate_summary(self, request, pk):
         batch = self.get_object()
-        serializer = serializers.GenerateDocumentSerializer(data={'batch': pk})
+        serializer = serializers.GenerateDocumentSerializer(data={"batch": pk})
         serializer.is_valid(raise_exception=True)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -262,9 +326,7 @@ class BatchViewSet(viewsets.ModelViewSet):
             resp[
                 "Content-Type"
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            resp[
-                "Content-Disposition"
-            ] = 'attachment; filename="Records Summary.docx"'
+            resp["Content-Disposition"] = 'attachment; filename="Records Summary.docx"'
             return resp
 
 
@@ -290,7 +352,9 @@ class PetitionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     @action(
         detail=True,
@@ -342,7 +406,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
         petition = self.get_object()
 
         request_data = request.data.copy()
-        request_data['petition'] = petition.pk
+        request_data["petition"] = petition.pk
         serializer = serializers.GeneratePetitionSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
 
@@ -358,12 +422,10 @@ class PetitionViewSet(viewsets.ModelViewSet):
         ), "Petition documents could not be found for petition"
 
         form_context = serializer.validated_data.copy()
-        form_context['client'] = client
-        form_context['attorney'] = petition.batch.attorney
-        form_context['agencies'] = petition.agencies
-        generated_petition_pdf = generate_petition_pdf(
-            petition_documents, form_context
-        )
+        form_context["client"] = client
+        form_context["attorney"] = petition.batch.attorney
+        form_context["agencies"] = petition.agencies
+        generated_petition_pdf = generate_petition_pdf(petition_documents, form_context)
 
         for doc in petition_documents.iterator():
             pm.GeneratedPetition.get_stats_generated_petition(doc.pk, request.user)
@@ -375,9 +437,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
         )
 
         petition = self.get_object()
-        petition_filename = utils.get_petition_filename(
-            client.name, petition, "pdf"
-        )
+        petition_filename = utils.get_petition_filename(client.name, petition, "pdf")
         if addendum_documents.exists():
             docs = [
                 generated_petition_pdf,
@@ -386,9 +446,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
                 petition_filename,
             ]
             for addendum_document in addendum_documents:
-                doc = generate_addendum_document_file(
-                    addendum_document
-                )
+                doc = generate_addendum_document_file(addendum_document)
                 docs.append(doc)
                 filename = utils.get_petition_filename(
                     client.name,
@@ -401,9 +459,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
             zip_file = create_zip_file(docs, filenames)
             resp = FileResponse(zip_file)
             resp["Content-Type"] = "application/zip"
-            filename = utils.get_petition_filename(
-                client.name, petition, "zip"
-            )
+            filename = utils.get_petition_filename(client.name, petition, "zip")
             resp["Content-Disposition"] = f'attachment; filename="{filename}"'
         else:
             resp = FileResponse(generated_petition_pdf)

@@ -10,6 +10,8 @@ pyjwt==2.1.0
 docxtpl==0.16.4 # https://docxtpl.readthedocs.io/en/latest/
 docx2pdf==0.1.8
 pydantic==2.4.2
+django-import-export==3.3.1
+tablib==3.5.0
 
 # Django
 # ------------------------------------------------------------------------------
@@ -30,4 +32,4 @@ djangorestframework==3.13.1  # https://github.com/encode/django-rest-framework
 djangorestframework-simplejwt==5.2.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
 
 pdfrw==0.4
-git+https://github.com/deardurham/ciprs-reader.git@v1.7.0#egg=ciprs-reader
+git+https://github.com/deardurham/ciprs-reader.git@v1.7.1#egg=ciprs-reader

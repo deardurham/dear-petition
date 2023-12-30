@@ -1,18 +1,20 @@
 import io
 import zipfile
+
+from dear_petition.petition import constants
+from dear_petition.petition import models as pm
+from dear_petition.petition.export.documents import addendums
+from dear_petition.petition.utils import get_ordered_offense_records
+
 from .annotate import add_pdf_template_annotations
 from .forms import (
-    AOCFormCR287,
     AOCFormCR285,
+    AOCFormCR287,
     AOCFormCR288,
     AOCFormCR293,
     DataPetitionForm,
 )
 from .writer import concatenate_pdf_streams, write_template_and_annotations_to_stream
-
-from dear_petition.petition import constants
-from dear_petition.petition.export.documents import addendums
-
 
 __all__ = ("generate_petition_pdf",)
 
@@ -38,10 +40,36 @@ def build_pdf_template_context(petition_document, extra):
     return form.data
 
 
+def add_additional_params_to_forms(petition_documents, extra):
+    """
+    Add additional keys to the extra dict
+    """
+
+    # Add the first file number of the first offense record on the base petition to populate file number field on all documents
+    base_document = petition_documents[0]
+    first_record = get_ordered_offense_records(base_document).first()
+    should_add_et_al = (
+        pm.CIPRSRecord.objects.filter(
+            offenses__offense_records__documents__id__in=petition_documents.values("id")
+        )
+        .distinct()
+        .count()
+        > 1
+    )
+    file_no = first_record.offense.ciprs_record.file_no
+    if should_add_et_al:
+        file_no = file_no + " et al."
+    extra["file_no"] = file_no
+
+
 def generate_petition_pdf(petition_documents, extra):
     pdf_stream = io.BytesIO()
     doc_streams = []
+
+    add_additional_params_to_forms(petition_documents, extra)
+
     for petition_document in petition_documents:
+
         doc_stream = io.BytesIO()
         context = build_pdf_template_context(petition_document, extra)
         add_pdf_template_annotations(context)
@@ -49,6 +77,7 @@ def generate_petition_pdf(petition_documents, extra):
             doc_stream, context, petition_document.form_type
         )
         doc_streams.append(doc_stream)
+
     concatenate_pdf_streams(doc_streams, pdf_stream)
     for doc_stream in doc_streams:
         doc_stream.close()

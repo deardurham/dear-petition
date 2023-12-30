@@ -81,6 +81,7 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django_celery_beat",
+    "import_export",
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
