@@ -1,7 +1,4 @@
-const POST_URL =
-  import.meta.env.MODE === 'development'
-    ? 'http://localhost:8000'
-    : 'https://www.durhamexpunction.org';
+const POST_URL = import.meta.env.MODE === 'development' ? 'http://localhost:8000' : 'https://www.durhamexpunction.org';
 import { minify } from 'terser';
 
 export const generateBookmarklet = async (username) =>
