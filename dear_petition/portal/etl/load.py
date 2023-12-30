@@ -1,6 +1,7 @@
 import logging
 
 from dear_petition.petition.models import Batch, CIPRSRecord
+from dear_petition.petition.etl.load import create_batch_petitions
 
 from .transform import transform_portal_record
 
@@ -17,3 +18,4 @@ def import_portal_record(user, source):
     record = CIPRSRecord(batch=batch, data=data)
     record.refresh_record_from_data()
     record.save()
+    create_batch_petitions(batch)
