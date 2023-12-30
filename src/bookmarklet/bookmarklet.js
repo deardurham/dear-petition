@@ -1,7 +1,7 @@
 const POST_URL =
   import.meta.env.MODE === 'development'
-    ? 'https://93d2-107-15-47-235.ngrok.io'
-    : 'https://dear-petition.herokuapp.com/portal/bookmarklet/';
+    ? 'http://localhost:8000'
+    : 'https://www.durhamexpunction.org';
 import { minify } from 'terser';
 
 export const generateBookmarklet = async (username) =>
