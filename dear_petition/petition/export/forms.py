@@ -233,8 +233,79 @@ class AOCFormCR293(AOCFormCR287):
 
 
 class AOCFormCR297(AOCFormCR287):
-    pass
+    def map_file_no(self):
+        self.data["FileNumber"] = self.extra["file_no"]
+
+    def map_header(self):
+        self.data["County"] = self.petition.county
+        if self.petition.jurisdiction == constants.DISTRICT_COURT:
+            self.data["DistrictCourtDivisionCkBox"] = Checkbox("Yes")
+        else:
+            self.data["DistrictCourtDivisionCkBox"] = Checkbox("")
+        if self.petition.jurisdiction == constants.SUPERIOR_COURT:
+            self.data["SuperiorCourtDivisionCkBox"] = Checkbox("Yes")
+        else:
+            self.data["SuperiorCourtDivisionCkBox"] = Checkbox("")
+
+    def map_offenses(self):
+        offense_records = self.get_ordered_offense_records()
+        for i, offense_record in enumerate(offense_records, 1):
+            offense = offense_record.offense
+            ciprs_record = offense.ciprs_record
+            # The index of the offense determines what line on the petition form
+            # the offense will be on
+            self.data[f"FileNumber:{i}"] = ciprs_record.file_no
+            self.data[f"ArrestDate:{i}"] = self.format_date(ciprs_record.arrest_date)
+            self.data[f"OffenseDescription:{i}"] = offense_record.description
+            self.data[f"Disposition:{i}"] = self.format_date(ciprs_record.offense_date)
+            self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
+
+    def map_petitioner(self):
+        client = self.extra["client"]
+        self.data["PetitionerName"] = client.name  # AOC-288
+        self.data["PetitionerStreetAddress"] = client.address1
+        self.data["PetitionerMailAddress"] = client.address2
+        self.data["PetitionerCity"] = client.city
+        self.data["PetitionerState"] = client.state
+        self.data["PetitionerZip"] = client.zipcode
+        offense_record = self.get_most_recent_record()
+        if offense_record:
+            record = offense_record.offense.ciprs_record
+            self.data["Race"] = record.race
+            self.data["Sex"] = record.sex
+            self.data["DOB"] = self.format_date(record.dob)
+
+    def map_additional_forms(self):
+        if (
+            self.petition.offense_records.filter(
+                petitionoffenserecord__active=True
+            ).count()
+            > 1
+        ):
+            # Petition section says to check one of the checkboxes if petitioning to expunge MULTIPLE dismissals
+            self.data["TwoOrThreeNonviolentFeloniesWaitingPeriodCkBox"] = Checkbox(
+                "Yes"
+            )
+        else:
+            self.data["OneNonviolentFelonyWaitingPeriodCkBox"] = Checkbox("Yes")
+
+    def map_attorney(self):
+        attorney = self.extra["attorney"]
+        self.data["AttorneyName"] = attorney.name
+        self.data["AttorneyStreetAddress"] = attorney.address1
+        self.data["AttorneyMailAddress"] = attorney.address2
+        self.data["AttorneyCity"] = attorney.city
+        self.data["AttorneyState"] = attorney.state
+        self.data["AttorneyZip"] = attorney.zipcode
+        #
+        # Petition to expunge section
+        #
+        self.data["PetitionerPetitionersAttorneySignedName"] = attorney.name
+        self.data["PetitionersAttorneyCkBox"] = Checkbox("Yes")
+        self.data["PetitionerPetitionersAttorneySignedDate"] = self.format_date(
+            dt.datetime.today()
+        )
 
 
-class AOCFormCR298(AOCFormCR287):
+class AOCFormCR298(AOCFormCR297):
     pass
