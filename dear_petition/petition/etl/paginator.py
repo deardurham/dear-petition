@@ -1,8 +1,20 @@
-from dear_petition.petition.constants import DISMISSED, ATTACHMENT, UNDERAGED_CONVICTIONS
+from dear_petition.petition.constants import (
+    DISMISSED,
+    ATTACHMENT,
+    UNDERAGED_CONVICTIONS,
+    NOT_GUILTY,
+    ADULT_FELONIES,
+    ADULT_MISDEMEANORS,
+)
 
-INITIAL_PAGE_SIZE = 10
-UNDERAGE_CONVICTIONS_PAGE_SIZE = 6
-ATTACHMENT_PAGE_SIZE = 20
+PAGE_SIZES = {
+    DISMISSED: 10,
+    NOT_GUILTY: 10,
+    ATTACHMENT: 20,
+    UNDERAGED_CONVICTIONS: 6,
+    ADULT_FELONIES: 2,
+    ADULT_MISDEMEANORS: 2,
+}
 
 
 class OffenseRecordPaginator:
@@ -24,7 +36,7 @@ class OffenseRecordPaginator:
         attachment_page_size=None,
         filter_active=True,
     ):
-        default_page_size = UNDERAGE_CONVICTIONS_PAGE_SIZE if petition.form_type == UNDERAGED_CONVICTIONS else INITIAL_PAGE_SIZE
+        default_page_size = PAGE_SIZES.get(petition.form_type, 10)
         self.initial_page_size = (
             abs(initial_page_size)
             if initial_page_size and initial_page_size >= 0
@@ -33,10 +45,12 @@ class OffenseRecordPaginator:
         self.attachment_page_size = (
             abs(attachment_page_size)
             if attachment_page_size and attachment_page_size >= 0
-            else ATTACHMENT_PAGE_SIZE
+            else PAGE_SIZES[ATTACHMENT]
         )
         self.petition = petition
-        self.queryset = self.petition.get_all_offense_records(filter_active=filter_active)
+        self.queryset = self.petition.get_all_offense_records(
+            filter_active=filter_active
+        )
 
     def query(self, start, size):
         """Slice query aginst petition offense records."""
