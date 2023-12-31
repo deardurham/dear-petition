@@ -3,6 +3,10 @@ from typing import List, Union
 
 from pydantic import BaseModel, field_validator
 
+from dear_petition.petition import constants as ciprs_constants
+
+from .constants import DISMISSED_DISPOSITION_METHODS
+
 
 class CaseSummary(BaseModel):
     case_number: str
@@ -25,8 +29,7 @@ class Charge(BaseModel):
             return dt.datetime.strptime(v, "%m/%d/%Y")
         return v
 
-    @property
-    def severity(self):
+    def transform_severity(self):
         """Attempt to convert Portal's degree to CIPRS severity"""
         severity = self.degree
         if self.degree in ("FH", "FNC"):
@@ -68,6 +71,20 @@ class Disposition(BaseModel):
             return dt.datetime.strptime(v, "%m/%d/%Y")
         return v
 
+    def is_dismissed(self) -> bool:
+        return self.criminal_disposition in DISMISSED_DISPOSITION_METHODS
+
+    def transform_action(self) -> str:
+        action = self.event
+        if self.is_dismissed():
+            action = "CHARGED"
+        return action
+
+    def transform_disposition_method(self) -> str:
+        if self.is_dismissed():
+            return ciprs_constants.DISTRICT_COURT_WITHOUT_DA_LEAVE
+        return self.criminal_disposition
+
 
 class PortalRecord(BaseModel):
     case_summary: CaseSummary
@@ -80,3 +97,7 @@ class PortalRecord(BaseModel):
         for charge in self.case_info.charges:
             if charge.number == charge_number:
                 return charge
+
+    def transform_offense_date(self) -> dt.date:
+        offense_dates = [c.offense_date for c in self.case_info.charges]
+        return min(offense_dates).isoformat()

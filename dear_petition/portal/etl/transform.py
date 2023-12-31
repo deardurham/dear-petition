@@ -10,7 +10,11 @@ def transform_portal_record(source):
         "General": {
             "County": portal_record.case_summary.county,
             "File No": portal_record.case_summary.case_number,
-            "District": "Yes" if court == "District" else "No",
+            court: "Yes",
+        },
+        "Case Information": {
+            "Case Status": portal_record.case_info.case_status,
+            "Offense Date": portal_record.transform_offense_date(),
         },
         "Defendant": {"Name": portal_record.party_info.defendant_name},
         "District Court Offense Information": (
@@ -36,13 +40,13 @@ def transform_offenses(portal_record: PortalRecord):
                 {
                     "Law": charge.statute if charge else "",
                     "Count": disposition.charge_number,
-                    "Action": disposition.event,
-                    "Severity": charge.severity,
+                    "Action": disposition.transform_action(),
+                    "Severity": charge.transform_severity(),
                     "Description": disposition.charge_offense,
                 }
             ],
             "Disposed On": portal_record.case_info.case_status_date.isoformat(),
-            "Disposition Method": disposition.criminal_disposition,
+            "Disposition Method": disposition.transform_disposition_method(),
         }
         offenses.append(offense)
     return offenses
