@@ -1,4 +1,7 @@
 import logging
+from dateutil.relativedelta import relativedelta
+
+from django.utils import timezone
 from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
@@ -23,5 +26,8 @@ def get_offense_records(batch, jurisdiction=""):
 def build_query(dob):
     action = Q(action=pc.CONVICTED)
     verdict = Q(severity__iexact=pc.SEVERITIES.FELONY)
-    query = action & verdict
+    today = timezone.now().date()
+    waiting_period_start_date = today - relativedelta(years=10)
+    waiting_period = Q(offense__disposed_on__lt=waiting_period_start_date)
+    query = action & verdict & waiting_period
     return query

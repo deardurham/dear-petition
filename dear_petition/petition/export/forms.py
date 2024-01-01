@@ -247,6 +247,13 @@ class AOCFormCR297(AOCFormCR287):
         else:
             self.data["SuperiorCourtDivisionCkBox"] = Checkbox("")
 
+    def map_agencies(self):
+        petition_agencies = self.petition.agencies.all()
+        if len(petition_agencies) > 3:
+            # This will check the checkbox indicating an attachment with additional agencies
+            self.data["AttachmentCkBox"] = Checkbox("Yes")
+        super().map_agencies()
+
     def map_offenses(self):
         offense_records = self.get_ordered_offense_records()
         for i, offense_record in enumerate(offense_records, 1):
@@ -257,7 +264,10 @@ class AOCFormCR297(AOCFormCR287):
             self.data[f"FileNumber:{i}"] = ciprs_record.file_no
             self.data[f"ArrestDate:{i}"] = self.format_date(ciprs_record.arrest_date)
             self.data[f"OffenseDescription:{i}"] = offense_record.description
-            self.data[f"Disposition:{i}"] = self.format_date(ciprs_record.offense_date)
+            self.data[f"DateOfOffense:{i}"] = self.format_date(
+                ciprs_record.offense_date
+            )
+            self.data[f"Disposition:{i}"] = self.disposition_code(offense)
             self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
 
     def map_petitioner(self):
