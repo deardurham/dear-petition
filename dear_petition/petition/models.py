@@ -271,9 +271,10 @@ class Contact(PrintableModelMixin, models.Model):
         User,
         related_name="clients",
         null=True,
+        blank=True,
         default=None,
         on_delete=models.CASCADE,
-        help_text="The user associated with this contact, if applicable"
+        help_text="The user associated with this contact (only applicable for Clients)"
     )
 
     def __str__(self):
