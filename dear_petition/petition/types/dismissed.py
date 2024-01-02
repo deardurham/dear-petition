@@ -18,7 +18,8 @@ def build_query():
     for method in DISMISSED_DISPOSITION_METHODS:
         methods |= Q(offense__disposition_method__iexact=method)
     guilty_to_lesser = build_guilty_to_lesser_query()
-    query = action & methods | guilty_to_lesser
+    # not_assigned_to_another_petition = Q(petitions__isnull=True)
+    query = action & methods | guilty_to_lesser  # & not_assigned_to_another_petition
     return query
 
 

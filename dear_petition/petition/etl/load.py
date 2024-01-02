@@ -5,10 +5,13 @@ from django.db import transaction
 
 from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
+    ADULT_FELONIES,
+    ADULT_MISDEMEANORS,
     ATTACHMENT,
     DISMISSED,
     NOT_GUILTY,
     UNDERAGED_CONVICTIONS,
+    INACTIVE_BY_DEFAULT_FORM_TYPES,
 )
 from dear_petition.petition.etl.extract import parse_ciprs_document
 from dear_petition.petition.types import (
@@ -59,7 +62,10 @@ def create_batch_petitions(batch):
     create_petitions_from_records(batch, NOT_GUILTY)
     # Convictions
     create_petitions_from_records(batch, UNDERAGED_CONVICTIONS)
-    # TODO: Misdemeanor
+    # Adult felonies
+    create_petitions_from_records(batch, ADULT_FELONIES)
+    # Adult misdemeanors
+    create_petitions_from_records(batch, ADULT_MISDEMEANORS)
 
 
 def create_petitions_from_records(batch, form_type):
@@ -84,7 +90,7 @@ def create_petitions_from_records(batch, form_type):
         assign_agencies_to_documents(petition)
         logger.info(f"Associated {petition.offense_records.count()} total records")
 
-        if form_type == UNDERAGED_CONVICTIONS:
+        if form_type in INACTIVE_BY_DEFAULT_FORM_TYPES:
             pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
                 active=False
             )

@@ -1,3 +1,4 @@
+import logging
 import pytz
 from datetime import datetime
 from django.conf import settings
@@ -9,6 +10,8 @@ from .constants import DATE_FORMAT
 
 from PIL import ImageFont
 import dateutil.parser
+
+logger = logging.getLogger(__name__)
 
 
 def dt_obj_to_date(dt_obj):
@@ -185,3 +188,23 @@ def get_ordered_offense_records(petition_document):
     )
 
     return qs
+def resolve_dob(qs):
+    """
+    It is possible that different CIPRS records could have different dates of birth. In this case, use the earliest date of birth as it is the most conservative.
+    """
+    dobs = set(
+        qs.filter(offense__ciprs_record__dob__isnull=False).values_list(
+            "offense__ciprs_record__dob"
+        )
+    )
+
+    if not dobs:
+        return None
+
+    earliest_dob = min(dobs)[0]
+    if len(dobs) > 1:
+        logger.warning(
+            f"This batch has multiple birthdates. Using the earliest birthdate {earliest_dob}"
+        )
+
+    return earliest_dob

@@ -63,7 +63,9 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
     case_status = models.CharField(max_length=256, blank=True)
     offense_date = models.DateTimeField(null=True, blank=True)
     arrest_date = models.DateField(null=True, blank=True)
-    jurisdiction = models.CharField(max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE)
+    jurisdiction = models.CharField(
+        max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE
+    )
     has_additional_offenses = models.BooleanField(default=False)
 
     def __str__(self):
@@ -90,7 +92,7 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
                 data = {"error": str(e)}
             return data
 
-    def refresh_record_from_data(self, exclude_file_nos = []):
+    def refresh_record_from_data(self, exclude_file_nos=[]):
         """
         Refresh this CIPRS record from its JSON data. Optionally pass in a list of CIPRS record file numbers.
         If the list of file numbers contains this CIPRS record's file number, then this CIPRS record will not be saved.
@@ -119,20 +121,34 @@ class Offense(PrintableModelMixin, models.Model):
         """
         Return true if convicted of the charged offense.
         """
-        convicted_verdicts = [pc.VERDICT_GUILTY, pc.VERDICT_PRAYER_FOR_JUDGMENT, pc.VERDICT_RESPONSIBLE]
-        return self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
+        convicted_verdicts = [
+            pc.VERDICT_GUILTY,
+            pc.VERDICT_PRAYER_FOR_JUDGMENT,
+            pc.VERDICT_RESPONSIBLE,
+        ]
+        return (
+            self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
+        )
 
     def is_guilty_to_lesser(self):
         """
         Return true if the offense is a guilty to lesser offense.
         """
-        return self.verdict == pc.VERDICT_GUILTY and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
+        return (
+            self.verdict == pc.VERDICT_GUILTY
+            and self.offense_records.count() == 2
+            and not self.has_equivalent_offense_records()
+        )
 
     def is_responsible_to_lesser(self):
         """
         Return true if the offense is a responsible to lesser offense.
         """
-        return self.verdict == pc.VERDICT_RESPONSIBLE and self.offense_records.count() == 2 and not self.has_equivalent_offense_records()
+        return (
+            self.verdict == pc.VERDICT_RESPONSIBLE
+            and self.offense_records.count() == 2
+            and not self.has_equivalent_offense_records()
+        )
 
     def has_equivalent_offense_records(self):
         """
@@ -142,7 +158,9 @@ class Offense(PrintableModelMixin, models.Model):
         if len(offense_records) != 2:
             return False
 
-        same_description = offense_records[0].description == offense_records[1].description
+        same_description = (
+            offense_records[0].description == offense_records[1].description
+        )
         same_severity = offense_records[0].severity == offense_records[1].severity
 
         return same_description and same_severity
@@ -252,9 +270,7 @@ class AgencyWithSherriffOfficeManager(models.Manager):
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
-    category = models.CharField(
-        max_length=16, choices=CONTACT_CATEGORIES
-    )
+    category = models.CharField(max_length=16, choices=CONTACT_CATEGORIES)
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
     city = models.CharField(max_length=64, blank=True)
@@ -298,18 +314,18 @@ class Batch(PrintableModelMixin, models.Model):
     )
     attorney = models.ForeignKey(
         Contact,
-        related_name='+',
+        related_name="+",
         null=True,
         default=None,
-        limit_choices_to={'category': 'attorney'},
-        on_delete=models.SET_NULL
+        limit_choices_to={"category": "attorney"},
+        on_delete=models.SET_NULL,
     )
     client = models.ForeignKey(
         Contact,
         related_name="batches",
         null=True,
-        limit_choices_to={'category': 'client'},
-        on_delete=models.SET_NULL
+        limit_choices_to={"category": "client"},
+        on_delete=models.SET_NULL,
     )
 
     class Meta:
@@ -357,6 +373,12 @@ class Batch(PrintableModelMixin, models.Model):
     def underaged_conviction_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.UNDERAGED_CONVICTIONS, jurisdiction)
 
+    def adult_felony_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.ADULT_FELONIES, jurisdiction)
+
+    def adult_misdemeanor_records(self, jurisdiction=""):
+        return self.petition_offense_records(pc.ADULT_MISDEMEANORS, jurisdiction)
+
     @property
     def race(self):
         return self.records.first().race
@@ -386,18 +408,20 @@ class Batch(PrintableModelMixin, models.Model):
             hours=settings.CIPRS_RECORD_LIFETIME_HOURS
         )
 
+
 @receiver(signals.post_delete, sender=Batch)
 def cleanup_batch_client_on_delete(sender, instance, **kwargs):
-    """ If the client has no relevant batches, delete the client """
+    """If the client has no relevant batches, delete the client"""
     try:
         if instance.client and len(instance.client.batches.all()) == 0:
             instance.client.delete()
     except Contact.DoesNotExist:
         pass
 
+
 @receiver(signals.pre_save, sender=Batch)
 def cleanup_batch_client_pre_save(sender, instance, **kwargs):
-    """ If the previous client on the batch is no longer used, delete the client """
+    """If the previous client on the batch is no longer used, delete the client"""
     if not instance.id:
         # skip if creating batch
         return
@@ -406,7 +430,10 @@ def cleanup_batch_client_pre_save(sender, instance, **kwargs):
         # skip if going from no client to some client
         return
     current_client = instance.client
-    if getattr(current_client, 'id', None) != getattr(prev_client, 'id', None) and len(prev_client.batches.all()) == 1:
+    if (
+        getattr(current_client, "id", None) != getattr(prev_client, "id", None)
+        and len(prev_client.batches.all()) == 1
+    ):
         prev_client.delete()
 
 
