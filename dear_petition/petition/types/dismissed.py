@@ -17,15 +17,5 @@ def build_query():
     methods = Q()
     for method in DISMISSED_DISPOSITION_METHODS:
         methods |= Q(offense__disposition_method__iexact=method)
-    guilty_to_lesser = build_guilty_to_lesser_query()
-    # not_assigned_to_another_petition = Q(petitions__isnull=True)
-    query = action & methods | guilty_to_lesser  # & not_assigned_to_another_petition
-    return query
-
-
-def build_guilty_to_lesser_query():
-    action = Q(action="CHARGED")
-    method = Q(offense__disposition_method="DISPOSED BY JUDGE")
-    plea = Q(offense__plea="GUILTY TO LESSER")
-    query = action & method & plea
+    query = action & methods
     return query
