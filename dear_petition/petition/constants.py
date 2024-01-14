@@ -29,7 +29,9 @@ SEX_CHOICES = Choices(
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
-CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client"))
+CONTACT_CATEGORIES = Choices(
+    ("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client")
+)
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"
@@ -80,6 +82,9 @@ DISMISSED_DISPOSITION_METHODS = (
     "No Probable Cause",
     "Never To Be Served",
     "Deferred Proceeding or Deferred Prosecution Dismissal",
+    # Portal:
+    "VD-District Dismissals w/o Leave by DA - No Plea Agreement",
+    "VD-Superior Dismissals w/o Leave by DA - No Plea Agreement",
 )
 
 DISP_METHOD_SUPERSEDING_INDICTMENT = "SUPERSEDING INDICTMENT OR PROCESS"

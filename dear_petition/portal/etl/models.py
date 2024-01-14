@@ -3,9 +3,7 @@ from typing import List, Union
 
 from pydantic import BaseModel, field_validator
 
-from dear_petition.petition import constants as ciprs_constants
-
-from .constants import DISMISSED_DISPOSITION_METHODS
+from dear_petition.petition import constants
 
 
 class CaseSummary(BaseModel):
@@ -72,17 +70,17 @@ class Disposition(BaseModel):
         return v
 
     def is_dismissed(self) -> bool:
-        return self.criminal_disposition in DISMISSED_DISPOSITION_METHODS
+        return self.criminal_disposition in constants.DISMISSED_DISPOSITION_METHODS
 
     def transform_action(self) -> str:
         action = self.event
         if self.is_dismissed():
-            action = "CHARGED"
+            action = constants.CHARGED
         return action
 
     def transform_disposition_method(self) -> str:
         if self.is_dismissed():
-            return ciprs_constants.DISTRICT_COURT_WITHOUT_DA_LEAVE
+            return constants.DISTRICT_COURT_WITHOUT_DA_LEAVE
         return self.criminal_disposition
 
 
