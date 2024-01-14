@@ -1,5 +1,8 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.authentication import CSRFCheck, SessionAuthentication as DRFSessionAuthentication
+from rest_framework.authentication import (
+    CSRFCheck,
+    SessionAuthentication as DRFSessionAuthentication,
+)
 from rest_framework.exceptions import NotAuthenticated
 from django.conf import settings
 
@@ -8,7 +11,11 @@ def enforce_csrf(request):
     """
     Enforce CSRF validation. From drf source, authentication.py
     """
-    check = CSRFCheck()
+
+    def dummy_get_response(request):  # pragma: no cover
+        return None
+
+    check = CSRFCheck(dummy_get_response)
     check.process_request(request)
     reason = check.process_view(request, None, (), {})
     if reason:
@@ -55,5 +62,6 @@ class SessionAuthentication(DRFSessionAuthentication):
     We do set authenticate_header function in SessionAuthentication, so that a value for the WWW-Authenticate
     header can be retrieved and the response code is automatically set to 401 in case of unauthenticated requests.
     """
+
     def authenticate_header(self, request):
-        return 'Session'
+        return "Session"
