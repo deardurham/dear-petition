@@ -2,7 +2,7 @@ from .extract import extract_portal_record
 from .models import PortalRecord
 
 
-def transform_portal_record(source):
+def transform_portal_record(source, location=""):
     """Transform eCourts Portal record to CIPRS-looking record."""
     portal_record = extract_portal_record(source)
     court = portal_record.case_summary.court
@@ -26,6 +26,7 @@ def transform_portal_record(source):
         "_meta": {
             "portal_record": portal_record.model_dump_json(),
             "source": source,
+            "location": location,
         },
     }
 

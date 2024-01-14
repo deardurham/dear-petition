@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class BookmarkletDataForm(forms.Form):
     user = forms.CharField()
+    location = forms.CharField()
     source = forms.CharField()
 
     def clean_user(self):

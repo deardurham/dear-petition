@@ -20,6 +20,8 @@ def bookmarklet_handler(request):
         return HttpResponse(status=400)
 
     import_portal_record(
-        user=form.cleaned_data["user"], source=form.cleaned_data["source"]
+        user=form.cleaned_data["user"],
+        location=form.cleaned_data["location"],
+        source=form.cleaned_data["source"],
     )
     return HttpResponse(status=201)

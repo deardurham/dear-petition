@@ -34,7 +34,12 @@ export const generateBookmarklet = async (username) =>
     textarea.name = 'source';
     textarea.value = html;
     
+    var location_input = document.createElement('input');
+    location_input.name = 'location';
+    location_input.value = window.location;
+
     form.appendChild(username_input);
+    form.appendChild(location_input);
     form.appendChild(textarea);
     iframe.appendChild(form);
     
