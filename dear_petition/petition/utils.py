@@ -120,8 +120,11 @@ def get_text_pixel_length(text):
     Note also that the length of a multi-character string may not equal the sum of the length of the characters comprising the string. This is again due to font rendering.
     """
     font = ImageFont.truetype(str(settings.APPS_DIR.path("static/times.ttf")), size=12)
-    size = font.getsize(text)
-    return size[0]
+    try:
+        _, _, w, h = font.getbbox(text)
+    except AttributeError:
+        w, h = font.getsize(text)  # Pillow<8
+    return w
 
 
 def get_truncation_point_of_text_by_pixel_size(text, desired_length):
@@ -188,6 +191,8 @@ def get_ordered_offense_records(petition_document):
     )
 
     return qs
+
+
 def resolve_dob(qs):
     """
     It is possible that different CIPRS records could have different dates of birth. In this case, use the earliest date of birth as it is the most conservative.
