@@ -316,6 +316,10 @@ REFRESH_COOKIE_KEY = "Refresh"
 # the same domain.
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
 CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
 SENDGRID_ALLOWED_SENDERS = env.list("SENDGRID_ALLOWED_SENDERS", default=[])
 SENDGRID_WEBHOOK_LISTENERS = (
