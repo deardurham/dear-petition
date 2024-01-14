@@ -5,7 +5,7 @@ from dear_petition.portal.etl.models import CaseInfo, Charge
 from .utils import catch_parse_error
 
 
-SELECT_OFFENSES = "div[ng-if*=ShowOffenses] tr.hide-sm"
+SELECT_OFFENSES = "div[ng-if*=ShowOffenses] tr:has(span[ng-if*='CurrChargeNum']):not(.hide-gt-sm)"
 
 
 def parse_case_information(soup):
