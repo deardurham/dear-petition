@@ -25,6 +25,7 @@ pytest-django==3.9.0  # https://github.com/pytest-dev/pytest-django
 pylint-django==2.0.15  # https://github.com/PyCQA/pylint-django
 pylint-celery==0.3  # https://github.com/PyCQA/pylint-celery
 django-coverage-plugin==1.8.0  # https://github.com/nedbat/django_coverage_plugin
+rich==13.6.0
 
 # Django
 # ------------------------------------------------------------------------------

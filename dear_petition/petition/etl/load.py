@@ -56,6 +56,8 @@ def import_ciprs_records(files, user, parser_mode, batch_label=""):
 
 
 def create_batch_petitions(batch):
+    # Start with a fresh petition list
+    batch.petitions.all().delete()
     # Dismissed
     create_petitions_from_records(batch, DISMISSED)
     # Not guilty
@@ -78,9 +80,13 @@ def create_petitions_from_records(batch, form_type):
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
-        sheriff_agency = pm.Contact.get_sherriff_office_by_county(petition_type["county"])
+        sheriff_agency = pm.Contact.get_sherriff_office_by_county(
+            petition_type["county"]
+        )
         if sheriff_agency is not None:
-            logger.info(f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency.")
+            logger.info(
+                f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency."
+            )
             petition.agencies.add(sheriff_agency)
         link_offense_records(petition)
         logger.info(
@@ -143,7 +149,6 @@ def assign_agencies_to_documents(petition):
     first_iteration = True
     i = 0
     while True:
-
         current_document_agencies = agencies[
             i : (i + 3)
         ]  # 3 boxes for agencies per document

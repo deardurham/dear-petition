@@ -11,7 +11,7 @@ const TARGET = process.env.OVERRIDE_API_PROXY || process.env.API_PROXY || FALLBA
 const agent = new http.Agent();
 
 const PROXIES = {};
-const PROXY_PATHS = ['/petition/api', '/admin/', '/static/admin', '/password_reset/', '/reset/'];
+const PROXY_PATHS = ['/petition/api', '/admin/', '/static/admin', '/password_reset/', '/reset/', '/portal/'];
 PROXY_PATHS.forEach((path) => {
   PROXIES[path] = { target: TARGET, changeOrigin: true, secure: false, agent };
 });

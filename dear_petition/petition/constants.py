@@ -97,6 +97,9 @@ DISMISSED_DISPOSITION_METHODS = (
     "No Probable Cause",
     "Never To Be Served",
     "Deferred Proceeding or Deferred Prosecution Dismissal",
+    # Portal:
+    "VD-District Dismissals w/o Leave by DA - No Plea Agreement",
+    "VD-Superior Dismissals w/o Leave by DA - No Plea Agreement",
 )
 
 DISP_METHOD_SUPERSEDING_INDICTMENT = "SUPERSEDING INDICTMENT OR PROCESS"
@@ -167,3 +170,8 @@ GENERATED_PETITION_ADMIN_FIELDS = (
     "number_of_charges",
     "created",
 )
+
+SEVERITY_FELONY = "FELONY"
+SEVERITY_MISDEMEANOR = "MISDEMEANOR"
+CHARGED_DEGREE_FELONY = ("FH", "FNC")
+CHARGED_DEGREE_MISDEMEANOR = ("MNC",)

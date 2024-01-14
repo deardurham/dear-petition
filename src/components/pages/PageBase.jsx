@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -20,6 +21,7 @@ import { loggedOut } from '../../slices/auth';
 import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { generateBookmarklet } from '../../bookmarklet/bookmarklet';
 
 const HeaderLogoLink = styled(LinkWrapper)`
   border: none;
@@ -56,6 +58,15 @@ function PageBase({ children, className, ...props }) {
   const { user } = useAuth();
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
+  const [bookmarklet, setBookmarklet] = useState();
+
+  useEffect(() => {
+    const generate = async () => {
+      const bookmarkletCode = await generateBookmarklet(user.username);
+      setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
+    };
+    generate();
+  }, [user.username]);
 
   return (
     <PageBaseStyled {...props}>
@@ -74,6 +85,11 @@ function PageBase({ children, className, ...props }) {
             )}
             <LinkWrapper>
               <Link to="/help">Help</Link>
+            </LinkWrapper>
+            <LinkWrapper>
+              <a href={bookmarklet} title="Drag to your bookmarks bar">
+                Portal Importer ({import.meta.env.MODE})
+              </a>
             </LinkWrapper>
             {user?.is_admin ? (
               <DropdownMenu
