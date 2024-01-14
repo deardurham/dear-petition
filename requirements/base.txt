@@ -1,35 +1,35 @@
-pytz==2019.1  # https://github.com/stub42/pytz
-python-slugify==4.0.1  # https://github.com/un33k/python-slugify
-Pillow==9.0.1  # https://github.com/python-pillow/Pillow
-argon2-cffi==20.1.0  # https://github.com/hynek/argon2_cffi
-whitenoise==5.2.0  # https://github.com/evansd/whitenoise
-redis==3.2.1  # https://github.com/antirez/redis
-celery==4.4.7  # pyup: < 5.0  # https://github.com/celery/celery
-flower==0.9.5  # https://github.com/mher/flower
-pyjwt==2.1.0
-docxtpl==0.16.4 # https://docxtpl.readthedocs.io/en/latest/
+pytz==2023.3  # https://github.com/stub42/pytz
+python-slugify==8.0.1  # https://github.com/un33k/python-slugify
+Pillow==10.2.0  # https://github.com/python-pillow/Pillow
+argon2-cffi==23.1.0  # https://github.com/hynek/argon2_cffi
+whitenoise==6.6.0  # https://github.com/evansd/whitenoise
+redis==5.0.1  # https://github.com/antirez/redis
+celery==5.3.6  # pyup: < 5.0  # https://github.com/celery/celery
+flower==2.0.1  # https://github.com/mher/flower
+pyjwt==2.8.0
+docxtpl==0.16.7 # https://docxtpl.readthedocs.io/en/latest/
 docx2pdf==0.1.8
-pydantic==2.4.2
-django-import-export==3.3.1
+pydantic==2.5.3
+django-import-export==3.3.6
 tablib==3.5.0
 beautifulsoup4==4.12.2
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.2.13  # pyup: < 2.1  # https://www.djangoproject.com/ good
-django-environ==0.8.1  # https://github.com/joke2k/django-environ
-django-model-utils==4.2.0  # https://github.com/jazzband/django-model-utils
-django-allauth==0.46.0  # https://github.com/pennersr/django-allauth
-django-crispy-forms==1.11.1  # https://github.com/django-crispy-forms/django-crispy-forms
-django-redis==5.2.0  # https://github.com/niwinz/django-redis
-django-localflavor==3.1 # https://django-localflavor.readthedocs.io/en/latest/
-django-filter==21.1 # https://github.com/baskoopmans/django-filters/
-django-celery-beat==2.2.0 # https://pypi.org/project/django-celery-beat/
-phonenumbers==8.12.56
-django-phonenumber-field==7.0.0 # https://django-phonenumber-field.readthedocs.io/en/latest/
+django==4.2.9  # pyup: < 2.1  # https://www.djangoproject.com/ good
+django-environ==0.11.2  # https://github.com/joke2k/django-environ
+django-model-utils==4.3.1  # https://github.com/jazzband/django-model-utils
+django-allauth==0.60.0  # https://github.com/pennersr/django-allauth
+django-crispy-forms==2.1  # https://github.com/django-crispy-forms/django-crispy-forms
+django-redis==5.4.0  # https://github.com/niwinz/django-redis
+django-localflavor==4.0 # https://django-localflavor.readthedocs.io/en/latest/
+django-filter==23.5 # https://github.com/baskoopmans/django-filters/
+django-celery-beat==2.5.0 # https://pypi.org/project/django-celery-beat/
+phonenumbers==8.13.27
+django-phonenumber-field==7.3.0 # https://django-phonenumber-field.readthedocs.io/en/latest/
 
 # Django REST Framework
-djangorestframework==3.13.1  # https://github.com/encode/django-rest-framework
+djangorestframework==3.14.0  # https://github.com/encode/django-rest-framework
 djangorestframework-simplejwt==5.2.0 # https://github.com/SimpleJWT/django-rest-framework-simplejwt
 
 pdfrw==0.4
