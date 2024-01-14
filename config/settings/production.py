@@ -103,7 +103,14 @@ AWS_LOCATION = env("AWS_LOCATION", default=ENVIRONMENT.lower())
 
 # STATIC
 # ------------------------
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "config.settings.production.MediaRootS3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # MEDIA
 # ------------------------------------------------------------------------------
@@ -121,7 +128,6 @@ class MediaRootS3Boto3Storage(S3Boto3Storage):
 
 
 # endregion
-DEFAULT_FILE_STORAGE = "config.settings.production.MediaRootS3Boto3Storage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/"
 
 # TEMPLATES

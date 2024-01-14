@@ -102,7 +102,7 @@ class TestBatchViewSet(APITestCase):
 
         with self.subTest("Get - Detail"):
             response = self.client.get(
-                self.detail_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+                self.detail_url, headers={"authorization": f"Bearer {self.access}"}
             )
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(self.batch_1.label, response.data["label"])
@@ -115,7 +115,7 @@ class TestBatchViewSet(APITestCase):
                 user=self.user.pk,
             )
             response = self.client.post(
-                self.list_url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+                self.list_url, data=data, headers={"authorization": f"Bearer {self.access}"}
             )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -127,7 +127,7 @@ class TestBatchViewSet(APITestCase):
 
         with self.subTest("DELETE"):
             response = self.client.delete(
-                self.detail_url, HTTP_AUTHORIZATION=f"Bearer {self.access}"
+                self.detail_url, headers={"authorization": f"Bearer {self.access}"}
             )
             self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
