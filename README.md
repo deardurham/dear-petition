@@ -23,7 +23,7 @@ A [Durham Expunction and Restoration (DEAR)](https://www.deardurham.org)
     - [Running tests with py.test](#running-tests-with-pytest)
     - [Test coverage](#test-coverage)
     - [Sign up for Sentry](#sign-up-for-sentry)
-- [Production testing](#production-testing)
+  - [Production testing](#production-testing)
 
 ## 🚀 Docker Quick Start
 
@@ -228,6 +228,6 @@ To test the production Dockerfile locally, run:
 
 ```sh
 COMPOSE_FILE=docker-compose.deploy.yml docker compose up --build -d django
-# View logs for debugging
+#  View logs for debugging
 COMPOSE_FILE=docker-compose.deploy.yml docker compose logs django -f
 ```
