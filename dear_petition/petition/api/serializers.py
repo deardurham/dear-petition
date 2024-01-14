@@ -118,7 +118,6 @@ class CIPRSRecordSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.ModelSerializer):
     formatted_address = serializers.SerializerMethodField()
-    user = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
 
     def get_formatted_address(self, contact_obj):
         lines = [contact_obj.address1]
@@ -147,6 +146,7 @@ class ClientSerializer(ContactSerializer):
     city = serializers.CharField(required=True)
     state = serializers.CharField(required=True)
     zipcode = serializers.CharField(required=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
