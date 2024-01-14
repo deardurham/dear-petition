@@ -119,6 +119,7 @@ def parse_charge_offense(tr):
     return span.text
 
 
+@catch_parse_error
 def parse_statute(tr):
     """
     Parse charge statute

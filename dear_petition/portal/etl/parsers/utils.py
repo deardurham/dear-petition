@@ -9,10 +9,10 @@ def catch_parse_error(func):
     """Decorator to catch parsing errors so parsing may continue"""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(soup):
         try:
-            return func(*args, **kwargs)
+            return func(soup)
         except Exception:
-            logger.exception(f"Exception occurred in {func}")
+            logger.exception(f"Exception occurred parsing: {soup}")
 
     return wrapper
