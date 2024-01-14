@@ -30,10 +30,10 @@ class Charge(BaseModel):
     def transform_severity(self):
         """Attempt to convert Portal's degree to CIPRS severity"""
         severity = self.degree
-        if self.degree in ("FH", "FNC"):
-            severity = "FELONY"
-        elif self.degree in ("MNC",):
-            severity = "MISDEMEANOR"
+        if self.degree in constants.CHARGED_DEGREE_FELONY:
+            severity = constants.SEVERITY_FELONY
+        elif self.degree in constants.CHARGED_DEGREE_MISDEMEANOR:
+            severity = constants.SEVERITY_MISDEMEANOR
         return severity
 
 

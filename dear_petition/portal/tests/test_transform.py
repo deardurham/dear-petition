@@ -2,7 +2,7 @@ import datetime as dt
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.portal.etl.models import Disposition
+from dear_petition.portal.etl.models import Charge, Disposition
 
 
 class TestCriminalDisposition:
@@ -42,3 +42,28 @@ class TestCriminalDisposition:
             disposition.transform_disposition_method()
             == disposition.criminal_disposition
         )
+
+
+class TestCharge:
+    @pytest.fixture
+    def charge(self):
+        return Charge(
+            number=1,
+            offense="BREAK OR ENTER A MOTOR VEHICLE",
+            statute="14-56",
+            degree="FNC",
+            offense_date=dt.date(1994, 2, 12),
+            filed_date=dt.date(1994, 2, 14),
+        )
+
+    @pytest.mark.parametrize(
+        "degree,severity",
+        [
+            ("FH", constants.SEVERITY_FELONY),
+            ("FNC", constants.SEVERITY_FELONY),
+            ("MNC", constants.SEVERITY_MISDEMEANOR),
+        ],
+    )
+    def test_(self, degree: str, severity: str, charge: Charge):
+        charge.degree = degree
+        assert charge.transform_severity() == severity
