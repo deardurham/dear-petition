@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture(scope="module")
 def sample_record():
-    path = pathlib.Path(__file__).parent.parent / "data" / "record.html"
+    path = pathlib.Path(__file__).parent / "data" / "record.html"
     return path.read_text()
 
 
