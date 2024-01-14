@@ -40,7 +40,9 @@ export const generateBookmarklet = async (username) =>
     
     document.body.appendChild(iframe);
     
-    form.submit();    
+    form.submit();
+
+    alert("Successfully submitted case summary to Expunction Tool");
 `,
       { mangle: false },
     )
