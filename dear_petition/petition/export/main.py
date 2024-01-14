@@ -12,6 +12,8 @@ from .forms import (
     AOCFormCR287,
     AOCFormCR288,
     AOCFormCR293,
+    AOCFormCR297,
+    AOCFormCR298,
     DataPetitionForm,
 )
 from .writer import concatenate_pdf_streams, write_template_and_annotations_to_stream
@@ -25,6 +27,8 @@ FORM_TYPE_MAP = {
     constants.ATTACHMENT: AOCFormCR285,
     constants.NOT_GUILTY: AOCFormCR288,
     constants.UNDERAGED_CONVICTIONS: AOCFormCR293,
+    constants.ADULT_FELONIES: AOCFormCR297,
+    constants.ADULT_MISDEMEANORS: AOCFormCR298,
 }
 
 

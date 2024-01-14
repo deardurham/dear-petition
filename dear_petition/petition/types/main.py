@@ -2,7 +2,13 @@ import logging
 
 from django.db.models import F
 
-from dear_petition.petition.types import dismissed, not_guilty, underaged_convictions
+from dear_petition.petition.types import (
+    dismissed,
+    not_guilty,
+    underaged_convictions,
+    adult_felonies,
+    adult_misdemeanors,
+)
 from dear_petition.petition import constants
 
 
@@ -11,6 +17,8 @@ TYPE_MAP = {
     constants.DISMISSED: dismissed.get_offense_records,
     constants.NOT_GUILTY: not_guilty.get_offense_records,
     constants.UNDERAGED_CONVICTIONS: underaged_convictions.get_offense_records,
+    constants.ADULT_FELONIES: adult_felonies.get_offense_records,
+    constants.ADULT_MISDEMEANORS: adult_misdemeanors.get_offense_records,
 }
 
 
