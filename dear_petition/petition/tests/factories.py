@@ -31,8 +31,7 @@ from ..constants import (
 )
 
 
-class BatchFactory(factory.DjangoModelFactory):
-
+class BatchFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("name")
     user = factory.SubFactory(UserFactory)
 
@@ -76,8 +75,7 @@ def record_data(idx):
     }
 
 
-class CIPRSRecordFactory(factory.DjangoModelFactory):
-
+class CIPRSRecordFactory(factory.django.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
     label = factory.Faker("name")
     data = factory.Sequence(record_data)
@@ -97,7 +95,7 @@ class CIPRSRecordFactory(factory.DjangoModelFactory):
         model = CIPRSRecord
 
 
-class OffenseFactory(factory.DjangoModelFactory):
+class OffenseFactory(factory.django.DjangoModelFactory):
     ciprs_record = factory.SubFactory(CIPRSRecordFactory)
     disposed_on = factory.Faker("date_object")
     disposition_method = "DISPOSED BY JUDGE"
@@ -106,7 +104,7 @@ class OffenseFactory(factory.DjangoModelFactory):
         model = Offense
 
 
-class OffenseRecordFactory(factory.DjangoModelFactory):
+class OffenseRecordFactory(factory.django.DjangoModelFactory):
     offense = factory.SubFactory(OffenseFactory)
     law = "20-141(J1)"
     code = "4450"
@@ -118,7 +116,7 @@ class OffenseRecordFactory(factory.DjangoModelFactory):
         model = OffenseRecord
 
 
-class PetitionFactory(factory.DjangoModelFactory):
+class PetitionFactory(factory.django.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
     county = DURHAM_COUNTY
     form_type = DISMISSED
@@ -128,7 +126,7 @@ class PetitionFactory(factory.DjangoModelFactory):
         model = Petition
 
 
-class PetitionOffenseRecordFactory(factory.DjangoModelFactory):
+class PetitionOffenseRecordFactory(factory.django.DjangoModelFactory):
     petition = factory.SubFactory(PetitionFactory)
     offense_record = factory.SubFactory(OffenseRecordFactory)
     active = True
@@ -137,7 +135,7 @@ class PetitionOffenseRecordFactory(factory.DjangoModelFactory):
         model = PetitionOffenseRecord
 
 
-class DismissedOffenseRecordFactory(factory.DjangoModelFactory):
+class DismissedOffenseRecordFactory(factory.django.DjangoModelFactory):
     offense = factory.SubFactory(
         OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
     )
@@ -151,7 +149,7 @@ class DismissedOffenseRecordFactory(factory.DjangoModelFactory):
         model = OffenseRecord
 
 
-class GuiltyOffenseRecordFactory(factory.DjangoModelFactory):
+class GuiltyOffenseRecordFactory(factory.django.DjangoModelFactory):
     offense = factory.SubFactory(
         OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
     )
@@ -165,7 +163,7 @@ class GuiltyOffenseRecordFactory(factory.DjangoModelFactory):
         model = OffenseRecord
 
 
-class PetitionDocumentFactory(factory.DjangoModelFactory):
+class PetitionDocumentFactory(factory.django.DjangoModelFactory):
     petition = factory.SubFactory(PetitionFactory)
     form_type = DISMISSED
 
@@ -173,25 +171,26 @@ class PetitionDocumentFactory(factory.DjangoModelFactory):
         model = PetitionDocument
 
 
-class ContactFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = Contact
-
-class ClientFactory(factory.DjangoModelFactory):
-    category = 'client'
-
+class ContactFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Contact
 
 
-class AttorneyFactory(factory.DjangoModelFactory):
-    category = 'attorney'
+class ClientFactory(factory.django.DjangoModelFactory):
+    category = "client"
 
     class Meta:
         model = Contact
 
 
-class GeneratedPetitionFactory(factory.DjangoModelFactory):
+class AttorneyFactory(factory.django.DjangoModelFactory):
+    category = "attorney"
+
+    class Meta:
+        model = Contact
+
+
+class GeneratedPetitionFactory(factory.django.DjangoModelFactory):
     form_type = DISMISSED
     number_of_charges = 1
     batch_id = 1

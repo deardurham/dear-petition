@@ -3,8 +3,7 @@ import factory
 from dear_petition.sendgrid.models import Email, Attachment
 
 
-class EmailFactory(factory.DjangoModelFactory):
-
+class EmailFactory(factory.django.DjangoModelFactory):
     subject = factory.Faker("sentence")
     recipient = factory.Faker("ascii_company_email")
     sender = factory.Faker("ascii_company_email")
@@ -14,8 +13,7 @@ class EmailFactory(factory.DjangoModelFactory):
         model = Email
 
 
-class AttachmentFactory(factory.DjangoModelFactory):
-
+class AttachmentFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("file_name")
     type = factory.Faker("mime_type")
     file = factory.Faker("file_path", absolute=False)
