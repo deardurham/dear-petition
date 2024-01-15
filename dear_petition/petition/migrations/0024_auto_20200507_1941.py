@@ -5,14 +5,15 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0023_comment_time"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="comment", name="text", field=models.TextField(),
+            model_name="comment",
+            name="text",
+            field=models.TextField(),
         ),
         migrations.CreateModel(
             name="Petition",

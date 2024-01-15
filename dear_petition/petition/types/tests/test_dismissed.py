@@ -27,9 +27,7 @@ def test_non_charged_offense_record(batch, dismissed_offense):
 
 def test_non_dismissed_disposition_method(batch, non_dismissed_offense):
     """Offenses with non-dismissed disposition methods should be excluded."""
-    offense_record = OffenseRecordFactory(
-        action="CHARGED", offense=non_dismissed_offense
-    )
+    offense_record = OffenseRecordFactory(action="CHARGED", offense=non_dismissed_offense)
     assert offense_record not in batch.dismissed_offense_records()
 
 
@@ -45,9 +43,7 @@ def test_infraction_severity_offense_record(batch, dismissed_offense):
     assert traffic_record in batch.dismissed_offense_records()
 
 
-@pytest.mark.parametrize(
-    "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
-)
+@pytest.mark.parametrize("jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT])
 def test_offense_records_by_jurisdiction(batch, jurisdiction):
     """Offense records helper function should allow filtering by jurisdiction."""
     ciprs_record = CIPRSRecordFactory(jurisdiction=jurisdiction, batch=batch)

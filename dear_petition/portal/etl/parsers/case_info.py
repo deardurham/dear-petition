@@ -44,9 +44,7 @@ def parse_case_type(soup):
             <td class="roa-label">Case Type:</td>
             <td class="roa-value ng-binding">Criminal</td>
     """
-    return soup.select_one(
-        "tr[ng-if*=CaseType\\.Description] td.roa-value"
-    ).text.strip()
+    return soup.select_one("tr[ng-if*=CaseType\\.Description] td.roa-value").text.strip()
 
 
 @catch_parse_error

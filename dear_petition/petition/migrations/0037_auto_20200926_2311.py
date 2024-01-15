@@ -4,12 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0036_auto_20200807_1344"),
     ]
 
     operations = [
-        migrations.RemoveField(model_name="offenserecord", name="plea",),
-        migrations.RemoveField(model_name="offenserecord", name="verdict",),
+        migrations.RemoveField(
+            model_name="offenserecord",
+            name="plea",
+        ),
+        migrations.RemoveField(
+            model_name="offenserecord",
+            name="verdict",
+        ),
     ]

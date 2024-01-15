@@ -10,7 +10,6 @@ from dear_petition.common.models import PrintableModelMixin
 
 
 class User(PrintableModelMixin, AbstractUser):
-
     name = CharField(_("Name of User"), blank=True, max_length=uc.NAME_MAX_LENGTH)
     last_generated_petition_time = DateField(null=True)
 

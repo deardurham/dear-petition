@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('petition', '0056_offenserecord_count'),
+        ("petition", "0056_offenserecord_count"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ciprsrecord',
-            name='has_additional_offenses',
+            model_name="ciprsrecord",
+            name="has_additional_offenses",
             field=models.BooleanField(default=False),
         ),
     ]

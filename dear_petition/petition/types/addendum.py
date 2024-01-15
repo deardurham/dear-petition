@@ -9,6 +9,7 @@ def create_addendum_documents(petition, previous_document):
         addendum_document_creator = ADDENDUM_FORMS_TYPE_MAP[petition.form_type]
         addendum_document_creator(petition, previous_document)
 
+
 def calculate_offense_record_string(offense_record):
     offense_record_string = f"{offense_record.file_no} {offense_record.description}"
 
@@ -17,10 +18,10 @@ def calculate_offense_record_string(offense_record):
 
     return offense_record_string
 
+
 def calculate_checkmark_3b_string(offense_records):
     offense_record_strings = [
-        calculate_offense_record_string(offense_record)
-        for offense_record in offense_records
+        calculate_offense_record_string(offense_record) for offense_record in offense_records
     ]
     checkmark_3b_string = ", ".join(offense_record_strings)
     return checkmark_3b_string
@@ -29,9 +30,7 @@ def calculate_checkmark_3b_string(offense_records):
 def create_checkmark_3b_addendum_form(petition, previous_document):
     ADDENDUM_3B_FIRST_LINE_LIMIT = 242
     ADDENDUM_3B_SECOND_LINE_LIMIT = 410
-    ADDENDUM_3B_PIXEL_LIMIT = (
-        ADDENDUM_3B_FIRST_LINE_LIMIT + ADDENDUM_3B_SECOND_LINE_LIMIT
-    )
+    ADDENDUM_3B_PIXEL_LIMIT = ADDENDUM_3B_FIRST_LINE_LIMIT + ADDENDUM_3B_SECOND_LINE_LIMIT
     qs = addendum_3b.get_offense_records(petition)
     if not qs.exists():
         petition.base_document.form_specific_data["is_checkmark_3b_checked"] = False
@@ -46,17 +45,15 @@ def create_checkmark_3b_addendum_form(petition, previous_document):
             )
             addendum_3b_document.offense_records.add(*qs)
             petition.base_document.form_specific_data["is_checkmark_3b_checked"] = True
-            petition.base_document.form_specific_data[
-                "charged_desc_string"
-            ] = "See addendum"
+            petition.base_document.form_specific_data["charged_desc_string"] = "See addendum"
         else:
             petition.base_document.form_specific_data["is_checkmark_3b_checked"] = True
             truncation_point = pu.get_truncation_point_of_text_by_pixel_size(
                 checkmark_3b_string, ADDENDUM_3B_FIRST_LINE_LIMIT
             )
-            petition.base_document.form_specific_data[
-                "charged_desc_string"
-            ] = checkmark_3b_string[0:truncation_point]
+            petition.base_document.form_specific_data["charged_desc_string"] = checkmark_3b_string[
+                0:truncation_point
+            ]
             petition.base_document.form_specific_data[
                 "charged_desc_cont_string"
             ] = checkmark_3b_string[truncation_point:]

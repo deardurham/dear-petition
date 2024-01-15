@@ -8,7 +8,7 @@ from dear_petition.petition import models as pm
 from dear_petition.petition.constants import (
     DISPOSITION_METHOD_CODE_MAP,
     VERDICT_CODE_MAP,
-    JURISDICTION_MAP
+    JURISDICTION_MAP,
 )
 
 
@@ -18,7 +18,9 @@ TEMPLATE = "records_summary.docx"
 
 
 def generate_summary(batch):
-    assert batch.client is not None and batch.attorney is not None, 'Client and attorney must be set for batch before generating document'
+    assert (
+        batch.client is not None and batch.attorney is not None
+    ), "Client and attorney must be set for batch before generating document"
 
     context = generate_context(batch, batch.attorney, batch.client)
     doc = DocxTemplate(settings.TEMPLATE_DIR.path(TEMPLATE))
@@ -70,7 +72,7 @@ def generate_context(batch, attorney, client):
             "jurisdiction": table_key[1],
             "idx": table_index,
             "offense_records": offense_records,
-            "addl_offense_file_nos": ', '.join(sorted(addl_offense_file_nos))
+            "addl_offense_file_nos": ", ".join(sorted(addl_offense_file_nos)),
         }
         tables.append(table)
 
@@ -88,9 +90,9 @@ def __get_offenses(batch):
     """
     Get offenses for the batch.
     """
-    offenses = pm.Offense.objects.filter(
-        ciprs_record__batch=batch
-    ).select_related("ciprs_record__batch")
+    offenses = pm.Offense.objects.filter(ciprs_record__batch=batch).select_related(
+        "ciprs_record__batch"
+    )
 
     return offenses
 
@@ -104,7 +106,6 @@ def __create_tables_data(offenses):
     table_data = {}
 
     for offense in offenses:
-
         county = offense.ciprs_record.county
         jurisdiction = JURISDICTION_MAP[offense.jurisdiction]
         key = (county, jurisdiction)
@@ -135,9 +136,9 @@ def __create_offense_record_data(offense_record):
     map. If that fails, use disposition (not the abbreviation).
     """
     disposition = DISPOSITION_METHOD_CODE_MAP.get(
-            offense_record.disposition,
-            VERDICT_CODE_MAP.get(offense_record.disposition, offense_record.disposition)
-        )
+        offense_record.disposition,
+        VERDICT_CODE_MAP.get(offense_record.disposition, offense_record.disposition),
+    )
 
     offense_record_data = {
         "file_no": ciprs_record.file_no,
@@ -147,7 +148,7 @@ def __create_offense_record_data(offense_record):
         "offense_date": __format_date(ciprs_record.offense_date),
         "disposition": disposition,
         "disposed_on": __format_date(offense.disposed_on),
-        "has_additional_offenses": ciprs_record.has_additional_offenses
+        "has_additional_offenses": ciprs_record.has_additional_offenses,
     }
 
     return offense_record_data

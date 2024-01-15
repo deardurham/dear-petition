@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("sendgrid", "0001_initial"),
     ]
@@ -13,8 +12,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="attachment",
             name="content_id",
-            field=models.CharField(
-                blank=True, max_length=256, verbose_name="Content ID"
-            ),
+            field=models.CharField(blank=True, max_length=256, verbose_name="Content ID"),
         ),
     ]

@@ -145,12 +145,7 @@ class AOCFormCR287(PetitionForm):
             self.data["ChargedB"] = Checkbox("Yes")
             self.data["ChargedDesc"] = charged_desc_string
             self.data["ChargedDescCont"] = charged_desc_cont_string
-        elif (
-            self.petition.offense_records.filter(
-                petitionoffenserecord__active=True
-            ).count()
-            > 1
-        ):
+        elif self.petition.offense_records.filter(petitionoffenserecord__active=True).count() > 1:
             # Petition section says to check one of the checkboxes if petitioning to expunge MULTIPLE dismissals
             self.data["ChargedA"] = Checkbox("Yes")
         else:
@@ -186,13 +181,9 @@ class AOCFormCR285(AOCFormCR287):
 
     def map_agencies(self):
         agencies = self.petition_document.agencies.all()
-        assert (
-            len(agencies) <= 3
-        ), f"This form was given {len(agencies)} Three is the maximum."
+        assert len(agencies) <= 3, f"This form was given {len(agencies)} Three is the maximum."
         if len(agencies) > 0:
-            self.data["FormNo1"] = self.petition_document.petition.form_type.split("-")[
-                -1
-            ]
+            self.data["FormNo1"] = self.petition_document.petition.form_type.split("-")[-1]
         for i, agency in enumerate(agencies, 1):
             body = get_285_form_agency_address(agency)
             self.data[f"NameAddress{i}"] = body
@@ -264,9 +255,7 @@ class AOCFormCR297(AOCFormCR287):
             self.data[f"FileNumber:{i}"] = ciprs_record.file_no
             self.data[f"ArrestDate:{i}"] = self.format_date(ciprs_record.arrest_date)
             self.data[f"OffenseDescription:{i}"] = offense_record.description
-            self.data[f"DateOfOffense:{i}"] = self.format_date(
-                ciprs_record.offense_date
-            )
+            self.data[f"DateOfOffense:{i}"] = self.format_date(ciprs_record.offense_date)
             self.data[f"Disposition:{i}"] = self.disposition_code(offense)
             self.data[f"DispositionDate:{i}"] = self.format_date(offense.disposed_on)
 
@@ -286,16 +275,9 @@ class AOCFormCR297(AOCFormCR287):
             self.data["DOB"] = self.format_date(record.dob)
 
     def map_additional_forms(self):
-        if (
-            self.petition.offense_records.filter(
-                petitionoffenserecord__active=True
-            ).count()
-            > 1
-        ):
+        if self.petition.offense_records.filter(petitionoffenserecord__active=True).count() > 1:
             # Petition section says to check one of the checkboxes if petitioning to expunge MULTIPLE dismissals
-            self.data["TwoOrThreeNonviolentFeloniesWaitingPeriodCkBox"] = Checkbox(
-                "Yes"
-            )
+            self.data["TwoOrThreeNonviolentFeloniesWaitingPeriodCkBox"] = Checkbox("Yes")
         else:
             self.data["OneNonviolentFelonyWaitingPeriodCkBox"] = Checkbox("Yes")
 
@@ -312,9 +294,7 @@ class AOCFormCR297(AOCFormCR287):
         #
         self.data["PetitionerPetitionersAttorneySignedName"] = attorney.name
         self.data["PetitionersAttorneyCkBox"] = Checkbox("Yes")
-        self.data["PetitionerPetitionersAttorneySignedDate"] = self.format_date(
-            dt.datetime.today()
-        )
+        self.data["PetitionerPetitionersAttorneySignedDate"] = self.format_date(dt.datetime.today())
 
 
 class AOCFormCR298(AOCFormCR297):

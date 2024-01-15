@@ -6,7 +6,6 @@ import model_utils.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0037_auto_20200926_2311"),
     ]

@@ -24,8 +24,7 @@ class TestCriminalDisposition:
 
     def test_dismissed_transform_disposition_method(self, disposition: Disposition):
         assert (
-            disposition.transform_disposition_method()
-            == constants.DISTRICT_COURT_WITHOUT_DA_LEAVE
+            disposition.transform_disposition_method() == constants.DISTRICT_COURT_WITHOUT_DA_LEAVE
         )
 
     def test_not_is_dismissed(self, disposition):
@@ -38,10 +37,7 @@ class TestCriminalDisposition:
 
     def test_unknown_transform_disposition_method(self, disposition: Disposition):
         disposition.criminal_disposition = "Other"
-        assert (
-            disposition.transform_disposition_method()
-            == disposition.criminal_disposition
-        )
+        assert disposition.transform_disposition_method() == disposition.criminal_disposition
 
 
 class TestCharge:

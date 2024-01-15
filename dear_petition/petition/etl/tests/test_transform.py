@@ -16,9 +16,7 @@ pytestmark = pytest.mark.django_db
 def test_recalculate_petitions(petition):
     petition = PetitionFactory(form_type=constants.UNDERAGED_CONVICTIONS)
     batch = petition.batch
-    record = CIPRSRecordFactory(
-        batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM"
-    )
+    record = CIPRSRecordFactory(batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM")
     offense = OffenseFactory(
         disposition_method="PROBATION OTHER",
         ciprs_record=record,
@@ -33,13 +31,8 @@ def test_recalculate_petitions(petition):
     link_offense_records(petition)
     create_documents(petition)
 
-    assert (
-        petition.offense_records.filter(petitionoffenserecord__active=True).count()
-        == 12
-    )
+    assert petition.offense_records.filter(petitionoffenserecord__active=True).count() == 12
     assert petition.has_attachments()
     recalculate_petitions(petition.id, offense_record_ids)
-    assert (
-        petition.offense_records.filter(petitionoffenserecord__active=True).count() == 5
-    )
+    assert petition.offense_records.filter(petitionoffenserecord__active=True).count() == 5
     assert not petition.has_attachments()

@@ -11,7 +11,5 @@ def mock_ciprs_reader():
 
 @pytest.fixture
 def mock_transform_ciprs_document():
-    with mock.patch(
-        "dear_petition.petition.etl.extract.transform_ciprs_document"
-    ) as mock_:
+    with mock.patch("dear_petition.petition.etl.extract.transform_ciprs_document") as mock_:
         yield mock_

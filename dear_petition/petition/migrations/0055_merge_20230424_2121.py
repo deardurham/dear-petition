@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('petition', '0053_alter_batch_client'),
-        ('petition', '0054_merge_0052_auto_20230305_1344_0053_auto_20230407_1702'),
+        ("petition", "0053_alter_batch_client"),
+        ("petition", "0054_merge_0052_auto_20230305_1344_0053_auto_20230407_1702"),
     ]
 
-    operations = [
-    ]
+    operations = []

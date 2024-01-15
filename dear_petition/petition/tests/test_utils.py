@@ -11,8 +11,7 @@ from ..constants import DATETIME_FORMAT
 
 
 def test_dt_obj_to_date(settings):
-    """Should receive only datetime objects to be converted into dates
-    """
+    """Should receive only datetime objects to be converted into dates"""
     # Set the TIME_ZONE in the settings.
     settings.TIME_ZONE = "America/New_York"
 
@@ -29,12 +28,8 @@ def test_dt_obj_to_date(settings):
     )
     # Calling pu.dt_obj_to_date() returns the date at each of these moments in the
     # "America/New_York" timezone, which was "2018-01-01".
-    assert pu.dt_obj_to_date(datetime_2018_01_01_2000_ny) == date(
-        year=2018, month=1, day=1
-    )
-    assert pu.dt_obj_to_date(datetime_2018_01_02_0100_utc) == date(
-        year=2018, month=1, day=1
-    )
+    assert pu.dt_obj_to_date(datetime_2018_01_01_2000_ny) == date(year=2018, month=1, day=1)
+    assert pu.dt_obj_to_date(datetime_2018_01_02_0100_utc) == date(year=2018, month=1, day=1)
 
     # Calling pu.dt_obj_to_date() for non datetime objects returns None.
     dt_obj = "A random string."
@@ -52,8 +47,7 @@ def test_dt_obj_to_date(settings):
 
 
 def test_make_datetime_aware(settings):
-    """Aware Datetime should be returned unless dt_str is empty ("" or None)
-    """
+    """Aware Datetime should be returned unless dt_str is empty ("" or None)"""
     # Set the TIME_ZONE in the settings.
     settings.TIME_ZONE = "America/New_York"
 

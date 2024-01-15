@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0049_auto_20221127_0002"),
         ("petition", "0050_alter_batchfile_file"),

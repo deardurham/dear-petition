@@ -4,11 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0034_auto_20200802_1419"),
     ]
 
     operations = [
-        migrations.RemoveField(model_name="ciprsrecord", name="report_pdf",),
+        migrations.RemoveField(
+            model_name="ciprsrecord",
+            name="report_pdf",
+        ),
     ]

@@ -169,9 +169,7 @@ def test_map_attorney__petition_attorney_cbx(form, contact1):
 def test_map_attorney__petition_not_filed_sign_date(form, contact1):
     form.extra["attorney"] = contact1
     form.map_attorney()
-    assert form.data["PetitionNotFiledSignDate"] == utils.format_petition_date(
-        dt.datetime.today()
-    )
+    assert form.data["PetitionNotFiledSignDate"] == utils.format_petition_date(dt.datetime.today())
 
 
 #
@@ -266,9 +264,7 @@ def test_map_offenses__offense_date(form, record2, offense_record1):
 
 def test_map_offenses__disposition_date(form, offense1, offense_record1):
     form.map_offenses()
-    assert form.data["DismissalDate:1"] == utils.format_petition_date(
-        offense1.disposed_on
-    )
+    assert form.data["DismissalDate:1"] == utils.format_petition_date(offense1.disposed_on)
 
 
 #
@@ -299,9 +295,7 @@ def test_checkmark_3b_checkmark_a_checked(
 def test_checkmark_3b_checkmark_b_checked(form):
     form.petition_document.form_specific_data["is_checkmark_3b_checked"] = True
     form.petition_document.form_specific_data["charged_desc_string"] = "Test string"
-    form.petition_document.form_specific_data[
-        "charged_desc_cont_string"
-    ] = "Test string (cont.)"
+    form.petition_document.form_specific_data["charged_desc_cont_string"] = "Test string (cont.)"
     form.map_additional_forms()
     assert not form.data.get("ChargedA")
     assert form.data.get("ChargedB")

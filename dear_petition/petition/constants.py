@@ -29,9 +29,7 @@ SEX_CHOICES = Choices(
     (NOT_AVAILABLE, "NOT AVAILABLE"),
 )
 
-CONTACT_CATEGORIES = Choices(
-    ("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client")
-)
+CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"
@@ -44,7 +42,9 @@ GUILTY = "GUILTY"
 COMMENT_MAX_LENGTH = 8192
 
 NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
-NEW_COMMENT_EMAIL_MESSAGE = "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
+NEW_COMMENT_EMAIL_MESSAGE = (
+    "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
+)
 
 DATA_PETITION = "DATA-PETITION"
 

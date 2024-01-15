@@ -81,15 +81,11 @@ class CIPRSRecordFactory(factory.django.DjangoModelFactory):
     data = factory.Sequence(record_data)
     offense_date = factory.Faker("date_time", tzinfo=timezone("US/Eastern"))
     arrest_date = factory.Faker("date_object")
-    jurisdiction = factory.LazyFunction(
-        lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT])
-    )
+    jurisdiction = factory.LazyFunction(lambda: random.choice([DISTRICT_COURT, SUPERIOR_COURT]))
     county = factory.LazyFunction(lambda: random.choice(["DURHAM", "WAKE", "ORANGE"]))
     file_no = "99CRAAAAAAAAAAAA"
     race = factory.LazyFunction(lambda: random.choice(["ASIAN", "BLACK", "WHITE"]))
-    sex = factory.LazyFunction(
-        lambda: random.choice([FEMALE, MALE, NOT_AVAILABLE, UNKNOWN])
-    )
+    sex = factory.LazyFunction(lambda: random.choice([FEMALE, MALE, NOT_AVAILABLE, UNKNOWN]))
 
     class Meta:
         model = CIPRSRecord
@@ -136,9 +132,7 @@ class PetitionOffenseRecordFactory(factory.django.DjangoModelFactory):
 
 
 class DismissedOffenseRecordFactory(factory.django.DjangoModelFactory):
-    offense = factory.SubFactory(
-        OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
-    )
+    offense = factory.SubFactory(OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE)
     law = "20-141(J1)"
     code = "4450"
     action = CHARGED
@@ -150,9 +144,7 @@ class DismissedOffenseRecordFactory(factory.django.DjangoModelFactory):
 
 
 class GuiltyOffenseRecordFactory(factory.django.DjangoModelFactory):
-    offense = factory.SubFactory(
-        OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE
-    )
+    offense = factory.SubFactory(OffenseFactory, disposition_method=DISTRICT_COURT_WITHOUT_DA_LEAVE)
     law = "20-141(J1)"
     code = "4450"
     action = "Guilty"

@@ -14,7 +14,6 @@ def add_user(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0015_auto_20200209_0226"),
     ]

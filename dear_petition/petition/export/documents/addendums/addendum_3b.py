@@ -28,7 +28,6 @@ def generate_context(petition_document):
 
 
 def generate_3b_addendum(petition_document):
-
     context = generate_context(petition_document)
     doc = DocxTemplate(settings.TEMPLATE_DIR.path(TEMPLATE))
     doc.render(context)

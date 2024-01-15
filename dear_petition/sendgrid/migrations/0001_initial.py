@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
@@ -56,9 +55,7 @@ class Migration(migrations.Migration):
                 ("type", models.CharField(max_length=256)),
                 (
                     "file",
-                    models.FileField(
-                        max_length=1024, upload_to="attachments/%Y/%m/%d/"
-                    ),
+                    models.FileField(max_length=1024, upload_to="attachments/%Y/%m/%d/"),
                 ),
                 (
                     "email",
