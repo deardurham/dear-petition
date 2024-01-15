@@ -45,5 +45,5 @@ export function generateBookmarklet(username) {
   form.submit();
 
   alert("Successfully submitted case summary to Expunction Tool");
-  `
+  `;
 }
