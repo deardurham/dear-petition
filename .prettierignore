@@ -7,4 +7,5 @@ dear_petition/
 *.yaml
 *.json
 *.md
-
+.direnv
+lib
