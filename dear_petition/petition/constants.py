@@ -22,12 +22,15 @@ OFFENSE_HEADERS = Choices(
 MALE = "M"
 FEMALE = "F"
 UNKNOWN = "U"
-SEX_CHOICES = Choices(
-    (MALE, "Male"),
-    (FEMALE, "Female"),
-    (UNKNOWN, "Unknown"),
-    (NOT_AVAILABLE, "NOT AVAILABLE"),
-)
+
+SEX_MAP = {
+    "Male": MALE,
+    "Female": FEMALE,
+    "Unknown": UNKNOWN,
+    "NOT AVAILABLE": NOT_AVAILABLE
+}
+
+SEX_CHOICES = Choices(*[(v, k) for k, v in SEX_MAP.items()])
 
 CONTACT_CATEGORIES = Choices(
     ("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client")
