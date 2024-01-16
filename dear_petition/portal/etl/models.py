@@ -53,6 +53,8 @@ class CaseInfo(BaseModel):
 
 class PartyInfo(BaseModel):
     defendant_name: str
+    defendant_race: str
+    defendant_sex: str
 
 
 class Disposition(BaseModel):
