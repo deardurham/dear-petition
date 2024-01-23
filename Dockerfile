@@ -15,7 +15,7 @@ FROM dear_frontend as static_files
 
 RUN npm run build
 
-FROM python:3.8-slim-bullseye as base
+FROM python:3.12-slim-bookworm as base
 
 # Install packages needed to run your application (not build deps):
 #   mime-support -- for mime types when serving static files

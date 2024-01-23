@@ -1,39 +1,37 @@
 -r ./base.txt
 
-Werkzeug==0.15.2  # https://github.com/pallets/werkzeug
-ipdb==0.12  # https://github.com/gotcha/ipdb
-Sphinx==2.0.1  # https://github.com/sphinx-doc/sphinx
-psycopg2==2.8.6 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
-click==7.1.2  # https://github.com/pallets/click
+Werkzeug==3.0.1  # https://github.com/pallets/werkzeug
+ipdb==0.13.13  # https://github.com/gotcha/ipdb
+Sphinx==7.2.6  # https://github.com/sphinx-doc/sphinx
+psycopg2==2.9.9 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
+click==8.1.7  # https://github.com/pallets/click
 
 # Testing
 # ------------------------------------------------------------------------------
-mypy==0.782  # https://github.com/python/mypy
-pytest==5.4.2  # https://github.com/pytest-dev/pytest
-pytest-sugar==0.9.5  # https://github.com/Frozenball/pytest-sugar
-pytest-mock==3.10.0  # https://github.com/pytest-dev/pytest-mock
+mypy==1.8.0  # https://github.com/python/mypy
+pytest==7.4.4  # https://github.com/pytest-dev/pytest
+pytest-sugar==0.9.7  # https://github.com/Frozenball/pytest-sugar
+pytest-mock==3.12.0  # https://github.com/pytest-dev/pytest-mock
 
 # Code quality
 # ------------------------------------------------------------------------------
-pre-commit==2.21.0  # https://github.com/pre-commit/pre-commit
-flake8==3.8.1  # https://github.com/PyCQA/flake8
-coverage==5.1  # https://github.com/nedbat/coveragepy
-black==19.10b0  # https://github.com/ambv/black
-pytest-cov==2.8.1
-pytest-flake8==1.0.6
-pytest-django==3.9.0  # https://github.com/pytest-dev/pytest-django
-pylint-django==2.0.15  # https://github.com/PyCQA/pylint-django
+pre-commit==3.6.0  # https://github.com/pre-commit/pre-commit
+flake8==7.0.0  # https://github.com/PyCQA/flake8
+coverage==7.4.0  # https://github.com/nedbat/coveragepy
+black==23.12.1  # https://github.com/ambv/black
+pytest-cov==4.1.0
+pytest-flake8==1.1.1
+pytest-django==4.7.0  # https://github.com/pytest-dev/pytest-django
+pylint-django==2.5.5  # https://github.com/PyCQA/pylint-django
 pylint-celery==0.3  # https://github.com/PyCQA/pylint-celery
-django-coverage-plugin==1.8.0  # https://github.com/nedbat/django_coverage_plugin
-rich==13.6.0
+django-coverage-plugin==3.1.0  # https://github.com/nedbat/django_coverage_plugin
+rich==13.7.0
 
 # Django
 # ------------------------------------------------------------------------------
-factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
+factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
 
-django-debug-toolbar==2.2  # https://github.com/jazzband/django-debug-toolbar
-django-extensions==2.2.9  # https://github.com/django-extensions/django-extensions
+django-debug-toolbar==4.2.0  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==3.2.3  # https://github.com/django-extensions/django-extensions
 
-jupyterlab==0.35.4
-invoke==1.5.0
-colorama==0.4.4
+jupyterlab==4.0.10

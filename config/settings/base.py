@@ -40,7 +40,6 @@ SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
-USE_L10N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 ENVIRONMENT = "BASE"
@@ -50,7 +49,7 @@ ENVIRONMENT = "BASE"
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "dear_petition",
         "USER": "",
         "PASSWORD": "",
@@ -168,6 +167,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # STATIC
@@ -315,6 +316,10 @@ REFRESH_COOKIE_KEY = "Refresh"
 # the same domain.
 AUTH_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
 CSRF_COOKIE_SAMESITE = "Strict"  # or 'Lax' or None
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
 SENDGRID_ALLOWED_SENDERS = env.list("SENDGRID_ALLOWED_SENDERS", default=[])
 SENDGRID_WEBHOOK_LISTENERS = (
