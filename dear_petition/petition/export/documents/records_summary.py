@@ -1,3 +1,4 @@
+import datetime
 import logging
 from django.conf import settings
 from docxtpl import DocxTemplate
@@ -155,6 +156,8 @@ def __create_offense_record_data(offense_record):
 
 def __format_date(date):
     """
-    Format the date for the Summary Document.
+    Format the date for the Summary Document. If not a date or datetime, return empty string.
     """
-    return utils.format_petition_date(date)
+    if isinstance(date, (datetime.date, datetime.datetime)):
+        return utils.format_petition_date(date)
+    return ""
