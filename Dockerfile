@@ -63,9 +63,9 @@ RUN set -ex \
 
 # install xpdfreader pdftotext, which supports multiline description parsing
 RUN set -ex \
-    && curl -k https://dl.xpdfreader.com/xpdf-4.04.tar.gz | tar zxf - \
-    && chmod -R 755 ./xpdf-4.04 \
-    && cd ./xpdf-4.04/ \
+    && curl -k https://dl.xpdfreader.com/xpdf-4.05.tar.gz | tar zxf - \
+    && chmod -R 755 ./xpdf-4.05 \
+    && cd ./xpdf-4.05/ \
     && mkdir build \
 	&& cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_Qt4=1 -DCMAKE_DISABLE_FIND_PACKAGE_Qt5Widgets=1 \
     && make \
