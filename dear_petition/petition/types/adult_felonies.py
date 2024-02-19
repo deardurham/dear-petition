@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 def get_offense_records(batch, jurisdiction=""):
     qs = OffenseRecord.objects.filter(offense__ciprs_record__batch=batch)
     if jurisdiction:
-        qs = qs.filter(offense__ciprs_record__jurisdiction=jurisdiction)
+        qs = qs.filter(offense__jurisdiction=jurisdiction)
     dob = resolve_dob(qs)
     if not dob:
         return qs  # We can't determine this petition type without the date of birth
@@ -25,9 +25,9 @@ def get_offense_records(batch, jurisdiction=""):
 
 def build_query(dob):
     action = Q(action=pc.CONVICTED)
-    verdict = Q(severity__iexact=pc.SEVERITIES.FELONY)
+    severity = Q(severity__iexact=pc.SEVERITIES.FELONY)
     today = timezone.now().date()
     waiting_period_start_date = today - relativedelta(years=10)
     waiting_period = Q(offense__disposed_on__lt=waiting_period_start_date)
-    query = action & verdict & waiting_period
+    query = action & severity & waiting_period
     return query
