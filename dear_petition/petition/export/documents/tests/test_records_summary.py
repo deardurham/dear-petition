@@ -505,12 +505,15 @@ def test_records_summary_context__additional_offenses(batch):
     assert not offense_records[4]["has_additional_offenses"]
 
 
-@pytest.mark.parametrize("input_date, expected_output", [
-    (datetime.datetime(2024, 1, 31, 11, 59, 59), "01/31/2024"),
-    (datetime.date(2024, 1, 31), "01/31/2024"),
-    (None, ""),
-    ("", ""),
-])
+@pytest.mark.parametrize(
+    "input_date, expected_output",
+    [
+        (datetime.datetime(2024, 1, 31, 11, 59, 59), "01/31/2024"),
+        (datetime.date(2024, 1, 31), "01/31/2024"),
+        (None, ""),
+        ("", ""),
+    ],
+)
 def test_format_date(input_date, expected_output):
     assert __format_date(input_date) == expected_output
 

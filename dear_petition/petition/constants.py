@@ -23,12 +23,7 @@ MALE = "M"
 FEMALE = "F"
 UNKNOWN = "U"
 
-SEX_MAP = {
-    "Male": MALE,
-    "Female": FEMALE,
-    "Unknown": UNKNOWN,
-    "NOT AVAILABLE": NOT_AVAILABLE
-}
+SEX_MAP = {"Male": MALE, "Female": FEMALE, "Unknown": UNKNOWN, "NOT AVAILABLE": NOT_AVAILABLE}
 
 SEX_CHOICES = Choices(*[(v, k) for k, v in SEX_MAP.items()])
 

@@ -30,9 +30,7 @@ def test_extract(sample_record):
             ],
         ),
         party_info=PartyInfo(
-            defendant_name="DOE, JANE EMMA",
-            defendant_race = "White",
-            defendant_sex="Female"
+            defendant_name="DOE, JANE EMMA", defendant_race="White", defendant_sex="Female"
         ),
         dispositions=[
             Disposition(
