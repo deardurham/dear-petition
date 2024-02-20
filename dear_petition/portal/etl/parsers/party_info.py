@@ -29,3 +29,29 @@ def parse_defendant_name(soup):
     row = div.find_parent("tr")
     name = row.css.select_one("table.roa-table").text.strip()
     return name
+
+
+@catch_parse_error
+def parse_defendant_race(soup):
+    """
+    Parse race
+
+    Sample HTML:
+        <div ng-if="::party.Race" class="ng-binding ng-scope">
+            White
+        </div>
+    """ # noqa
+    return soup.find('div', {'ng-if': '::party.Race'}).get_text(strip=True)
+
+
+@catch_parse_error
+def parse_defendant_sex(soup):
+    """
+    Parse sex
+
+    Sample HTML:
+        <div ng-if="::party.Gender" class="ng-binding ng-scope">
+            Female
+        </div>
+    """ # noqa
+    return soup.find('div', {'ng-if': '::party.Gender'}).get_text(strip=True)
