@@ -164,16 +164,16 @@ def parse_charge_degree(tr):
 @catch_parse_error
 def parse_charge_offense_date(tr):
     """
-    Parse charge degree
+    Parse charge offense date
 
     Sample HTML:
         <tr hide-xs="" hide-sm="" class="hide-sm hide-xs ng-scope">
-            <roa-charge-data-column ng-if="::charge.ChargeOffense.Degree" label="Degree" data-value="FNC" class="ng-scope">
+            <roa-charge-data-column ng-if="::charge.OffenseDate" label="Offense Date" data-value="01/01/2001" class="ng-scope">
                 <div class="roa-inline">
                     <div class="roa-text-bold hide-gt-sm ng-binding" hide-gt-sm="">
-                        Degree
+                        Offense Date
                     </div>
-                    <div class="ng-binding">FNC</div>
+                    <div class="ng-binding">01/01/2001</div>
                 </div>
             </roa-charge-data-column>
     """  # noqa

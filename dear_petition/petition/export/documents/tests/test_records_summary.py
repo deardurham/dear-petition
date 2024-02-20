@@ -1,7 +1,9 @@
+import datetime
+
 import pytest
 from datetime import date
 
-from dear_petition.petition.export.documents.records_summary import generate_context
+from dear_petition.petition.export.documents.records_summary import generate_context, __format_date
 from dear_petition.petition.tests.factories import (
     AttorneyFactory,
     CIPRSRecordFactory,
@@ -501,6 +503,16 @@ def test_records_summary_context__additional_offenses(batch):
     assert offense_records[2]["has_additional_offenses"]
     assert offense_records[3]["has_additional_offenses"]
     assert not offense_records[4]["has_additional_offenses"]
+
+
+@pytest.mark.parametrize("input_date, expected_output", [
+    (datetime.datetime(2024, 1, 31, 11, 59, 59), "01/31/2024"),
+    (datetime.date(2024, 1, 31), "01/31/2024"),
+    (None, ""),
+    ("", ""),
+])
+def test_format_date(input_date, expected_output):
+    assert __format_date(input_date) == expected_output
 
 
 def create_offense_record(offense, action, description, severity):

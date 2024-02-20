@@ -1,5 +1,6 @@
 from .extract import extract_portal_record
 from .models import PortalRecord
+from ...petition import constants as pc
 
 
 def transform_portal_record(source, location=""):
@@ -16,7 +17,11 @@ def transform_portal_record(source, location=""):
             "Case Status": portal_record.case_info.case_status,
             "Offense Date": portal_record.transform_offense_date(),
         },
-        "Defendant": {"Name": portal_record.party_info.defendant_name},
+        "Defendant": {
+            "Name": portal_record.party_info.defendant_name,
+            "Race": portal_record.party_info.defendant_race,
+            "Sex": pc.SEX_MAP[portal_record.party_info.defendant_sex],
+        },
         "District Court Offense Information": (
             transform_offenses(portal_record) if court == "District" else []
         ),
