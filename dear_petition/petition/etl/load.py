@@ -39,9 +39,7 @@ def import_ciprs_records(files, user, parser_mode, batch_label=""):
         batch_file = batch.files.create(file=file_)
 
         for record_data in parse_ciprs_document(batch_file.file, parser_mode):
-            record = pm.CIPRSRecord(
-                batch=batch, batch_file=batch_file, data=record_data
-            )
+            record = pm.CIPRSRecord(batch=batch, batch_file=batch_file, data=record_data)
             # Pass file numbers of CIPRS records that have already been saved in this batch of CIPRS records.
             # If this CIPRS record is in the list, it will not be saved again.
             record.refresh_record_from_data(saved_file_nos)
@@ -80,9 +78,7 @@ def create_petitions_from_records(batch, form_type):
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
-        sheriff_agency = pm.Contact.get_sherriff_office_by_county(
-            petition_type["county"]
-        )
+        sheriff_agency = pm.Contact.get_sherriff_office_by_county(petition_type["county"])
         if sheriff_agency is not None:
             logger.info(
                 f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency."
@@ -97,9 +93,7 @@ def create_petitions_from_records(batch, form_type):
         logger.info(f"Associated {petition.offense_records.count()} total records")
 
         if form_type in INACTIVE_BY_DEFAULT_FORM_TYPES:
-            pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
-                active=False
-            )
+            pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(active=False)
 
 
 def link_offense_records(petition, filter_active=True):
@@ -120,9 +114,7 @@ def create_documents(petition):
         )
         base_document.offense_records.add(*paginator.petition_offense_records())
 
-        logger.info(
-            f"Created {base_document} with {base_document.offense_records.count()} records"
-        )
+        logger.info(f"Created {base_document} with {base_document.offense_records.count()} records")
 
         previous_document = base_document
 
@@ -134,9 +126,7 @@ def create_documents(petition):
             )
             attachment.offense_records.add(*attachment_records)
             previous_document = attachment
-            logger.info(
-                f"Created {attachment} with {attachment.offense_records.count()} records"
-            )
+            logger.info(f"Created {attachment} with {attachment.offense_records.count()} records")
 
         create_addendum_documents(petition, previous_document)
 
@@ -149,9 +139,7 @@ def assign_agencies_to_documents(petition):
     first_iteration = True
     i = 0
     while True:
-        current_document_agencies = agencies[
-            i : (i + 3)
-        ]  # 3 boxes for agencies per document
+        current_document_agencies = agencies[i : (i + 3)]  # 3 boxes for agencies per document
         if not current_document_agencies:
             break
 

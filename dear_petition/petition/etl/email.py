@@ -10,11 +10,13 @@ from dear_petition.sendgrid.models import Email
 logger = logging.getLogger(__name__)
 
 
-EMAIL_SPACE_CHARACTER = '_'
+EMAIL_SPACE_CHARACTER = "_"
+
 
 def parse_label_from_address(label: str) -> str:
     """Convert special character into spaces"""
-    return label.replace(EMAIL_SPACE_CHARACTER, ' ')
+    return label.replace(EMAIL_SPACE_CHARACTER, " ")
+
 
 def extract_username_and_label(addr: str) -> Tuple[str, str]:
     """

@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0042_auto_20220123_0109"),
     ]
@@ -59,9 +58,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "offense_records",
-                    models.ManyToManyField(
-                        related_name="documents", to="petition.OffenseRecord"
-                    ),
+                    models.ManyToManyField(related_name="documents", to="petition.OffenseRecord"),
                 ),
                 (
                     "petition",

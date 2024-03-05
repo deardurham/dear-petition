@@ -50,7 +50,7 @@ def data():
                 ],
                 "Disposed On": "2001-03-01",
                 "Disposition Method": "DISPOSED BY JUDGE",
-                "Verdict": "GUILTY"
+                "Verdict": "GUILTY",
             },
         ],
         "Superior Court Offense Information": [],
@@ -95,4 +95,3 @@ def test_offense_record(record):
 def test_offense_record__multi(record):
     offense = record.offenses.get(disposed_on="2001-03-01")
     assert offense.offense_records.count() == 2
-

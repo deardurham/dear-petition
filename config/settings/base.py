@@ -148,9 +148,7 @@ PASSWORD_HASHERS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -246,9 +244,7 @@ X_FRAME_OPTIONS = "DENY"
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = env(
-    "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
-)
+EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 
 # ADMIN
 # ------------------------------------------------------------------------------
@@ -322,6 +318,4 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 SENDGRID_ALLOWED_SENDERS = env.list("SENDGRID_ALLOWED_SENDERS", default=[])
-SENDGRID_WEBHOOK_LISTENERS = (
-    "dear_petition.petition.etl.email.sendgrid_webhook_listener",
-)
+SENDGRID_WEBHOOK_LISTENERS = ("dear_petition.petition.etl.email.sendgrid_webhook_listener",)

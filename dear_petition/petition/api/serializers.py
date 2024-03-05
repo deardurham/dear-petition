@@ -47,9 +47,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         random_pw = User.objects.make_random_password()
         is_admin = validated_data.get("is_staff", False)
-        return User.objects.create_user(
-            password=random_pw, is_superuser=is_admin, **validated_data
-        )
+        return User.objects.create_user(password=random_pw, is_superuser=is_admin, **validated_data)
 
 
 class OffenseRecordSerializer(serializers.ModelSerializer):
@@ -141,6 +139,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "county",
         ]
 
+
 class ClientSerializer(ContactSerializer):
     address1 = serializers.CharField(required=True)
     city = serializers.CharField(required=True)
@@ -150,7 +149,6 @@ class ClientSerializer(ContactSerializer):
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
-
     documents = serializers.PrimaryKeyRelatedField(
         many=True, queryset=PetitionDocument.objects.all()
     )
@@ -165,29 +163,33 @@ class GeneratePetitionSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "There are no documents selected for download for the petition document."
             )
-        petition_id = self.get_initial().get('petition')
+        petition_id = self.get_initial().get("petition")
         for doc in value:
             if doc.petition.pk != petition_id:
-                raise serializers.ValidationError('Documents must be associated with this petition.')
+                raise serializers.ValidationError(
+                    "Documents must be associated with this petition."
+                )
         return value
 
     def validate_petition(self, value):
         errors = {}
         if not value.batch.client:
-            errors['client'] = ["A client has not been selected for this batch."]
+            errors["client"] = ["A client has not been selected for this batch."]
         if not value.batch.attorney:
-            errors['attorney'] = ["An attorney has not been selected for this batch."]
+            errors["attorney"] = ["An attorney has not been selected for this batch."]
         if not value.agencies.exists():
-            errors['agencies'] = ["There are no agencies selected for the petition."]
-        if not value.get_all_offense_records(filter_active=True, include_annotations=False).exists():
+            errors["agencies"] = ["There are no agencies selected for the petition."]
+        if not value.get_all_offense_records(
+            filter_active=True, include_annotations=False
+        ).exists():
             if value.form_type == UNDERAGED_CONVICTIONS:
                 errors[UNDERAGED_CONVICTIONS] = [
-                    'Additional verification is needed to include offense records in this petition form'
+                    "Additional verification is needed to include offense records in this petition form"
                 ]
             else:
-                errors['offense records'] = [
-                    'There are no records selected for the petition document.',
-                    'Please review the list of offense records and update the petition to include offense records if needed.'
+                errors["offense records"] = [
+                    "There are no records selected for the petition document.",
+                    "Please review the list of offense records and update the petition to include offense records if needed.",
                 ]
         if errors:
             raise serializers.ValidationError(errors)
@@ -198,7 +200,7 @@ class PetitionSerializer(serializers.ModelSerializer):
     generation_errors = ValidationField(serializer=GeneratePetitionSerializer)
 
     def get_generation_errors_data(self, obj):
-        return {'documents': obj.documents.all().values_list('pk', flat=True), 'petition': obj.pk}
+        return {"documents": obj.documents.all().values_list("pk", flat=True), "petition": obj.pk}
 
     class Meta:
         model = Petition
@@ -246,9 +248,7 @@ class ParentPetitionSerializer(PetitionSerializer):
 
     def get_base_document(self, instance):
         return PetitionDocumentSerializer(
-            PetitionDocument.objects.get(
-                petition_id=instance.id, previous_document__isnull=True
-            )
+            PetitionDocument.objects.get(petition_id=instance.id, previous_document__isnull=True)
         ).data
 
     def get_attachments(self, instance):
@@ -264,13 +264,12 @@ class ParentPetitionSerializer(PetitionSerializer):
         return OffenseRecordSerializer(offense_records, many=True).data
 
     def get_active_records(self, petition):
-        return petition.offense_records.filter(
-            petitionoffenserecord__active=True
-        ).values_list("id", flat=True)
+        return petition.offense_records.filter(petitionoffenserecord__active=True).values_list(
+            "id", flat=True
+        )
 
 
 class GenerateDocumentSerializer(serializers.Serializer):
-
     batch = serializers.PrimaryKeyRelatedField(queryset=Batch.objects.all())
 
     def validate_batch(self, value):
@@ -286,11 +285,15 @@ class GenerateDocumentSerializer(serializers.Serializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
-    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_letter_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
+    generate_summary_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
 
     def get_generate_errors_data(self, obj):
-        return {'batch': obj.pk}
+        return {"batch": obj.pk}
 
     class Meta:
         model = Batch
@@ -312,19 +315,29 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = serializers.SerializerMethodField()
     attorney_id = serializers.PrimaryKeyRelatedField(
-        source='attorney', queryset=Contact.objects.filter(category='attorney'), write_only=True, required=False
+        source="attorney",
+        queryset=Contact.objects.filter(category="attorney"),
+        write_only=True,
+        required=False,
     )
     attorney = ContactSerializer(read_only=True)
     client_id = serializers.PrimaryKeyRelatedField(
-        source='client', queryset=Contact.objects.filter(category='client'), write_only=True, required=False
+        source="client",
+        queryset=Contact.objects.filter(category="client"),
+        write_only=True,
+        required=False,
     )
     client = ClientSerializer(read_only=True)
 
-    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
-    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
+    generate_letter_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
+    generate_summary_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
 
     def get_generate_errors_data(self, obj):
-        return {'batch': obj.pk}
+        return {"batch": obj.pk}
 
     class Meta:
         model = Batch
@@ -395,7 +408,6 @@ class TokenObtainPairCookieSerializer(TokenObtainPairSerializer):
 
 
 class DataPetitionSerializer(serializers.Serializer):
-
     form_type = serializers.ChoiceField(
         choices=((DISMISSED, DISMISSED), (ATTACHMENT, ATTACHMENT)), initial=DISMISSED
     )

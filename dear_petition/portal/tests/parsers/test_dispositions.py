@@ -16,9 +16,7 @@ class TestDispositionsFullRecord:
 
     def test_parse_charge_offense(self, soup):
         div = soup.select_one(dispositions.SELECT_DISPOSITIONS)
-        assert (
-            dispositions.parse_charge_offense(div) == "EXTRADITION/FUGITIVE OTH STATE"
-        )
+        assert dispositions.parse_charge_offense(div) == "EXTRADITION/FUGITIVE OTH STATE"
 
     def test_parse_criminal_disposition(self, soup):
         div = soup.select_one(dispositions.SELECT_DISPOSITIONS)

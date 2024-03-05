@@ -67,14 +67,9 @@ def test_paginator_default_page_size(petition, form_type, expected):
     assert paginator.initial_page_size == expected
 
 
-@pytest.mark.parametrize(
-    "attachment_page_size,expected", [[10, 10], [0, 20], [-10, 20]]
-)
+@pytest.mark.parametrize("attachment_page_size,expected", [[10, 10], [0, 20], [-10, 20]])
 def test_paginator_attachment_page_size(petition, attachment_page_size, expected):
-
-    paginator = OffenseRecordPaginator(
-        petition, attachment_page_size=attachment_page_size
-    )
+    paginator = OffenseRecordPaginator(petition, attachment_page_size=attachment_page_size)
     assert paginator.attachment_page_size == expected
 
 
@@ -129,9 +124,7 @@ def test_link_offense_records__25(petition, records_35):
     create_documents(petition)
     # two attachments
     assert petition.documents.count() == 3
-    attachments = petition.documents.filter(previous_document__isnull=False).order_by(
-        "id"
-    )
+    attachments = petition.documents.filter(previous_document__isnull=False).order_by("id")
     # first attachment has 20 records
     assert attachments[0].offense_records.count() == 20
     # 2nd attachment has 5 records
@@ -154,11 +147,7 @@ def test_paginator_same_record_number_order(petition, records_10):
     )
     link_offense_records(petition)
     create_documents(petition)
-    attachment = (
-        petition.documents.filter(previous_document__isnull=False)
-        .order_by("pk")
-        .first()
-    )
+    attachment = petition.documents.filter(previous_document__isnull=False).order_by("pk").first()
     # the 1st charge should always be on the first petition
     assert charge_1.pk in petition.offense_records.values_list("pk", flat=True)
     # the 2nd charge should always be on the attachment
@@ -225,18 +214,10 @@ def test_paginator_orders_records_correctly(batch, petition):
     )
 
     assert (
-        list(
-            main_petition_form.get_ordered_offense_records().values_list(
-                "id", flat=True
-            )
-        )
+        list(main_petition_form.get_ordered_offense_records().values_list("id", flat=True))
         == EXPECTED_ORDER_FIRST_FORM
     )
     assert (
-        list(
-            attachment_petition_form.get_ordered_offense_records().values_list(
-                "id", flat=True
-            )
-        )
+        list(attachment_petition_form.get_ordered_offense_records().values_list("id", flat=True))
         == EXPECTED_ORDER_SECOND_FORM
     )

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class ValidationField(serializers.SerializerMethodField):
     def __init__(self, serializer, **kwargs):
         self.serializer_class = serializer
@@ -13,12 +14,12 @@ class ValidationField(serializers.SerializerMethodField):
         super().bind(field_name, parent)
 
         if self.serializer_class == self.parent:
-            raise ValueError('Validation serializer must not be parent of this serializer field')
+            raise ValueError("Validation serializer must not be parent of this serializer field")
 
     def to_representation(self, value):
         # handle case where serializer is creating new value
         # TODO: Figure out how to get instance/native values for a new instance
-        if not hasattr(value, 'pk'):
+        if not hasattr(value, "pk"):
             return None
         method = getattr(self.parent, self.method_name)
         try:
@@ -27,4 +28,3 @@ class ValidationField(serializers.SerializerMethodField):
             return {}
         except serializers.ValidationError as exc:
             return exc.detail
-

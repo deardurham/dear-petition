@@ -9,9 +9,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_calculate_checkmark_3b_string(offense_record1, offense_record2):
-    checkmark_3b_string = addendum.calculate_checkmark_3b_string(
-        [offense_record1, offense_record2]
-    )
+    checkmark_3b_string = addendum.calculate_checkmark_3b_string([offense_record1, offense_record2])
     assert (
         checkmark_3b_string
         == f"{offense_record1.file_no} {offense_record1.description}, {offense_record2.file_no} {offense_record2.description}"
@@ -62,7 +60,4 @@ def test_create_checkmark_3b_addendum_form_with_too_many_records(
     ).update(active=False)
     addendum.create_checkmark_3b_addendum_form(petition, petition_document)
     assert petition.base_document.form_specific_data["is_checkmark_3b_checked"]
-    assert (
-        petition.base_document.form_specific_data["charged_desc_string"]
-        == "See addendum"
-    )
+    assert petition.base_document.form_specific_data["charged_desc_string"] == "See addendum"

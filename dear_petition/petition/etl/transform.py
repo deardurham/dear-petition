@@ -11,9 +11,7 @@ def recalculate_petitions(petition_id, offense_record_ids):
     petition = pm.Petition.objects.get(id=petition_id)
 
     with transaction.atomic():
-        pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(
-            active=False
-        )
+        pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(active=False)
         pm.PetitionOffenseRecord.objects.filter(
             petition_id=petition.id, offense_record_id__in=offense_record_ids
         ).update(active=True)

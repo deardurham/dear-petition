@@ -104,9 +104,7 @@ def parse_criminal_disposition(div):
                 </div>
     """  # noqa
     disposition = (
-        div.select_one("div[ng-if*=CriminalDispositionTypeId]")
-        .text.strip()
-        .replace("\n", "")
+        div.select_one("div[ng-if*=CriminalDispositionTypeId]").text.strip().replace("\n", "")
     )
     # Remove double spaces
     return " ".join(disposition.split())

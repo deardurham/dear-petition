@@ -18,9 +18,7 @@ def test_underaged_conviction_included(batch, record1, non_dismissed_offense):
     record1.dob = datetime(2000, 1, 2)
     record1.offense_date = datetime(2018, 1, 1)
     record1.save()
-    offense_record = OffenseRecordFactory(
-        action="CONVICTED", offense=non_dismissed_offense
-    )
+    offense_record = OffenseRecordFactory(action="CONVICTED", offense=non_dismissed_offense)
     assert offense_record in batch.underaged_conviction_records()
 
 
@@ -28,7 +26,5 @@ def test_overaged_conviction_not_included(batch, record1, non_dismissed_offense)
     record1.dob = datetime(2000, 1, 1)
     record1.offense_date = datetime(2018, 1, 1)
     record1.save()
-    offense_record = OffenseRecordFactory(
-        action="CONVICTED", offense=non_dismissed_offense
-    )
+    offense_record = OffenseRecordFactory(action="CONVICTED", offense=non_dismissed_offense)
     assert offense_record not in batch.underaged_conviction_records()

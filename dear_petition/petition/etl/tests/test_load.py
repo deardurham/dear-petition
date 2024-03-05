@@ -64,9 +64,7 @@ def test_save_pdf(fake_pdf, user, mock_transform_ciprs_document, parser_mode):
 
 
 @pytest.mark.parametrize("parser_mode", [1, 2])
-def test_save_pdf__multiple(
-    fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode
-):
+def test_save_pdf__multiple(fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode):
     record = [{"Defendant": {"Name": "Jon Doe"}}]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)
@@ -74,9 +72,7 @@ def test_save_pdf__multiple(
 
 
 @pytest.mark.parametrize("parser_mode", [1, 2])
-def test_save_pdf__duplicate(
-    fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode
-):
+def test_save_pdf__duplicate(fake_pdf, fake_pdf2, user, mock_transform_ciprs_document, parser_mode):
     """
     Test that duplicate CIPRS records, both within the same file and in separate files, are not saved. In this case,
     the same CIPRS record (as determined by the file no) is uploaded twice in the first pdf file and twice in the second
@@ -84,7 +80,7 @@ def test_save_pdf__duplicate(
     """
     record = [
         {"Defendant": {"Name": "Dee Fendant"}, "General": {"File No": "00CR123456"}},
-        {"Defendant": {"Name": "Dee Fendant"}, "General": {"File No": "00CR123456"}}
+        {"Defendant": {"Name": "Dee Fendant"}, "General": {"File No": "00CR123456"}},
     ]
     mock_transform_ciprs_document.return_value = record
     batch = import_ciprs_records([fake_pdf, fake_pdf2], user, parser_mode)

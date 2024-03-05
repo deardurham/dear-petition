@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('petition', '0051_merge_20230103_1758'),
+        ("petition", "0051_merge_20230103_1758"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='offenserecord',
-            name='disposition',
+            model_name="offenserecord",
+            name="disposition",
             field=models.CharField(blank=True, max_length=256),
         ),
         migrations.AddField(
-            model_name='offenserecord',
-            name='is_visible',
+            model_name="offenserecord",
+            name="is_visible",
             field=models.BooleanField(default=True),
         ),
     ]

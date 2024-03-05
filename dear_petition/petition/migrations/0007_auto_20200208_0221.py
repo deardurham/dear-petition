@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0006_auto_20191015_2329"),
     ]
@@ -23,8 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="batch",
             name="records",
-            field=models.ManyToManyField(
-                related_name="batches", to="petition.CIPRSRecord"
-            ),
+            field=models.ManyToManyField(related_name="batches", to="petition.CIPRSRecord"),
         ),
     ]

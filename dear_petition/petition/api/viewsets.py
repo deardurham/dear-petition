@@ -42,7 +42,6 @@ logger = logging.getLogger(__name__)
 
 
 class UserViewSet(viewsets.ModelViewSet):
-
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
@@ -74,7 +73,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CIPRSRecordViewSet(viewsets.ModelViewSet):
-
     queryset = pm.CIPRSRecord.objects.all()
     serializer_class = serializers.CIPRSRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -98,9 +96,7 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
     def get_petition_records(self, request):
         petition_id = request.GET.get("petition")
         if not petition_id:
-            return Response(
-                "No petition id provided.", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("No petition id provided.", status=status.HTTP_400_BAD_REQUEST)
 
         try:
             pet = pm.Petition.objects.get(id=petition_id)
@@ -112,9 +108,7 @@ class OffenseRecordViewSet(viewsets.ModelViewSet):
 
         offense_records = pet.get_all_offense_records(filter_active=False)
         active_records = list(
-            offense_records.filter(petitionoffenserecord__active=True).values_list(
-                "id", flat=True
-            )
+            offense_records.filter(petitionoffenserecord__active=True).values_list("id", flat=True)
         )
         serialized_data = {
             "offense_records": self.get_serializer(offense_records, many=True).data,
@@ -133,8 +127,9 @@ class ContactSearchFilter(filters.SearchFilter):
 
 
 temp_files = {}
-class ContactViewSet(viewsets.ModelViewSet):
 
+
+class ContactViewSet(viewsets.ModelViewSet):
     queryset = pm.Contact.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
@@ -184,10 +179,10 @@ class ContactViewSet(viewsets.ModelViewSet):
             .order_by()
         )
         return Response(field_options)
-    
+
     @action(detail=False, methods=["put"])
     def preview_import_agencies(self, request):
-        file_data = request.data.get('file')
+        file_data = request.data.get("file")
         dataset = tablib.Dataset().load(file_data)
         resource = resources.AgencyResource()
         result = resource.import_data(dataset, dry_run=True)
@@ -196,51 +191,62 @@ class ContactViewSet(viewsets.ModelViewSet):
         for row_index, row_errors in result.row_errors():
             row_number = row_index + 1
             row_errors_dict[row_number] = [str(e.error) for e in row_errors]
-        
+
         row_diffs = []
         for row_result in result.valid_rows():
-            address = f"{row_result.instance.address1}, {row_result.instance.address2}" if row_result.instance.address2 else row_result.instance.address1
+            address = (
+                f"{row_result.instance.address1}, {row_result.instance.address2}"
+                if row_result.instance.address2
+                else row_result.instance.address1
+            )
             row_diff = {
-                'name': row_result.instance.name,
-                'address': address,
-                'city': row_result.instance.city,
-                'state': row_result.instance.state,
-                'zipcode': row_result.instance.zipcode,
-                'county': row_result.instance.county,
+                "name": row_result.instance.name,
+                "address": address,
+                "city": row_result.instance.city,
+                "state": row_result.instance.state,
+                "zipcode": row_result.instance.zipcode,
+                "county": row_result.instance.county,
             }
             if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
                 continue
             elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
-                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county']
+                row_diff["new_fields"] = ["name", "address", "city", "state", "zipcode", "county"]
             else:
-                original_address = f"{row_result.original.address1}, {row_result.original.address2}" if row_result.instance.address2 else row_result.original.address1
-                row_diff['new_fields'] = []
+                original_address = (
+                    f"{row_result.original.address1}, {row_result.original.address2}"
+                    if row_result.instance.address2
+                    else row_result.original.address1
+                )
+                row_diff["new_fields"] = []
 
                 if original_address != address:
-                    row_diff['new_fields'].append('address')
+                    row_diff["new_fields"].append("address")
 
-                for field in ['name', 'city', 'state', 'zipcode', 'county']:                    
+                for field in ["name", "city", "state", "zipcode", "county"]:
                     if getattr(row_result.original, field) != getattr(row_result.instance, field):
-                        row_diff['new_fields'].append(field)
-            
-            if len(row_diff['new_fields']) > 0:
+                        row_diff["new_fields"].append(field)
+
+            if len(row_diff["new_fields"]) > 0:
                 row_diffs.append(row_diff)
 
-        return Response({'has_errors': result.has_errors(), 'row_errors': row_errors_dict, 'row_diffs': row_diffs})
+        return Response(
+            {
+                "has_errors": result.has_errors(),
+                "row_errors": row_errors_dict,
+                "row_diffs": row_diffs,
+            }
+        )
 
     @action(detail=False, methods=["put"])
     def import_agencies(self, request):
-        file_data = request.data.get('file')
+        file_data = request.data.get("file")
         dataset = tablib.Dataset().load(file_data)
         resources.AgencyResource().import_data(dataset, raise_errors=True)
         return Response({})
 
 
-
 class BatchViewSet(viewsets.ModelViewSet):
-    queryset = pm.Batch.objects.prefetch_related(
-        "petitions", "records__offenses__offense_records"
-    )
+    queryset = pm.Batch.objects.prefetch_related("petitions", "records__offenses__offense_records")
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
@@ -352,9 +358,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         detail=True,
@@ -417,9 +421,7 @@ class PetitionViewSet(viewsets.ModelViewSet):
             pk__in=serializer.data["documents"],
             form_type__in=constants.PETITION_FORM_TYPES._db_values,
         ).order_by("pk")
-        assert (
-            len(petition_documents) > 0
-        ), "Petition documents could not be found for petition"
+        assert len(petition_documents) > 0, "Petition documents could not be found for petition"
 
         form_context = serializer.validated_data.copy()
         form_context["client"] = client
@@ -470,7 +472,6 @@ class PetitionViewSet(viewsets.ModelViewSet):
 
 
 class GenerateDataPetitionView(viewsets.ModelViewSet):
-
     serializer_class = serializers.DataPetitionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -488,7 +489,6 @@ class GenerateDataPetitionView(viewsets.ModelViewSet):
 
 
 class GeneratedPetitionViewSet(viewsets.GenericViewSet):
-
     queryset = pm.GeneratedPetition.objects.all()
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
@@ -540,9 +540,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         try:
-            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(
-                access_token
-            )
+            validated_user, _ = JWTHttpOnlyCookieAuthentication().authenticate_token(access_token)
         except:
             validated_user = None
         if validated_user is None:
@@ -566,9 +564,7 @@ class TokenObtainPairCookieView(simplejwt_views.TokenObtainPairView):
 
         response.set_cookie(
             settings.AUTH_COOKIE_KEY,  # get cookie key from settings
-            serializer.validated_data[
-                "access"
-            ],  # pull access token out of validated_data
+            serializer.validated_data["access"],  # pull access token out of validated_data
             max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None
@@ -639,9 +635,7 @@ class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
 
         response.set_cookie(
             settings.AUTH_COOKIE_KEY,  # get cookie key from settings
-            serializer.validated_data[
-                "access"
-            ],  # pull access token out of validated_data
+            serializer.validated_data["access"],  # pull access token out of validated_data
             max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"].total_seconds(),
             domain=getattr(
                 settings, "AUTH_COOKIE_DOMAIN", None

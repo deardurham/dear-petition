@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class EmailForm(forms.ModelForm):
-
     attachment_info = forms.CharField()
     # Field names to be re-keyed to match our Email model:
     # model_name -> sendgrid_name

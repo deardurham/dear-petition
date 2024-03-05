@@ -16,7 +16,9 @@ __all__ = ("transform_ciprs_document", "parse_ciprs_document")
 logger = logging.getLogger(__name__)
 
 
-def transform_ciprs_document(saved_file_path, parser_mode, save_source=settings.CIPRS_READER_SOURCE):
+def transform_ciprs_document(
+    saved_file_path, parser_mode, save_source=settings.CIPRS_READER_SOURCE
+):
     """Run PDF extraction and return entity-extracted JSON data."""
     reader = PDFToTextReader(saved_file_path, mode=parser_mode)
     try:

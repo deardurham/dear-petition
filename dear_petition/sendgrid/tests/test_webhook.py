@@ -70,7 +70,7 @@ class TestEmails:
 
     @pytest.mark.django_db
     def test_email_with_empty_subject(self, payload, rf):
-        payload['subject'] = ''
+        payload["subject"] = ""
         request = rf.post(reverse("sendgrid-webhook"), data=payload)
         form = EmailForm(request)
         assert form.is_valid(), form.errors
@@ -79,7 +79,7 @@ class TestEmails:
 
     @pytest.mark.django_db
     def test_email_without_subject(self, payload, rf):
-        payload.pop('subject')
+        payload.pop("subject")
         request = rf.post(reverse("sendgrid-webhook"), data=payload)
         form = EmailForm(request)
         assert form.is_valid(), form.errors

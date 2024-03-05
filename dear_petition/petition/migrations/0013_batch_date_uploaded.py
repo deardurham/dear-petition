@@ -5,7 +5,6 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0012_auto_20200208_0240"),
     ]
@@ -14,9 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="batch",
             name="date_uploaded",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
     ]

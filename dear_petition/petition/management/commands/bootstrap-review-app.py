@@ -14,5 +14,7 @@ class Command(BaseCommand):  # pragma: no cover
         if os.getenv("IS_REVIEW", "False") != "True" or qatester_exists:
             self.stdout.write("**Not running bootstrap tasks**")
             return
-        User.objects.create_superuser(username="qatester", email="qatester@example.com", password=settings.QATESTER_PASSWORD)
+        User.objects.create_superuser(
+            username="qatester", email="qatester@example.com", password=settings.QATESTER_PASSWORD
+        )
         self.stdout.write(self.style.SUCCESS("Successfully created qatester"))

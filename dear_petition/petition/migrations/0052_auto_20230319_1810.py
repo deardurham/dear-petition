@@ -6,31 +6,54 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('petition', '0051_merge_20230103_1758'),
+        ("petition", "0051_merge_20230103_1758"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='batch',
-            name='attorney',
-            field=models.ForeignKey(default=None, limit_choices_to={'category': 'attorney'}, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='petition.contact'),
+            model_name="batch",
+            name="attorney",
+            field=models.ForeignKey(
+                default=None,
+                limit_choices_to={"category": "attorney"},
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="petition.contact",
+            ),
         ),
         migrations.AddField(
-            model_name='batch',
-            name='client',
-            field=models.ForeignKey(default=None, limit_choices_to={'category': 'client'}, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='batches', to='petition.contact'),
+            model_name="batch",
+            name="client",
+            field=models.ForeignKey(
+                default=None,
+                limit_choices_to={"category": "client"},
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="batches",
+                to="petition.contact",
+            ),
         ),
         migrations.AddField(
-            model_name='contact',
-            name='user',
-            field=models.ForeignKey(default=None, help_text='The user associated with this contact, if applicable', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='clients', to=settings.AUTH_USER_MODEL),
+            model_name="contact",
+            name="user",
+            field=models.ForeignKey(
+                default=None,
+                help_text="The user associated with this contact, if applicable",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="clients",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='category',
-            field=models.CharField(choices=[('agency', 'Agency'), ('attorney', 'Attorney'), ('client', 'Client')], max_length=16),
+            model_name="contact",
+            name="category",
+            field=models.CharField(
+                choices=[("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client")],
+                max_length=16,
+            ),
         ),
     ]

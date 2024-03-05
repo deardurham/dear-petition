@@ -29,9 +29,7 @@ def get_county_string(counties: list):
 
 def generate_context(batch, attorney, client):
     context = {}
-    context["first_name"], context["last_name"] = utils.split_first_and_last_name(
-        client.name
-    )
+    context["first_name"], context["last_name"] = utils.split_first_and_last_name(client.name)
     context["sex"] = batch.sex
     context["address"] = client.address1
     context["address_second_line"] = client.address2
@@ -68,9 +66,7 @@ def generate_context(batch, attorney, client):
 
     dismissals = get_dismissed_records(batch)
     context["dismissed"] = list(dismissals)
-    dismissed_counties = list(
-        set(dismissal.county.capitalize() for dismissal in dismissals)
-    )
+    dismissed_counties = list(set(dismissal.county.capitalize() for dismissal in dismissals))
     context["dismissed_counties_string"] = get_county_string(dismissed_counties)
 
     context["phone_number"] = attorney.phone_number
@@ -81,7 +77,9 @@ def generate_context(batch, attorney, client):
 
 
 def generate_advice_letter(batch):
-    assert batch.client is not None and batch.attorney is not None, 'Client and attorney must be set for batch before generating document'
+    assert (
+        batch.client is not None and batch.attorney is not None
+    ), "Client and attorney must be set for batch before generating document"
 
     context = generate_context(batch, batch.attorney, batch.client)
     doc = DocxTemplate(settings.TEMPLATE_DIR.path(TEMPLATE))

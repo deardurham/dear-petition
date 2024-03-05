@@ -43,7 +43,6 @@ logger = logging.getLogger(__name__)
 
 
 class CIPRSRecord(PrintableModelMixin, models.Model):
-
     batch = models.ForeignKey("Batch", related_name="records", on_delete=models.CASCADE)
     batch_file = models.ForeignKey(
         "BatchFile",
@@ -126,9 +125,7 @@ class Offense(PrintableModelMixin, models.Model):
             pc.VERDICT_PRAYER_FOR_JUDGMENT,
             pc.VERDICT_RESPONSIBLE,
         ]
-        return (
-            self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
-        )
+        return self.verdict in convicted_verdicts and self.has_equivalent_offense_records()
 
     def is_guilty_to_lesser(self):
         """
@@ -158,18 +155,14 @@ class Offense(PrintableModelMixin, models.Model):
         if len(offense_records) != 2:
             return False
 
-        same_description = (
-            offense_records[0].description == offense_records[1].description
-        )
+        same_description = offense_records[0].description == offense_records[1].description
         same_severity = offense_records[0].severity == offense_records[1].severity
 
         return same_description and same_severity
 
 
 class OffenseRecord(PrintableModelMixin, models.Model):
-    offense = models.ForeignKey(
-        "Offense", related_name="offense_records", on_delete=models.CASCADE
-    )
+    offense = models.ForeignKey("Offense", related_name="offense_records", on_delete=models.CASCADE)
     count = models.IntegerField(blank=True, null=True)
     law = models.CharField(max_length=256, blank=True)
     code = models.IntegerField(blank=True, null=True)
@@ -210,10 +203,14 @@ class OffenseRecord(PrintableModelMixin, models.Model):
         """
 
         # check if any conditions are met that would cause offense record to be hidden
-        has_excluded_disp_method = self.offense.disposition_method in \
-                                  [pc.DISP_METHOD_SUPERSEDING_INDICTMENT, pc.DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]
+        has_excluded_disp_method = self.offense.disposition_method in [
+            pc.DISP_METHOD_SUPERSEDING_INDICTMENT,
+            pc.DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE,
+        ]
         has_de_novo_review = self.has_de_novo_review
-        is_convicted_of_charged = self.action == pc.CHARGED and self.offense.is_convicted_of_charged()
+        is_convicted_of_charged = (
+            self.action == pc.CHARGED and self.offense.is_convicted_of_charged()
+        )
 
         # determine if the offense record should be visible
         return not (has_excluded_disp_method or has_de_novo_review or is_convicted_of_charged)
@@ -226,14 +223,17 @@ class OffenseRecord(PrintableModelMixin, models.Model):
         """
 
         # return false if this is not a district court, guilty offense
-        if self.offense.verdict != pc.VERDICT_GUILTY or self.offense.jurisdiction != pc.DISTRICT_COURT:
+        if (
+            self.offense.verdict != pc.VERDICT_GUILTY
+            or self.offense.jurisdiction != pc.DISTRICT_COURT
+        ):
             return False
 
         # determine if there are matching (same description and severity) superior court offenses on this ciprs record
         return self.offense.ciprs_record.offenses.filter(
             jurisdiction=pc.SUPERIOR_COURT,
             offense_records__description=self.description,
-            offense_records__severity=self.severity
+            offense_records__severity=self.severity,
         ).exists()
 
     @property
@@ -253,26 +253,31 @@ class OffenseRecord(PrintableModelMixin, models.Model):
 
 AGENCY_SHERRIFF_OFFICE_PATTERN = r"Sheriff'?s? Office\s*$"
 AGENCY_SHERRIFF_DEPARTMENT_PATTERN = r"Sheriff'?s? Department\s*$"
+
+
 class AgencyWithSherriffOfficeManager(models.Manager):
     def get_queryset(self):
         """Annotation version of is_sheriff_office to be used from database"""
         return (
             super(AgencyWithSherriffOfficeManager, self)
             .get_queryset()
-            .filter(category='agency')
-            .annotate(is_sheriff_office=Case(
-                When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
-                When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
-                default=Value(False),
-                output_field=models.BooleanField(),
-            ))
+            .filter(category="agency")
+            .annotate(
+                is_sheriff_office=Case(
+                    When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
+                    When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
+                    default=Value(False),
+                    output_field=models.BooleanField(),
+                )
+            )
         )
+
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
     category = models.CharField(max_length=16, choices=CONTACT_CATEGORIES)
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
-    address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, default="", blank=True)
     city = models.CharField(max_length=64, blank=True)
     state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
@@ -290,28 +295,28 @@ class Contact(PrintableModelMixin, models.Model):
         blank=True,
         default=None,
         on_delete=models.CASCADE,
-        help_text="The user associated with this contact (only applicable for Clients)"
+        help_text="The user associated with this contact (only applicable for Clients)",
     )
 
     def __str__(self):
-        return self.name if self.name else ''
-    
+        return self.name if self.name else ""
+
     @classmethod
     def get_sherriff_office_by_county(cls, county: str):
         print(county)
         qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
         if qs.count() > 1:
-            logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
+            logger.error(
+                "Multiple agencies with sherriff department name detected. Picking first one..."
+            )
         return qs.first() if qs.exists() else None
 
-class Batch(PrintableModelMixin, models.Model):
 
+class Batch(PrintableModelMixin, models.Model):
     label = models.CharField(max_length=2048, blank=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name="batches", on_delete=models.CASCADE)
-    emails = models.ManyToManyField(
-        "sendgrid.Email", related_name="batches", blank=True
-    )
+    emails = models.ManyToManyField("sendgrid.Email", related_name="batches", blank=True)
     attorney = models.ForeignKey(
         Contact,
         related_name="+",
@@ -347,9 +352,7 @@ class Batch(PrintableModelMixin, models.Model):
     @property
     def most_recent_record(self):
         most_recent_record = None
-        most_recent_offense_date = make_datetime_aware(
-            datetime.min.strftime(DATETIME_FORMAT)
-        )
+        most_recent_offense_date = make_datetime_aware(datetime.min.strftime(DATETIME_FORMAT))
         for record in self.records.order_by("pk"):
             if not record.offense_date:
                 continue
@@ -404,9 +407,7 @@ class Batch(PrintableModelMixin, models.Model):
     @property
     def automatic_delete_date(self):
         """Date when this batch will be automatically deleted by the cleanup task"""
-        return self.date_uploaded + timedelta(
-            hours=settings.CIPRS_RECORD_LIFETIME_HOURS
-        )
+        return self.date_uploaded + timedelta(hours=settings.CIPRS_RECORD_LIFETIME_HOURS)
 
 
 @receiver(signals.post_delete, sender=Batch)
@@ -451,16 +452,13 @@ class BatchFile(PrintableModelMixin, models.Model):
 
 
 class Comment(PrintableModelMixin, models.Model):
-
     user = models.ForeignKey(User, related_name="comments", on_delete=models.DO_NOTHING)
     text = models.TextField()
     batch = models.ForeignKey(Batch, related_name="comments", on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        link = reverse(
-            "create-petition", kwargs={"pk": self.batch.id, "tab": "comments"}
-        )
+        link = reverse("create-petition", kwargs={"pk": self.batch.id, "tab": "comments"})
         if self.user.is_staff:
             for staff_member in User.objects.filter(is_staff=True):
                 staff_member.send_email(
@@ -476,7 +474,6 @@ class Comment(PrintableModelMixin, models.Model):
 
 
 class Petition(PrintableModelMixin, TimeStampedModel):
-
     form_type = models.CharField(choices=FORM_TYPES, max_length=255)
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="petitions")
     county = models.CharField(max_length=256, blank=True)
@@ -531,15 +528,11 @@ class Petition(PrintableModelMixin, TimeStampedModel):
                     file_number_year=Case(
                         When(
                             first_two_digits_file_number__gt=two_digit_current_year,
-                            then=Concat(
-                                Value("19"), "first_two_digits_file_number_chars"
-                            ),
+                            then=Concat(Value("19"), "first_two_digits_file_number_chars"),
                         ),
                         When(
                             first_two_digits_file_number__lte=two_digit_current_year,
-                            then=Concat(
-                                Value("20"), "first_two_digits_file_number_chars"
-                            ),
+                            then=Concat(Value("20"), "first_two_digits_file_number_chars"),
                         ),
                     )
                 )
@@ -566,9 +559,7 @@ DataPetitionDocument = namedtuple("DataPetitionDocument", ["petition"])
 
 
 class PetitionDocument(PrintableModelMixin, models.Model):
-    petition = models.ForeignKey(
-        Petition, on_delete=models.CASCADE, related_name="documents"
-    )
+    petition = models.ForeignKey(Petition, on_delete=models.CASCADE, related_name="documents")
     offense_records = models.ManyToManyField(OffenseRecord, related_name="documents")
     previous_document = models.OneToOneField(
         "self", on_delete=models.CASCADE, null=True, related_name="following_document"
@@ -607,13 +598,9 @@ class GeneratedPetition(PrintableModelMixin, TimeStampedModel):
     number_of_charges = models.IntegerField()
     batch_id = models.PositiveIntegerField()
     county = models.CharField(max_length=256, blank=True, null=True)
-    jurisdiction = models.CharField(
-        choices=JURISDICTION_CHOICES, max_length=255, null=True
-    )
+    jurisdiction = models.CharField(choices=JURISDICTION_CHOICES, max_length=255, null=True)
     race = models.CharField(max_length=256, null=True)
-    sex = models.CharField(
-        max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, null=True
-    )
+    sex = models.CharField(max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, null=True)
     age = models.PositiveIntegerField(null=True)
 
     @classmethod

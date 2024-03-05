@@ -95,9 +95,7 @@ def test_map_offenses__fileno(form, record2, offense_record1):
 
 def test_map_offenses__arrest_date(form, record2, offense_record1):
     form.map_offenses()
-    assert form.data["ArrestDateRow1"] == utils.format_petition_date(
-        record2.arrest_date
-    )
+    assert form.data["ArrestDateRow1"] == utils.format_petition_date(record2.arrest_date)
 
 
 def test_map_offenses__description(form, record2, offense_record1):
@@ -107,9 +105,7 @@ def test_map_offenses__description(form, record2, offense_record1):
 
 def test_map_offenses__offense_date(form, record2, offense_record1):
     form.map_offenses()
-    assert form.data["DateOfOffenseRow1"] == utils.format_petition_date(
-        record2.offense_date
-    )
+    assert form.data["DateOfOffenseRow1"] == utils.format_petition_date(record2.offense_date)
 
 
 @pytest.mark.parametrize(
@@ -140,6 +136,4 @@ def test_map_offenses__disposition_method(
 
 def test_map_offenses__disposition_date(form, offense1, offense_record1):
     form.map_offenses()
-    assert form.data["DispositionDateRow1"] == utils.format_petition_date(
-        offense1.disposed_on
-    )
+    assert form.data["DispositionDateRow1"] == utils.format_petition_date(offense1.disposed_on)

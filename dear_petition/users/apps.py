@@ -2,7 +2,6 @@ from django.apps import AppConfig
 
 
 class UsersAppConfig(AppConfig):
-
     name = "dear_petition.users"
     verbose_name = "Users"
 

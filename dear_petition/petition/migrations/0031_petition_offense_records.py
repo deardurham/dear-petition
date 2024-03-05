@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0030_petition_parent"),
     ]
@@ -13,8 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="petition",
             name="offense_records",
-            field=models.ManyToManyField(
-                related_name="petitions", to="petition.OffenseRecord"
-            ),
+            field=models.ManyToManyField(related_name="petitions", to="petition.OffenseRecord"),
         ),
     ]

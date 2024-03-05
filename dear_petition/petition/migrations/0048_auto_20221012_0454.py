@@ -5,7 +5,6 @@ import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0047_alter_petitiondocument_previous_document"),
     ]

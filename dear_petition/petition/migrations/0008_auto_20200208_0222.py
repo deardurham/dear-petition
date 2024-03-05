@@ -17,7 +17,6 @@ def move_batch_fks(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0007_auto_20200208_0221"),
     ]

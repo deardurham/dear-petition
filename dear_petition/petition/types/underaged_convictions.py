@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 def get_offense_records(batch, jurisdiction=""):
-
     qs = OffenseRecord.objects.filter(offense__ciprs_record__batch=batch)
     if not qs.exists():
         return qs

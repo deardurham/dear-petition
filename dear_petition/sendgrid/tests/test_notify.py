@@ -15,9 +15,7 @@ def test_no_listeners(settings):
 
 def test_defined_listener(settings):
     """Defined listener should be called when notify_sendgrid_listeners is triggered"""
-    settings.SENDGRID_WEBHOOK_LISTENERS = [
-        "dear_petition.sendgrid.tests.test_notify.my_listener"
-    ]
+    settings.SENDGRID_WEBHOOK_LISTENERS = ["dear_petition.sendgrid.tests.test_notify.my_listener"]
     with mock.patch("dear_petition.sendgrid.tests.test_notify.my_listener") as mock_:
         notify_sendgrid_listeners(1)
         assert mock_.assert_called_once

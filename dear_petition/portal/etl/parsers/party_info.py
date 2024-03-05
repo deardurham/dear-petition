@@ -40,8 +40,8 @@ def parse_defendant_race(soup):
         <div ng-if="::party.Race" class="ng-binding ng-scope">
             White
         </div>
-    """ # noqa
-    return soup.find('div', {'ng-if': '::party.Race'}).get_text(strip=True)
+    """  # noqa
+    return soup.find("div", {"ng-if": "::party.Race"}).get_text(strip=True)
 
 
 @catch_parse_error
@@ -53,5 +53,5 @@ def parse_defendant_sex(soup):
         <div ng-if="::party.Gender" class="ng-binding ng-scope">
             Female
         </div>
-    """ # noqa
-    return soup.find('div', {'ng-if': '::party.Gender'}).get_text(strip=True)
+    """  # noqa
+    return soup.find("div", {"ng-if": "::party.Gender"}).get_text(strip=True)

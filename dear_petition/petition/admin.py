@@ -8,7 +8,6 @@ from dear_petition.petition import constants
 
 @admin.register(models.CIPRSRecord)
 class CIPRSRecordAdmin(admin.ModelAdmin):
-
     list_display = (
         "pk",
         "label",
@@ -165,7 +164,6 @@ class ContactAdmin(ImportExportModelAdmin):
 
 @admin.register(models.Comment)
 class CommentAdmin(admin.ModelAdmin):
-
     list_display = ("pk", "user", "batch", "time")
     search_fields = ("batch__label",)
     date_hierarchy = "time"
@@ -175,7 +173,6 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(models.Petition)
 class PetitionAdmin(admin.ModelAdmin):
-
     list_display = ("pk", "batch", "form_type", "county", "jurisdiction")
     search_fields = ("batch__label",)
     list_filter = ("form_type", "county", "jurisdiction")
@@ -185,7 +182,6 @@ class PetitionAdmin(admin.ModelAdmin):
 
 @admin.register(models.PetitionDocument)
 class PetitionDocumentAdmin(admin.ModelAdmin):
-
     list_display = (
         "id",
         "batch",
@@ -203,9 +199,7 @@ class PetitionDocumentAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(
-            _offense_record_count=Count("offense_records", distinct=True)
-        )
+        queryset = queryset.annotate(_offense_record_count=Count("offense_records", distinct=True))
         return queryset
 
     def offense_record_count(self, obj):
@@ -222,7 +216,6 @@ class PetitionDocumentAdmin(admin.ModelAdmin):
 
 @admin.register(models.GeneratedPetition)
 class GeneratedPetitionAdmin(admin.ModelAdmin):
-
     date_hierarchy = "created"
     list_display = constants.GENERATED_PETITION_ADMIN_FIELDS
     list_filter = ("form_type", "created", "username")

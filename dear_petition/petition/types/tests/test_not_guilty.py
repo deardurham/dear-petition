@@ -19,9 +19,7 @@ def test_charged_not_guilty_record(batch, not_guilty_offense):
 
 def test_non_charged_offense_record(batch, not_guilty_offense):
     """Non-charged records should be excluded."""
-    offense_record = OffenseRecordFactory(
-        action="CONVICTED", offense=not_guilty_offense
-    )
+    offense_record = OffenseRecordFactory(action="CONVICTED", offense=not_guilty_offense)
     assert offense_record not in batch.not_guilty_offense_records()
 
 
@@ -50,9 +48,7 @@ def test_not_both_dismissed_and_not_guilty(batch, record1):
         ciprs_record=record1,
     )
     offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
-    assert offense_record not in batch.not_guilty_offense_records(
-        jurisdiction=record1.jurisdiction
-    )
+    assert offense_record not in batch.not_guilty_offense_records(jurisdiction=record1.jurisdiction)
 
 
 def test_petition_offenses(batch, record1, not_guilty_offense):

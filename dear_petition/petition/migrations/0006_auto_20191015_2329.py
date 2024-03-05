@@ -4,37 +4,45 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('petition', '0005_contact'),
+        ("petition", "0005_contact"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='address1',
-            field=models.CharField(blank=True, max_length=512, verbose_name='Address (Line 1)'),
+            model_name="contact",
+            name="address1",
+            field=models.CharField(blank=True, max_length=512, verbose_name="Address (Line 1)"),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='address2',
-            field=models.CharField(blank=True, max_length=512, verbose_name='Address (Line 2)'),
+            model_name="contact",
+            name="address2",
+            field=models.CharField(blank=True, max_length=512, verbose_name="Address (Line 2)"),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='category',
-            field=models.CharField(choices=[('agency', 'Agency'), ('attorney', 'Attorney')], default='agency', max_length=16),
+            model_name="contact",
+            name="category",
+            field=models.CharField(
+                choices=[("agency", "Agency"), ("attorney", "Attorney")],
+                default="agency",
+                max_length=16,
+            ),
         ),
         migrations.AlterField(
-            model_name='contact',
-            name='zipcode',
-            field=models.CharField(blank=True, max_length=16, verbose_name='ZIP Code'),
+            model_name="contact",
+            name="zipcode",
+            field=models.CharField(blank=True, max_length=16, verbose_name="ZIP Code"),
         ),
         migrations.CreateModel(
-            name='Batch',
+            name="Batch",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('records', models.ManyToManyField(to='petition.CIPRSRecord')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("records", models.ManyToManyField(to="petition.CIPRSRecord")),
             ],
         ),
     ]

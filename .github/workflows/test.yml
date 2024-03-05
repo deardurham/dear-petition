@@ -1,4 +1,4 @@
-name: Lint and Test code
+name: Test and build code
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: config.settings.test
     services:
@@ -44,11 +44,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docker-
             ${{ runner.os }}-
-      - name: Run eslint + format
-        run: |
-          npm i
-          npm run lint
-          npx prettier --check .
       - name: Build Docker Deploy Image
         uses: docker/build-push-action@v5
         with:
