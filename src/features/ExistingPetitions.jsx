@@ -7,13 +7,109 @@ import { manualAxiosRequest } from '../service/axios';
 import { Button, ModalButton } from '../components/elements/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
-import { useDeleteBatchMutation, useGetUserBatchesQuery } from '../service/api';
+import { useDeleteBatchMutation, useGetUserBatchesQuery, useCombineBatchesMutation } from '../service/api';
 import useAuth from '../hooks/useAuth';
 import { DownloadDocumentsModal } from './DownloadDocuments';
 import { hasValidationsErrors } from '../util/errors';
 import { downloadFile } from '../util/downloadFile';
-import { CAUTION, NEUTRAL } from '../components/elements/Button/Button';
+import { POSITIVE, CAUTION, NEUTRAL } from '../components/elements/Button/Button';
 import { useModalContext } from '../components/elements/Button/ModalButton';
+
+const finishCombineModal = (
+  batch,
+  batchIds,
+  setCombineWithBatchId,
+  setBatchIdsToCombine,
+  triggerCombine,
+  rowData,
+  setRowData,
+) => {
+  let postData = {
+    batchIds: batchIds,
+    label: batch.label,
+    user_id: batch.user,
+  };
+
+  triggerCombine(postData).then((newBatch) => {
+    console.log(newBatch.data);
+    setRowData((prevList) => [newBatch.data, ...prevList]);
+
+    setCombineWithBatchId(null);
+    setBatchIdsToCombine([]);
+  });
+};
+
+const CombineBatchModal = ({
+  batch,
+  combineWithBatchId,
+  setCombineWithBatchId,
+  batchIdsToCombine,
+  setBatchIdsToCombine,
+  rowData,
+  setRowData,
+}) => {
+  const [triggerCombine] = useCombineBatchesMutation();
+  let batchId = batch.pk;
+  if (!combineWithBatchId) {
+    return (
+      <Button
+        title="Combine"
+        onClick={() => {
+          setCombineWithBatchId(batchId);
+          setBatchIdsToCombine([batchId]);
+        }}
+      >
+        Combine
+      </Button>
+    );
+  } else if (batchId != combineWithBatchId) {
+    let alreadyIncluded = batchIdsToCombine.includes(batchId);
+    if (alreadyIncluded) {
+      return (
+        <Button
+          title="Subtract"
+          colorClass={NEUTRAL}
+          onClick={() => {
+            setBatchIdsToCombine((prevList) => prevList.filter((item) => item != batchId));
+          }}
+        >
+          Subtract
+        </Button>
+      );
+    } else {
+      return (
+        <Button
+          title="Add"
+          colorClass={POSITIVE}
+          onClick={() => {
+            setBatchIdsToCombine((prevList) => [...prevList, batchId]);
+          }}
+        >
+          Add
+        </Button>
+      );
+    }
+  } else {
+    return (
+      <Button
+        title="Finish"
+        onClick={() => {
+          finishCombineModal(
+            batch,
+            batchIdsToCombine,
+            setCombineWithBatchId,
+            setBatchIdsToCombine,
+            triggerCombine,
+            rowData,
+            setRowData,
+          );
+        }}
+      >
+        Finish
+      </Button>
+    );
+  }
+};
 
 const DeleteBatchModal = ({ batch }) => {
   const [triggerDelete] = useDeleteBatchMutation();
@@ -41,8 +137,11 @@ const DeleteBatchModal = ({ batch }) => {
 // TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
   const { user } = useAuth();
-  const { data } = useGetUserBatchesQuery({ user: user.pk });
+  const data = useGetUserBatchesQuery({ user: user.pk });
   const [downloadDocumentBatch, setDownloadDocumentBatch] = useState(null);
+  const [combineWithBatchId, setCombineWithBatchId] = useState(null);
+  const [batchIdsToCombine, setBatchIdsToCombine] = useState([]);
+  const [rowData, setRowData] = useState(data?.data?.results);
 
   return (
     <div className="flex flex-col">
@@ -71,7 +170,7 @@ export const ExistingPetitions = () => {
             <TableCell header />
           </TableHeader>
           <TableBody>
-            {data?.results?.map((batch) => (
+            {rowData?.map((batch) => (
               <TableRow key={batch.pk}>
                 <TableCell>{batch.label}</TableCell>
                 <TableCell>
@@ -96,28 +195,6 @@ export const ExistingPetitions = () => {
                   >
                     Download
                   </Button>
-                  {/*
-                    Legal team requested this be temporarily removed from UI
-
-                    <Button
-                      disabled={!!batch?.generate_letter_errors?.batch}
-                      title={batch?.generate_letter_errors?.batch?.join(' ') ?? ''}
-                      onClick={() => {
-                        manualAxiosRequest({
-                          url: `/batch/${batch.pk}/generate_advice_letter/`,
-                          responseType: 'arraybuffer',
-                          method: 'post',
-                        }).then((adviceLetter) => {
-                          const docBlob = new Blob([adviceLetter.data], {
-                            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                          });
-                          downloadFile(docBlob, 'Advice Letter.docx');
-                        });
-                      }}
-                    >
-                      Advice Letter
-                    </Button>
-                  */}
                   <Button
                     disabled={!!batch?.generate_summary_errors?.batch}
                     title={batch?.generate_summary_errors?.batch?.join(' ') ?? ''}
@@ -139,6 +216,15 @@ export const ExistingPetitions = () => {
                   <ModalButton title="Delete" colorClass={CAUTION}>
                     <DeleteBatchModal batch={batch} />
                   </ModalButton>
+                  <CombineBatchModal
+                    batch={batch}
+                    combineWithBatchId={combineWithBatchId}
+                    setCombineWithBatchId={setCombineWithBatchId}
+                    batchIdsToCombine={batchIdsToCombine}
+                    setBatchIdsToCombine={setBatchIdsToCombine}
+                    rowData={rowData}
+                    setRowData={setRowData}
+                  ></CombineBatchModal>
                 </TableCell>
               </TableRow>
             ))}

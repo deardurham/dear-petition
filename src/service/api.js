@@ -104,6 +104,9 @@ export const api = createApi({
       query: ({ user }) => ({ url: `batch/`, method: 'get', params: { user, limit: 10 } }),
       providesTags: ['Batch'],
     }),
+    combineBatches: builder.mutation({
+      query: (data) => ({ url: 'batch/combine_batches/', method: 'post', data }),
+    }),
     login: builder.mutation({
       query: (data) => ({ url: 'token/', method: 'post', data }),
     }),
@@ -167,6 +170,7 @@ export const {
   useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
   useDeleteBatchMutation,
+  useCombineBatchesMutation,
   useLazyCheckLoginQuery,
   useGetBatchQuery,
   useGetUserBatchesQuery,
