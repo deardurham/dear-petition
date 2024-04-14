@@ -106,6 +106,7 @@ export const api = createApi({
     }),
     combineBatches: builder.mutation({
       query: (data) => ({ url: 'batch/combine_batches/', method: 'post', data }),
+      invalidatesTags: ['Batch'],
     }),
     login: builder.mutation({
       query: (data) => ({ url: 'token/', method: 'post', data }),

@@ -341,7 +341,7 @@ class BatchViewSet(viewsets.ModelViewSet):
     def combine_batches(self, request):
         batch_ids = request.data['batchIds']
         label = request.data['label']
-        user_id = request.data['user_id']
+        user_id = request.user.id
 
         new_batch = combine_batches(batch_ids, label, user_id)
         return Response(self.get_serializer(new_batch).data)
