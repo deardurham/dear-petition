@@ -85,7 +85,7 @@ def test_combine_batches(batch, batch_file, fake_pdf):
     assert batch.files.count() == 1
 
     new_label = "Combined Batch"
-    new_batch = combine_batches([batch.id, second_batch.id], label=new_label, user_id=1)
+    new_batch = combine_batches([batch.id, second_batch.id], label=new_label, user_id=batch.user.id)
 
     assert new_batch.records.count() == 2
     assert pm.Offense.objects.filter(ciprs_record__batch__id=new_batch.id).count() == 2
