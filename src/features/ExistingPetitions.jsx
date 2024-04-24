@@ -92,13 +92,13 @@ const CombineBatchModalButton = ({ batchId, batchIdsToCombine, setBatchIdsToComb
 };
 
 const CombineBatchModal = ({ rowData }) => {
-  const [newLabel, setNewLabel] = useState();
+  const [newLabel, setNewLabel] = useState('');
   const { closeModal } = useModalContext();
   const [batchIdsToCombine, setBatchIdsToCombine] = useState([]);
   const [triggerCombine] = useCombineBatchesMutation();
 
   return (
-    <div className="flex flex-col gap-10 justify-center w-[450px] h-[200px] m-20 mb-40 mt-40">
+    <div className="flex flex-col gap-10 justify-center w-[450px] m-20 mb-40 mt-40">
       <Table className="text-[1.7rem]" columnSizes="4fr 2fr">
         <TableHeader>
           <TableCell header>Label</TableCell>
@@ -136,6 +136,8 @@ const CombineBatchModal = ({ rowData }) => {
                 closeModal: closeModal,
               })
             }
+            disabled={batchIdsToCombine.length === 0 || !newLabel}
+            title="Please add a new label and atleast one client upload."
           >
             Finish
           </Button>
