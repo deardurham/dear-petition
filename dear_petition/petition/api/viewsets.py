@@ -345,11 +345,11 @@ class BatchViewSet(viewsets.ModelViewSet):
 
         if not batch_ids:
             return Response(
-                "No client uploads have been.", status=status.HTTP_400_BAD_REQUEST
+                "No client uploads have been uploaded.", status=status.HTTP_400_BAD_REQUEST
             )
-        if not batch_ids:
+        if not label:
             return Response(
-                "No client uploads have been included.", status=status.HTTP_400_BAD_REQUEST
+                "A new label needs to be included for the client.", status=status.HTTP_400_BAD_REQUEST
             )
 
         new_batch = combine_batches(batch_ids, label, user_id)

@@ -40,7 +40,6 @@
   ],
   "rules": {
     // Disabled default rules
-    "no-debugger": "off",
     "no-plusplus": "off",
     "no-continue": "off",
     "react/jsx-props-no-spreading": "off",
