@@ -11,12 +11,13 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, parsers, permissions, status, viewsets
+from rest_framework import filters, generics, parsers, permissions, status, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
@@ -27,6 +28,7 @@ from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentic
 from dear_petition.petition.etl import (
     import_ciprs_records,
     recalculate_petitions,
+    combine_batches,
     assign_agencies_to_documents,
 )
 from dear_petition.petition.export import (
@@ -328,6 +330,30 @@ class BatchViewSet(viewsets.ModelViewSet):
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             resp["Content-Disposition"] = 'attachment; filename="Records Summary.docx"'
             return resp
+        
+
+    @action(
+        detail=False,
+        methods=[
+            "post",
+        ],
+    )
+    def combine_batches(self, request):
+        batch_ids = request.data['batchIds']
+        label = request.data['label']
+        user_id = request.user.id
+
+        if not batch_ids:
+            return Response(
+                "No client uploads have been uploaded.", status=status.HTTP_400_BAD_REQUEST
+            )
+        if not label:
+            return Response(
+                "A new label needs to be included for the client.", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_batch = combine_batches(batch_ids, label, user_id)
+        return Response(self.get_serializer(new_batch).data)
 
 
 class MyInboxView(generics.ListAPIView):

@@ -57,7 +57,6 @@ def refresh_offenses(record):
     """Create Offense and OffenseRecords in each jurisdiction for this record."""
     for jurisdiction, header in constants.OFFENSE_HEADERS:
         offenses = record.data.get(header, {})
-
         # delete existing offenses in this jurisdiction
         record.offenses.filter(jurisdiction=jurisdiction).delete()
         for data_offense in offenses:

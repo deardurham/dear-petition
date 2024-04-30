@@ -1,34 +1,19 @@
+import io
 import random
-from pytz import timezone
 
 import factory
-
-from dear_petition.petition.models import (
-    CIPRSRecord,
-    Batch,
-    Offense,
-    OffenseRecord,
-    Petition,
-    PetitionOffenseRecord,
-    PetitionDocument,
-    Contact,
-    GeneratedPetition,
-)
+from dear_petition.petition.models import (Batch, BatchFile, CIPRSRecord,
+                                           Contact, GeneratedPetition, Offense,
+                                           OffenseRecord, Petition,
+                                           PetitionDocument,
+                                           PetitionOffenseRecord)
 from dear_petition.users.tests.factories import UserFactory
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from pytz import timezone
 
-from ..constants import (
-    CHARGED,
-    CONVICTED,
-    DISMISSED,
-    DISTRICT_COURT,
-    SUPERIOR_COURT,
-    DURHAM_COUNTY,
-    DISTRICT_COURT_WITHOUT_DA_LEAVE,
-    FEMALE,
-    MALE,
-    NOT_AVAILABLE,
-    UNKNOWN,
-)
+from ..constants import (CHARGED, CONVICTED, DISMISSED, DISTRICT_COURT,
+                         DISTRICT_COURT_WITHOUT_DA_LEAVE, DURHAM_COUNTY,
+                         FEMALE, MALE, NOT_AVAILABLE, SUPERIOR_COURT, UNKNOWN)
 
 
 class BatchFactory(factory.django.DjangoModelFactory):
@@ -37,6 +22,29 @@ class BatchFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Batch
+
+
+def fake_file(filename, content_type):
+    output = io.StringIO("blahblah")
+    stream = io.BytesIO(output.getvalue().encode("utf-8"))
+    file_ = InMemoryUploadedFile(
+        file=stream,
+        field_name=None,
+        name=filename,
+        content_type=content_type,
+        size=stream.getbuffer().nbytes,
+        charset=None,
+    )
+    return file_
+
+
+class BatchFileFactory(factory.django.DjangoModelFactory):
+    batch = factory.SubFactory(BatchFactory)
+    date_uploaded = factory.Faker("date_time", tzinfo=timezone("US/Eastern"))
+    file = fake_file("fakefile.pdf", "pdf")
+
+    class Meta:
+        model = BatchFile
 
 
 def record_data(idx):
@@ -52,31 +60,35 @@ def record_data(idx):
             "Race": "WHITE",
             "Sex": "MALE",
         },
-        "Offense Record": {
-            "Records": [
-                {
-                    "Action": "CHARGED",
-                    "Description": "SPEEDING(80 mph in a 65 mph zone)",
-                    "Severity": "TRAFFIC",
-                    "Law": "20-141(J1)",
-                    "Code": "4450",
-                },
-                {
-                    "Action": "ARRAIGNED",
-                    "Description": "SPEEDING(80 mph in a 65 mph zone)",
-                    "Severity": "INFRACTION",
-                    "Law": "G.S. 20-141(B)",
-                    "Code": "4450",
-                },
-            ],
-            "Disposed On": "2018-02-01",
-            "Disposition Method": "DISPOSED BY JUDGE",
-        },
+        "District Court Offense Information": [
+            {
+                "Records": [
+                    {
+                        "Action": "CHARGED",
+                        "Description": "SPEEDING(80 mph in a 65 mph zone)",
+                        "Severity": "TRAFFIC",
+                        "Law": "20-141(J1)",
+                        "Code": "4450",
+                    },
+                    {
+                        "Action": "ARRAIGNED",
+                        "Description": "SPEEDING(80 mph in a 65 mph zone)",
+                        "Severity": "INFRACTION",
+                        "Law": "G.S. 20-141(B)",
+                        "Code": "4450",
+                    },
+                ],
+                "Disposed On": "2018-02-01",
+                "Disposition Method": "DISPOSED BY JUDGE",
+            }
+        ],
+        "Superior Court Offense Information": [],
     }
 
 
 class CIPRSRecordFactory(factory.django.DjangoModelFactory):
     batch = factory.SubFactory(BatchFactory)
+    batch_file = factory.SubFactory(BatchFileFactory)
     label = factory.Faker("name")
     data = factory.Sequence(record_data)
     offense_date = factory.Faker("date_time", tzinfo=timezone("US/Eastern"))

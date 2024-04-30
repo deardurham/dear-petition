@@ -13,7 +13,7 @@ const Row = styled.div`
   }
 `;
 
-const TextInput = styled(Input)`
+export const TextInput = styled(Input)`
   input {
     padding: 0.9rem;
     width: 100%;

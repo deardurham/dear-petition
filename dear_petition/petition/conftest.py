@@ -1,13 +1,12 @@
-import io
 import string
 from datetime import datetime
 
 import pytest
-from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from dear_petition.petition.constants import CHARGED, CONVICTED, FEMALE
 from dear_petition.petition.tests.factories import (
     BatchFactory,
+    BatchFileFactory,
     CIPRSRecordFactory,
     ClientFactory,
     PetitionFactory,
@@ -16,6 +15,7 @@ from dear_petition.petition.tests.factories import (
     ContactFactory,
     OffenseFactory,
     OffenseRecordFactory,
+    fake_file,
 )
 from dear_petition.petition.types import dismissed
 from dear_petition.petition import constants
@@ -95,20 +95,6 @@ def offense_record2(offense1, petition, petition_document):
     yield record
 
 
-def fake_file(filename, content_type):
-    output = io.StringIO("blahblah")
-    stream = io.BytesIO(output.getvalue().encode("utf-8"))
-    file_ = InMemoryUploadedFile(
-        file=stream,
-        field_name=None,
-        name=filename,
-        content_type=content_type,
-        size=stream.getbuffer().nbytes,
-        charset=None,
-    )
-    return file_
-
-
 @pytest.fixture
 def fake_pdf():
     return fake_file("sample.pdf", "pdf")
@@ -117,6 +103,11 @@ def fake_pdf():
 @pytest.fixture
 def fake_pdf2():
     return fake_file("sample2.pdf", "pdf")
+
+
+@pytest.fixture
+def batch_file(batch):
+    return BatchFileFactory(batch=batch)
 
 
 @pytest.fixture
