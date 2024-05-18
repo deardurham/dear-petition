@@ -23,8 +23,9 @@ import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { generateBookmarklet } from 'bookmarklet';
+import bookmarkletMetadata from 'bookmarklet/package.json';
 
-const bookmarkletVersion = `v${(await import('bookmarklet/package.json')).version}`;
+const bookmarkletVersion = `v${bookmarkletMetadata.version}`;
 
 const HeaderLogoLink = styled(LinkWrapper)`
   border: none;

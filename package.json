@@ -52,7 +52,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "DISABLE_ESLINT_PLUGIN=true vite build",
     "serve": "vite preview",
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx",
