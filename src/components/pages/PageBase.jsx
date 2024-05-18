@@ -22,7 +22,10 @@ import { loggedOut } from '../../slices/auth';
 import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+
+// eslint-disable-next-line import/no-unresolved
 import { generateBookmarklet } from 'bookmarklet';
+// eslint-disable-next-line import/no-unresolved
 import bookmarkletMetadata from 'bookmarklet/package.json';
 
 const bookmarkletVersion = `v${bookmarkletMetadata.version}`;
