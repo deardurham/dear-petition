@@ -14,6 +14,7 @@ import {
 import dearLogo from '../../assets/img/DEAR_logo.png';
 import codeWithDurhamHorizontalLogo from '../../assets/img/CWD_horizontal_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
+import { Tooltip } from '../elements/Tooltip/Tooltip';
 
 import useAuth from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../service/api';
@@ -21,7 +22,9 @@ import { loggedOut } from '../../slices/auth';
 import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
-import { generateBookmarklet } from '../../bookmarklet/bookmarklet';
+import { generateBookmarklet } from 'bookmarklet';
+
+const bookmarkletVersion = `v${(await import('bookmarklet/package.json')).version}`;
 
 const HeaderLogoLink = styled(LinkWrapper)`
   border: none;
@@ -61,11 +64,8 @@ function PageBase({ children, className, ...props }) {
   const [bookmarklet, setBookmarklet] = useState();
 
   useEffect(() => {
-    const generate = async () => {
-      const bookmarkletCode = await generateBookmarklet(user.username);
-      setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
-    };
-    generate();
+    const bookmarkletCode = generateBookmarklet(user.username);
+    setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
   }, [user.username]);
 
   return (
@@ -83,13 +83,23 @@ function PageBase({ children, className, ...props }) {
                 <Link to="/">Dashboard</Link>
               </LinkWrapper>
             )}
+            <Tooltip
+              offset={[0, 5]}
+              placement="bottom"
+              tooltipContent="To install, please click and drag this button to your bookmarks bar"
+            >
+              <a
+                href={bookmarklet}
+                className="cursor-grab"
+                onClick={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <LinkWrapper>Portal Importer ({bookmarkletVersion})</LinkWrapper>
+              </a>
+            </Tooltip>
             <LinkWrapper>
               <Link to="/help">Help</Link>
-            </LinkWrapper>
-            <LinkWrapper>
-              <a href={bookmarklet} title="Drag to your bookmarks bar">
-                Portal Importer ({import.meta.env.MODE})
-              </a>
             </LinkWrapper>
             {user?.is_admin ? (
               <DropdownMenu

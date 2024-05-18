@@ -1,7 +1,15 @@
 const POST_URL = window.location.origin;
+const PORTAL_URL = 'https://portal-nc.tylertech.cloud/Portal/';
+const PORTAL_APP_URL = 'https://portal-nc.tylertech.cloud';
+const PORTAL_APP_PATHNAME = '/app/RegisterOfActions/#/';
 
 export function generateBookmarklet(username) {
   return `
+  if (window.location.origin !== '${PORTAL_APP_URL}' && !window.location.pathname.startsWith('${PORTAL_APP_PATHNAME}')) {
+    alert('Failed to import case. To use the Portal Importer, please navigate to ${PORTAL_URL} and click this bookmark while viewing a a case.');
+    return;
+  }
+
   var html = document.documentElement.innerHTML;
   var loaded = 0;
   
@@ -44,6 +52,6 @@ export function generateBookmarklet(username) {
   
   form.submit();
 
-  alert("Successfully submitted case summary to Expunction Tool");
+  alert("Submitted case summary to Expunction Tool");
   `;
 }
