@@ -1,7 +1,4 @@
-import pytest
-from pytest_django.fixtures import settings
 import pytz
-from django.conf import settings
 from django.utils.timezone import make_aware, utc
 from datetime import datetime, date
 
@@ -73,6 +70,25 @@ def test_make_datetime_aware(settings):
     dt_str = None
     aware_dt = pu.make_datetime_aware(dt_str)
     assert aware_dt == None
+
+
+def test_make_datetime_aware_ambiguous(settings):
+    """Aware Datetime should be returned assuming standard time in the case of ambiguity between standard time and
+    daylight saving time.
+    """
+    # Set the TIME_ZONE in the settings.
+    settings.TIME_ZONE = "America/New_York"
+
+    # Calling pu.make_datetime_aware() with a date/time that falls within the hour before or after daylight saving time
+    # ends returns a timezone-aware datetime referring to the moment from the naive_datetime_obj, in the appropriate
+    # time zone, assuming standard time.
+    naive_datetime_str = "2011-11-06T01:46:00"
+    expected_datetime_obj = make_aware(
+        datetime(year=2011, month=11, day=6, hour=1, minute=46, second=0),
+        timezone=pytz.timezone("America/New_York"),
+        is_dst=False
+    )
+    assert pu.make_datetime_aware(naive_datetime_str) == expected_datetime_obj
 
 
 def test_format_petition_date(settings):

@@ -48,9 +48,16 @@ def make_datetime_aware(dt_str):
     naive_datetime_obj = dateutil.parser.parse(dt_str)
 
     # b) Assign the timezone-naive datetime a timezone based on settings.TIME_ZONE
-    aware_datetime_obj = make_aware(
-        naive_datetime_obj, pytz.timezone(settings.TIME_ZONE)
-    )
+    tz = pytz.timezone(settings.TIME_ZONE)
+    try:
+        aware_datetime_obj = make_aware(naive_datetime_obj, tz)
+    except pytz.exceptions.AmbiguousTimeError:
+        # Ambiguity occurs when the date/time falls within the hour before or after daylight saving time ends. For
+        # example, if the date/time is November 6, 2011 01:46 AM, it is not known if the time is before or after the
+        # time change since that time occurs twice on that date. However, this level of granularity is not important in
+        # expungement, so default to standard time in case of ambiguity.
+        aware_datetime_obj = make_aware(naive_datetime_obj, tz, is_dst=False)
+
     # Return the timezone aware object.
     return aware_datetime_obj
 
