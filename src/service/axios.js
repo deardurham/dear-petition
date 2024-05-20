@@ -4,7 +4,7 @@ import { CSRF_COOKIE_NAME, CSRF_HEADER_KEY } from '../constants/authConstants';
 
 const Axios = axios.create({
   baseURL: `/petition/api/`,
-  timeout: 20 * 1000,
+  timeout: 5 * 1000, // 5 second timeout
   withCredentials: true, // allow setting/passing cookies
   xsrfCookieName: CSRF_COOKIE_NAME,
   xsrfHeaderName: CSRF_HEADER_KEY,
@@ -20,7 +20,12 @@ export const axiosBaseQuery =
       throw new Error('Must provide api instance');
     }
     const requestConfig = { url, method, data, params, responseType };
-    if (timeout) {
+
+    // Set a different timeout for batch/{pk}/ GET requests because they can take a long time
+    const isBatchGetRequest = (url, method) => url?.match(/^batch\/\d+\/$/) !== null && method?.toLowerCase() === 'get';
+    if (isBatchGetRequest(url, method)) {
+      requestConfig.timeout = 30 * 1000; // 30 second timeout
+    } else if (timeout) {
       requestConfig.timeout = timeout;
     }
     try {
