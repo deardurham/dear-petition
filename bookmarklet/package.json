@@ -1,5 +1,5 @@
 {
-  "name": "bookmarklet",
+  "name": "@code-with-durham/bookmarklet",
   "version": "0.1.0",
   "description": "Bookmark that forwards Portal case info for parsing",
   "main": "index.js",
@@ -7,5 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rob Gries",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deardurham/dear-petition/bookmarklet"
+  }
 }

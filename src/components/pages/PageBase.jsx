@@ -23,10 +23,8 @@ import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
-// eslint-disable-next-line import/no-unresolved
-import { generateBookmarklet } from 'bookmarklet';
-// eslint-disable-next-line import/no-unresolved
-import bookmarkletMetadata from 'bookmarklet/package.json';
+import { generateBookmarklet } from '@code-with-durham/bookmarklet';
+import bookmarkletMetadata from '@code-with-durham/bookmarklet/package.json';
 
 const bookmarkletVersion = `v${bookmarkletMetadata.version}`;
 
