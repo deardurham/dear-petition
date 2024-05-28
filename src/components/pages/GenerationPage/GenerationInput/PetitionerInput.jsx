@@ -9,7 +9,7 @@ import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
 import { useLazySearchClientsQuery, useUpdateBatchMutation, useUpdateContactMutation } from '../../../../service/api';
 import Button, { ModalButton } from '../../../elements/Button';
 import { useModalContext } from '../../../elements/Button/ModalButton';
-import { CreateContact } from '../../../../features/CreateContact';
+import { CreateClient } from '../../../../features/CreateClient';
 
 const TextInput = styled(Input)`
   input {
@@ -27,7 +27,7 @@ export const CreateClientModal = ({ onCreate }) => {
   const { closeModal } = useModalContext();
   return (
     <div className="w-[550px] px-40 py-20" ref={modalElement}>
-      <CreateContact onClose={closeModal} category="client" onSubmitSuccess={(submitData) => onCreate(submitData)} />
+      <CreateClient onClose={closeModal} category="client" onSubmitSuccess={(submitData) => onCreate(submitData)} />
     </div>
   );
 };
@@ -57,7 +57,7 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
   const [editErrors, setEditErrors] = useState({});
 
   const [petitionerData, setPetitionerData] = useState(getPetitionerData(petitioner));
-  const { name, ...address } = petitionerData;
+  const { name, dob, ...address } = petitionerData;
 
   const addError = (key, error) => setEditErrors((prev) => ({ ...prev, [key]: [error] }));
   const clearError = (key) => setEditErrors((prev) => ({ ...prev, [key]: [] }));
@@ -197,6 +197,14 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
           <TextInput
             label="Name"
             value={name}
+            onChange={(e) => setPetitionerData((prev) => ({ ...prev, name: e.target.value }))}
+            errors={isEditing && editErrors.name}
+            onClearError={onClearError}
+            disabled={!isEditing}
+          />
+          <TextInput
+            label="Date of Birth"
+            value={dob}
             onChange={(e) => setPetitionerData((prev) => ({ ...prev, name: e.target.value }))}
             errors={isEditing && editErrors.name}
             onClearError={onClearError}

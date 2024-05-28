@@ -237,6 +237,15 @@ class ContactViewSet(viewsets.ModelViewSet):
         resources.AgencyResource().import_data(dataset, raise_errors=True)
         return Response({})
 
+class ClientViewSet(ContactViewSet):
+    queryset = pm.Client.objects.all()
+    serializer_class = serializers.ClientSerializer
+
+    def get_queryset(self):
+        return pm.Client.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class BatchViewSet(viewsets.ModelViewSet):

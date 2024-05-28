@@ -25,6 +25,7 @@ from localflavor.us import us_states
 from dear_petition.users.models import User
 from dear_petition.users import constants as uc
 from dear_petition.common.models import PrintableModelMixin
+from dear_petition.petition.utils import resolve_dob
 from . import constants as pc
 
 from .constants import (
@@ -267,6 +268,7 @@ class AgencyWithSherriffOfficeManager(models.Manager):
                 output_field=models.BooleanField(),
             ))
         )
+    
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
@@ -298,11 +300,21 @@ class Contact(PrintableModelMixin, models.Model):
     
     @classmethod
     def get_sherriff_office_by_county(cls, county: str):
-        print(county)
         qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
         if qs.count() > 1:
             logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
         return qs.first() if qs.exists() else None
+    
+
+class Client(Contact):
+    dob = models.DateField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # This is for backwards compatibility with existing data that pre-exists the multi-table inheritance paradigm
+        # TODO: Fully convert to multi-table inheritance paradigm
+        if self._state.adding:
+            self.category = "client"
+        super().save(*args, **kwargs)
 
 class Batch(PrintableModelMixin, models.Model):
 
@@ -321,7 +333,7 @@ class Batch(PrintableModelMixin, models.Model):
         on_delete=models.SET_NULL,
     )
     client = models.ForeignKey(
-        Contact,
+        Client,
         related_name="batches",
         null=True,
         limit_choices_to={"category": "client"},

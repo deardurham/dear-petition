@@ -45,6 +45,12 @@ export const api = createApi({
             ]
           : [],
     }),
+    createClient: builder.mutation({
+      query: ({ data }) => ({ url: `client/`, method: 'post', data }),
+    }),
+    updateClient: builder.mutation({
+      query: ({ id, data }) => ({ url: `client/${id}/`, method: 'put', data }),
+    }),
     deleteAgency: builder.mutation({
       query: ({ id }) => ({ url: `contact/${id}/`, method: 'delete' }),
       invalidatesTags: [
@@ -164,6 +170,8 @@ export const {
   useLazySearchClientsQuery,
   useCreateContactMutation,
   useUpdateContactMutation,
+  useCreateClientMutation,
+  useUpdateClientMutation,
   useDeleteAgencyMutation,
   useImportAgenciesMutation,
   usePreviewImportAgenciesMutation,
