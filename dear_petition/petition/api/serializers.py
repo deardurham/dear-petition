@@ -140,7 +140,6 @@ class ContactSerializer(serializers.ModelSerializer):
             "zipcode",
             "user",
             "county",
-            "dob",
         ]
 
 class ClientSerializer(ContactSerializer):
