@@ -25,7 +25,6 @@ from localflavor.us import us_states
 from dear_petition.users.models import User
 from dear_petition.users import constants as uc
 from dear_petition.common.models import PrintableModelMixin
-from dear_petition.petition.utils import resolve_dob
 from . import constants as pc
 
 from .constants import (
@@ -336,7 +335,6 @@ class Batch(PrintableModelMixin, models.Model):
         Client,
         related_name="batches",
         null=True,
-        limit_choices_to={"category": "client"},
         on_delete=models.SET_NULL,
     )
 

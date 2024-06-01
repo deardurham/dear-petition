@@ -6,7 +6,6 @@ from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
 from dear_petition.petition import constants as pc
-from dear_petition.petition.utils import resolve_dob
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 import pytest
+from django.utils import timezone
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
@@ -9,6 +10,7 @@ from dear_petition.petition.tests.factories import (
     OffenseRecordFactory,
     PetitionFactory,
     CIPRSRecordFactory,
+    ClientFactory,
 )
 from dear_petition.petition.etl.load import link_offense_records, create_documents
 from dear_petition.petition.etl.transform import recalculate_petitions, combine_batches
@@ -17,13 +19,12 @@ pytestmark = pytest.mark.django_db
 
 
 def test_recalculate_petitions(petition):
-    petition = PetitionFactory(form_type=constants.UNDERAGED_CONVICTIONS)
     batch = petition.batch
     record = CIPRSRecordFactory(
         batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM"
     )
     offense = OffenseFactory(
-        disposition_method="PROBATION OTHER",
+        disposition_method="Dismissed by Court",
         ciprs_record=record,
         jurisdiction=constants.DISTRICT_COURT,
     )
@@ -57,7 +58,7 @@ def test_combine_batches(batch, batch_file, fake_pdf):
         ciprs_record=record,
         jurisdiction=constants.DISTRICT_COURT,
     )
-    offense_record = OffenseRecordFactory(offense=offense, action="CHARGED")
+    OffenseRecordFactory(offense=offense, action="CHARGED")
 
     second_batch = BatchFactory()
     second_batch_file = BatchFileFactory(batch=second_batch, file=fake_pdf)

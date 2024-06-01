@@ -3,7 +3,7 @@ import random
 
 import factory
 from dear_petition.petition.models import (Batch, BatchFile, CIPRSRecord,
-                                           Contact, GeneratedPetition, Offense,
+                                           Contact, Client, GeneratedPetition, Offense,
                                            OffenseRecord, Petition,
                                            PetitionDocument,
                                            PetitionOffenseRecord)
@@ -16,9 +16,29 @@ from ..constants import (CHARGED, CONVICTED, DISMISSED, DISTRICT_COURT,
                          FEMALE, MALE, NOT_AVAILABLE, SUPERIOR_COURT, UNKNOWN)
 
 
+class ContactFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Contact
+
+
+class ClientFactory(factory.django.DjangoModelFactory):
+    category = "client"
+
+    class Meta:
+        model = Client
+
+
+class AttorneyFactory(factory.django.DjangoModelFactory):
+    category = "attorney"
+
+    class Meta:
+        model = Contact
+
+
 class BatchFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("name")
     user = factory.SubFactory(UserFactory)
+    client = factory.SubFactory(ClientFactory)
 
     class Meta:
         model = Batch
@@ -181,25 +201,6 @@ class PetitionDocumentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PetitionDocument
-
-
-class ContactFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Contact
-
-
-class ClientFactory(factory.django.DjangoModelFactory):
-    category = "client"
-
-    class Meta:
-        model = Contact
-
-
-class AttorneyFactory(factory.django.DjangoModelFactory):
-    category = "attorney"
-
-    class Meta:
-        model = Contact
 
 
 class GeneratedPetitionFactory(factory.django.DjangoModelFactory):

@@ -1,6 +1,7 @@
 import string
 from datetime import datetime
 
+from django.utils import timezone
 import pytest
 
 from dear_petition.petition.constants import CHARGED, CONVICTED, FEMALE
@@ -164,6 +165,7 @@ def client():
         city='Durham',
         state='NC',
         zipcode='27701',
+        dob = timezone.now().date() # I wasn't born yesterday
     )
 
 

@@ -9,7 +9,7 @@ from dear_petition.petition.types.dismissed import build_query as build_dismisse
 from dear_petition.petition.types.not_guilty import (
     build_query as build_not_guilty_query,
 )
-from dear_petition.petition.utils import resolve_dob
+from dear_petition.petition.utils import resolve_dob_from_offense_records
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,10 @@ def get_offense_records(batch, jurisdiction=""):
     if not qs.exists():
         return qs
 
-    dob = resolve_dob(qs)
+    if batch.client and batch.client.dob:
+        dob = batch.client.dob
+    else:
+        dob = resolve_dob_from_offense_records(qs)
     if not dob:
         return OffenseRecord.objects.none()  # We can't determine this petition type without the date of birth
 
