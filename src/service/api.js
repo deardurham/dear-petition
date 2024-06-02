@@ -50,6 +50,18 @@ export const api = createApi({
     }),
     updateClient: builder.mutation({
       query: ({ id, data }) => ({ url: `client/${id}/`, method: 'put', data }),
+      invalidatesTags: (result) => {
+        if (!result) {
+          return [];
+        }
+        const tags = [
+          { type: 'ContactList', id: result.category },
+          { type: 'ContactFilterOptions', id: result.category },
+        ];
+        console.log(result);
+        result?.batches?.forEach((batchId) => tags.push({ type: 'Batch', id: batchId }));
+        return tags;
+      },
     }),
     deleteAgency: builder.mutation({
       query: ({ id }) => ({ url: `contact/${id}/`, method: 'delete' }),
@@ -67,7 +79,7 @@ export const api = createApi({
     }),
     searchClients: builder.query({
       query: ({ search }) => ({
-        url: `contact/?category=client&search=${search}`,
+        url: `client/?search=${search}`,
         method: 'get',
       }),
     }),
@@ -159,6 +171,24 @@ export const api = createApi({
       }),
       invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
     }),
+    assignClientToBatch: builder.mutation({
+      query: ({ batchId, data }) => ({
+        url: `/batch/${batchId}/assign_client_to_batch/`,
+        method: 'post',
+        data: data,
+      }),
+      invalidatesTags: (result) => {
+        if (!result) {
+          return [];
+        }
+        const tags = [
+          { type: 'ContactList', id: result.category },
+          { type: 'ContactFilterOptions', id: result.category },
+          { type: 'Batch', id: result.batch_id },
+        ];
+        return tags;
+      },
+    }),
   }),
 });
 
@@ -191,4 +221,5 @@ export const {
   useCreateUserMutation,
   useModifyUserMutation,
   useUsersQuery,
+  useAssignClientToBatchMutation,
 } = api;

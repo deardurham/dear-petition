@@ -241,11 +241,11 @@ class ClientViewSet(ContactViewSet):
     queryset = pm.Client.objects.all()
     serializer_class = serializers.ClientSerializer
 
+    def get_serializer_class(self):
+        return serializers.ClientSerializer
+
     def get_queryset(self):
         return pm.Client.objects.filter(user=self.request.user)
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class BatchViewSet(viewsets.ModelViewSet):
@@ -363,6 +363,20 @@ class BatchViewSet(viewsets.ModelViewSet):
 
         new_batch = combine_batches(batch_ids, label, user_id)
         return Response(self.get_serializer(new_batch).data)
+    
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def assign_client_to_batch(self, request, pk):
+        client_id = request.data['client_id']
+        batch = self.get_object()
+        batch.client_id = client_id
+        batch.save()
+        batch.adjust_for_new_client_dob()
+        return Response({"batch_id": batch.pk})
 
 
 class MyInboxView(generics.ListAPIView):

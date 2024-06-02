@@ -6,7 +6,11 @@ import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
 import AddressInput from './AddressInput';
 import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
-import { useLazySearchClientsQuery, useUpdateBatchMutation, useUpdateContactMutation } from '../../../../service/api';
+import {
+  useLazySearchClientsQuery,
+  useAssignClientToBatchMutation,
+  useUpdateClientMutation,
+} from '../../../../service/api';
 import Button, { ModalButton } from '../../../elements/Button';
 import { useModalContext } from '../../../elements/Button/ModalButton';
 import { CreateClient } from '../../../../features/CreateClient';
@@ -51,8 +55,8 @@ const getPetitionerData = (petitioner) => {
 export default function PetitionerInput({ petitioner, errors, onClearError }) {
   const { batchId } = useParams();
   const [triggerSuggestionsFetch] = useLazySearchClientsQuery();
-  const [triggerBatchUpdate] = useUpdateBatchMutation();
-  const [triggerContactUpdate] = useUpdateContactMutation();
+  const [triggerAssignClientToBatch] = useAssignClientToBatchMutation();
+  const [triggerClientUpdate] = useUpdateClientMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [editErrors, setEditErrors] = useState({});
 
@@ -84,8 +88,8 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
             onClearError('client');
             clearError('client');
             try {
-              await triggerBatchUpdate({
-                id: batchId,
+              await triggerAssignClientToBatch({
+                batchId: batchId,
                 data: { client_id: clientData.pk },
               }).unwrap();
               setPetitionerData(getPetitionerData(clientData));
@@ -116,7 +120,7 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
         onClick={async () => {
           clearAllErrors();
           try {
-            await triggerContactUpdate({
+            await triggerClientUpdate({
               id: petitioner.pk,
               data: { ...petitionerData, category: 'client' },
             }).unwrap();
@@ -162,8 +166,8 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
               onClearError('client');
               clearError('client');
               try {
-                await triggerBatchUpdate({
-                  id: batchId,
+                await triggerAssignClientToBatch({
+                  batchId: batchId,
                   data: { client_id: pk },
                 }).unwrap();
 
@@ -205,10 +209,11 @@ export default function PetitionerInput({ petitioner, errors, onClearError }) {
           <TextInput
             label="Date of Birth"
             value={dob}
-            onChange={(e) => setPetitionerData((prev) => ({ ...prev, name: e.target.value }))}
-            errors={isEditing && editErrors.name}
+            onChange={(e) => setPetitionerData((prev) => ({ ...prev, dob: e.target.value }))}
+            errors={isEditing && editErrors.dob}
             onClearError={onClearError}
             disabled={!isEditing}
+            type="date"
           />
           <AddressInput
             address={address}

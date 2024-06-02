@@ -308,12 +308,25 @@ class Contact(PrintableModelMixin, models.Model):
 class Client(Contact):
     dob = models.DateField(null=True, blank=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Save the original DOB so we can compare it during save to see if it has changed
+        self.history = {"dob": self.dob}
+
     def save(self, *args, **kwargs):
         # This is for backwards compatibility with existing data that pre-exists the multi-table inheritance paradigm
         # TODO: Fully convert to multi-table inheritance paradigm
+
         if self._state.adding:
             self.category = "client"
+
         super().save(*args, **kwargs)
+
+        if self.dob != self.history["dob"]:
+            # The DOB has changed. Need to recalculate underaged conviction forms
+            for batch in self.batches.all():
+                batch.adjust_for_new_client_dob()
+
 
 class Batch(PrintableModelMixin, models.Model):
 
@@ -388,6 +401,14 @@ class Batch(PrintableModelMixin, models.Model):
 
     def adult_misdemeanor_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.ADULT_MISDEMEANORS, jurisdiction)
+    
+    def adjust_for_new_client_dob(self):
+        """
+        Called when a new date of birth is added to a batch's client to adjust the petitions accordingly.
+        """
+        from dear_petition.petition.etl.load import create_petitions_from_records
+        Petition.objects.filter(batch=self, form_type=pc.UNDERAGED_CONVICTIONS).delete()
+        create_petitions_from_records(self, pc.UNDERAGED_CONVICTIONS)
 
     @property
     def race(self):

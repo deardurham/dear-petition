@@ -148,7 +148,7 @@ class ClientSerializer(ContactSerializer):
     state = serializers.CharField(required=True)
     zipcode = serializers.CharField(required=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    dob = serializers.DateField(required=False)
+    batches = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Client
@@ -163,6 +163,7 @@ class ClientSerializer(ContactSerializer):
             "state",
             "zipcode",
             "user",
+            "batches",
             "county",
             "dob",
         ]
