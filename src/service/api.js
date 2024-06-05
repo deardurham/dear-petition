@@ -90,7 +90,7 @@ export const api = createApi({
       },
     }),
     getBatch: builder.query({
-      query: ({ id }) => ({ url: `batch/${id}/`, method: 'get' }),
+      query: ({ id }) => ({ url: `batch/${id}/`, method: 'get', timeout: 30 * 1000 }),
       providesTags: (result, _err, { id }) => {
         const tags = [{ type: 'Batch', id }];
         // TODO: Add petitions from this result to redux store
