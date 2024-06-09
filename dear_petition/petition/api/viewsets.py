@@ -372,8 +372,15 @@ class BatchViewSet(viewsets.ModelViewSet):
     )
     def assign_client_to_batch(self, request, pk):
         client_id = request.data['client_id']
+
+        try:
+            client = pm.Client.objects.get(pk=client_id)
+        except pm.Client.DoesNotExist:
+            return Response(
+                "Unknown client.", status=status.HTTP_400_BAD_REQUEST
+            )
         batch = self.get_object()
-        batch.client_id = client_id
+        batch.client = client
         batch.save()
         batch.adjust_for_new_client_dob()
         return Response({"batch_id": batch.pk})
