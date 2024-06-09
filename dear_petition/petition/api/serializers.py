@@ -7,6 +7,7 @@ from dear_petition.users.models import User
 from dear_petition.petition.models import (
     CIPRSRecord,
     Contact,
+    Client,
     Batch,
     Offense,
     OffenseRecord,
@@ -147,6 +148,25 @@ class ClientSerializer(ContactSerializer):
     state = serializers.CharField(required=True)
     zipcode = serializers.CharField(required=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+    batches = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Client
+        fields = [
+            "pk",
+            "name",
+            "category",
+            "address1",
+            "address2",
+            "formatted_address",
+            "city",
+            "state",
+            "zipcode",
+            "user",
+            "batches",
+            "county",
+            "dob",
+        ]
 
 
 class GeneratePetitionSerializer(serializers.Serializer):
@@ -288,7 +308,7 @@ class BatchSerializer(serializers.ModelSerializer):
     petitions = PetitionSerializer(many=True, read_only=True)
     generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
     generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
-
+    
     def get_generate_errors_data(self, obj):
         return {'batch': obj.pk}
 
@@ -316,9 +336,10 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     )
     attorney = ContactSerializer(read_only=True)
     client_id = serializers.PrimaryKeyRelatedField(
-        source='client', queryset=Contact.objects.filter(category='client'), write_only=True, required=False
+        source='client', queryset=Client.objects.all(), write_only=True, required=False
     )
     client = ClientSerializer(read_only=True)
+    client_errors = serializers.SerializerMethodField()
 
     generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
     generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
@@ -341,6 +362,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "client_id",
             "generate_letter_errors",
             "generate_summary_errors",
+            "client_errors"
         ]
         read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 
@@ -350,6 +372,14 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             batch=instance.pk,
         ).order_by("county", "jurisdiction")
         return ParentPetitionSerializer(parent_petitions, many=True).data
+    
+    def get_client_errors(self, instance):
+        errors = []
+        if not instance.client:
+            return errors
+        if not instance.client.dob:
+            errors.append("Date of birth missing. The petition generator will try its best to identify a date of birth from the records at time of petition creation.")
+        return errors
 
 
 class MyInboxSerializer(serializers.ModelSerializer):

@@ -267,6 +267,7 @@ class AgencyWithSherriffOfficeManager(models.Manager):
                 output_field=models.BooleanField(),
             ))
         )
+    
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
@@ -298,11 +299,34 @@ class Contact(PrintableModelMixin, models.Model):
     
     @classmethod
     def get_sherriff_office_by_county(cls, county: str):
-        print(county)
         qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
         if qs.count() > 1:
             logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
         return qs.first() if qs.exists() else None
+    
+
+class Client(Contact):
+    dob = models.DateField(null=True, blank=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Save the original DOB so we can compare it during save to see if it has changed
+        self.history = {"dob": self.dob}
+
+    def save(self, *args, **kwargs):
+        # This is for backwards compatibility with existing data that pre-exists the multi-table inheritance paradigm
+        # TODO: Fully convert to multi-table inheritance paradigm
+
+        if self._state.adding:
+            self.category = "client"
+
+        super().save(*args, **kwargs)
+
+        if self.dob != self.history["dob"]:
+            # The DOB has changed. Need to recalculate underaged conviction forms
+            for batch in self.batches.all():
+                batch.adjust_for_new_client_dob()
+
 
 class Batch(PrintableModelMixin, models.Model):
 
@@ -321,10 +345,9 @@ class Batch(PrintableModelMixin, models.Model):
         on_delete=models.SET_NULL,
     )
     client = models.ForeignKey(
-        Contact,
+        Client,
         related_name="batches",
         null=True,
-        limit_choices_to={"category": "client"},
         on_delete=models.SET_NULL,
     )
 
@@ -378,6 +401,14 @@ class Batch(PrintableModelMixin, models.Model):
 
     def adult_misdemeanor_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.ADULT_MISDEMEANORS, jurisdiction)
+    
+    def adjust_for_new_client_dob(self):
+        """
+        Called when a new date of birth is added to a batch's client to adjust the petitions accordingly.
+        """
+        from dear_petition.petition.etl.load import create_petitions_from_records
+        Petition.objects.filter(batch=self, form_type=pc.UNDERAGED_CONVICTIONS).delete()
+        create_petitions_from_records(self, pc.UNDERAGED_CONVICTIONS)
 
     @property
     def race(self):

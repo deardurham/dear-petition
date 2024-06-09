@@ -6,7 +6,6 @@ from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
 from dear_petition.petition import constants as pc
-from dear_petition.petition.utils import resolve_dob
 
 logger = logging.getLogger(__name__)
 
@@ -15,15 +14,12 @@ def get_offense_records(batch, jurisdiction=""):
     qs = OffenseRecord.objects.filter(offense__ciprs_record__batch=batch)
     if jurisdiction:
         qs = qs.filter(offense__jurisdiction=jurisdiction)
-    dob = resolve_dob(qs)
-    if not dob:
-        return qs  # We can't determine this petition type without the date of birth
-    query = build_query(dob)
+    query = build_query()
     qs = qs.filter(query)
     return qs.select_related("offense__ciprs_record__batch")
 
 
-def build_query(dob):
+def build_query():
     action = Q(action=pc.CONVICTED)
     severity = Q(severity__iexact=pc.SEVERITIES.FELONY)
     today = timezone.now().date()

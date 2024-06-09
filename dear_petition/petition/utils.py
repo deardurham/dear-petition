@@ -200,7 +200,7 @@ def get_ordered_offense_records(petition_document):
     return qs
 
 
-def resolve_dob(qs):
+def resolve_dob_from_offense_records(qs):
     """
     It is possible that different CIPRS records could have different dates of birth. In this case, use the earliest date of birth as it is the most conservative.
     """

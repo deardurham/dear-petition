@@ -237,6 +237,15 @@ class ContactViewSet(viewsets.ModelViewSet):
         resources.AgencyResource().import_data(dataset, raise_errors=True)
         return Response({})
 
+class ClientViewSet(ContactViewSet):
+    queryset = pm.Client.objects.all()
+    serializer_class = serializers.ClientSerializer
+
+    def get_serializer_class(self):
+        return serializers.ClientSerializer
+
+    def get_queryset(self):
+        return pm.Client.objects.filter(user=self.request.user)
 
 
 class BatchViewSet(viewsets.ModelViewSet):
@@ -354,6 +363,27 @@ class BatchViewSet(viewsets.ModelViewSet):
 
         new_batch = combine_batches(batch_ids, label, user_id)
         return Response(self.get_serializer(new_batch).data)
+    
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def assign_client_to_batch(self, request, pk):
+        client_id = request.data['client_id']
+
+        try:
+            client = pm.Client.objects.get(pk=client_id)
+        except pm.Client.DoesNotExist:
+            return Response(
+                "Unknown client.", status=status.HTTP_400_BAD_REQUEST
+            )
+        batch = self.get_object()
+        batch.client = client
+        batch.save()
+        batch.adjust_for_new_client_dob()
+        return Response({"batch_id": batch.pk})
 
 
 class MyInboxView(generics.ListAPIView):

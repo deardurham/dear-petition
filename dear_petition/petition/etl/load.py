@@ -102,7 +102,7 @@ def create_petitions_from_records(batch, form_type):
             )
 
 
-def link_offense_records(petition, filter_active=True):
+def link_offense_records(petition):
     """Divide offense records across petition and any needed attachment forms."""
 
     offense_records = petition.get_all_offense_records()
