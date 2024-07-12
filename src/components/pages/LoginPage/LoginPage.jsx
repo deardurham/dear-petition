@@ -5,7 +5,7 @@ import { SplashLogo, FormErrors, InputStyled, PasswordInputStyled } from './Logi
 import { Button } from '../../elements/Button';
 
 // Assets
-import dearLogo from '../../../assets/img/DEAR_logo.png';
+import lancLogoTextless from '../../../assets/img/LANC_logo_textless.png';
 
 // Routing
 import { useHistory } from 'react-router-dom';
@@ -62,9 +62,12 @@ function Login() {
   };
 
   return (
-    <main className="flex-1 flex flex-col gap-[10rem] items-center w-100 h-100 mt-20">
-      <div className="max-w-[950px] p-2">
-        <SplashLogo src={dearLogo} alt="DEAR logo" />
+    <main className="flex-1 flex flex-col gap-12 items-center w-100 h-100 mt-20">
+      <div className="max-w-[350px] p-2 flex flex-col items-center">
+        <SplashLogo src={lancLogoTextless} alt="DEAR logo" />
+        <h1 className="font-sans text-[40px] tracking-wide my-4 text-blue-primary drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)] font-semibold">
+          Easy Expunge
+        </h1>
       </div>
       <form className="flex flex-col items-center gap-4 w-[190px]" onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
