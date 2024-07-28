@@ -6,7 +6,7 @@ from django.utils.timezone import make_aware
 from django.utils import timezone
 from django.db.models import IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
-from .constants import DATE_FORMAT
+from .constants import DATE_FORMAT, STATUTES
 
 from PIL import ImageFont
 import dateutil.parser
@@ -84,12 +84,9 @@ def remove_prefix(text, prefix):
 
 
 def get_petition_filename(petitioner_name, petition, extension, addendum_document=None):
-    form_type = (
-        f"{petition.form_type} {addendum_document.form_type}"
-        if addendum_document is not None
-        else petition.form_type
-    )
-    return f"{petitioner_name} - {form_type} - {petition.jurisdiction} {petition.county}.{extension}"
+    date_generated = petition.created.date().strftime("%m-%d-%Y")
+    statute = STATUTES.get(petition.form_type)
+    return f"{date_generated} {petition.county} {petition.jurisdiction}C {statute} {petitioner_name}.{extension}"
 
 
 def split_first_and_last_name(name):
