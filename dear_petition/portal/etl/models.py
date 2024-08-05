@@ -6,6 +6,13 @@ from pydantic import BaseModel, field_validator
 from dear_petition.petition import constants
 
 
+def parse_date(v):
+    """Parse date strings into datetime.date objects"""
+    if isinstance(v, str):
+        return dt.datetime.strptime(v, "%m/%d/%Y").date()
+    return v
+
+
 class CaseSummary(BaseModel):
     case_number: str
     county: str
@@ -19,13 +26,12 @@ class Charge(BaseModel):
     degree: str
     offense_date: Union[dt.date, None]
     filed_date: Union[dt.date, None]
+    arrest_date: Union[dt.date, None]
 
-    @field_validator("offense_date", "filed_date", mode="before")
+    @field_validator("offense_date", "filed_date", "arrest_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        if isinstance(v, str):
-            return dt.datetime.strptime(v, "%m/%d/%Y")
-        return v
+        return parse_date(v);
 
     def transform_severity(self):
         """Attempt to convert Portal's degree to CIPRS severity"""
@@ -46,9 +52,7 @@ class CaseInfo(BaseModel):
     @field_validator("case_status_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        if isinstance(v, str):
-            return dt.datetime.strptime(v, "%m/%d/%Y")
-        return v
+        return parse_date(v);
 
 
 class PartyInfo(BaseModel):
@@ -67,9 +71,7 @@ class Disposition(BaseModel):
     @field_validator("event_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        if isinstance(v, str):
-            return dt.datetime.strptime(v, "%m/%d/%Y")
-        return v
+        return parse_date(v);
 
     def is_dismissed(self) -> bool:
         return self.criminal_disposition in constants.DISMISSED_DISPOSITION_METHODS
@@ -99,5 +101,19 @@ class PortalRecord(BaseModel):
                 return charge
 
     def transform_offense_date(self) -> dt.date:
+        if not self.case_info.charges:
+            return None
+
         offense_dates = [c.offense_date for c in self.case_info.charges]
         return min(offense_dates).isoformat()
+
+    def transform_arrest_date(self) -> dt.date:
+        if not self.case_info.charges:
+            return None
+
+        arrest_dates = [c.arrest_date for c in self.case_info.charges if c.arrest_date is not None]
+
+        if not arrest_dates:
+            return None
+
+        return min(arrest_dates).isoformat()
