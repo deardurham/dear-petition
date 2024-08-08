@@ -23,6 +23,7 @@ def parse_case_information(soup):
                 degree=parse_charge_degree(tr=tr) or "",
                 offense_date=parse_charge_offense_date(tr=tr) or None,
                 filed_date=parse_charge_filed_date(tr=tr) or None,
+                agency=parse_charge_agency(tr.findNext('tr')) or '',
             )
         )
     ci = CaseInfo(
@@ -83,6 +84,28 @@ def parse_case_status(soup):
     """
     # status is always last, so select last one
     return soup.select("tr[ng-if*=caseInfo\\.CaseStatuses] span")[-1].text.strip()
+
+@catch_parse_error
+def parse_charge_agency(tr):
+    """
+    Parse agency info for the previously listed charge
+
+    <div class="roa-data ng-scope ng-isolate-scope" label="Agency:" ng-if="::charge.FilingAgencyDescription">
+        <div class="roa-value roa-inline roa-indent" ng-transclude="">
+            <div class="ng-binding ng-scope">
+                Creedmoor Police Department
+            </div>
+            <div ng-if="::charge.FilingAgencyAddress.length" ng-repeat="address in ::charge.FilingAgencyAddress" class="ng-binding ng-scope">
+                111 Masonic St
+            </div>
+            <div ng-if="::charge.FilingAgencyAddress.length" ng-repeat="address in ::charge.FilingAgencyAddress" class="ng-binding ng-scope">
+                Creedmoor, NC, 27522
+            </div>
+        </div>
+    </div>
+    """
+    return tr.select_one("div[ng-if*='::charge.FilingAgencyDescription'] > div.roa-value > div:first-of-type").text.strip() 
+
 
 
 @catch_parse_error
