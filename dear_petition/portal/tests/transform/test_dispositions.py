@@ -54,6 +54,7 @@ class TestCharge:
             degree="FNC",
             offense_date=dt.date(1994, 2, 12),
             filed_date=dt.date(1994, 2, 14),
+            arrest_date=dt.date(1994, 4, 15),
         )
 
     @pytest.mark.parametrize(

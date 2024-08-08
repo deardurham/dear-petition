@@ -3,7 +3,11 @@ from dear_petition.portal.etl.transform import transform_portal_record
 
 def test_transform_full_record(sample_record):
     expected = {
-        "Case Information": {"Case Status": "Disposed", "Offense Date": "2001-01-01"},
+        "Case Information": {
+            "Case Status": "Disposed",
+            "Offense Date": "2001-01-01",
+            "Arrest Date": "2001-01-03"
+        },
         "Defendant": {
             "Name": "DOE, JANE EMMA",
             "Race": "White",

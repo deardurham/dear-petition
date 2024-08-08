@@ -2126,6 +2126,34 @@
                                         <div>
                                           <!-- Arrests -->
                                           <!-- ngIf: ::charge.Arrests.length -->
+                                          <div ng-if="::charge.Arrests.length" class="roa-pad-top ng-scope">
+                                            <div>Arrest</div>
+                                            <!-- ngRepeat: arrest in ::charge.Arrests -->
+                                            <div ng-repeat="arrest in ::charge.Arrests" class="roa-indent-2 ng-scope">
+                                              <!-- Arrest Date -->
+                                              <div class="roa-data ng-scope ng-isolate-scope" label="Date:" ng-if="::arrest.ArrestDate">
+                                                <div class="roa-label roa-inline roa-align-top ng-binding ng-scope" ng-if="::label" ng-bind="::label">
+                                                  Date:
+                                                </div>
+                                                <div class="roa-value roa-inline roa-indent" ng-transclude="">
+                                                  <span class="ng-binding ng-scope">01/03/2001</span>
+                                                </div>
+                                              </div>
+                                              <!-- Agency -->
+                                              <div class="roa-data ng-scope ng-isolate-scope" label="Agency:" ng-if="::arrest.AgencyAddress.length ||(arrest.AgencyCode && arrest.AgencyDescription)">
+                                                <div class="roa-label roa-inline roa-align-top ng-binding ng-scope" ng-if="::label" ng-bind="::label">
+                                                  Agency:
+                                                </div>
+                                                <div class="roa-value roa-inline roa-indent" ng-transclude="">
+                                                  <div ng-if="::arrest.AgencyCode && arrest.AgencyDescription" class="ng-binding ng-scope">
+                                                    WAKESO - Wake County Sheriffs Office
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <!-- end ngRepeat: arrest in ::charge.Arrests -->
+                                          </div>
+                                          <!-- end ngIf: ::charge.Arrests.length -->
                                           <!-- Rearrests -->
                                           <!-- ngIf: ::charge.Rearrests.length -->
                                           <!-- Offense Reports -->
@@ -4126,4 +4154,3 @@
       window.onload = function () { // todo remove this - app cache is deprecated, and not even applicable to an app like ROA TylerUiCacheControl.start({ loaderPath: '', appTitle: 'Register of Actions', }); }
     </script>
   </body>
-  
