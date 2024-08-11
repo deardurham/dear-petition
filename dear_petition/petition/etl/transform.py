@@ -1,7 +1,6 @@
 import os
 from typing import List
 from django.db import transaction
-from django.db.models import Q
 
 from dear_petition.petition import models as pm
 

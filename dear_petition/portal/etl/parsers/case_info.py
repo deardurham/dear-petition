@@ -24,6 +24,7 @@ def parse_case_information(soup):
                 offense_date=parse_charge_offense_date(tr=tr) or None,
                 filed_date=parse_charge_filed_date(tr=tr) or None,
                 agency=parse_charge_agency(tr.findNext('tr')) or '',
+                arrest_date = parse_arrest_date(soup) or None,
             )
         )
     ci = CaseInfo(
@@ -226,3 +227,26 @@ def parse_charge_filed_date(tr):
     """  # noqa
     elem = tr.select_one("roa-charge-data-column[ng-if*=FiledDate]")
     return elem["data-value"]
+
+
+@catch_parse_error
+def parse_arrest_date(soup):
+    """
+    Parse arrest date. There can be multiple arrest dates for a single charge, but for now just take the first one.
+
+    Sample HTML:
+        <div class="roa-data ng-scope ng-isolate-scope" label="Date:" ng-if="::arrest.ArrestDate">
+            <div class="roa-label roa-inline roa-align-top ng-binding ng-scope" ng-if="::label" ng-bind="::label">
+                Date:
+            </div>
+            <div class="roa-value roa-inline roa-indent" ng-transclude="">
+                <span class="ng-binding ng-scope">
+                    10/04/1991
+                </span>
+            </div>
+        </div>
+    """
+    arrest_date_div = soup.find('div', {'ng-if': '::arrest.ArrestDate'})
+    if not arrest_date_div:
+        return None;
+    return arrest_date_div.find('span', class_='ng-binding ng-scope').get_text(strip=True)
