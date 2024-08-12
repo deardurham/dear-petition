@@ -24,6 +24,7 @@ def test_transform_full_record(sample_record):
                         "Description": "EXTRADITION/FUGITIVE OTH STATE",
                         "Law": "15A-727;733;734",
                         "Severity": "FELONY",
+                        "Agency": "Creedmoor Police Department",
                     }
                 ],
             }

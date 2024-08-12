@@ -26,6 +26,7 @@ class Charge(BaseModel):
     degree: str
     offense_date: Union[dt.date, None]
     filed_date: Union[dt.date, None]
+    agency: str
     arrest_date: Union[dt.date, None]
 
     @field_validator("offense_date", "filed_date", "arrest_date", mode="before")

@@ -51,6 +51,7 @@ def transform_offenses(portal_record: PortalRecord):
                     "Action": disposition.transform_action(),
                     "Severity": charge.transform_severity(),
                     "Description": disposition.charge_offense,
+                    "Agency": charge.agency if charge else None,
                 }
             ],
             "Disposed On": portal_record.case_info.case_status_date.isoformat(),

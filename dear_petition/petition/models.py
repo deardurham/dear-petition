@@ -176,6 +176,7 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     action = models.CharField(max_length=256)
     severity = models.CharField(max_length=256)
     description = models.CharField(max_length=256)
+    agency = models.ForeignKey("Contact", related_name="+", null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         ciprs_record = self.offense.ciprs_record
@@ -268,6 +269,23 @@ class AgencyWithSherriffOfficeManager(models.Manager):
             ))
         )
     
+class AgencyWithCleanNameManager(models.Manager):
+    def get_queryset(self):
+        """Annotation version of is_sheriff_office to be used from database"""
+        return (
+            super(AgencyWithCleanNameManager, self)
+            .get_queryset()
+            .filter(category='agency')
+            .annotate(clean_name=models.Func(
+                models.F('name'),
+                Value(r'[\'\-\"\(\)&:\/\.]'), # special characters to remove
+                Value(r''),
+                Value('g'), # regex flag
+                function='REGEXP_REPLACE',
+                output_field=models.TextField(),
+            ))
+        )
+
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512)
@@ -283,6 +301,7 @@ class Contact(PrintableModelMixin, models.Model):
 
     objects = models.Manager()
     agencies_with_sherriff_office = AgencyWithSherriffOfficeManager()
+    agencies_with_clean_name = AgencyWithCleanNameManager()
 
     user = models.ForeignKey(
         User,
