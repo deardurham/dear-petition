@@ -1,5 +1,6 @@
 import string
 from datetime import datetime
+from datetime import date
 
 from django.utils import timezone
 import pytest
@@ -205,6 +206,18 @@ def guilty_offense(record1):
 
 @pytest.fixture
 def convicted_guilty_record(guilty_offense):
+    yield OffenseRecordFactory(action=CONVICTED, offense=guilty_offense)
+
+
+@pytest.fixture
+def adult_convicted_guilty_record(record1):
+    guilty_offense = OffenseFactory(
+        ciprs_record=record1,
+        jurisdiction=constants.DISTRICT_COURT,
+        verdict="GUILTY",
+        disposition_method="",
+        disposed_on=date(2010, 1, 1), # account for waiting period
+    )
     yield OffenseRecordFactory(action=CONVICTED, offense=guilty_offense)
 
 
