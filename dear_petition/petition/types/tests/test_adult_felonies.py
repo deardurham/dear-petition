@@ -1,7 +1,6 @@
 import pytest
 
 from dear_petition.petition import constants
-from dear_petition.petition.models import OffenseRecord
 
 pytestmark = pytest.mark.django_db
 
