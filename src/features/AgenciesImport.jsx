@@ -1,5 +1,7 @@
 import cx from 'classnames';
 import { useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useImportAgenciesMutation, usePreviewImportAgenciesMutation } from '../service/api';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
 import { Button } from '../components/elements/Button';
@@ -66,9 +68,9 @@ const ImportPreview = ({ rowDiffs, file }) => {
     );
   }
   return (
-    <div className="p-6 flex flex-col gap-4 w-[800px] h-[500px]">
+    <div className="p-6 flex flex-col gap-4 w-[900px] h-[500px]">
       <h3>Preview Changes</h3>
-      <Table className="flex-1 grid grid-cols-[2fr_2fr_1fr_60px_1fr_1fr] max-h-[500px] overflow-auto h-full auto-rows-max">
+      <Table className="flex-1 grid grid-cols-[2fr_2fr_1fr_60px_1fr_1fr_80px] max-h-[500px] overflow-auto h-full auto-rows-max">
         <TableHeader>
           <HeaderCell>Arresting Agency</HeaderCell>
           <HeaderCell>Address</HeaderCell>
@@ -76,8 +78,9 @@ const ImportPreview = ({ rowDiffs, file }) => {
           <HeaderCell>State</HeaderCell>
           <HeaderCell>Zipcode</HeaderCell>
           <HeaderCell>County</HeaderCell>
+          <HeaderCell>Sheriff?</HeaderCell>
         </TableHeader>
-        {rowDiffs.map(({ new_fields, name, address, city, state, zipcode, county }) => (
+        {rowDiffs.map(({ new_fields, name, address, city, state, zipcode, county, is_sheriff }) => (
           <TableRow key={name}>
             <TableCell className={cx({ 'bg-green': new_fields.includes('name') })}>{name}</TableCell>
             <TableCell className={cx({ 'bg-green': new_fields.includes('address') })}>{address}</TableCell>
@@ -85,6 +88,9 @@ const ImportPreview = ({ rowDiffs, file }) => {
             <TableCell className={cx({ 'bg-green': new_fields.includes('state') })}>{state}</TableCell>
             <TableCell className={cx({ 'bg-green': new_fields.includes('zipcode') })}>{zipcode}</TableCell>
             <TableCell className={cx({ 'bg-green': new_fields.includes('county') })}>{county}</TableCell>
+            <TableCell className={cx({ 'bg-green': new_fields.includes('is_sheriff') })}>
+              <FontAwesomeIcon icon={is_sheriff ? faCheck : faTimes} />
+            </TableCell>
           </TableRow>
         ))}
       </Table>
@@ -177,7 +183,7 @@ const AgenciesImport = () => {
 };
 
 export const AgenciesImportModal = () => (
-  <div className="max-w-[800px] max-h-[500px] bg-white">
+  <div className="max-w-[1200px] max-h-[500px] bg-white">
     <AgenciesImport />
   </div>
 );

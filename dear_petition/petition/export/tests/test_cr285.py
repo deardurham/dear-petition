@@ -1,9 +1,8 @@
 import pytest
 
 from dear_petition.petition import constants, utils
-from dear_petition.petition.etl.load import assign_agencies_to_documents
 from dear_petition.petition.export.forms import AOCFormCR285
-from dear_petition.petition.tests.factories import PetitionDocumentFactory
+from dear_petition.petition.tests.factories import AgencyFactory, PetitionDocumentFactory
 from dear_petition.petition.utils import get_285_form_agency_address
 
 
@@ -74,8 +73,8 @@ def test_map_petitioner__name(form, client):
 #
 
 
-def test_map_agencies__address(petition, form, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__address(petition, form):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
     addresses = [form.data[f"NameAddress{i+1}"] for i in range(len(agencies))]

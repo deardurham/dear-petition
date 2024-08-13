@@ -3,7 +3,7 @@ import pytest
 
 from dear_petition.petition import constants, utils
 from dear_petition.petition.export.forms import AOCFormCR287
-from dear_petition.petition.tests.factories import ClientFactory
+from dear_petition.petition.tests.factories import AgencyFactory, ClientFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -179,8 +179,8 @@ def test_map_attorney__petition_not_filed_sign_date(form, contact1):
 #
 
 
-def test_map_agencies__name(form, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__name(form):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
     names = [form.data[f"NameAgency{i+1}"] for i in range(len(agencies))]
@@ -188,8 +188,8 @@ def test_map_agencies__name(form, contact1, contact2, contact3):
         assert contact.name in names
 
 
-def test_map_agencies__street_address(form, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__street_address(form):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
     addresses = [form.data[f"AddrAgency{i+1}"] for i in range(len(agencies))]
@@ -197,8 +197,8 @@ def test_map_agencies__street_address(form, contact1, contact2, contact3):
         assert contact.address1 in addresses
 
 
-def test_map_agencies__mail_address(form, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__mail_address(form):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
     mails = [form.data[f"MailAgency{i+1}"] for i in range(len(agencies))]
@@ -206,8 +206,8 @@ def test_map_agencies__mail_address(form, contact1, contact2, contact3):
         assert contact.address2 in mails
 
 
-def test_map_agencies__city(form, petition_document, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__city(form, petition_document):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     petition_document.agencies.set(agencies)
     form.map_agencies()
     for i, contact in enumerate(agencies, start=1):
@@ -218,8 +218,8 @@ def test_map_agencies__city(form, petition_document, contact1, contact2, contact
             pytest.fail(f"Expected key '{key}' in form data")
 
 
-def test_map_agencies__state(form, petition_document, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__state(form, petition_document):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     petition_document.agencies.set(agencies)
     form.map_agencies()
     for i, contact in enumerate(agencies, start=1):
@@ -230,8 +230,8 @@ def test_map_agencies__state(form, petition_document, contact1, contact2, contac
             pytest.fail(f"Expected key '{key}' in form data")
 
 
-def test_map_agencies__zipcode(form, contact1, contact2, contact3):
-    agencies = [contact1, contact2, contact3]
+def test_map_agencies__zipcode(form):
+    agencies = [AgencyFactory(), AgencyFactory(), AgencyFactory()]
     form.petition_document.agencies.set(agencies)
     form.map_agencies()
     zips = [form.data[f"ZipAgency{i+1}"] for i in range(len(agencies))]

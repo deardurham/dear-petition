@@ -23,19 +23,21 @@ from dear_petition.petition.constants import (
     MALE
 )
 from dear_petition.petition.models import GeneratedPetition
-from dear_petition.petition.tests.factories import OffenseFactory, OffenseRecordFactory
+from dear_petition.petition.tests.factories import AgencyFactory, OffenseFactory, OffenseRecordFactory
 from dear_petition.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
 
-def test_printable_model_mixin__petition(batch, petition, contact1, contact2, offense_record1):
+def test_printable_model_mixin__petition(batch, petition, offense_record1):
     """
     Test PrintableModelMixin repr() method using Petition model because Petition has many to many
     relationships.
     """
 
     # set many to many relationships
+    contact1 = AgencyFactory()
+    contact2 = AgencyFactory()
     petition.agencies.add(contact1)
     petition.agencies.add(contact2)
     petition.offense_records.add(offense_record1)

@@ -155,9 +155,21 @@ class BatchFileAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Contact)
-class ContactAdmin(ImportExportModelAdmin):
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ("pk", "name", "category", "address1")
+    list_filter = ("category",)
+    ordering = ("category", "name")
+
+@admin.register(models.Agency)
+class AgencyAdmin(ImportExportModelAdmin):
     resource_classes = [resources.AgencyResource]
 
+    list_display = ("pk", "name", "category", "address1")
+    list_filter = ("category",)
+    ordering = ("category", "name")
+
+@admin.register(models.Client)
+class ClientAdmin(admin.ModelAdmin):
     list_display = ("pk", "name", "category", "address1")
     list_filter = ("category",)
     ordering = ("category", "name")

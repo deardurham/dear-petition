@@ -7,6 +7,7 @@ from dear_petition.users.models import User
 from dear_petition.petition.models import (
     CIPRSRecord,
     Contact,
+    Agency,
     Client,
     Batch,
     Offense,
@@ -138,9 +139,24 @@ class ContactSerializer(serializers.ModelSerializer):
             "city",
             "state",
             "zipcode",
-            "user",
-            "county",
         ]
+
+class AgencySerializer(ContactSerializer):
+    class Meta:
+        model = Agency
+        fields = [
+            "pk",
+            "name",
+            "address1",
+            "address2",
+            "formatted_address",
+            "city",
+            "state",
+            "zipcode",
+            "county",
+            "is_sheriff",
+        ]
+
 
 class ClientSerializer(ContactSerializer):
     address1 = serializers.CharField(required=True)
@@ -164,7 +180,6 @@ class ClientSerializer(ContactSerializer):
             "zipcode",
             "user",
             "batches",
-            "county",
             "dob",
         ]
 
