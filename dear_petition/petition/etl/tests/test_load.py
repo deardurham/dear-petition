@@ -1,5 +1,4 @@
 import pytest
-import logging
 
 from dear_petition.petition import constants
 from dear_petition.petition.models import Batch
@@ -18,7 +17,6 @@ from dear_petition.petition.tests.factories import (
 )
 
 
-logger = logging.getLogger(__name__)
 pytestmark = pytest.mark.django_db
 
 
