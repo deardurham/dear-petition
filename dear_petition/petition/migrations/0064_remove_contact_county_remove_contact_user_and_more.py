@@ -5,7 +5,7 @@ from django.db import migrations, models, transaction
 import django.db.models.deletion
 import django.db.models.manager
 
-from dear_petition.petition.management.commands.convert_agency_table import convert_agencies_to_contact_objects, convert_contacts_to_agency_objects
+from dear_petition.petition.management.commands.convert_agency_table import convert_contacts_to_agency_objects
 
 def forwards(apps, schema_editor):
     if schema_editor.connection.alias != "default":
@@ -14,15 +14,6 @@ def forwards(apps, schema_editor):
     ContactModel = apps.get_model('petition', 'Contact')
     AgencyModel = apps.get_model('petition', 'Agency')
     convert_contacts_to_agency_objects(ContactModel, AgencyModel)
-
-
-def backwards(apps, schema_editor):
-    if schema_editor.connection.alias != "default":
-        return
-
-    AgencyModel = apps.get_model('petition', 'Agency')
-    ContactModel = apps.get_model('petition', 'Contact')
-    convert_agencies_to_contact_objects(AgencyModel, ContactModel)
 
 
 class Migration(migrations.Migration):
@@ -70,5 +61,5 @@ class Migration(migrations.Migration):
                 ("agencies_with_sherriff_office", django.db.models.manager.Manager()),
             ],
         ),
-        migrations.RunPython(forwards, backwards),
+        migrations.RunPython(forwards),
     ]
