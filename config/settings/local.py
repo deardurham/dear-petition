@@ -96,7 +96,7 @@ LOGGING = {
         "dear_petition": {
             "level": APP_LOG_LEVEL,
             "handlers": ["console"],
-            "propagate": False,
+            "propagate": True,
         },
         "ciprs_reader": {
             "level": APP_LOG_LEVEL,
