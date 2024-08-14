@@ -61,5 +61,5 @@ class Migration(migrations.Migration):
                 ("agencies_with_sherriff_office", django.db.models.manager.Manager()),
             ],
         ),
-        migrations.RunPython(forwards),
+        migrations.RunPython(forwards, migrations.RunPython.noop),
     ]

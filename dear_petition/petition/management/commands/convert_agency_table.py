@@ -19,7 +19,7 @@ def convert_contacts_to_agency_objects(current_cls, target_cls):
                 agency.is_sheriff = False
             agency.save()
 
-            target_cls.objects.filter(id=id).delete()
+            current_cls.objects.filter(id=id).delete()
             print(f"Migrated Contact '{agency.name}' to Agency table")
     print()
 
