@@ -52,6 +52,8 @@ class Command(BaseCommand):
         if options["convert_contacts"]:
             convert_contacts_to_agency_objects()
         elif options["convert_agencies"]:
-            convert_agencies_to_contact_objects()
+            # convert_agencies_to_contact_objects()
+            print("This operation is currently not supported")
+            pass
         else:
             raise CommandError('Did not provide one of `convert_contacts` or `convert_agencies` arguments')
