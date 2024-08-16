@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '../components/elements/Button';
 import StyledDialog from '../components/elements/Modal/Dialog';
 import AutocompleteInput from '../components/elements/Input/AutocompleteInput';
-import { useLazySearchAgenciesQuery, useAssignAgenciesToDocumentsMutation, usePetitionQuery } from '../service/api';
+import { useLazySearchAgenciesQuery, useAssignAgenciesToDocumentsMutation } from '../service/api';
 import { Spinner } from '../components/elements/Spinner';
 import { Badge } from '../components/elements/Badge/Badge';
 
@@ -28,9 +28,7 @@ const sortAgencyArrayByPk = ({ pk: pkA }, { pk: pkB }) => {
   return 0;
 };
 
-export const SelectAgenciesModal = ({ isOpen, onClose, petitionId }) => {
-  const { data: petitionData } = usePetitionQuery({ petitionId });
-
+export const SelectAgenciesModal = ({ isOpen, onClose, petitionId, petitionData }) => {
   const content = petitionData ? (
     <SelectAgencies petitionId={petitionId} selectedAgencies={petitionData.agencies} onClose={onClose} />
   ) : (

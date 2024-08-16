@@ -224,6 +224,7 @@ class PetitionSerializer(serializers.ModelSerializer):
         model = Petition
         fields = [
             "pk",
+            "batch",
             "form_type",
             "county",
             "jurisdiction",
