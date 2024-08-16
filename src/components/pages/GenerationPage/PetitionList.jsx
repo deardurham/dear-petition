@@ -184,11 +184,13 @@ function PetitionRow({ petition, validateInput, backgroundColor, setFormErrors }
       </TableRow>
       <OffenseTableModal
         petitionId={petition.pk}
+        petition={petition}
         isOpen={isOffenseModalOpen}
         onClose={() => setIsOffenseModalOpen(false)}
       />
       <SelectAgenciesModal
         petitionId={petition.pk}
+        petitionData={petition}
         isOpen={isAgencySelectModalOpen}
         onClose={() => setIsAgencySelectModalOpen(false)}
       />

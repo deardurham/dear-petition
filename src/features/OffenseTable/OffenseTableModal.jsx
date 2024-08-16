@@ -1,33 +1,23 @@
 import { useEffect, useState } from 'react';
-import { usePetitionQuery, useRecalculatePetitionsMutation } from '../../service/api';
+import { useRecalculatePetitionsMutation } from '../../service/api';
 import StyledDialog from '../../components/elements/Modal/Dialog';
 import OffenseTable from './OffenseTable';
 import { Button } from '../../components/elements/Button';
-import { Spinner } from '../../components/elements/Spinner';
 import { DISABLED, POSITIVE } from '../../components/elements/Button/Button';
 
-const OffenseTableModal = ({ isOpen, onClose, petitionId }) => (
+const OffenseTableModal = ({ isOpen, onClose, petitionId, petition }) => (
   <StyledDialog isOpen={isOpen} onClose={() => onClose()}>
-    <ModalWrapper petitionId={petitionId}>
-      <ModalContent petitionId={petitionId} onClose={onClose} />
+    <ModalWrapper>
+      <ModalContent petitionId={petitionId} petition={petition} onClose={onClose} />
     </ModalWrapper>
   </StyledDialog>
 );
 
-const ModalWrapper = ({ children, petitionId }) => {
-  const { isLoading } = usePetitionQuery({ petitionId });
-  if (isLoading) {
-    return (
-      <div className="w-[900px] h-[500px] p-10 flex flex-col items-center justify-center gap-8">
-        <Spinner size="2xl" />
-      </div>
-    );
-  }
+const ModalWrapper = ({ children }) => {
   return <div className="w-[900px] h-[500px] p-10 flex flex-col gap-8">{children}</div>;
 };
 
-const ModalContent = ({ petitionId, onClose }) => {
-  const { data: petition } = usePetitionQuery({ petitionId });
+const ModalContent = ({ petitionId, petition, onClose }) => {
   const [isModified, setIsModified] = useState(false);
   const [selectedRows, setSelectedRows] = useState(petition?.active_records ?? []);
 
