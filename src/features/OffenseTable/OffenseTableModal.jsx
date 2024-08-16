@@ -7,15 +7,11 @@ import { DISABLED, POSITIVE } from '../../components/elements/Button/Button';
 
 const OffenseTableModal = ({ isOpen, onClose, petitionId, petition }) => (
   <StyledDialog isOpen={isOpen} onClose={() => onClose()}>
-    <ModalWrapper>
+    <div className="w-[900px] h-[500px] p-10 flex flex-col gap-8">
       <ModalContent petitionId={petitionId} petition={petition} onClose={onClose} />
-    </ModalWrapper>
+    </div>
   </StyledDialog>
 );
-
-const ModalWrapper = ({ children }) => {
-  return <div className="w-[900px] h-[500px] p-10 flex flex-col gap-8">{children}</div>;
-};
 
 const ModalContent = ({ petitionId, petition, onClose }) => {
   const [isModified, setIsModified] = useState(false);
