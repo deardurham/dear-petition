@@ -8,10 +8,30 @@ export const api = createApi({
   endpoints: (builder) => ({
     agencies: builder.query({
       query: ({ queryString }) => ({
-        url: `contact/?category=agency&${queryString}`,
+        url: `agency/?${queryString}`,
         method: 'get',
       }),
       providesTags: [{ type: 'ContactList', id: 'agency' }],
+    }),
+    createAgency: builder.mutation({
+      query: ({ data }) => ({ url: `agency/`, method: 'post', data }),
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: 'ContactList', id: 'agency' },
+              { type: 'ContactFilterOptions', id: 'agency' },
+            ]
+          : [],
+    }),
+    updateAgency: builder.mutation({
+      query: ({ id, data }) => ({ url: `agency/${id}/`, method: 'put', data }),
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: 'ContactList', id: 'agency' },
+              { type: 'ContactFilterOptions', id: 'agency' },
+            ]
+          : [],
     }),
     searchAttornies: builder.query({
       query: ({ search }) => ({
@@ -21,7 +41,7 @@ export const api = createApi({
     }),
     searchAgencies: builder.query({
       query: ({ search }) => ({
-        url: `contact/?category=agency&search=${search}`,
+        url: `agency/?search=${search}`,
         method: 'get',
       }),
     }),
@@ -64,17 +84,17 @@ export const api = createApi({
       },
     }),
     deleteAgency: builder.mutation({
-      query: ({ id }) => ({ url: `contact/${id}/`, method: 'delete' }),
+      query: ({ id }) => ({ url: `agency/${id}/`, method: 'delete' }),
       invalidatesTags: [
         { type: 'ContactList', id: 'agency' },
         { type: 'ContactFilterOptions', id: 'agency' },
       ],
     }),
     previewImportAgencies: builder.mutation({
-      query: ({ data }) => ({ url: `contact/preview_import_agencies/`, method: 'put', data }),
+      query: ({ data }) => ({ url: `agency/preview_import_agencies/`, method: 'put', data }),
     }),
     importAgencies: builder.mutation({
-      query: ({ data }) => ({ url: `contact/import_agencies/`, method: 'put', data }),
+      query: ({ data }) => ({ url: `agency/import_agencies/`, method: 'put', data }),
       invalidatesTags: [{ type: 'ContactList', id: 'agency' }],
     }),
     searchClients: builder.query({
@@ -200,6 +220,8 @@ export const api = createApi({
 
 export const {
   useAgenciesQuery,
+  useCreateAgencyMutation,
+  useUpdateAgencyMutation,
   useLazyAgenciesQuery,
   useLazySearchAgenciesQuery,
   useLazySearchAttorniesQuery,

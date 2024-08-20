@@ -80,7 +80,7 @@ def create_petitions_from_records(batch, form_type):
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
-        sheriff_agency = pm.Contact.get_sherriff_office_by_county(
+        sheriff_agency = pm.Agency.get_sherriff_office_by_county(
             petition_type["county"]
         )
         
@@ -90,7 +90,7 @@ def create_petitions_from_records(batch, form_type):
                 f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency."
             )
             petition.agencies.add(sheriff_agency)
-        offense_record_agencies = pm.Contact.objects.filter(pk__in=record_set.exclude(agency__isnull=True).values_list('agency'))
+        offense_record_agencies = pm.Agency.objects.filter(pk__in=record_set.exclude(agency__isnull=True).values_list('agency'))
         petition.agencies.add(*offense_record_agencies)
 
         link_offense_records(petition)

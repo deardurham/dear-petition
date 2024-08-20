@@ -186,7 +186,28 @@ class ContactViewSet(viewsets.ModelViewSet):
             .order_by()
         )
         return Response(field_options)
-    
+
+
+class AgencyViewSet(ContactViewSet):
+    queryset = pm.Agency.objects.all()
+    serializer_class = serializers.AgencySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
+    filterset_fields = {
+        "category": ["exact"],
+        "city": ["exact", "in"],
+        "zipcode": ["exact", "in"],
+    }
+    search_fields = ["name"]
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode", "county"]
+    ordering = ["name"]
+
+    def get_serializer_class(self):
+        return serializers.AgencySerializer
+
+    def get_queryset(self):
+        return pm.Agency.objects.all()
+
     @action(detail=False, methods=["put"])
     def preview_import_agencies(self, request):
         file_data = request.data.get('file')
@@ -209,11 +230,12 @@ class ContactViewSet(viewsets.ModelViewSet):
                 'state': row_result.instance.state,
                 'zipcode': row_result.instance.zipcode,
                 'county': row_result.instance.county,
+                'is_sheriff': row_result.instance.is_sheriff,
             }
             if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
                 continue
             elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
-                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county']
+                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county', 'is_sheriff']
             else:
                 original_address = f"{row_result.original.address1}, {row_result.original.address2}" if row_result.instance.address2 else row_result.original.address1
                 row_diff['new_fields'] = []
@@ -221,7 +243,7 @@ class ContactViewSet(viewsets.ModelViewSet):
                 if original_address != address:
                     row_diff['new_fields'].append('address')
 
-                for field in ['name', 'city', 'state', 'zipcode', 'county']:                    
+                for field in ['name', 'city', 'state', 'zipcode', 'county', 'is_sheriff']:                    
                     if getattr(row_result.original, field) != getattr(row_result.instance, field):
                         row_diff['new_fields'].append(field)
             
@@ -236,6 +258,7 @@ class ContactViewSet(viewsets.ModelViewSet):
         dataset = tablib.Dataset().load(file_data)
         resources.AgencyResource().import_data(dataset, raise_errors=True)
         return Response({})
+
 
 class ClientViewSet(ContactViewSet):
     queryset = pm.Client.objects.all()

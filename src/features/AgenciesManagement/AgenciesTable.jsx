@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDeleteAgencyMutation, useUpdateContactMutation } from '../../service/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useDeleteAgencyMutation, useUpdateAgencyMutation } from '../../service/api';
 import {
   EditableRow,
   HeaderCell,
@@ -18,7 +20,7 @@ import StyledDialog from '../../components/elements/Modal/Dialog';
 const getFormattedAddress = (address1, address2) => (address2 ? `${address1}\n${address2}` : address1);
 
 const AgencyInputRow = ({ agencyData, onStopEditing }) => {
-  const [triggerUpdate, { error }] = useUpdateContactMutation();
+  const [triggerUpdate, { error }] = useUpdateAgencyMutation();
   const { data: errorData } = error ?? {};
 
   const { control, handleSubmit, formState } = useForm({
@@ -27,6 +29,8 @@ const AgencyInputRow = ({ agencyData, onStopEditing }) => {
       address: getFormattedAddress(agencyData.address1, agencyData.address2),
       city: agencyData.city,
       zipcode: agencyData.zipcode,
+      county: agencyData.county,
+      is_sheriff: agencyData.is_sheriff,
     },
     reValidateMode: 'onSubmit',
   });
@@ -129,10 +133,25 @@ const AgencyInputRow = ({ agencyData, onStopEditing }) => {
           maxLength={5}
           inputProps={{
             control,
+            required: true,
             name: 'county',
           }}
           errors={errorData?.county}
         />
+      </TableCell>
+      <TableCell>
+        <div className="flex">
+          <FormInput
+            className="self-start"
+            type="checkbox"
+            inputProps={{
+              control,
+              required: true,
+              name: 'is_sheriff',
+            }}
+            errors={errorData?.is_sheriff}
+          />
+        </div>
       </TableCell>
       <TableCell className="flex flex-col gap-4">
         <div className="flex gap-2">
@@ -161,13 +180,14 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
     setDeleteModalId(null);
   };
   return (
-    <Table className="grid-cols-[5fr_4fr_3fr_2fr_2fr_2fr]">
+    <Table className="grid-cols-[5fr_4fr_2fr_2fr_2fr_1fr_2fr]">
       <TableHeader sortedHeader={sortBy.field} sortDir={sortBy.dir} onSelectColumn={onSortBy}>
         <SortableHeader field="name">Name</SortableHeader>
         <SortableHeader field="address">Address</SortableHeader>
         <SortableHeader field="city">City</SortableHeader>
         <SortableHeader field="zipcode">Zip</SortableHeader>
         <SortableHeader field="county">County</SortableHeader>
+        <HeaderCell field="county">Sheriff?</HeaderCell>
         <HeaderCell>Actions</HeaderCell>
       </TableHeader>
       <TableBody>
@@ -182,6 +202,9 @@ const AgenciesTable = ({ agencies, sortBy, onSortBy }) => {
             <TableCell>{agencyData.city}</TableCell>
             <TableCell>{agencyData.zipcode}</TableCell>
             <TableCell>{agencyData.county}</TableCell>
+            <TableCell>
+              <FontAwesomeIcon icon={agencyData.is_sheriff ? faCheck : faTimes} />
+            </TableCell>
             <TableCell className="flex gap-2">
               <Button type="button" onClick={() => setEditingId(agencyData.pk)}>
                 Edit

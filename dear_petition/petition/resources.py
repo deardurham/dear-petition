@@ -1,6 +1,5 @@
 import re
 import typing
-from django.db import ProgrammingError
 from import_export import fields, resources
 
 from dear_petition.petition import constants, models
@@ -35,20 +34,23 @@ class AgencyResource(resources.ModelResource):
         instance.address1 = row['address1']
         instance.address2 = row['address2']
         return instance
-    
+
     def get_instance(self, instance_loader, row):
         try:
             return super().get_instance(instance_loader, row)
-        except models.Contact.MultipleObjectsReturned as e:
-            raise models.Contact.MultipleObjectsReturned(f"There are multiple agencies named '{row['Arresting Agency']}' in county '{row['County']}. Ensure there is only 1.")
+        except models.Agency.MultipleObjectsReturned as e:
+            raise models.Agency.MultipleObjectsReturned(f"There are multiple agencies named '{row['Arresting Agency']}' in county '{row['County']}. Ensure there is only 1.")
 
     def before_import_row(self, row, **kwargs):
         if is_empty_row(row):
             return
 
-        row['name'] = row['Arresting Agency'].strip()
+        # found a bug where leading newlines were causing false negative matches for existing agencies
+        row['Arresting Agency'] = row['Arresting Agency'].strip()
+        row['name'] = row['Arresting Agency']
+        row['County'] = row['County'].strip()
         row['county'] = row['County'].strip()
-        
+
         (address1, address2, city, state, zipcode) = parse_agency_full_address(row['Address'])
         row['city'] = city.strip()
         row['state'] = state.strip()
@@ -56,15 +58,19 @@ class AgencyResource(resources.ModelResource):
         row['address1'] = address1.strip()
         row['address2'] = address2.strip() if address2 else None
 
+        name = row['name']
+        if re.search(models.AGENCY_SHERRIFF_OFFICE_PATTERN, name, re.IGNORECASE) or re.search(models.AGENCY_SHERRIFF_DEPARTMENT_PATTERN, name, re.IGNORECASE):
+            row['is_sheriff'] = True
+        else:
+            row['is_sheriff'] = False
+
     def skip_row(self, instance, original, row, import_validation_errors=None):
         if (is_empty_row(row)):
             return True
         return super().skip_row(instance, original, row, import_validation_errors=import_validation_errors)
 
-    def before_save_instance(self, instance, using_transactions, dry_run):
-        instance.category = constants.CONTACT_CATEGORIES.agency
 
     class Meta:
-        model = models.Contact
+        model = models.Agency
         import_id_fields = ('name', 'county')
         store_instance = True
