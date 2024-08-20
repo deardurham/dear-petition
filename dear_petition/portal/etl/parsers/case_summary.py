@@ -7,7 +7,7 @@ from .utils import catch_parse_error
 logger = logging.getLogger(__name__)
 
 COUNTY_COURT_REGEX = re.compile(r"([\w\s]+)(District|Superior) Court")
-FILENO_REGEX = re.compile(r"\d\dCR\d\d\d\d\d\d-\d\d\d")
+FILENO_REGEX = re.compile(r"\d\d(CR|IF)\d\d\d\d\d\d-\d\d\d")
 
 
 @catch_parse_error

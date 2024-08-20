@@ -6,7 +6,7 @@ from .utils import catch_parse_error
 @catch_parse_error
 def parse_defendant_name(soup):
     """
-    Parse case type
+    Parse defendant name
 
     Sample HTML:
 
@@ -41,7 +41,11 @@ def parse_defendant_race(soup):
             White
         </div>
     """ # noqa
-    return soup.find('div', {'ng-if': '::party.Race'}).get_text(strip=True)
+    race_div = soup.find('div', {'ng-if': '::party.Race'})
+    if not race_div:
+        return ""
+
+    return race_div.get_text(strip=True)
 
 
 @catch_parse_error
@@ -54,4 +58,8 @@ def parse_defendant_sex(soup):
             Female
         </div>
     """ # noqa
-    return soup.find('div', {'ng-if': '::party.Gender'}).get_text(strip=True)
+    sex_div = soup.find('div', {'ng-if': '::party.Gender'})
+    if not sex_div:
+        return ""
+
+    return sex_div.get_text(strip=True)

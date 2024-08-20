@@ -1,5 +1,6 @@
 import logging
 from dear_petition.petition import constants
+from dear_petition.petition.models import Contact
 from dear_petition.petition.utils import (
     dt_obj_to_date,
     make_datetime_aware,
@@ -68,10 +69,18 @@ def refresh_offenses(record):
                 verdict=data_offense.get("Verdict", ""),
             )
             for data_offense_record in data_offense.get("Records", []):
+                agency = Contact.objects.none()
+                agency_name = data_offense_record.get("Agency", "")
+                if agency_name:
+                    agency = Contact.agencies_with_clean_name.filter(clean_name__icontains=agency_name)
+                    if agency.exists():
+                        logger.info(f"Matched agency '{agency.first().name}' to offense")
+
                 offense.offense_records.create(
                     count=data_offense_record.get("Count"),
                     law=data_offense_record.get("Law", ""),
                     action=data_offense_record.get("Action", ""),
                     severity=data_offense_record.get("Severity", ""),
                     description=data_offense_record.get("Description", ""),
+                    agency=agency.first() if agency.exists() else None,
                 )

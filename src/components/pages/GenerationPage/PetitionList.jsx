@@ -9,7 +9,6 @@ import { PETITION_FORM_NAMES } from '../../../constants/petitionConstants';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faChevronDown, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '../../elements/Button';
-import { usePetitionQuery } from '../../../service/api';
 import { SelectAgenciesModal } from '../../../features/SelectAgencies';
 import OffenseTableModal from '../../../features/OffenseTable/OffenseTableModal';
 import { Tooltip } from '../../elements/Tooltip/Tooltip';
@@ -46,9 +45,8 @@ const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10]
 
 const NO_DOCUMENTS_SELECTED = ['Documents: There are no documents selected for download for the petition document.'];
 
-function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErrors }) {
+function PetitionRow({ petition, validateInput, backgroundColor, setFormErrors }) {
   const [error, setError] = useState('');
-  const { data: petition } = usePetitionQuery({ petitionId: petitionData.pk });
   const [prevPetition, setPrevPetition] = useState(petition);
   const [isOffenseModalOpen, setIsOffenseModalOpen] = useState(false);
   const [isAgencySelectModalOpen, setIsAgencySelectModalOpen] = useState(false);
@@ -68,7 +66,7 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
     try {
       setError('');
       const { data, meta } = await manualAxiosRequest({
-        url: `/petitions/${petitionData.pk}/generate_petition_pdf/`,
+        url: `/petitions/${petition.pk}/generate_petition_pdf/`,
         data: {
           documents: selectedDocuments,
         },
@@ -186,11 +184,13 @@ function PetitionRow({ petitionData, validateInput, backgroundColor, setFormErro
       </TableRow>
       <OffenseTableModal
         petitionId={petition.pk}
+        petition={petition}
         isOpen={isOffenseModalOpen}
         onClose={() => setIsOffenseModalOpen(false)}
       />
       <SelectAgenciesModal
         petitionId={petition.pk}
+        petitionData={petition}
         isOpen={isAgencySelectModalOpen}
         onClose={() => setIsAgencySelectModalOpen(false)}
       />
@@ -226,7 +226,7 @@ export default function PetitionList({ petitions, validateInput, setFormErrors }
         {petitions.map((petition, index) => (
           <PetitionRow
             key={petition.pk}
-            petitionData={petition}
+            petition={petition}
             validateInput={validateInput}
             backgroundColor={index % 2 === 0 ? 'white' : greyScale(9)}
             setFormErrors={setFormErrors}
