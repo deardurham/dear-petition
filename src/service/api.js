@@ -181,7 +181,10 @@ export const api = createApi({
         data: { offense_record_ids: offenseRecordIds },
         method: 'POST',
       }),
-      invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
+      invalidatesTags: (result, _err, { petitionId }) => [
+        { type: 'Batch', id: result?.batch },
+        { type: 'Petition', id: petitionId },
+      ],
     }),
     assignAgenciesToDocuments: builder.mutation({
       query: ({ petitionId, agencies }) => ({
@@ -189,7 +192,10 @@ export const api = createApi({
         method: 'post',
         data: { agencies },
       }),
-      invalidatesTags: (_result, _err, { petitionId }) => [{ type: 'Petition', id: petitionId }],
+      invalidatesTags: (result, _err, { petitionId }) => [
+        { type: 'Batch', id: result?.batch },
+        { type: 'Petition', id: petitionId },
+      ],
     }),
     assignClientToBatch: builder.mutation({
       query: ({ batchId, data }) => ({
