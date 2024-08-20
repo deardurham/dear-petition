@@ -30,6 +30,7 @@ const CATEGORY_TO_TITLE = {
   attorney: 'Attorney',
 };
 
+// TODO: SPlit out client/agency/attorney
 export const CreateContact = ({
   onClose,
   category,
@@ -46,6 +47,7 @@ export const CreateContact = ({
       zipcode: '',
       state: { label: 'NC', value: 'NC' },
       county: '',
+      is_sheriff: false,
     },
     reValidateMode: 'onSubmit',
   });
@@ -128,6 +130,18 @@ export const CreateContact = ({
           inputProps={{
             control,
             name: 'county',
+            rules: {
+              required: true,
+            },
+          }}
+        />
+        <FormInput
+          type="checkbox"
+          label="Is Sheriff?"
+          className="w-[200px] flex flex-col gap-2 [&>input]:w-[20px]"
+          inputProps={{
+            control,
+            name: 'is_sheriff',
             rules: {
               required: true,
             },
