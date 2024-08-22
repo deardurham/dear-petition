@@ -13,6 +13,7 @@ import {
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
 import lancLogoHoriz from '../../assets/img/LANC_logo_horiz.png';
+import ezExpungeWithoutTextHoriz from '../../assets/img/ez_expunge_without_lanc_text.png';
 import codeWithDurhamHorizontalLogo from '../../assets/img/CWD_horizontal_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 import { Tooltip } from '../elements/Tooltip/Tooltip';
@@ -77,7 +78,7 @@ function PageBase({ children, className, ...props }) {
         <PageHeader>
           <HeaderLogoLink>
             <Link to="/">
-              <Logo src={lancLogoHoriz} alt="DEAR logo" />
+              <Logo src={ezExpungeWithoutTextHoriz} alt="DEAR logo" />
             </Link>
           </HeaderLogoLink>
           <LinksGroup>
