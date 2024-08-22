@@ -3,7 +3,7 @@ import random
 
 import factory
 from dear_petition.petition.models import (Batch, BatchFile, CIPRSRecord,
-                                           Contact, Client, GeneratedPetition, Offense,
+                                           Contact, Agency, Client, GeneratedPetition, Offense,
                                            OffenseRecord, Petition,
                                            PetitionDocument,
                                            PetitionOffenseRecord)
@@ -19,6 +19,13 @@ from ..constants import (CHARGED, CONVICTED, DISMISSED, DISTRICT_COURT,
 class ContactFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Contact
+
+
+class AgencyFactory(factory.django.DjangoModelFactory):
+    category = "agency"
+
+    class Meta:
+        model = Agency
 
 
 class ClientFactory(factory.django.DjangoModelFactory):

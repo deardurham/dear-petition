@@ -260,7 +260,6 @@ class AgencyWithSherriffOfficeManager(models.Manager):
         return (
             super(AgencyWithSherriffOfficeManager, self)
             .get_queryset()
-            .filter(category='agency')
             .annotate(is_sheriff_office=Case(
                 When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
                 When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
@@ -275,7 +274,6 @@ class AgencyWithCleanNameManager(models.Manager):
         return (
             super(AgencyWithCleanNameManager, self)
             .get_queryset()
-            .filter(category='agency')
             .annotate(clean_name=models.Func(
                 models.F('name'),
                 Value(r'[\'\-\"\(\)&:\/\.]'), # special characters to remove
@@ -300,9 +298,13 @@ class Contact(PrintableModelMixin, models.Model):
     county = models.CharField(max_length=100, null=True, blank=True)
 
     objects = models.Manager()
-    agencies_with_sherriff_office = AgencyWithSherriffOfficeManager()
-    agencies_with_clean_name = AgencyWithCleanNameManager()
 
+    def __str__(self):
+        return self.name if self.name else ''
+    
+
+class Client(Contact):
+    dob = models.DateField(null=True, blank=True)
     user = models.ForeignKey(
         User,
         related_name="clients",
@@ -312,20 +314,6 @@ class Contact(PrintableModelMixin, models.Model):
         on_delete=models.CASCADE,
         help_text="The user associated with this contact (only applicable for Clients)"
     )
-
-    def __str__(self):
-        return self.name if self.name else ''
-    
-    @classmethod
-    def get_sherriff_office_by_county(cls, county: str):
-        qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
-        if qs.count() > 1:
-            logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
-        return qs.first() if qs.exists() else None
-    
-
-class Client(Contact):
-    dob = models.DateField(null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -345,6 +333,30 @@ class Client(Contact):
             # The DOB has changed. Need to recalculate underaged conviction forms
             for batch in self.batches.all():
                 batch.adjust_for_new_client_dob()
+
+
+class Agency(Contact):
+    is_sheriff = models.BooleanField(default=False)
+
+    agencies_with_sherriff_office = AgencyWithSherriffOfficeManager()
+    agencies_with_clean_name = AgencyWithCleanNameManager()
+
+    def save(self, *args, **kwargs):
+        # This is for backwards compatibility with existing data that pre-exists the multi-table inheritance paradigm
+        # TODO: Fully convert to multi-table inheritance paradigm
+
+        if self._state.adding:
+            self.category = "agency"
+
+        super().save(*args, **kwargs)
+
+
+    @classmethod
+    def get_sherriff_office_by_county(cls, county: str):
+        qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
+        if qs.count() > 1:
+            logger.error('Multiple agencies with sherriff department name detected. Picking first one...')
+        return qs.first() if qs.exists() else None
 
 
 class Batch(PrintableModelMixin, models.Model):
