@@ -5,7 +5,7 @@ import { SplashLogo, FormErrors, InputStyled, PasswordInputStyled } from './Logi
 import { Button } from '../../elements/Button';
 
 // Assets
-import dearLogo from '../../../assets/img/DEAR_logo.png';
+import ezExpungeLogoWithLancText from '../../../assets/img/ez_expunge_logo_with_lanc.png';
 
 // Routing
 import { useHistory } from 'react-router-dom';
@@ -62,9 +62,9 @@ function Login() {
   };
 
   return (
-    <main className="flex-1 flex flex-col gap-[10rem] items-center w-100 h-100 mt-20">
-      <div className="max-w-[950px] p-2">
-        <SplashLogo src={dearLogo} alt="DEAR logo" />
+    <main className="flex-1 flex flex-col gap-12 items-center w-100 h-100 mt-20">
+      <div className="w-[600px] px-2 py-12 flex flex-col items-center">
+        <SplashLogo src={ezExpungeLogoWithLancText} alt="EZ Expunge logo" />
       </div>
       <form className="flex flex-col items-center gap-4 w-[190px]" onSubmit={handleSubmit(handleLogin)}>
         <InputStyled

@@ -12,6 +12,8 @@ import {
   PageContentWrapper,
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
+import lancLogoHoriz from '../../assets/img/LANC_logo_horiz.png';
+import ezExpungeWithoutTextHoriz from '../../assets/img/ez_expunge_without_lanc_text.png';
 import codeWithDurhamHorizontalLogo from '../../assets/img/CWD_horizontal_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
 import { Tooltip } from '../elements/Tooltip/Tooltip';
@@ -76,7 +78,7 @@ function PageBase({ children, className, ...props }) {
         <PageHeader>
           <HeaderLogoLink>
             <Link to="/">
-              <Logo src={dearLogo} alt="DEAR logo" />
+              <Logo src={ezExpungeWithoutTextHoriz} alt="DEAR logo" />
             </Link>
           </HeaderLogoLink>
           <LinksGroup>
@@ -146,9 +148,19 @@ function PageBase({ children, className, ...props }) {
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
           <FooterLogoLink>
+            <a href="https://www.deardurham.org/" target="_blank" rel="noopener noreferrer">
+              <Logo src={dearLogo} alt="DEAR logo" />
+            </a>
+          </FooterLogoLink>
+          <FooterLogoLink>
             <p className="m-0 relative top-14 text-[1.25rem] text-center">developed by</p>
             <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
               <Logo src={codeWithDurhamHorizontalLogo} alt="Code with Durham logo" />
+            </a>
+          </FooterLogoLink>
+          <FooterLogoLink>
+            <a href="https://legalaidnc.org/" target="_blank" rel="noopener noreferrer">
+              <Logo src={lancLogoHoriz} alt="Legal Aid of NC logo" />
             </a>
           </FooterLogoLink>
         </PageFooter>

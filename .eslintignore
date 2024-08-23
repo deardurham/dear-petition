@@ -4,3 +4,4 @@ vite.config.js
 tailwind.config.js
 staticfiles/
 htmlcov/
+index.html
