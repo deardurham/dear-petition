@@ -1,10 +1,13 @@
 import pytz
+import pytest
 from django.utils.timezone import make_aware, utc
 from datetime import datetime, date
 
 from dear_petition.petition import utils as pu
 
 from ..constants import DATETIME_FORMAT
+
+pytestmark = pytest.mark.django_db
 
 
 def test_dt_obj_to_date(settings):
@@ -114,3 +117,10 @@ def test_get_truncation_point_of_short_text_by_pixel_size():
     text = "Lorem ipsum"
     truncation_point = pu.get_truncation_point_of_text_by_pixel_size(text, 20000)
     assert truncation_point == len(text)
+
+
+def test_get_petition_filename(petition):
+    case_number = "12345"
+    date = "2020-01-01"
+    petitioner_name = "Test"
+    assert pu.get_petition_filename(petitioner_name, petition, 'pdf') == '07-28-2024 DURHAM DC 146(a) Test.pdf'
