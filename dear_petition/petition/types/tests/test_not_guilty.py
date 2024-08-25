@@ -2,27 +2,42 @@ import pytest
 
 from dear_petition.petition import constants
 from dear_petition.petition.tests.factories import (
-    CIPRSRecordFactory,
-    OffenseFactory,
     OffenseRecordFactory,
     PetitionFactory,
 )
+from dear_petition.petition.constants import CONVICTED, CHARGED, VERDICT_GUILTY, VERDICT_NOT_GUILTY
+from dear_petition.petition.models import Offense, OffenseRecord
 
 pytestmark = pytest.mark.django_db
 
 
-def test_charged_not_guilty_record(batch, not_guilty_offense):
-    """Charged not guilty records should be included"""
-    offense_record = OffenseRecordFactory(action="CHARGED", offense=not_guilty_offense)
-    assert offense_record in batch.not_guilty_offense_records()
-
-
-def test_non_charged_offense_record(batch, not_guilty_offense):
-    """Non-charged records should be excluded."""
-    offense_record = OffenseRecordFactory(
-        action="CONVICTED", offense=not_guilty_offense
+@pytest.mark.parametrize(
+    "action, verdict, disposition_method, should_be_included", [
+        # records that have data as they would from Portal (no action or verdict)
+        ("", "", "District Not Guilty - Judge", True),
+        ("", "", "District Guilty - Judge", False),  # exclude because not Portal not-guilty disposition method
+        # records that have data as they would from CIPRS (disposition_method not one seen in Portal)
+        (CHARGED, VERDICT_NOT_GUILTY, "Disposed By Judge", True),
+        (CONVICTED, VERDICT_NOT_GUILTY, "Disposed By Judge", False),  # exclude because not charged action
+        (CHARGED, VERDICT_GUILTY, "Disposed By Judge", False),  # exclude because not not-guilty verdict
+        (CHARGED, VERDICT_NOT_GUILTY, "Dismissed by Court", False), # exclude because meets dismissed criteria
+    ]
+)
+def test_not_guilty(action, verdict, disposition_method, should_be_included, batch, record1):
+    offense = Offense.objects.create(
+        ciprs_record=record1,
+        verdict=verdict,
+        disposition_method=disposition_method,
     )
-    assert offense_record not in batch.not_guilty_offense_records()
+    offense_record = OffenseRecord.objects.create(
+        offense=offense,
+        action=action,
+    )
+
+    if should_be_included:
+        assert offense_record in batch.not_guilty_offense_records()
+    else:
+        assert offense_record not in batch.not_guilty_offense_records()
 
 
 def test_infraction_severity_offense_record(batch, not_guilty_offense):
@@ -35,24 +50,6 @@ def test_infraction_severity_offense_record(batch, not_guilty_offense):
     )
     assert infraction_record not in batch.not_guilty_offense_records()
     assert traffic_record in batch.not_guilty_offense_records()
-
-
-def test_non_not_guilty_verdict(batch, record1):
-    offense = OffenseFactory(verdict="Guilty", ciprs_record=record1)
-    offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
-    assert offense_record not in batch.not_guilty_offense_records()
-
-
-def test_not_both_dismissed_and_not_guilty(batch, record1):
-    offense = OffenseFactory(
-        disposition_method="DISMISSAL WITHOUT LEAVE BY DA",
-        verdict="Not Guilty",
-        ciprs_record=record1,
-    )
-    offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
-    assert offense_record not in batch.not_guilty_offense_records(
-        jurisdiction=record1.jurisdiction
-    )
 
 
 def test_petition_offenses(batch, record1, not_guilty_offense):

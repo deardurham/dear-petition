@@ -1,14 +1,8 @@
 import pytest
 from datetime import datetime
 
-from django.utils import timezone
-
-from dear_petition.petition import constants
 from dear_petition.petition.tests.factories import (
-    CIPRSRecordFactory,
-    OffenseFactory,
     OffenseRecordFactory,
-    PetitionFactory,
 )
 
 pytestmark = pytest.mark.django_db

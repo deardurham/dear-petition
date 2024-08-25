@@ -98,7 +98,7 @@ DURHAM_COUNTY = "DURHAM"
 
 DISTRICT_COURT_WITHOUT_DA_LEAVE = "Dismissal without Leave by DA"
 
-DISMISSED_DISPOSITION_METHODS = (
+CIPRS_DISPOSITION_METHODS_DISMISSED = (
     DISTRICT_COURT_WITHOUT_DA_LEAVE,
     "Dismissed by Court",
     "Deferred Prosecution Dismissal",
@@ -107,9 +107,22 @@ DISMISSED_DISPOSITION_METHODS = (
     "No Probable Cause",
     "Never To Be Served",
     "Deferred Proceeding or Deferred Prosecution Dismissal",
-    # Portal:
+)
+
+PORTAL_DISPOSITION_METHODS_DISMISSED = (
     "VD-District Dismissals w/o Leave by DA - No Plea Agreement",
     "VD-Superior Dismissals w/o Leave by DA - No Plea Agreement",
+    "No Probable Cause Found",
+)
+
+PORTAL_DISPOSITION_METHODS_NOT_GUILTY = (
+    "District Not Guilty - Judge",
+    "Superior Not Guilty - Judge"
+)
+
+PORTAL_DISPOSITION_METHODS_CONVICTED = (
+    "District Guilty - Judge",
+    "Superior Guilty - Judge"
 )
 
 DISP_METHOD_SUPERSEDING_INDICTMENT = "SUPERSEDING INDICTMENT OR PROCESS"
@@ -183,5 +196,5 @@ GENERATED_PETITION_ADMIN_FIELDS = (
 
 SEVERITY_FELONY = "FELONY"
 SEVERITY_MISDEMEANOR = "MISDEMEANOR"
-CHARGED_DEGREE_FELONY = ("FH", "FNC")
-CHARGED_DEGREE_MISDEMEANOR = ("MNC",)
+CHARGED_DEGREE_FELONY = ("FA", "FB", "FC", "FD", "FE", "FF", "FG", "FH", "FI", "FNC")
+CHARGED_DEGREE_MISDEMEANOR = ("MA1", "M1", "M2", "M3", "MNC")
