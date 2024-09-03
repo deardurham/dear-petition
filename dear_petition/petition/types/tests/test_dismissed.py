@@ -7,30 +7,37 @@ from dear_petition.petition.tests.factories import (
     OffenseRecordFactory,
     PetitionFactory,
 )
+from dear_petition.petition.constants import CONVICTED, CHARGED
+from dear_petition.petition.models import Offense, OffenseRecord
 
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize("method", constants.DISMISSED_DISPOSITION_METHODS)
-def test_charged_disposition_methods(batch, record1, method):
-    """CHARGED offense records should be included for all dismissed disposition methods."""
-    offense = OffenseFactory(disposition_method=method, ciprs_record=record1)
-    offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
-    assert offense_record in batch.dismissed_offense_records()
-
-
-def test_non_charged_offense_record(batch, dismissed_offense):
-    """Non-CHARGED dismissed offense records should be excluded."""
-    offense_record = OffenseRecordFactory(action="CONVICTED", offense=dismissed_offense)
-    assert offense_record not in batch.dismissed_offense_records()
-
-
-def test_non_dismissed_disposition_method(batch, non_dismissed_offense):
-    """Offenses with non-dismissed disposition methods should be excluded."""
-    offense_record = OffenseRecordFactory(
-        action="CHARGED", offense=non_dismissed_offense
+@pytest.mark.parametrize(
+    "action, disposition_method, should_be_included", [
+        # records that have data as they would from Portal (no action)
+        ("", "No Probable Cause Found", True),
+        ("", "District Guilty - Judge", False),  # exclude because not Portal dismissed disposition method
+        # records that have data as they would from CIPRS (disposition_method not one seen in Portal)
+        (CHARGED, "No Probable Cause", True),
+        (CONVICTED, "No Probable Cause", False),  # exclude because not charged action
+        (CHARGED, "Disposed By Judge", False),  # exclude because not CIPRS dismissed disposition method
+    ]
+)
+def test_dismissed(action, disposition_method, should_be_included, batch, record1):
+    offense = Offense.objects.create(
+        ciprs_record=record1,
+        disposition_method=disposition_method,
     )
-    assert offense_record not in batch.dismissed_offense_records()
+    offense_record = OffenseRecord.objects.create(
+        offense=offense,
+        action=action,
+    )
+
+    if should_be_included:
+        assert offense_record in batch.dismissed_offense_records()
+    else:
+        assert offense_record not in batch.dismissed_offense_records()
 
 
 def test_infraction_severity_offense_record(batch, dismissed_offense):
@@ -52,7 +59,7 @@ def test_offense_records_by_jurisdiction(batch, jurisdiction):
     """Offense records helper function should allow filtering by jurisdiction."""
     ciprs_record = CIPRSRecordFactory(jurisdiction=jurisdiction, batch=batch)
     offense = OffenseFactory(
-        disposition_method=constants.DISMISSED_DISPOSITION_METHODS[0],
+        disposition_method=constants.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
         ciprs_record=ciprs_record,
     )
     offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)

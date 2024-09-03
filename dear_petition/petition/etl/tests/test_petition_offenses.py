@@ -20,7 +20,7 @@ def many_offense_records(batch, size):
             batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM"
         )
         offense = OffenseFactory(
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposition_method=dismissed.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
             ciprs_record=record,
             jurisdiction=constants.DISTRICT_COURT,
         )
@@ -146,7 +146,7 @@ def test_paginator_same_record_number_order(petition, records_10):
     # attach a 2nd dismissed charge
     charge_2 = OffenseRecordFactory(
         offense=OffenseFactory(
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposition_method=dismissed.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
             ciprs_record=charge_1.offense.ciprs_record,
             jurisdiction=constants.DISTRICT_COURT,
         ),
@@ -176,7 +176,7 @@ def test_paginator_orders_records_correctly(batch, petition):
         offense = OffenseFactory(
             ciprs_record=ciprs_record,
             jurisdiction=constants.DISTRICT_COURT,
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposition_method=dismissed.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
         )
         offense_record = OffenseRecordFactory(offense=offense)
         return offense_record.id

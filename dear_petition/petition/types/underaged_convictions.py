@@ -1,8 +1,7 @@
 import logging
 from dateutil.relativedelta import relativedelta
 
-from django.utils import timezone
-from django.db.models import Q, F, DurationField, ExpressionWrapper
+from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
 from dear_petition.petition.types.dismissed import build_query as build_dismissed_query
@@ -41,6 +40,6 @@ def build_query(dob):
     logger.debug(f"Using {eighteenth_birthday} as eighteenth birthday (dob={dob})")
     dismissed_query = build_dismissed_query()
     not_guilty_query = build_not_guilty_query()
-    action = Q(offense__ciprs_record__offense_date__date__lt=eighteenth_birthday)
-    query = action & ~dismissed_query & ~not_guilty_query
+    before_eighteen = Q(offense__ciprs_record__offense_date__date__lt=eighteenth_birthday)
+    query = before_eighteen & ~dismissed_query & ~not_guilty_query
     return query

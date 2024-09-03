@@ -19,7 +19,6 @@ def test_transform_full_record(sample_record):
                 "Disposition Method": "District Dismissed by the Court - No Plea Agreement",
                 "Records": [
                     {
-                        "Action": "Disposition",
                         "Count": 1,
                         "Description": "EXTRADITION/FUGITIVE OTH STATE",
                         "Law": "15A-727;733;734",
