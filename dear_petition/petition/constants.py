@@ -112,17 +112,23 @@ CIPRS_DISPOSITION_METHODS_DISMISSED = (
 PORTAL_DISPOSITION_METHODS_DISMISSED = (
     "VD-District Dismissals w/o Leave by DA - No Plea Agreement",
     "VD-Superior Dismissals w/o Leave by DA - No Plea Agreement",
+    "VD-District Dismissals w/o Leave by DA - Per Plea Agreement",
+    "Superior Dismissed by the Court - No Plea Agreement",
+    "District Dismissed by the Court - No Plea Agreement",
     "No Probable Cause Found",
+    "Superior Deferred Proceeding/Prosecution Dismissal",
 )
 
 PORTAL_DISPOSITION_METHODS_NOT_GUILTY = (
     "District Not Guilty - Judge",
-    "Superior Not Guilty - Judge"
+    "Superior Not Guilty - Judge",
+    "Not Guilty - Jury",
 )
 
 PORTAL_DISPOSITION_METHODS_CONVICTED = (
     "District Guilty - Judge",
-    "Superior Guilty - Judge"
+    "Superior Guilty - Judge",
+    "Guilty - Jury",
 )
 
 DISP_METHOD_SUPERSEDING_INDICTMENT = "SUPERSEDING INDICTMENT OR PROCESS"
