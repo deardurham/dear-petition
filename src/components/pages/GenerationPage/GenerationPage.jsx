@@ -84,7 +84,7 @@ function GenerationPage() {
     );
   }
 
-  const { attorney, client } = data;
+  const { attorney, client, label } = data;
 
   const validateInput = () => {
     let hasErrors = false;
@@ -139,6 +139,16 @@ function GenerationPage() {
     });
   };
 
+  const generateRecordsSpreadsheet = async () => {
+    manualAxiosRequest({
+      url: `/batch/${batchId}/generate_spreadsheet/`,
+      responseType: 'arraybuffer',
+      method: 'post',
+    }).then((recordsSummary) => {
+      _openDoc(recordsSummary.data, `${label}.xlsx`);
+    });
+  };
+
   return (
     <GenerationPageStyled>
       <GenerationContentStyled>
@@ -174,17 +184,13 @@ function GenerationPage() {
             >
               Create Records Summary
             </Button>
-            {/*
-                Legal team requested this be temporarily removed from UI
-
-                 <Button
-                  onClick={() => generateAdviceLetter()}
-                  disabled={!!data?.generate_letter_errors?.batch}
-                  title={data?.generate_letter_errors?.batch?.join(' ') ?? ''}
-                >
-              Create Advice Letter
+            <Button
+              onClick={() => generateRecordsSpreadsheet()}
+              disabled={!!data?.generate_summary_errors?.batch}
+              title={data?.generate_summary_errors?.batch?.join(' ') ?? ''}
+            >
+              Create Records Spreadsheet
             </Button>
-            */}
           </div>
         </InputSection>
         <GenerationSection>
