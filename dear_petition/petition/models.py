@@ -52,21 +52,21 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
         null=True,
         blank=True,
     )
-    date_uploaded = models.DateTimeField(auto_now_add=True)
-    label = models.CharField(max_length=2048, blank=True)
-    data = JSONField(blank=True, null=True)
-    file_no = models.CharField(max_length=256, blank=True)
-    county = models.CharField(max_length=256, blank=True)
-    dob = models.DateField(null=True, blank=True)
-    sex = models.CharField(max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE)
-    race = models.CharField(max_length=256, blank=True)
-    case_status = models.CharField(max_length=256, blank=True)
-    offense_date = models.DateTimeField(null=True, blank=True)
-    arrest_date = models.DateField(null=True, blank=True)
+    date_uploaded = models.DateTimeField(auto_now_add=True, verbose_name="Date Uploaded")
+    label = models.CharField(max_length=2048, blank=True, verbose_name="Label")
+    data = JSONField(blank=True, null=True, verbose_name="Data")
+    file_no = models.CharField(max_length=256, blank=True, verbose_name="File Number")
+    county = models.CharField(max_length=256, blank=True, verbose_name="County")
+    dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
+    sex = models.CharField(max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, verbose_name="Sex")
+    race = models.CharField(max_length=256, blank=True, verbose_name="Race")
+    case_status = models.CharField(max_length=256, blank=True, verbose_name="Case Status")
+    offense_date = models.DateTimeField(null=True, blank=True, verbose_name="Offense Date")
+    arrest_date = models.DateField(null=True, blank=True, verbose_name="Arrest Date")
     jurisdiction = models.CharField(
-        max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE
+        max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE, verbose_name="Jurisdiction"
     )
-    has_additional_offenses = models.BooleanField(default=False)
+    has_additional_offenses = models.BooleanField(default=False, verbose_name="Has Additional Offenses")
 
     def __str__(self):
         return f"{self.label} {self.file_no} ({self.pk})"
@@ -107,12 +107,12 @@ class Offense(PrintableModelMixin, models.Model):
         "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
     jurisdiction = models.CharField(
-        choices=JURISDICTION_CHOICES, max_length=255, default=pc.DISTRICT_COURT
+        choices=JURISDICTION_CHOICES, max_length=255, default=pc.DISTRICT_COURT, verbose_name="Jurisdiction"
     )
-    disposed_on = models.DateField(blank=True, null=True)
-    disposition_method = models.CharField(max_length=256)
-    verdict = models.CharField(max_length=256, blank=True)
-    plea = models.CharField(max_length=256, blank=True)
+    disposed_on = models.DateField(blank=True, null=True, verbose_name="Disposed On Date")
+    disposition_method = models.CharField(max_length=256, verbose_name="Disposition Method")
+    verdict = models.CharField(max_length=256, null=True, blank=True, verbose_name="Verdict")
+    plea = models.CharField(max_length=256, null=True, blank=True, verbose_name="Plea")
 
     def __str__(self):
         return f"{self.id} ({self.ciprs_record.file_no})"
@@ -170,12 +170,12 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     offense = models.ForeignKey(
         "Offense", related_name="offense_records", on_delete=models.CASCADE
     )
-    count = models.IntegerField(blank=True, null=True)
-    law = models.CharField(max_length=256, blank=True)
-    code = models.IntegerField(blank=True, null=True)
-    action = models.CharField(max_length=256)
-    severity = models.CharField(max_length=256)
-    description = models.CharField(max_length=256)
+    count = models.IntegerField(blank=True, null=True, verbose_name="Count")
+    law = models.CharField(max_length=256, blank=True, verbose_name="Law")
+    code = models.IntegerField(blank=True, null=True, verbose_name="Code")
+    action = models.CharField(max_length=256, null=True, verbose_name="Action")
+    severity = models.CharField(max_length=256, verbose_name="Severity")
+    description = models.CharField(max_length=256, verbose_name="Description")
     agency = models.ForeignKey("Contact", related_name="+", null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -286,16 +286,16 @@ class AgencyWithCleanNameManager(models.Manager):
 
 
 class Contact(PrintableModelMixin, models.Model):
-    name = models.CharField(max_length=512)
+    name = models.CharField(max_length=512, verbose_name="Name")
     category = models.CharField(max_length=16, choices=CONTACT_CATEGORIES)
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
     address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
-    city = models.CharField(max_length=64, blank=True)
-    state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True)
+    city = models.CharField(max_length=64, blank=True, verbose_name="City")
+    state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True, verbose_name="State")
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
-    phone_number = PhoneNumberField(null=True, blank=True)
-    email = models.EmailField(max_length=254, null=True, blank=True)
-    county = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = PhoneNumberField(null=True, blank=True, verbose_name="Phone Number")
+    email = models.EmailField(max_length=254, null=True, blank=True, verbose_name="Email Address")
+    county = models.CharField(max_length=100, null=True, blank=True, verbose_name="County")
 
     objects = models.Manager()
 
@@ -304,7 +304,7 @@ class Contact(PrintableModelMixin, models.Model):
     
 
 class Client(Contact):
-    dob = models.DateField(null=True, blank=True)
+    dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
     user = models.ForeignKey(
         User,
         related_name="clients",

@@ -85,7 +85,7 @@ def record_data(idx):
             "Date of Birth/Estimated Age": "1990-01-01",
             "Name": "DOE,JON,BOJACK",
             "Race": "WHITE",
-            "Sex": "MALE",
+            "Sex": "M",
         },
         "District Court Offense Information": [
             {

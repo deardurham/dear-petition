@@ -74,6 +74,7 @@ def create_petitions_from_records(batch, form_type):
     logger.info(f"Searching for {form_type} records (batch {batch})")
     record_set = petition_offense_records(batch, form_type)
     petition_types = identify_distinct_petitions(record_set)
+
     for petition_type in petition_types:
         petition = batch.petitions.create(
             form_type=form_type,

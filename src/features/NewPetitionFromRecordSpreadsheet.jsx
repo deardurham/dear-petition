@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button, CloseButton } from '../components/elements/Button';
 import DragNDrop from '../components/elements/DragNDrop/DragNDrop';
-import { useCreateBatchMutation } from '../service/api';
-import CenteredDialog from '../components/elements/Modal/Dialog';
+import { useCreateBatchFromRecordSpreadsheetMutation } from '../service/api';
 import { Spinner } from '../components/elements/Spinner';
 import { POSITIVE } from '../components/elements/Button/Button';
-import useAuth from '../hooks/useAuth';
 
-const ALLOWED_MIME_TYPES = ['application/pdf'];
-const MAX_FILES = 10;
+const ALLOWED_MIME_TYPES = [
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+];
+const MAX_FILES = 1;
 const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
 
@@ -23,7 +24,7 @@ const RecordUpload = () => {
   const [uploadError, setUploadError] = useState('');
   const [files, setFiles] = useState(new Set());
   const history = useHistory();
-  const [createBatch, { isLoading: isUploading }] = useCreateBatchMutation();
+  const [createBatch, { isLoading: isUploading }] = useCreateBatchFromRecordSpreadsheetMutation();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -33,12 +34,6 @@ const RecordUpload = () => {
     };
   }, []);
 
-  const _mergeFileSets = (newFiles) => {
-    const mergedFiles = new Set(files);
-    newFiles.forEach((file) => mergedFiles.add(file));
-    return mergedFiles;
-  };
-
   const handleDrop = (drop) => {
     setDragErrors(drop.errors);
     setDragWarnings(drop.warnings);
@@ -46,16 +41,7 @@ const RecordUpload = () => {
       setDragErrors(['Maximum file limit exceeded']);
       return;
     }
-
-    let hasDups = false;
-    files.forEach((file) => {
-      const dup = drop.files.find((newFile) => newFile.name === file.name);
-      if (dup) {
-        setDragErrors([`Cannot upload duplicate file "${dup.name}"`]);
-        hasDups = true;
-      }
-    });
-    if (!hasDups) setFiles(_mergeFileSets(drop.files));
+    setFiles(new Set(drop.files));
   };
 
   const handleRemoveFile = (file) => {
@@ -70,7 +56,7 @@ const RecordUpload = () => {
     setFiles(copiedSet);
   };
 
-  const handlePreparePetitions = async () => {
+  const handleRecordsSpreadsheetImport = async () => {
     setUploadError(true);
     let timer = null;
     const filesFormData = new FormData();
@@ -87,7 +73,7 @@ const RecordUpload = () => {
         if (timer) {
           clearTimeout(timer);
         }
-        history.push(`/generate/${data.id}`);
+        history.push(`/generate/${data.batch_id}`);
       })
       .catch(() => {
         if (timer) {
@@ -100,8 +86,7 @@ const RecordUpload = () => {
   };
 
   const hasFiles = files?.size > 0 ?? false;
-  console.log(files);
-  console.log(hasFiles);
+
   return (
     <>
       <DragNDrop
@@ -114,7 +99,7 @@ const RecordUpload = () => {
       >
         <div className="flex flex-col justify-between items-center gap-4 px-3 py-10">
           <div className="">
-            <h2>Upload CIPRS PDF Files</h2>
+            <h2>Upload Record Spreadsheet</h2>
             <p className="whitespace-normal">Drag and Drop files here or click to open file finder</p>
           </div>
           <div className="flex flex-col gap-4 self-start">
@@ -150,10 +135,10 @@ const RecordUpload = () => {
           <Button
             className="text-2xl flex justify-center items-center gap-4"
             disabled={!hasFiles}
-            onClick={handlePreparePetitions}
+            onClick={handleRecordsSpreadsheetImport}
             title={!hasFiles ? 'Files have not yet been selected' : undefined}
           >
-            <span>Submit Files</span>
+            <span>Submit File</span>
             {isUploading && <Spinner size="xs" color={POSITIVE} />}
           </Button>
           <span className="text-red">{uploadError}</span>
@@ -180,67 +165,19 @@ const RecordUpload = () => {
     </>
   );
 };
-
-export const NewPetition = () => {
-  const { user } = useAuth();
-  const [showEmailModal, setShowEmailModal] = useState(false);
+export const NewPetitionFromRecordSpreadsheet = () => {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2">
-        <h3>How to Submit the CIPRS documents</h3>
-        <p>There are two methods of starting a new expunction petition</p>
-        <p className="flex gap-2">
-          1. Email the documents directly from the CIPRS computer.
-          <button type="button" className="text-blue font-semibold" onClick={() => setShowEmailModal(true)}>
-            Click here for instructions
-          </button>
+        <h3>How to Submit the Record Spreadsheet</h3>
+        <p>This will allow you to generate petitions from a modified record spreadsheet.</p>
+        <p>
+          The original record spreadsheet must be downloaded after uploading the PDF record from external record
+          provider (CIPRS, Portal, etc.)
         </p>
-        <p>2. If you have access to the CIPRS record PDF files, you may manually upload them.</p>
       </div>
       <RecordUpload />
       <iframe id="printIframe" title="Print" className="h-0 w-0 absolute" />
-      <CenteredDialog isOpen={showEmailModal} onClose={() => setShowEmailModal(false)}>
-        <div id="printableInstructions" className="flex flex-col px-8 py-16 w-[800px]">
-          <h3 className="">Upload CIPRS Record via Court Email System</h3>
-          <div className="mt-6 [&_li]:text-[17px]">
-            <ul className="list-disc list-inside flex flex-col gap-4">
-              <li>
-                <span>You may send an email with CIPRS record attachments to </span>
-                <b>
-                  {user.username}
-                  @inbox.durhamexpunction.org
-                </b>
-                <span> to view and generate documents.</span>
-              </li>
-              <li>
-                <span>
-                  {`You may optionally add a label for the CIPRS records by adding a '+'. For example, to create a label called 'Test' use the following email address: `}
-                </span>
-                <b>{user.username}+Test@inbox.durhamexpunction.org</b>
-              </li>
-              <li>
-                <span>{`You can add spaces in the label by using '_'. For example, to create label called 'John Doe Records' use the following email address: `}</span>
-                <b>{user.username}+John_Doe_Records@inbox.durhamexpunction.org</b>
-              </li>
-            </ul>
-            <div className="mt-6 flex gap-4" media="print" style={{ display: 'none' }}>
-              <Button
-                onClick={() => {
-                  const content = document.getElementById('printableInstructions');
-                  const pri = document.getElementById('printIframe').contentWindow;
-                  pri.document.open();
-                  pri.document.write(content.innerHTML);
-                  pri.document.close();
-                  pri.focus();
-                  pri.print();
-                }}
-              >
-                Print
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CenteredDialog>
     </div>
   );
 };
