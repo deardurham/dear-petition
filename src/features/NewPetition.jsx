@@ -100,8 +100,6 @@ const RecordUpload = () => {
   };
 
   const hasFiles = files?.size > 0 ?? false;
-  console.log(files);
-  console.log(hasFiles);
   return (
     <>
       <DragNDrop
