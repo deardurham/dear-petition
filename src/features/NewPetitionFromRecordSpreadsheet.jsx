@@ -14,7 +14,6 @@ const ALLOWED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 const MAX_FILES = 1;
-const MAX_FILE_SIZE = 30000;
 const LONG_WAIT_TIMEOUT = 5; // seconds
 
 const RecordUpload = () => {
@@ -94,7 +93,6 @@ const RecordUpload = () => {
         ref={fileInputRef}
         mimeTypes={ALLOWED_MIME_TYPES}
         maxFiles={MAX_FILES}
-        maxSize={MAX_FILE_SIZE}
         onDrop={handleDrop}
       >
         <div className="flex flex-col justify-between items-center gap-4 px-3 py-10">

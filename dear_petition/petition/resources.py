@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 from django.db.models.query import QuerySet
 from django.db.models import BooleanField
+from django.db import transaction
 from import_export import fields, resources
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
@@ -53,11 +54,10 @@ class ExcelField(fields.Field):
         super().__init__(**kwargs)
 
 class ExcelDataset:
-    def __init__(self, worksheet_title=None):
+    def __init__(self):
         self.wb = Workbook()
-        self.ws = self.wb.active
-        if worksheet_title:
-            self.ws.title = worksheet_title
+        self.wb.remove(self.wb.active)
+        self.ws = None
 
     def change_worksheet(self, sheet_name=None, sheet_index=None):
         if sheet_name:
@@ -72,7 +72,10 @@ class ExcelDataset:
         self.change_worksheet(sheet_name=title)
 
     def append(self, values, fields, is_header=False, num_indent=0, bold=False, color=None,):
-        assert len(values) == len(fields), "The values and fields passed to append should match."
+
+        if len(values) != len(fields):
+            raise ValueError("The values and fields passed to append should match.")
+
         row = ["" for i in range(num_indent)] + values
         self.ws.append(row)
         row_number = self.ws.max_row
@@ -365,14 +368,15 @@ class RecordSummaryResource(resources.ModelResource):
         self.first_offense_record_header = self.offense_record_headers[0]
 
     def export(self, batch_object=None, *args, **kwargs):
-        # Initialize a new dataset with headers
-        assert isinstance(batch_object,models.Batch), "Queryset must be a Batch object"
+
+        if not isinstance(batch_object,models.Batch):
+            raise ValueError("Queryset must be a Batch object")
 
         dataset = ExcelDataset()
 
         # Client
         if batch_object.client:
-            dataset.ws.title = CLIENT_SHEET_TITLE
+            dataset.create_new_worksheet(title=CLIENT_SHEET_TITLE)
             self.client_resource.export_excel(batch_object.client, dataset)
 
         # Record
@@ -398,63 +402,65 @@ class RecordSummaryResource(resources.ModelResource):
     
    
     def import_data(self, workbook: Workbook, batch: models.Batch, *args, **kwargs):
-        client_worksheet = workbook[CLIENT_SHEET_TITLE]
-        client_headers = [cell.value for cell in client_worksheet[1]]
-        client_values = [cell.value for cell in client_worksheet[2]]
-        client_dataset = tablib.Dataset()
-        client_dataset.headers = client_headers
-        client_dataset.append(client_values)
-        self.client_resource.import_data(client_dataset)
-        workbook.remove(client_worksheet)
+        with transaction.atomic():
+            if CLIENT_SHEET_TITLE in workbook:
+                client_worksheet = workbook[CLIENT_SHEET_TITLE]
+                client_headers = [cell.value for cell in client_worksheet[1]]
+                client_values = [cell.value for cell in client_worksheet[2]]
+                client_dataset = tablib.Dataset()
+                client_dataset.headers = client_headers
+                client_dataset.append(client_values)
+                self.client_resource.import_data(client_dataset)
+                workbook.remove(client_worksheet)
 
-        current_resource = None
-        current_dataset = tablib.Dataset()
-        for worksheet in workbook.worksheets:
-            if current_resource and current_dataset:
-                result = current_resource.import_data(current_dataset)
             current_resource = None
             current_dataset = tablib.Dataset()
-            for row_number, row in enumerate(worksheet.iter_rows(), 1):
+            for worksheet in workbook.worksheets:
+                if current_resource and current_dataset:
+                    result = current_resource.import_data(current_dataset)
+                current_resource = None
+                current_dataset = tablib.Dataset()
+                for row_number, row in enumerate(worksheet.iter_rows(), 1):
 
-                if all(cell.value in (None, '') for cell in row):
-                    continue # This is an empty row.
+                    if all(cell.value in (None, '') for cell in row):
+                        continue # This is an empty row.
 
-                for cell_number, cell in enumerate(worksheet[row_number]):
-                    if cell.value is not None:
-                        break # Get first non-null value
-                        
-                if cell.value in (self.first_record_header, self.first_offense_header, self.first_offense_record_header):
+                    for cell_number, cell in enumerate(worksheet[row_number]):
+                        if cell.value is not None:
+                            break # Get first non-null value
+                            
+                    if cell.value in (self.first_record_header, self.first_offense_header, self.first_offense_record_header):
 
-                    if current_resource and current_dataset:
-                        result = current_resource.import_data(current_dataset)
-                        current_dataset = tablib.Dataset()
+                        if current_resource and current_dataset:
+                            result = current_resource.import_data(current_dataset)
+                            current_dataset = tablib.Dataset()
 
-                    if cell.value == self.first_record_header:
-                        current_resource = self.record_resource
-                        current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
-                    elif cell.value == self.first_offense_header:
-                        current_resource = self.offense_resource
-                        current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
-                    elif cell.value == self.first_offense_record_header:
-                        current_resource = self.offense_record_resource
-                        current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
-                else: 
-                    if current_resource == self.record_resource:
-                        row = list(row)[current_resource.NUM_INDENT:len(self.record_headers) + current_resource.NUM_INDENT]
-                        current_dataset.append([batch.id] + [cell.value for cell in row])
-                    elif current_resource == self.offense_resource:
-                        row = list(row)[current_resource.NUM_INDENT:len(self.offense_headers) + current_resource.NUM_INDENT]
-                        record_id = self.record_resource.saved_instance_ids[-1]
-                        current_dataset.append([record_id] + [cell.value for cell in row])
-                    elif current_resource == self.offense_record_resource:
-                        row = list(row)[current_resource.NUM_INDENT:len(self.offense_record_headers) + current_resource.NUM_INDENT]
-                        offense_id = self.offense_resource.saved_instance_ids[-1]
-                        current_dataset.append([offense_id] + [cell.value for cell in row])
-                    else:
-                        current_dataset.append(row[cell_number:])
+                        if cell.value == self.first_record_header:
+                            current_resource = self.record_resource
+                            current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
+                        elif cell.value == self.first_offense_header:
+                            current_resource = self.offense_resource
+                            current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
+                        elif cell.value == self.first_offense_record_header:
+                            current_resource = self.offense_record_resource
+                            current_dataset.headers = [col.column_name for col in current_resource.get_import_fields()]
+                    else: 
+                        if current_resource == self.record_resource:
+                            row = list(row)[current_resource.NUM_INDENT:len(self.record_headers) + current_resource.NUM_INDENT]
+                            current_dataset.append([batch.id] + [cell.value for cell in row])
+                        elif current_resource == self.offense_resource:
+                            row = list(row)[current_resource.NUM_INDENT:len(self.offense_headers) + current_resource.NUM_INDENT]
+                            record_id = self.record_resource.saved_instance_ids[-1]
+                            current_dataset.append([record_id] + [cell.value for cell in row])
+                        elif current_resource == self.offense_record_resource:
+                            row = list(row)[current_resource.NUM_INDENT:len(self.offense_record_headers) + current_resource.NUM_INDENT]
+                            offense_id = self.offense_resource.saved_instance_ids[-1]
+                            current_dataset.append([offense_id] + [cell.value for cell in row])
+                        else:
+                            current_dataset.append(row[cell_number:])
 
-        if current_resource and current_dataset:
-            result = current_resource.import_data(current_dataset)
+            if current_resource and current_dataset:
+                result = current_resource.import_data(current_dataset)
 
-        batch.refresh_from_db()
-        create_batch_petitions(batch)
+            batch.refresh_from_db()
+            create_batch_petitions(batch)

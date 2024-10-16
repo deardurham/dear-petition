@@ -230,7 +230,6 @@ export const ExistingPetitions = () => {
                     Summary
                   </Button>
                   <Button
-                    disabled={!!batch?.generate_summary_errors?.batch}
                     title={batch?.generate_summary_errors?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       manualAxiosRequest({

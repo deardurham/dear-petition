@@ -186,7 +186,6 @@ function GenerationPage() {
             </Button>
             <Button
               onClick={() => generateRecordsSpreadsheet()}
-              disabled={!!data?.generate_summary_errors?.batch}
               title={data?.generate_summary_errors?.batch?.join(' ') ?? ''}
             >
               Create Records Spreadsheet
