@@ -230,7 +230,6 @@ export const ExistingPetitions = () => {
                     Summary
                   </Button>
                   <Button
-                    title={batch?.generate_summary_errors?.batch?.join(' ') ?? ''}
                     onClick={() => {
                       manualAxiosRequest({
                         url: `/batch/${batch.pk}/generate_spreadsheet/`,
