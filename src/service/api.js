@@ -115,6 +115,10 @@ export const api = createApi({
       query: ({ data }) => ({ url: 'batch/', method: 'post', timeout: 30 * 1000, data }),
       invalidatesTags: (result) => (result ? [{ type: 'Batch' }] : []),
     }),
+    createBatchFromRecordSpreadsheet: builder.mutation({
+      query: ({ data }) => ({ url: `batch/import_spreadsheet/`, method: 'post', timeout: 30 * 1000, data }),
+      invalidatesTags: (result) => (result ? [{ type: 'Batch' }] : []),
+    }),
     deleteBatch: builder.mutation({
       query: ({ id }) => ({ url: `batch/${id}/`, method: 'delete' }),
       invalidatesTags: ['Batch'],
@@ -236,6 +240,7 @@ export const {
   useAssignAgenciesToDocumentsMutation,
   useLazyGetContactFilterOptionsQuery,
   useCreateBatchMutation,
+  useCreateBatchFromRecordSpreadsheetMutation,
   useDeleteBatchMutation,
   useCombineBatchesMutation,
   useLazyCheckLoginQuery,

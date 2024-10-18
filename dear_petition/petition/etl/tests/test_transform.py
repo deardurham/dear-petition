@@ -69,7 +69,7 @@ def test_combine_batches(batch, batch_file, fake_pdf):
             "Date of Birth/Estimated Age": "1990-01-01",
             "Name": "DOE,JON,BOJACK",
             "Race": "WHITE",
-            "Sex": "MALE",
+            "Sex": "M",
         },
         "District Court Offense Information": [
             {

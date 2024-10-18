@@ -8,6 +8,7 @@ import { useGetUserBatchesQuery } from '../../service/api';
 import useAuth from '../../hooks/useAuth';
 import { ExistingPetitions } from '../../features/ExistingPetitions';
 import { NewPetition } from '../../features/NewPetition';
+import { NewPetitionFromRecordSpreadsheet } from '../../features/NewPetitionFromRecordSpreadsheet';
 import { Spinner } from '../elements/Spinner';
 
 export const Dashboard = () => {
@@ -29,7 +30,7 @@ export const Dashboard = () => {
           First time creating an expunction petition form?
           <Link to="/help">See the Help page for more information.</Link>
         </span>
-        <Tab.Group defaultIndex={hasExistingPetitions ? 1 : 0}>
+        <Tab.Group defaultIndex={hasExistingPetitions ? 2 : 0}>
           <Tab.List className="flex">
             <div className="flex bg-blue-primary p-2 gap-1 rounded-md text-white font-bold">
               <Tab as="div">
@@ -54,6 +55,19 @@ export const Dashboard = () => {
                       selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]',
                     )}
                   >
+                    Record Spreadsheet
+                  </button>
+                )}
+              </Tab>
+              <Tab as="div">
+                {({ selected }) => (
+                  <button
+                    type="button"
+                    className={cx(
+                      'px-4 py-2 rounded-md border-0',
+                      selected ? 'bg-white text-blue-primary' : 'bg-inherit hover:bg-white/[0.25]',
+                    )}
+                  >
                     Existing Petitions
                   </button>
                 )}
@@ -63,6 +77,9 @@ export const Dashboard = () => {
           <Tab.Panels as="div">
             <Tab.Panel>
               <NewPetition />
+            </Tab.Panel>
+            <Tab.Panel>
+              <NewPetitionFromRecordSpreadsheet />
             </Tab.Panel>
             <Tab.Panel>
               <ExistingPetitions />
