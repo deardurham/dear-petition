@@ -205,7 +205,7 @@ export const ExistingPetitions = () => {
   return (
     <div className="flex flex-col">
       <ModalButton title="Combine Petitions" colorClass={POSITIVE} className="w-[150px] h-[32px] mb-5">
-        <CombineBatchModal rowData={data?.results} count={data?.count} pageNumber={pageNumber} setPageNumber={setPageNumber} />
+        <CombineBatchModal rowData={data?.results} />
       </ModalButton>
       <h3 className="mb-2">Recent Petitions</h3>
       <p>Petitions you have recently worked on will show up here </p>
