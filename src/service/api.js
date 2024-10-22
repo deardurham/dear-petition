@@ -139,7 +139,7 @@ export const api = createApi({
       },
     }),
     getUserBatches: builder.query({
-      query: ({ user }) => ({ url: `batch/`, method: 'get', params: { user, limit: 10 } }),
+      query: ({ user, limit, offset }) => ({ url: `batch/`, method: 'get', params: { user, limit, offset } }),
       providesTags: ['Batch'],
     }),
     combineBatches: builder.mutation({

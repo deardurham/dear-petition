@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -6,7 +6,15 @@ import { formatDistance } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { manualAxiosRequest } from '../service/axios';
 import { Button, ModalButton } from '../components/elements/Button';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '../components/elements/Table';
+import {
+  LegacyPageSelection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+  calculateNumberOfPages,
+} from '../components/elements/Table';
 import { Tooltip } from '../components/elements/Tooltip/Tooltip';
 import { useDeleteBatchMutation, useGetUserBatchesQuery, useCombineBatchesMutation } from '../service/api';
 import useAuth from '../hooks/useAuth';
@@ -91,21 +99,45 @@ const CombineBatchModalButton = ({ batchId, batchIdsToCombine, setBatchIdsToComb
   }
 };
 
-const CombineBatchModal = ({ rowData }) => {
+const COMBINE_MODAL_NUM_PETITIONS_PER_PAGE = 5;
+
+const CombineBatchModal = () => {
+  const { user } = useAuth();
   const [newLabel, setNewLabel] = useState('');
   const { closeModal } = useModalContext();
   const [batchIdsToCombine, setBatchIdsToCombine] = useState([]);
   const [triggerCombine] = useCombineBatchesMutation();
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const { data } = useGetUserBatchesQuery({
+    user: user.pk,
+    offset: (pageNumber - 1) * COMBINE_MODAL_NUM_PETITIONS_PER_PAGE,
+    limit: COMBINE_MODAL_NUM_PETITIONS_PER_PAGE,
+  });
+
+  useEffect(() => {
+    if (calculateNumberOfPages(data?.count ?? 0, COMBINE_MODAL_NUM_PETITIONS_PER_PAGE) < pageNumber) {
+      setPageNumber(1);
+    }
+  }, [data?.count, pageNumber]);
 
   return (
-    <div className="flex flex-col gap-10 justify-center w-[450px] m-20 mb-40 mt-40">
+    <div className="flex flex-col gap-10 justify-center min-w-[600px] min-h-[100px] p-10">
+      <div>
+        <LegacyPageSelection
+            currentPage={pageNumber}
+            numPages={calculateNumberOfPages(data?.count ?? 0, COMBINE_MODAL_NUM_PETITIONS_PER_PAGE)}
+            onPageSelect={(pageNum) => setPageNumber(pageNum)}
+          />
+      </div>
+      <div className='h-[300px]'>
       <Table className="text-[1.7rem]" columnSizes="4fr 2fr">
         <TableHeader>
           <TableCell header>Label</TableCell>
           <TableCell header>Action</TableCell>
         </TableHeader>
         <TableBody>
-          {rowData?.map((batch) => (
+          {data?.results?.map((batch) => (
             <TableRow key={batch.pk}>
               <TableCell>{batch.label}</TableCell>
               <TableCell>
@@ -119,6 +151,7 @@ const CombineBatchModal = ({ rowData }) => {
           ))}
         </TableBody>
       </Table>
+      </div>
       <div className="flex flex-col gap-10 justify-center w-[450px] h-[200px]">
         <form>
           <TextInput label="New Label" onChange={(e) => setNewLabel(e.target.value)} />
@@ -150,20 +183,40 @@ const CombineBatchModal = ({ rowData }) => {
   );
 };
 
+const BATCH_TABLE_NUM_PETITIONS_PER_PAGE = 7;
+
 // TODO: Rename batches to "Petition Groups"
 export const ExistingPetitions = () => {
   const { user } = useAuth();
-  const { data } = useGetUserBatchesQuery({ user: user.pk });
+  const [pageNumber, setPageNumber] = useState(1);
+  const { data } = useGetUserBatchesQuery({
+    user: user.pk,
+    offset: (pageNumber - 1) * BATCH_TABLE_NUM_PETITIONS_PER_PAGE,
+    limit: BATCH_TABLE_NUM_PETITIONS_PER_PAGE,
+  });
   const [downloadDocumentBatch, setDownloadDocumentBatch] = useState(null);
+
+  useEffect(() => {
+    if (calculateNumberOfPages(data?.count ?? 0, BATCH_TABLE_NUM_PETITIONS_PER_PAGE) < pageNumber) {
+      setPageNumber(1);
+    }
+  }, [data?.count, pageNumber]);
 
   return (
     <div className="flex flex-col">
       <ModalButton title="Combine Petitions" colorClass={POSITIVE} className="w-[150px] h-[32px] mb-5">
-        <CombineBatchModal rowData={data?.results} />
+        <CombineBatchModal rowData={data?.results} count={data?.count} pageNumber={pageNumber} setPageNumber={setPageNumber} />
       </ModalButton>
       <h3 className="mb-2">Recent Petitions</h3>
       <p>Petitions you have recently worked on will show up here </p>
       <div className="w-full">
+        <div className="tw-flex items-end justify-end pb-2">
+          <LegacyPageSelection
+            currentPage={pageNumber}
+            numPages={calculateNumberOfPages(data?.count ?? 0, BATCH_TABLE_NUM_PETITIONS_PER_PAGE)}
+            onPageSelect={(pageNum) => setPageNumber(pageNum)}
+          />
+        </div>
         <Table className="text-[1.7rem]" columnSizes="4fr 2fr 2fr 6fr">
           <TableHeader>
             <TableCell header>Label</TableCell>
