@@ -125,32 +125,32 @@ const CombineBatchModal = () => {
     <div className="flex flex-col gap-10 justify-center min-w-[600px] min-h-[100px] p-10">
       <div>
         <LegacyPageSelection
-            currentPage={pageNumber}
-            numPages={calculateNumberOfPages(data?.count ?? 0, COMBINE_MODAL_NUM_PETITIONS_PER_PAGE)}
-            onPageSelect={(pageNum) => setPageNumber(pageNum)}
-          />
+          currentPage={pageNumber}
+          numPages={calculateNumberOfPages(data?.count ?? 0, COMBINE_MODAL_NUM_PETITIONS_PER_PAGE)}
+          onPageSelect={(pageNum) => setPageNumber(pageNum)}
+        />
       </div>
-      <div className='h-[300px]'>
-      <Table className="text-[1.7rem]" columnSizes="4fr 2fr">
-        <TableHeader>
-          <TableCell header>Label</TableCell>
-          <TableCell header>Action</TableCell>
-        </TableHeader>
-        <TableBody>
-          {data?.results?.map((batch) => (
-            <TableRow key={batch.pk}>
-              <TableCell>{batch.label}</TableCell>
-              <TableCell>
-                <CombineBatchModalButton
-                  batchId={batch.pk}
-                  batchIdsToCombine={batchIdsToCombine}
-                  setBatchIdsToCombine={setBatchIdsToCombine}
-                ></CombineBatchModalButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="h-[300px]">
+        <Table className="text-[1.7rem]" columnSizes="4fr 2fr">
+          <TableHeader>
+            <TableCell header>Label</TableCell>
+            <TableCell header>Action</TableCell>
+          </TableHeader>
+          <TableBody>
+            {data?.results?.map((batch) => (
+              <TableRow key={batch.pk}>
+                <TableCell>{batch.label}</TableCell>
+                <TableCell>
+                  <CombineBatchModalButton
+                    batchId={batch.pk}
+                    batchIdsToCombine={batchIdsToCombine}
+                    setBatchIdsToCombine={setBatchIdsToCombine}
+                  ></CombineBatchModalButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
       <div className="flex flex-col gap-10 justify-center w-[450px] h-[200px]">
         <form>
