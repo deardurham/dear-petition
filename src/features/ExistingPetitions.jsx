@@ -227,7 +227,23 @@ export const ExistingPetitions = () => {
                       });
                     }}
                   >
-                    Records Summary
+                    Summary
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      manualAxiosRequest({
+                        url: `/batch/${batch.pk}/generate_spreadsheet/`,
+                        responseType: 'arraybuffer',
+                        method: 'post',
+                      }).then((recordsSummary) => {
+                        const docBlob = new Blob([recordsSummary.data], {
+                          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        });
+                        downloadFile(docBlob, `${batch.label}.xlsx`);
+                      });
+                    }}
+                  >
+                    Spreadsheet
                   </Button>
                   <ModalButton title="Delete" colorClass={CAUTION}>
                     <DeleteBatchModal batch={batch} />

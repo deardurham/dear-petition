@@ -3,6 +3,7 @@ from import_export.results import RowResult
 import logging
 import tablib
 import tempfile
+import os
 
 from django.db import transaction
 from django.db.models import Count
@@ -11,13 +12,13 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import update_last_login
 from django.http import FileResponse, HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, parsers, permissions, status, viewsets, views
+from rest_framework import filters, generics, parsers, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-
+from openpyxl import load_workbook
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
@@ -363,6 +364,25 @@ class BatchViewSet(viewsets.ModelViewSet):
             resp["Content-Disposition"] = 'attachment; filename="Records Summary.docx"'
             return resp
         
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def generate_spreadsheet(self, request, pk):
+        batch = self.get_object()
+        resource = resources.RecordSummaryResource()
+        dataset = resource.export(batch)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            filepath = tmpdir + f"/{batch.label}.xlsx"
+            dataset.save(filepath)
+            resp = FileResponse(open(filepath, "rb"))
+            resp[
+                "Content-Type"
+            ] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            return resp
 
     @action(
         detail=False,
@@ -406,6 +426,26 @@ class BatchViewSet(viewsets.ModelViewSet):
         batch.client = client
         batch.save()
         batch.adjust_for_new_client_dob()
+        return Response({"batch_id": batch.pk})
+    
+    @action(
+        detail=False,
+        methods=[
+            "post",
+        ],
+    )
+    def import_spreadsheet(self, request):
+        files = request.data.getlist("files")
+        user = request.user
+        resource = resources.RecordSummaryResource()
+        for file in files:
+            label = os.path.basename(file.name)
+            batch = pm.Batch.objects.create(label=label, user=user)
+            batch.files.create(file=file) 
+            file.seek(0)
+            workbook = load_workbook(filename=file)
+            resource.import_data(workbook, batch)
+
         return Response({"batch_id": batch.pk})
 
 
