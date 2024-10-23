@@ -140,6 +140,7 @@ PORTAL_DISPOSITION_METHODS_DISMISSED = (
     "Superior Dismissed Incapacity without Leave - Plea Agreement",
     "No Probable Cause Found",
     "Superior Deferred Proceeding/Prosecution Dismissal",
+    "District Never to Be Served",
 )
 
 PORTAL_DISPOSITION_METHODS_NOT_GUILTY = (
