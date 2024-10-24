@@ -30,10 +30,10 @@ def petition_offense_records(batch, petition_type, jurisdiction=""):
 
 def identify_distinct_petitions(offense_records):
     qs = offense_records.values(
-        "offense__ciprs_record__jurisdiction", "offense__ciprs_record__county"
+        "offense__jurisdiction", "offense__ciprs_record__county"
     )
     qs = qs.values(
-        jurisdiction=F("offense__ciprs_record__jurisdiction"),
+        jurisdiction=F("offense__jurisdiction"),
         county=F("offense__ciprs_record__county"),
     ).distinct()
     logger.info(f"Distinct petitions: {list(qs.values_list('county', 'jurisdiction'))}")
