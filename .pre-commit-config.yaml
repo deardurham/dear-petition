@@ -16,11 +16,10 @@ repos:
           name: Run formatter (prettier)
           language: system
           entry: npx prettier --write --ignore-unknown
-          pass_filenames: true
+          files:  ".*\\.(js|jsx)$"
         - id: lint
           name: Run linter (eslint)
           language: system
           entry: npx eslint --fix
           files:  ".*\\.(js|jsx)$"
-          pass_filenames: true
 
