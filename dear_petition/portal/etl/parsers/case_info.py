@@ -23,8 +23,8 @@ def parse_case_information(soup):
                 degree=parse_charge_degree(tr=tr) or "",
                 offense_date=parse_charge_offense_date(tr=tr) or None,
                 filed_date=parse_charge_filed_date(tr=tr) or None,
-                agency=parse_charge_agency(tr.findNext('tr')) or '',
-                arrest_date = parse_arrest_date(soup) or None,
+                agency=parse_charge_agency(tr.findNext("tr")) or "",
+                arrest_date=parse_arrest_date(soup) or None,
             )
         )
     ci = CaseInfo(
@@ -46,9 +46,7 @@ def parse_case_type(soup):
             <td class="roa-label">Case Type:</td>
             <td class="roa-value ng-binding">Criminal</td>
     """
-    return soup.select_one(
-        "tr[ng-if*=CaseType\\.Description] td.roa-value"
-    ).text.strip()
+    return soup.select_one("tr[ng-if*=CaseType\\.Description] td.roa-value").text.strip()
 
 
 @catch_parse_error
@@ -86,6 +84,7 @@ def parse_case_status(soup):
     # status is always last, so select last one
     return soup.select("tr[ng-if*=caseInfo\\.CaseStatuses] span")[-1].text.strip()
 
+
 @catch_parse_error
 def parse_charge_agency(tr):
     """
@@ -105,8 +104,9 @@ def parse_charge_agency(tr):
         </div>
     </div>
     """
-    return tr.select_one("div[ng-if*='::charge.FilingAgencyDescription'] > div.roa-value > div:first-of-type").text.strip() 
-
+    return tr.select_one(
+        "div[ng-if*='::charge.FilingAgencyDescription'] > div.roa-value > div:first-of-type"
+    ).text.strip()
 
 
 @catch_parse_error
@@ -246,7 +246,7 @@ def parse_arrest_date(soup):
             </div>
         </div>
     """
-    arrest_date_div = soup.find('div', {'ng-if': '::arrest.ArrestDate'})
+    arrest_date_div = soup.find("div", {"ng-if": "::arrest.ArrestDate"})
     if not arrest_date_div:
-        return None;
-    return arrest_date_div.find('span', class_='ng-binding ng-scope').get_text(strip=True)
+        return None
+    return arrest_date_div.find("span", class_="ng-binding ng-scope").get_text(strip=True)

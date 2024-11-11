@@ -6,7 +6,7 @@ def test_transform_full_record(sample_record):
         "Case Information": {
             "Case Status": "Disposed",
             "Offense Date": "2001-01-01",
-            "Arrest Date": "2001-01-03"
+            "Arrest Date": "2001-01-03",
         },
         "Defendant": {
             "Name": "DOE, JANE EMMA",

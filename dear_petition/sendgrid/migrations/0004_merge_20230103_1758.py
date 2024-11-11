@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("sendgrid", "0002_alter_email_payload"),
         ("sendgrid", "0003_alter_email_spam_score"),

@@ -34,4 +34,3 @@ def build_query():
     adult_felony_portal = methods & severity & waiting_period
 
     return adult_felony_ciprs | adult_felony_portal
-

@@ -20,10 +20,14 @@ from dear_petition.petition.constants import (
     CHARGED,
     CONVICTED,
     FEMALE,
-    MALE
+    MALE,
 )
 from dear_petition.petition.models import GeneratedPetition
-from dear_petition.petition.tests.factories import AgencyFactory, OffenseFactory, OffenseRecordFactory
+from dear_petition.petition.tests.factories import (
+    AgencyFactory,
+    OffenseFactory,
+    OffenseRecordFactory,
+)
 from dear_petition.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -43,18 +47,20 @@ def test_printable_model_mixin__petition(batch, petition, offense_record1):
     petition.offense_records.add(offense_record1)
 
     # assertions
-    expected_repr = ", ".join([
-        "{'id': " + repr(petition.id),
-        "'created': " + repr(petition.created),
-        "'modified': " + repr(petition.modified),
-        "'form_type': 'AOC-CR-287'",
-        "'batch': " + repr(batch.id),
-        "'county': 'DURHAM'",
-        "'jurisdiction': 'D'",
-        "'offense_records': [" + repr(offense_record1.id) + "]",
-        "'agencies': [" + repr(contact1.id) + ", " + repr(contact2.id) + "]}"
-    ])
-    assert(repr(petition) == expected_repr)
+    expected_repr = ", ".join(
+        [
+            "{'id': " + repr(petition.id),
+            "'created': " + repr(petition.created),
+            "'modified': " + repr(petition.modified),
+            "'form_type': 'AOC-CR-287'",
+            "'batch': " + repr(batch.id),
+            "'county': 'DURHAM'",
+            "'jurisdiction': 'D'",
+            "'offense_records': [" + repr(offense_record1.id) + "]",
+            "'agencies': [" + repr(contact1.id) + ", " + repr(contact2.id) + "]}",
+        ]
+    )
+    assert repr(petition) == expected_repr
 
 
 def test_printable_model_mixin__user():
@@ -63,44 +69,51 @@ def test_printable_model_mixin__user():
     """
 
     # create model object
-    user = UserFactory(username="tmarshall", email="tmarshall@supremecourt.gov", name="Thurgood Marshall")
+    user = UserFactory(
+        username="tmarshall", email="tmarshall@supremecourt.gov", name="Thurgood Marshall"
+    )
 
     # assertions
-    expected_repr = ", ".join([
-        "{'id': " + repr(user.id),
-        "'last_login': None",
-        "'is_superuser': False",
-        "'username': 'tmarshall'",
-        "'first_name': ''",
-        "'last_name': ''",
-        "'email': 'tmarshall@supremecourt.gov'",
-        "'is_staff': False",
-        "'is_active': True",
-        "'date_joined': " + repr(user.date_joined),
-        "'name': 'Thurgood Marshall'",
-        "'last_generated_petition_time': None",
-        "'groups': []",
-        "'user_permissions': []}"
-    ])
-    assert(repr(user) == expected_repr)
+    expected_repr = ", ".join(
+        [
+            "{'id': " + repr(user.id),
+            "'last_login': None",
+            "'is_superuser': False",
+            "'username': 'tmarshall'",
+            "'first_name': ''",
+            "'last_name': ''",
+            "'email': 'tmarshall@supremecourt.gov'",
+            "'is_staff': False",
+            "'is_active': True",
+            "'date_joined': " + repr(user.date_joined),
+            "'name': 'Thurgood Marshall'",
+            "'last_generated_petition_time': None",
+            "'groups': []",
+            "'user_permissions': []}",
+        ]
+    )
+    assert repr(user) == expected_repr
 
 
-@pytest.mark.parametrize("input_dob, input_today, expected_age", [
-    # has had birthday already this year
-    (datetime(2000, 1, 1), datetime(2030, 7, 15, 0, 0, 0, 0, pytz.UTC), 30),
-    # has not had birthday yet this year
-    (datetime(2000, 12, 31), datetime(2030, 7, 15, 0, 0, 0, 0, pytz.UTC), 29),
-    # tomorrow is birthday
-    (datetime(2000, 7, 15), datetime(2020, 7, 14, 23, 59, 59, 999999, pytz.UTC), 19),
-    # today is birthday
-    (datetime(2000, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 20),
-    # born today
-    (datetime(2020, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 0),
-    # born 100+ years ago
-    (datetime(1920, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 100),
-    # age < 0 (dob mistake)
-    (datetime(2070, 1, 1), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), -50),
-])
+@pytest.mark.parametrize(
+    "input_dob, input_today, expected_age",
+    [
+        # has had birthday already this year
+        (datetime(2000, 1, 1), datetime(2030, 7, 15, 0, 0, 0, 0, pytz.UTC), 30),
+        # has not had birthday yet this year
+        (datetime(2000, 12, 31), datetime(2030, 7, 15, 0, 0, 0, 0, pytz.UTC), 29),
+        # tomorrow is birthday
+        (datetime(2000, 7, 15), datetime(2020, 7, 14, 23, 59, 59, 999999, pytz.UTC), 19),
+        # today is birthday
+        (datetime(2000, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 20),
+        # born today
+        (datetime(2020, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 0),
+        # born 100+ years ago
+        (datetime(1920, 7, 15), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), 100),
+        # age < 0 (dob mistake)
+        (datetime(2070, 1, 1), datetime(2020, 7, 15, 0, 0, 0, 0, pytz.UTC), -50),
+    ],
+)
 def test_batch__age(mocker, batch, record0, input_dob, input_today, expected_age):
     """
     Test age in Batch
@@ -116,7 +129,7 @@ def test_batch__age(mocker, batch, record0, input_dob, input_today, expected_age
     record0(None, "ASIAN", FEMALE)
 
     # assertions
-    assert(batch.age == expected_age)
+    assert batch.age == expected_age
 
 
 def test_batch__age_no_dob(batch, record0):
@@ -128,7 +141,7 @@ def test_batch__age_no_dob(batch, record0):
     record0(None, "ASIAN", FEMALE)
 
     # assertions
-    assert(batch.age is None)
+    assert batch.age is None
 
 
 def test_batch__race(batch, record0):
@@ -143,7 +156,7 @@ def test_batch__race(batch, record0):
     record0(None, RACE, FEMALE)
 
     # assertions
-    assert(batch.race == RACE)
+    assert batch.race == RACE
 
 
 def test_batch__sex(batch, record0):
@@ -158,11 +171,12 @@ def test_batch__sex(batch, record0):
     record0(None, "BLACK", SEX)
 
     # assertions
-    assert(batch.sex == SEX)
+    assert batch.sex == SEX
 
 
-def test_generated_petition__get_stats_generated_petition(mocker, charged_dismissed_record, charged_not_guilty_record,
-    petition_document, user):
+def test_generated_petition__get_stats_generated_petition(
+    mocker, charged_dismissed_record, charged_not_guilty_record, petition_document, user
+):
     """
     Test get_stats_generated_petition in GeneratedPetition
     """
@@ -187,19 +201,21 @@ def test_generated_petition__get_stats_generated_petition(mocker, charged_dismis
     generated_petition = GeneratedPetition.get_stats_generated_petition(petition_document.id, user)
 
     # assertions
-    assert(generated_petition.username == USERNAME)
-    assert(generated_petition.form_type == DISMISSED)
-    assert(generated_petition.number_of_charges == len(OFFENSE_RECORDS))
-    assert(generated_petition.batch_id == petition_document.petition.batch.id)
-    assert(generated_petition.age == AGE)
-    assert(generated_petition.race == RACE)
-    assert(generated_petition.sex == SEX)
-    assert(generated_petition.jurisdiction == DISTRICT_COURT)
-    assert(generated_petition.county == DURHAM_COUNTY)
-    assert(user.last_generated_petition_time == TODAY)
+    assert generated_petition.username == USERNAME
+    assert generated_petition.form_type == DISMISSED
+    assert generated_petition.number_of_charges == len(OFFENSE_RECORDS)
+    assert generated_petition.batch_id == petition_document.petition.batch.id
+    assert generated_petition.age == AGE
+    assert generated_petition.race == RACE
+    assert generated_petition.sex == SEX
+    assert generated_petition.jurisdiction == DISTRICT_COURT
+    assert generated_petition.county == DURHAM_COUNTY
+    assert user.last_generated_petition_time == TODAY
 
 
-def test_generated_petition__get_stats_generated_petition__dob_after_today(mocker, petition_document, record0, user):
+def test_generated_petition__get_stats_generated_petition__dob_after_today(
+    mocker, petition_document, record0, user
+):
     """
     Test get_stats_generated_petition in GeneratedPetition when date of birth on CIPRS record (mistakenly) is after
     today
@@ -218,52 +234,70 @@ def test_generated_petition__get_stats_generated_petition__dob_after_today(mocke
 
     # test should pass if error raised
     with pytest.raises(IntegrityError):
-
         # get stats for generated petition
-        generated_petition = GeneratedPetition.get_stats_generated_petition(petition_document.id, user)
+        generated_petition = GeneratedPetition.get_stats_generated_petition(
+            petition_document.id, user
+        )
 
 
 def test_offense__is_convicted_of_charged():
     """
     Test is_convicted_of_charged in Offense. Should return true.
     """
-    offense = OffenseFactory(verdict = VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(offense.is_convicted_of_charged())
+    assert offense.is_convicted_of_charged()
 
 
 def test_offense__is_convicted_of_charged__different_descriptions():
     """
     Test is_convicted_of_charged in Offense. Should return false because descriptions are different.
     """
-    offense = OffenseFactory(verdict = VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR",
+    )
 
-    assert(not offense.is_convicted_of_charged())
+    assert not offense.is_convicted_of_charged()
 
 
 def test_offense__is_convicted_of_charged__different_severities():
     """
     Test is_convicted_of_charged in Offense. Should return false because severities are different.
     """
-    offense = OffenseFactory(verdict = VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense = OffenseFactory(verdict=VERDICT_GUILTY)
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY"
+    )
+    OffenseRecordFactory(
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(not offense.is_convicted_of_charged())
+    assert not offense.is_convicted_of_charged()
 
 
 def test_offense__is_convicted_of_charged__not_guilty():
     """
     Test is_convicted_of_charged in Offense. Should return false because verdict is not GUILTY.
     """
-    offense = OffenseFactory(verdict = "NOT GUILTY")
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    offense = OffenseFactory(verdict="NOT GUILTY")
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(not offense.is_convicted_of_charged())
+    assert not offense.is_convicted_of_charged()
 
 
 def test_offense__is_guilty_to_lesser__different_descriptions():
@@ -271,10 +305,17 @@ def test_offense__is_guilty_to_lesser__different_descriptions():
     Test is_guilty_to_lesser in Offense. Should return true because descriptions are different.
     """
     offense = OffenseFactory(verdict=VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR",
+    )
 
-    assert(offense.is_guilty_to_lesser())
+    assert offense.is_guilty_to_lesser()
 
 
 def test_offense__is_guilty_to_lesser__different_severities():
@@ -282,10 +323,14 @@ def test_offense__is_guilty_to_lesser__different_severities():
     Test is_guilty_to_lesser in Offense. Should return true because severities are different.
     """
     offense = OffenseFactory(verdict=VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY"
+    )
+    OffenseRecordFactory(
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(offense.is_guilty_to_lesser())
+    assert offense.is_guilty_to_lesser()
 
 
 def test_offense__is_guilty_to_lesser__equivalent_offenses():
@@ -293,10 +338,14 @@ def test_offense__is_guilty_to_lesser__equivalent_offenses():
     Test is_guilty_to_lesser in Offense. Should return false because offenses are equivalent.
     """
     offense = OffenseFactory(verdict=VERDICT_GUILTY)
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(not offense.is_guilty_to_lesser())
+    assert not offense.is_guilty_to_lesser()
 
 
 def test_offense__is_guilty_to_lesser__not_guilty():
@@ -304,51 +353,72 @@ def test_offense__is_guilty_to_lesser__not_guilty():
     Test is_guilty_to_lesser in Offense. Should return false because verdict is not GUILTY.
     """
     offense = OffenseFactory(verdict="NOT GUILTY")
-    OffenseRecordFactory(offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(not offense.is_guilty_to_lesser())
+    assert not offense.is_guilty_to_lesser()
 
 
 def test_offense__has_equivalent_offense_records__equivalent(offense1):
     """
     Test has_equivalent_offense_records in Offense. Should return true.
     """
-    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(offense1.has_equivalent_offense_records())
+    assert offense1.has_equivalent_offense_records()
 
 
 def test_offense__has_equivalent_offense_records__different_descriptions(offense1):
     """
     Test has_equivalent_offense_records in Offense. Should return false because descriptions are different.
     """
-    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
-    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="COMMUNICATING THREATS", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
+    OffenseRecordFactory(
+        offense=offense1,
+        action=CONVICTED,
+        description="COMMUNICATING THREATS",
+        severity="MISDEMEANOR",
+    )
 
-    assert(not offense1.has_equivalent_offense_records())
+    assert not offense1.has_equivalent_offense_records()
 
 
 def test_offense__has_equivalent_offense_records__different_severities(offense1):
     """
     Test has_equivalent_offense_records in Offense. Should return false because severities are different.
     """
-    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
-    OffenseRecordFactory(offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR")
+    OffenseRecordFactory(
+        offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY"
+    )
+    OffenseRecordFactory(
+        offense=offense1, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
+    )
 
-    assert(not offense1.has_equivalent_offense_records())
+    assert not offense1.has_equivalent_offense_records()
 
 
 def test_offense__has_equivalent_offense_records__one_offense_record(offense1):
     """
     Test has_equivalent_offense_records in Offense. Should return false because there is only one offense record.
     """
-    OffenseRecordFactory(offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY")
+    OffenseRecordFactory(
+        offense=offense1, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY"
+    )
 
-    assert(not offense1.has_equivalent_offense_records())
+    assert not offense1.has_equivalent_offense_records()
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize(
+    "verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE]
+)
 def test_offense__is_visible__equivalent(verdict):
     """
     Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
@@ -356,23 +426,19 @@ def test_offense__is_visible__equivalent(verdict):
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
-        offense=offense,
-        action=CONVICTED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert not offense_record_charged.is_visible
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize(
+    "verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE]
+)
 def test_offense__is_visible__not_equivalent_description(verdict):
     """
     Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
@@ -380,23 +446,22 @@ def test_offense__is_visible__not_equivalent_description(verdict):
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
         offense=offense,
         action=CONVICTED,
         description="COMMUNICATING THREATS",
-        severity="MISDEMEANOR"
+        severity="MISDEMEANOR",
     )
 
     assert offense_record_charged.is_visible
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize(
+    "verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE]
+)
 def test_offense__is_visible__not_equivalent_severity(verdict):
     """
     Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and the offense records
@@ -404,23 +469,19 @@ def test_offense__is_visible__not_equivalent_severity(verdict):
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="FELONY"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="FELONY"
     )
     offense_record_convicted = OffenseRecordFactory(
-        offense=offense,
-        action=CONVICTED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert offense_record_charged.is_visible
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE])
+@pytest.mark.parametrize(
+    "verdict", [VERDICT_GUILTY, VERDICT_PRAYER_FOR_JUDGMENT, VERDICT_RESPONSIBLE]
+)
 def test_offense__is_visible__one_offense_record(verdict):
     """
     Test is_visible in Offense when the verdict is GUILTY, RESPONSIBLE, or PRAYER FOR JUDGMENT and there is only one
@@ -428,10 +489,7 @@ def test_offense__is_visible__one_offense_record(verdict):
     """
     offense = OffenseFactory(verdict=verdict)
     offense_record = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert offense_record.is_visible
@@ -444,39 +502,29 @@ def test_offense__is_visible__not_convicted():
     """
     offense = OffenseFactory(verdict="JUDGMENT ARRESTED")
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
-        offense=offense,
-        action=CONVICTED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert offense_record_charged.is_visible
     assert offense_record_convicted.is_visible
 
 
-@pytest.mark.parametrize("disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE])
+@pytest.mark.parametrize(
+    "disp_method", [DISP_METHOD_SUPERSEDING_INDICTMENT, DISP_METHOD_WAIVER_OF_PROBABLE_CAUSE]
+)
 def test_offense__is_visible__excluded_disp_method(disp_method):
     """
     Test is_visible in Offense when the disposition method is excluded. No offense records should be visible.
     """
     offense = OffenseFactory(verdict=VERDICT_GUILTY, disposition_method=disp_method)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
-        offense=offense,
-        action=CONVICTED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CONVICTED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert not offense_record_charged.is_visible
@@ -492,24 +540,20 @@ def test_offense_record__is_visible__yes_has_de_novo(batch, record1):
         ciprs_record=record1,
         jurisdiction=DISTRICT_COURT,
         verdict=VERDICT_GUILTY,
-        disposition_method="JURY TRIAL"
+        disposition_method="JURY TRIAL",
     )
     offense_record_district = OffenseRecordFactory(
-        offense=offense_district,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense_district, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     offense_superior = OffenseFactory(
         ciprs_record=record1,
         jurisdiction=SUPERIOR_COURT,
         verdict=VERDICT_PRAYER_FOR_JUDGMENT,
-        disposition_method="JURY TRIAL"
+        disposition_method="JURY TRIAL",
     )
     offense_record_superior = OffenseRecordFactory(
-        offense=offense_superior,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense_superior, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert not offense_record_district.is_visible
@@ -520,21 +564,34 @@ def test_offense_record__is_visible__yes_has_de_novo(batch, record1):
     "verdict_d, description_d, severity_d, verdict_s, description_s, severity_s ",
     [
         (
-            VERDICT_PRAYER_FOR_JUDGMENT, "SIMPLE ASSAULT", "MISDEMEANOR",
-            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR"
+            VERDICT_PRAYER_FOR_JUDGMENT,
+            "SIMPLE ASSAULT",
+            "MISDEMEANOR",
+            VERDICT_GUILTY,
+            "SIMPLE ASSAULT",
+            "MISDEMEANOR",
         ),
         (
-            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR",
-            VERDICT_PRAYER_FOR_JUDGMENT, "NOT SIMPLE ASSAULT", "MISDEMEANOR"
+            VERDICT_GUILTY,
+            "SIMPLE ASSAULT",
+            "MISDEMEANOR",
+            VERDICT_PRAYER_FOR_JUDGMENT,
+            "NOT SIMPLE ASSAULT",
+            "MISDEMEANOR",
         ),
         (
-            VERDICT_GUILTY, "SIMPLE ASSAULT", "MISDEMEANOR",
-            VERDICT_PRAYER_FOR_JUDGMENT, "SIMPLE ASSAULT", "NOT MISDEMEANOR"
+            VERDICT_GUILTY,
+            "SIMPLE ASSAULT",
+            "MISDEMEANOR",
+            VERDICT_PRAYER_FOR_JUDGMENT,
+            "SIMPLE ASSAULT",
+            "NOT MISDEMEANOR",
         ),
-    ]
+    ],
 )
 def test_offense_record__is_visible__no_has_de_novo(
-    batch, record1, verdict_d, description_d, severity_d, verdict_s, description_s, severity_s):
+    batch, record1, verdict_d, description_d, severity_d, verdict_s, description_s, severity_s
+):
     """
     Test is_visible in OffenseRecord when there is no de novo review. There is no de novo review when 1) it is not a
     guilty district court offense or 2) when there is no matching (description and severity) offense record in superior
@@ -547,9 +604,7 @@ def test_offense_record__is_visible__no_has_de_novo(
         disposition_method="JURY TRIAL",
     )
     offense_record_district = OffenseRecordFactory(
-        offense=offense_district,
-        description=description_d,
-        severity=severity_d
+        offense=offense_district, description=description_d, severity=severity_d
     )
 
     offense_superior = OffenseFactory(
@@ -559,9 +614,7 @@ def test_offense_record__is_visible__no_has_de_novo(
         disposition_method="JURY TRIAL",
     )
     offense_record_superior = OffenseRecordFactory(
-        offense=offense_superior,
-        description=description_s,
-        severity=severity_s
+        offense=offense_superior, description=description_s, severity=severity_s
     )
 
     assert offense_record_district.is_visible
@@ -575,10 +628,7 @@ def test_offense__disposition__no_verdict():
     """
     offense = OffenseFactory(disposition_method="NO PROBABLE CAUSE", verdict="")
     offense_record = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert offense_record.disposition == "NO PROBABLE CAUSE"
@@ -591,10 +641,7 @@ def test_offense__disposition__verdict():
     """
     offense = OffenseFactory(disposition_method="NO PROBABLE CAUSE", verdict="JUDGMENT ARRESTED")
     offense_record = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
 
     assert offense_record.disposition == "JUDGMENT ARRESTED"
@@ -607,16 +654,13 @@ def test_offense__disposition__guilty_to_lesser():
     """
     offense = OffenseFactory(disposition_method="DISPOSED BY JUDGE", verdict=VERDICT_GUILTY)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
         offense=offense,
         action=CONVICTED,
         description="COMMUNICATING THREATS",
-        severity="MISDEMEANOR"
+        severity="MISDEMEANOR",
     )
 
     assert offense_record_charged.disposition == VERDICT_GUILTY_TO_LESSER
@@ -630,16 +674,13 @@ def test_offense__disposition__responsible_to_lesser():
     """
     offense = OffenseFactory(disposition_method="DISPOSED BY JUDGE", verdict=VERDICT_RESPONSIBLE)
     offense_record_charged = OffenseRecordFactory(
-        offense=offense,
-        action=CHARGED,
-        description="SIMPLE ASSAULT",
-        severity="MISDEMEANOR"
+        offense=offense, action=CHARGED, description="SIMPLE ASSAULT", severity="MISDEMEANOR"
     )
     offense_record_convicted = OffenseRecordFactory(
         offense=offense,
         action=CONVICTED,
         description="COMMUNICATING THREATS",
-        severity="MISDEMEANOR"
+        severity="MISDEMEANOR",
     )
 
     assert offense_record_charged.disposition == VERDICT_RESPONSIBLE_TO_LESSER

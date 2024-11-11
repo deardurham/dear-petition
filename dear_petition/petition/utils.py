@@ -165,11 +165,7 @@ def get_ordered_offense_records(petition_document):
     qs = (
         petition_document.offense_records.filter(petitionoffenserecord__active=True)
         .select_related("offense__ciprs_record")
-        .annotate(
-            first_two_digits_file_number_chars=Substr(
-                "offense__ciprs_record__file_no", 1, 2
-            )
-        )
+        .annotate(first_two_digits_file_number_chars=Substr("offense__ciprs_record__file_no", 1, 2))
         .annotate(
             first_two_digits_file_number=Cast(
                 "first_two_digits_file_number_chars", output_field=IntegerField()

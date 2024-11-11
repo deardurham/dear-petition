@@ -73,13 +73,10 @@ def generate_petition_pdf(petition_documents, extra):
     add_additional_params_to_forms(petition_documents, extra)
 
     for petition_document in petition_documents:
-
         doc_stream = io.BytesIO()
         context = build_pdf_template_context(petition_document, extra)
         add_pdf_template_annotations(context)
-        write_template_and_annotations_to_stream(
-            doc_stream, context, petition_document.form_type
-        )
+        write_template_and_annotations_to_stream(doc_stream, context, petition_document.form_type)
         doc_streams.append(doc_stream)
 
     concatenate_pdf_streams(doc_streams, pdf_stream)
@@ -89,17 +86,13 @@ def generate_petition_pdf(petition_documents, extra):
 
 
 ADDENDUM_DOCUMENT_GENERATION_MAP = {
-    constants.ADDENDUM_FORM_TYPES[
-        constants.ADDENDUM_3B
-    ]: addendums.generate_3b_addendum,
+    constants.ADDENDUM_FORM_TYPES[constants.ADDENDUM_3B]: addendums.generate_3b_addendum,
 }
 
 
 def generate_addendum_document_file(petition_document):
     assert petition_document.form_type in constants.ADDENDUM_FORM_TYPES
-    addendum_document_file_generator = ADDENDUM_DOCUMENT_GENERATION_MAP[
-        petition_document.form_type
-    ]
+    addendum_document_file_generator = ADDENDUM_DOCUMENT_GENERATION_MAP[petition_document.form_type]
     doc = addendum_document_file_generator(petition_document)
 
     file_stream = io.BytesIO()

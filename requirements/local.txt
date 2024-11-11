@@ -15,7 +15,7 @@ pytest-mock==3.12.0  # https://github.com/pytest-dev/pytest-mock
 
 # Code quality
 # ------------------------------------------------------------------------------
-pre-commit==3.6.0  # https://github.com/pre-commit/pre-commit
+pre-commit==3.6.2  # https://github.com/pre-commit/pre-commit
 flake8==7.0.0  # https://github.com/PyCQA/flake8
 coverage==7.4.0  # https://github.com/nedbat/coveragepy
 black==23.12.1  # https://github.com/ambv/black

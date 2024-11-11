@@ -157,16 +157,17 @@ def contact3():
         zipcode="27703",
     )
 
+
 @pytest.fixture
 def client():
     return ClientFactory(
-        name='Test Name',
-        address1='123 Test Ct',
-        address2='Apt A',
-        city='Durham',
-        state='NC',
-        zipcode='27701',
-        dob = timezone.now().date() # I wasn't born yesterday
+        name="Test Name",
+        address1="123 Test Ct",
+        address2="Apt A",
+        city="Durham",
+        state="NC",
+        zipcode="27701",
+        dob=timezone.now().date(),  # I wasn't born yesterday
     )
 
 

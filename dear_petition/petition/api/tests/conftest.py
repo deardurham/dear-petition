@@ -18,9 +18,7 @@ def api_client(api_client_anon, user):
 
 @pytest.fixture
 def mock_import():
-    with mock.patch(
-        "dear_petition.petition.api.viewsets.import_ciprs_records"
-    ) as mock_:
+    with mock.patch("dear_petition.petition.api.viewsets.import_ciprs_records") as mock_:
         batch = mock_.return_value
         batch.pk = batch.id = 99
         yield mock_

@@ -23,18 +23,11 @@ MALE = "M"
 FEMALE = "F"
 UNKNOWN = "U"
 
-SEX_MAP = {
-    "Male": MALE,
-    "Female": FEMALE,
-    "Unknown": UNKNOWN,
-    "NOT AVAILABLE": NOT_AVAILABLE
-}
+SEX_MAP = {"Male": MALE, "Female": FEMALE, "Unknown": UNKNOWN, "NOT AVAILABLE": NOT_AVAILABLE}
 
 SEX_CHOICES = Choices(*[(v, k) for k, v in SEX_MAP.items()])
 
-CONTACT_CATEGORIES = Choices(
-    ("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client")
-)
+CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"), ("client", "Client"))
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"
@@ -54,7 +47,9 @@ ACTIONS = Choices(
 COMMENT_MAX_LENGTH = 8192
 
 NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
-NEW_COMMENT_EMAIL_MESSAGE = "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
+NEW_COMMENT_EMAIL_MESSAGE = (
+    "There is a new comment available for batch#{batch}.{user}\n\n\n{text}\n\nSee it here:{link}"
+)
 
 DATA_PETITION = "DATA-PETITION"
 

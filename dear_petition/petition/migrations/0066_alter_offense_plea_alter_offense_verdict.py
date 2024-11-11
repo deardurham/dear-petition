@@ -12,15 +12,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="offense",
             name="plea",
-            field=models.CharField(
-                blank=True, max_length=256, null=True, verbose_name="Plea"
-            ),
+            field=models.CharField(blank=True, max_length=256, null=True, verbose_name="Plea"),
         ),
         migrations.AlterField(
             model_name="offense",
             name="verdict",
-            field=models.CharField(
-                blank=True, max_length=256, null=True, verbose_name="Verdict"
-            ),
+            field=models.CharField(blank=True, max_length=256, null=True, verbose_name="Verdict"),
         ),
     ]

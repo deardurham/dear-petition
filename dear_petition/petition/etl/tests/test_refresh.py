@@ -24,8 +24,7 @@ def test_defendant_dob(record1):
     record1.refresh_record_from_data()
     record1.refresh_from_db()
     assert (
-        record1.dob.strftime("%Y-%m-%d")
-        == record1.data["Defendant"]["Date of Birth/Estimated Age"]
+        record1.dob.strftime("%Y-%m-%d") == record1.data["Defendant"]["Date of Birth/Estimated Age"]
     )
 
 
@@ -63,8 +62,7 @@ def test_case_information_arrest_date(record1):
     record1.refresh_record_from_data()
     record1.refresh_from_db()
     assert (
-        record1.arrest_date.strftime("%Y-%m-%d")
-        == record1.data["Case Information"]["Arrest Date"]
+        record1.arrest_date.strftime("%Y-%m-%d") == record1.data["Case Information"]["Arrest Date"]
     )
 
 

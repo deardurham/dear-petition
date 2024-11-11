@@ -1,7 +1,12 @@
 import pytest
 
 from dear_petition.petition.export.documents.advice_letter import generate_context
-from dear_petition.petition.tests.factories import AttorneyFactory, BatchFactory, ClientFactory, CIPRSRecordFactory
+from dear_petition.petition.tests.factories import (
+    AttorneyFactory,
+    BatchFactory,
+    ClientFactory,
+    CIPRSRecordFactory,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -27,8 +32,8 @@ def test_advice_letter_context():
         "city": "Faketown",
         "state": "NC",
         "zipcode": "11111",
-        "phone_number": '123-456-7890',
-        "email": 'attorney@example.com',
+        "phone_number": "123-456-7890",
+        "email": "attorney@example.com",
     }
     attorney = AttorneyFactory(**ATTORNEY_INFO)
 
@@ -48,9 +53,9 @@ def test_advice_letter_context():
         "underaged_conviction_counties_string": "",
         "dismissed": [],
         "dismissed_counties_string": "",
-        "phone_number": ATTORNEY_INFO['phone_number'],
-        "email": ATTORNEY_INFO['email'],
-        "attorney_name": ATTORNEY_INFO['name'],
+        "phone_number": ATTORNEY_INFO["phone_number"],
+        "email": ATTORNEY_INFO["email"],
+        "attorney_name": ATTORNEY_INFO["name"],
     }
 
     context = generate_context(batch, attorney, client)

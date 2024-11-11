@@ -14,7 +14,6 @@ def add_labels(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0011_batch_label"),
     ]

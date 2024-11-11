@@ -18,10 +18,7 @@ class TestCriminalDisposition:
 
     def test_unknown_transform_disposition_method(self, disposition: Disposition):
         disposition.criminal_disposition = "Other"
-        assert (
-            disposition.transform_disposition_method()
-            == disposition.criminal_disposition
-        )
+        assert disposition.transform_disposition_method() == disposition.criminal_disposition
 
 
 class TestCharge:

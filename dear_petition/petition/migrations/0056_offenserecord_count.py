@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('petition', '0055_merge_20230424_2121'),
+        ("petition", "0055_merge_20230424_2121"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='offenserecord',
-            name='count',
+            model_name="offenserecord",
+            name="count",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

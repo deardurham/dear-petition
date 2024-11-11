@@ -21,7 +21,7 @@ def get_jurisdiction(record):
         return constants.NOT_AVAILABLE
 
 
-def refresh_record_from_data(record, exclude_file_nos = []):
+def refresh_record_from_data(record, exclude_file_nos=[]):
     """
     Transform record.data (JSONField) into model data.
     Refresh the CIPRS record from its JSON data. Optionally pass in a list of CIPRS record file numbers.
@@ -30,9 +30,7 @@ def refresh_record_from_data(record, exclude_file_nos = []):
     record.label = record.data.get("Defendant", {}).get("Name", "")
     record.file_no = record.data.get("General", {}).get("File No", "")
     record.county = record.data.get("General", {}).get("County", "")
-    record.dob = record.data.get("Defendant", {}).get(
-        "Date of Birth/Estimated Age", None
-    )
+    record.dob = record.data.get("Defendant", {}).get("Date of Birth/Estimated Age", None)
     record.sex = record.data.get("Defendant", {}).get("Sex", constants.NOT_AVAILABLE)
     record.race = record.data.get("Defendant", {}).get("Race", "")
     record.case_status = record.data.get("Case Information", {}).get("Case Status", "")
@@ -43,10 +41,14 @@ def refresh_record_from_data(record, exclude_file_nos = []):
         "Arrest Date", dt_obj_to_date(record.offense_date)
     )
     record.jurisdiction = get_jurisdiction(record)
-    record.has_additional_offenses = "Additional offenses exist" in record.data.get("_meta", {}).get("source", {})
+    record.has_additional_offenses = "Additional offenses exist" in record.data.get(
+        "_meta", {}
+    ).get("source", {})
 
     if exclude_file_nos and record.file_no in exclude_file_nos:
-        logger.warning(f"Not saving ciprs record {record.file_no} (most likely because it's a duplicate).")
+        logger.warning(
+            f"Not saving ciprs record {record.file_no} (most likely because it's a duplicate)."
+        )
         return
 
     logger.info(f"Saving ciprs record {record.file_no}")
@@ -72,7 +74,9 @@ def refresh_offenses(record):
                 agency = Agency.objects.none()
                 agency_name = data_offense_record.get("Agency", "")
                 if agency_name:
-                    agency = Agency.agencies_with_clean_name.filter(clean_name__icontains=agency_name)
+                    agency = Agency.agencies_with_clean_name.filter(
+                        clean_name__icontains=agency_name
+                    )
                     if agency.exists():
                         logger.info(f"Matched agency '{agency.first().name}' to offense")
 

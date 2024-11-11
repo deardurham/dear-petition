@@ -18,9 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="ciprsrecord",
             name="case_status",
-            field=models.CharField(
-                blank=True, max_length=256, verbose_name="Case Status"
-            ),
+            field=models.CharField(blank=True, max_length=256, verbose_name="Case Status"),
         ),
         migrations.AlterField(
             model_name="ciprsrecord",
@@ -45,16 +43,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="ciprsrecord",
             name="file_no",
-            field=models.CharField(
-                blank=True, max_length=256, verbose_name="File Number"
-            ),
+            field=models.CharField(blank=True, max_length=256, verbose_name="File Number"),
         ),
         migrations.AlterField(
             model_name="ciprsrecord",
             name="has_additional_offenses",
-            field=models.BooleanField(
-                default=False, verbose_name="Has Additional Offenses"
-            ),
+            field=models.BooleanField(default=False, verbose_name="Has Additional Offenses"),
         ),
         migrations.AlterField(
             model_name="ciprsrecord",
@@ -78,9 +72,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="ciprsrecord",
             name="offense_date",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Offense Date"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Offense Date"),
         ),
         migrations.AlterField(
             model_name="ciprsrecord",
@@ -115,9 +107,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="contact",
             name="county",
-            field=models.CharField(
-                blank=True, max_length=100, null=True, verbose_name="County"
-            ),
+            field=models.CharField(blank=True, max_length=100, null=True, verbose_name="County"),
         ),
         migrations.AlterField(
             model_name="contact",
@@ -207,9 +197,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="offense",
             name="disposed_on",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Disposed On Date"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Disposed On Date"),
         ),
         migrations.AlterField(
             model_name="offense",

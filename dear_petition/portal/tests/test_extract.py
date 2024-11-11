@@ -13,9 +13,7 @@ from dear_petition.portal.etl.models import (
 
 def test_extract(sample_record):
     expected = PortalRecord(
-        case_summary=CaseSummary(
-            case_number="01CR012345-678", county="Wake", court="District"
-        ),
+        case_summary=CaseSummary(case_number="01CR012345-678", county="Wake", court="District"),
         case_info=CaseInfo(
             case_type="Criminal",
             case_status="Disposed",
@@ -34,9 +32,7 @@ def test_extract(sample_record):
             ],
         ),
         party_info=PartyInfo(
-            defendant_name="DOE, JANE EMMA",
-            defendant_race = "White",
-            defendant_sex="Female"
+            defendant_name="DOE, JANE EMMA", defendant_race="White", defendant_sex="Female"
         ),
         dispositions=[
             Disposition(

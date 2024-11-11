@@ -14,7 +14,6 @@ def add_dates(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("petition", "0013_batch_date_uploaded"),
     ]

@@ -14,15 +14,24 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    "action, disposition_method, should_be_included", [
+    "action, disposition_method, should_be_included",
+    [
         # records that have data as they would from Portal (no action)
         ("", "No Probable Cause Found", True),
-        ("", "District Guilty - Judge", False),  # exclude because not Portal dismissed disposition method
+        (
+            "",
+            "District Guilty - Judge",
+            False,
+        ),  # exclude because not Portal dismissed disposition method
         # records that have data as they would from CIPRS (disposition_method not one seen in Portal)
         (CHARGED, "No Probable Cause", True),
         (CONVICTED, "No Probable Cause", False),  # exclude because not charged action
-        (CHARGED, "Disposed By Judge", False),  # exclude because not CIPRS dismissed disposition method
-    ]
+        (
+            CHARGED,
+            "Disposed By Judge",
+            False,
+        ),  # exclude because not CIPRS dismissed disposition method
+    ],
 )
 def test_dismissed(action, disposition_method, should_be_included, batch, record1):
     offense = Offense.objects.create(
@@ -52,9 +61,7 @@ def test_infraction_severity_offense_record(batch, dismissed_offense):
     assert traffic_record in batch.dismissed_offense_records()
 
 
-@pytest.mark.parametrize(
-    "jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]
-)
+@pytest.mark.parametrize("jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT])
 def test_offense_records_by_jurisdiction(batch, jurisdiction):
     """Offense records helper function should allow filtering by jurisdiction."""
     ciprs_record = CIPRSRecordFactory(jurisdiction=jurisdiction, batch=batch)

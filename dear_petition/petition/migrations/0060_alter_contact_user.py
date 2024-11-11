@@ -6,16 +6,23 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('petition', '0059_alter_contact_address2'),
+        ("petition", "0059_alter_contact_address2"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contact',
-            name='user',
-            field=models.ForeignKey(blank=True, default=None, help_text='The user associated with this contact (only applicable for Clients)', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='clients', to=settings.AUTH_USER_MODEL),
+            model_name="contact",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The user associated with this contact (only applicable for Clients)",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="clients",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]
