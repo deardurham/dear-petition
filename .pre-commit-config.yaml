@@ -10,8 +10,17 @@ repos:
           - id: black
             language_version: python3.12
             args: [--config=./pyproject.toml]
-    - repo: https://github.com/pre-commit/mirrors-prettier
-      rev: "v3.1.0"
+    - repo: local
       hooks:
-          - id: prettier
-            args: [--config=./.prettierrc]
+        - id: format
+          name: Run formatter (prettier)
+          language: system
+          entry: npx prettier --write --ignore-unknown
+          pass_filenames: true
+        - id: lint
+          name: Run linter (eslint)
+          language: system
+          entry: npx eslint --fix
+          files:  ".*\\.(js|jsx)$"
+          pass_filenames: true
+

@@ -17,12 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Run eslint + format
-        run: |
-          npm i
-          npm run lint
       - name: Install dependencies
         run: |
+          npm i
           python -m pip install --upgrade pip wheel
           pip install pre-commit==3.6.2
       - name: Run pre-commit
