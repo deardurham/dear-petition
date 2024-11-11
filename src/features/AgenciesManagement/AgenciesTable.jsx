@@ -130,7 +130,6 @@ const AgencyInputRow = ({ agencyData, onStopEditing }) => {
       <TableCell>
         <FormInput
           className="w-full"
-          maxLength={5}
           inputProps={{
             control,
             required: true,
