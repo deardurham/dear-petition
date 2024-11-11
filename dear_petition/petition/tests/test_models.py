@@ -23,7 +23,11 @@ from dear_petition.petition.constants import (
     MALE,
 )
 from dear_petition.petition.models import GeneratedPetition
-from dear_petition.petition.tests.factories import AgencyFactory, OffenseFactory, OffenseRecordFactory
+from dear_petition.petition.tests.factories import (
+    AgencyFactory,
+    OffenseFactory,
+    OffenseRecordFactory,
+)
 from dear_petition.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db

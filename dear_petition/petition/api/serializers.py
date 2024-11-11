@@ -139,6 +139,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "zipcode",
         ]
 
+
 class AgencySerializer(ContactSerializer):
     class Meta:
         model = Agency
@@ -320,9 +321,13 @@ class GenerateDocumentSerializer(serializers.Serializer):
 class BatchSerializer(serializers.ModelSerializer):
     records = CIPRSRecordSerializer(many=True, read_only=True)
     petitions = PetitionSerializer(many=True, read_only=True)
-    generate_letter_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
-    generate_summary_errors = ValidationField(method_name='get_generate_errors_data', serializer=GenerateDocumentSerializer)
-    
+    generate_letter_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
+    generate_summary_errors = ValidationField(
+        method_name="get_generate_errors_data", serializer=GenerateDocumentSerializer
+    )
+
     def get_generate_errors_data(self, obj):
         return {"batch": obj.pk}
 
@@ -353,7 +358,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
     )
     attorney = ContactSerializer(read_only=True)
     client_id = serializers.PrimaryKeyRelatedField(
-        source='client', queryset=Client.objects.all(), write_only=True, required=False
+        source="client", queryset=Client.objects.all(), write_only=True, required=False
     )
     client = ClientSerializer(read_only=True)
     client_errors = serializers.SerializerMethodField()
@@ -383,7 +388,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "client_id",
             "generate_letter_errors",
             "generate_summary_errors",
-            "client_errors"
+            "client_errors",
         ]
         read_only_fields = ["user", "pk", "date_uploaded", "records", "petitions"]
 
@@ -393,13 +398,15 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             batch=instance.pk,
         ).order_by("county", "jurisdiction")
         return ParentPetitionSerializer(parent_petitions, many=True).data
-    
+
     def get_client_errors(self, instance):
         errors = []
         if not instance.client:
             return errors
         if not instance.client.dob:
-            errors.append("Date of birth missing. The petition generator will try its best to identify a date of birth from the records at time of petition creation.")
+            errors.append(
+                "Date of birth missing. The petition generator will try its best to identify a date of birth from the records at time of petition creation."
+            )
         return errors
 
 

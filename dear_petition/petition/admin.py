@@ -159,6 +159,7 @@ class ContactAdmin(admin.ModelAdmin):
     list_filter = ("category",)
     ordering = ("category", "name")
 
+
 @admin.register(models.Agency)
 class AgencyAdmin(ImportExportModelAdmin):
     resource_classes = [resources.AgencyResource]
@@ -166,6 +167,7 @@ class AgencyAdmin(ImportExportModelAdmin):
     list_display = ("pk", "name", "category", "address1")
     list_filter = ("category",)
     ordering = ("category", "name")
+
 
 @admin.register(models.Client)
 class ClientAdmin(admin.ModelAdmin):

@@ -83,7 +83,7 @@ def test_make_datetime_aware_ambiguous(settings):
     expected_datetime_obj = make_aware(
         datetime(year=2011, month=11, day=6, hour=1, minute=46, second=0),
         timezone=pytz.timezone("America/New_York"),
-        is_dst=False
+        is_dst=False,
     )
     assert pu.make_datetime_aware(naive_datetime_str) == expected_datetime_obj
 
@@ -112,8 +112,12 @@ def test_get_truncation_point_of_short_text_by_pixel_size():
     truncation_point = pu.get_truncation_point_of_text_by_pixel_size(text, 20000)
     assert truncation_point == len(text)
 
+
 def test_get_petition_filename(petition):
     petition.created = datetime(2024, 7, 28, 0, 0)
     petition.save()
     petitioner_name = "Test"
-    assert pu.get_petition_filename(petitioner_name, petition, 'pdf') == '07-28-2024 DURHAM DC 146(a) Test.pdf'
+    assert (
+        pu.get_petition_filename(petitioner_name, petition, "pdf")
+        == "07-28-2024 DURHAM DC 146(a) Test.pdf"
+    )

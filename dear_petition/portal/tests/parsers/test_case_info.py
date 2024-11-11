@@ -41,10 +41,9 @@ class TestCaseInfoFullRecord:
         tr = soup.select_one(case_info.SELECT_OFFENSES)
         assert case_info.parse_charge_filed_date(tr) == "01/09/2001"
 
-
     def test_parse_charge_agency(self, soup):
         tr = soup.select_one(case_info.SELECT_OFFENSES)
-        agency_tr = tr.findNext('tr')
+        agency_tr = tr.findNext("tr")
         assert agency_tr is not None
         assert case_info.parse_charge_agency(agency_tr) == "Creedmoor Police Department"
 

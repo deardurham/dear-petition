@@ -74,7 +74,9 @@ def refresh_offenses(record):
                 agency = Agency.objects.none()
                 agency_name = data_offense_record.get("Agency", "")
                 if agency_name:
-                    agency = Agency.agencies_with_clean_name.filter(clean_name__icontains=agency_name)
+                    agency = Agency.agencies_with_clean_name.filter(
+                        clean_name__icontains=agency_name
+                    )
                     if agency.exists():
                         logger.info(f"Matched agency '{agency.first().name}' to offense")
 

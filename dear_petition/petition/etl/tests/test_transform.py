@@ -42,12 +42,8 @@ def test_recalculate_petitions(petition):
     assert not petition.has_attachments()
 
 
-
-
 def test_combine_batches(batch, batch_file, fake_pdf):
-    record = CIPRSRecordFactory(
-        batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM"
-    )
+    record = CIPRSRecordFactory(batch=batch, jurisdiction=constants.DISTRICT_COURT, county="DURHAM")
     record.refresh_record_from_data()
 
     second_batch = BatchFactory()
@@ -90,17 +86,21 @@ def test_combine_batches(batch, batch_file, fake_pdf):
                 ],
                 "Disposed On": "2018-02-01",
                 "Disposition Method": "DISPOSED BY JUDGE",
-            }
+            },
         ],
         "Superior Court Offense Information": [],
     }
     second_batch_file = BatchFileFactory(batch=second_batch, file=fake_pdf)
 
     second_record = CIPRSRecordFactory(
-        batch=second_batch, data = second_record_data, batch_file=second_batch_file, jurisdiction=constants.DISTRICT_COURT, county="DURHAM"
+        batch=second_batch,
+        data=second_record_data,
+        batch_file=second_batch_file,
+        jurisdiction=constants.DISTRICT_COURT,
+        county="DURHAM",
     )
     second_record.refresh_record_from_data()
-  
+
     assert batch.records.count() == 1
     assert pm.Offense.objects.filter(ciprs_record__batch__id=batch.id).count() == 1
     assert pm.Offense.objects.filter(ciprs_record__batch__id=second_batch.id).count() == 2
@@ -112,8 +112,9 @@ def test_combine_batches(batch, batch_file, fake_pdf):
 
     assert new_batch.records.count() == 2
     assert pm.Offense.objects.filter(ciprs_record__batch__id=new_batch.id).count() == 3
-    assert pm.OffenseRecord.objects.filter(offense__ciprs_record__batch__id=new_batch.id).count() == 4
+    assert (
+        pm.OffenseRecord.objects.filter(offense__ciprs_record__batch__id=new_batch.id).count() == 4
+    )
     assert new_batch.files.count() == 2
     assert new_batch.label == new_label
     assert new_batch.user_id == user_id
-    

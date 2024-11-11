@@ -32,7 +32,7 @@ class Charge(BaseModel):
     @field_validator("offense_date", "filed_date", "arrest_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        return parse_date(v);
+        return parse_date(v)
 
     def transform_severity(self):
         """Attempt to convert Portal's degree to CIPRS severity"""
@@ -53,7 +53,7 @@ class CaseInfo(BaseModel):
     @field_validator("case_status_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        return parse_date(v);
+        return parse_date(v)
 
 
 class PartyInfo(BaseModel):
@@ -72,7 +72,7 @@ class Disposition(BaseModel):
     @field_validator("event_date", mode="before")
     @classmethod
     def parse_date(cls, v):
-        return parse_date(v);
+        return parse_date(v)
 
     def transform_disposition_method(self) -> str:
         return self.criminal_disposition

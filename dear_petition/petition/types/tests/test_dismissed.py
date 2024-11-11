@@ -14,15 +14,24 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    "action, disposition_method, should_be_included", [
+    "action, disposition_method, should_be_included",
+    [
         # records that have data as they would from Portal (no action)
         ("", "No Probable Cause Found", True),
-        ("", "District Guilty - Judge", False),  # exclude because not Portal dismissed disposition method
+        (
+            "",
+            "District Guilty - Judge",
+            False,
+        ),  # exclude because not Portal dismissed disposition method
         # records that have data as they would from CIPRS (disposition_method not one seen in Portal)
         (CHARGED, "No Probable Cause", True),
         (CONVICTED, "No Probable Cause", False),  # exclude because not charged action
-        (CHARGED, "Disposed By Judge", False),  # exclude because not CIPRS dismissed disposition method
-    ]
+        (
+            CHARGED,
+            "Disposed By Judge",
+            False,
+        ),  # exclude because not CIPRS dismissed disposition method
+    ],
 )
 def test_dismissed(action, disposition_method, should_be_included, batch, record1):
     offense = Offense.objects.create(

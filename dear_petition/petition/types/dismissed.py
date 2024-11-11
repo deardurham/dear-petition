@@ -1,7 +1,10 @@
 from django.db.models import Q
 
 from dear_petition.petition.models import OffenseRecord
-from dear_petition.petition.constants import CIPRS_DISPOSITION_METHODS_DISMISSED, PORTAL_DISPOSITION_METHODS_DISMISSED
+from dear_petition.petition.constants import (
+    CIPRS_DISPOSITION_METHODS_DISMISSED,
+    PORTAL_DISPOSITION_METHODS_DISMISSED,
+)
 
 
 def get_offense_records(batch, jurisdiction=""):
@@ -14,7 +17,7 @@ def get_offense_records(batch, jurisdiction=""):
 
 def build_query():
     action = Q(action="CHARGED")
-    
+
     methods_ciprs = Q()
     for method in CIPRS_DISPOSITION_METHODS_DISMISSED:
         methods_ciprs |= Q(offense__disposition_method__iexact=method)

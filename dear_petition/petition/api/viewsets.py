@@ -224,18 +224,26 @@ class AgencyViewSet(ContactViewSet):
                 else row_result.instance.address1
             )
             row_diff = {
-                'name': row_result.instance.name,
-                'address': address,
-                'city': row_result.instance.city,
-                'state': row_result.instance.state,
-                'zipcode': row_result.instance.zipcode,
-                'county': row_result.instance.county,
-                'is_sheriff': row_result.instance.is_sheriff,
+                "name": row_result.instance.name,
+                "address": address,
+                "city": row_result.instance.city,
+                "state": row_result.instance.state,
+                "zipcode": row_result.instance.zipcode,
+                "county": row_result.instance.county,
+                "is_sheriff": row_result.instance.is_sheriff,
             }
             if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
                 continue
             elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
-                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county', 'is_sheriff']
+                row_diff["new_fields"] = [
+                    "name",
+                    "address",
+                    "city",
+                    "state",
+                    "zipcode",
+                    "county",
+                    "is_sheriff",
+                ]
             else:
                 original_address = (
                     f"{row_result.original.address1}, {row_result.original.address2}"
@@ -247,7 +255,7 @@ class AgencyViewSet(ContactViewSet):
                 if original_address != address:
                     row_diff["new_fields"].append("address")
 
-                for field in ['name', 'city', 'state', 'zipcode', 'county', 'is_sheriff']:                    
+                for field in ["name", "city", "state", "zipcode", "county", "is_sheriff"]:
                     if getattr(row_result.original, field) != getattr(row_result.instance, field):
                         row_diff["new_fields"].append(field)
 
@@ -370,7 +378,7 @@ class BatchViewSet(viewsets.ModelViewSet):
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             resp["Content-Disposition"] = 'attachment; filename="Records Summary.docx"'
             return resp
-        
+
     @action(
         detail=True,
         methods=[
@@ -398,8 +406,8 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def combine_batches(self, request):
-        batch_ids = request.data['batchIds']
-        label = request.data['label']
+        batch_ids = request.data["batchIds"]
+        label = request.data["label"]
         user_id = request.user.id
 
         if not batch_ids:
@@ -408,12 +416,13 @@ class BatchViewSet(viewsets.ModelViewSet):
             )
         if not label:
             return Response(
-                "A new label needs to be included for the client.", status=status.HTTP_400_BAD_REQUEST
+                "A new label needs to be included for the client.",
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         new_batch = combine_batches(batch_ids, label, user_id)
         return Response(self.get_serializer(new_batch).data)
-    
+
     @action(
         detail=True,
         methods=[
@@ -421,20 +430,18 @@ class BatchViewSet(viewsets.ModelViewSet):
         ],
     )
     def assign_client_to_batch(self, request, pk):
-        client_id = request.data['client_id']
+        client_id = request.data["client_id"]
 
         try:
             client = pm.Client.objects.get(pk=client_id)
         except pm.Client.DoesNotExist:
-            return Response(
-                "Unknown client.", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Unknown client.", status=status.HTTP_400_BAD_REQUEST)
         batch = self.get_object()
         batch.client = client
         batch.save()
         batch.adjust_for_new_client_dob()
         return Response({"batch_id": batch.pk})
-    
+
     @action(
         detail=False,
         methods=[
@@ -448,7 +455,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         for file in files:
             label = os.path.basename(file.name)
             batch = pm.Batch.objects.create(label=label, user=user)
-            batch.files.create(file=file) 
+            batch.files.create(file=file)
             file.seek(0)
             workbook = load_workbook(filename=file)
             resource.import_data(workbook, batch)

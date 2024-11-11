@@ -23,7 +23,9 @@ def get_offense_records(batch, jurisdiction=""):
     else:
         dob = resolve_dob_from_offense_records(qs)
     if not dob:
-        return OffenseRecord.objects.none()  # We can't determine this petition type without the date of birth
+        return (
+            OffenseRecord.objects.none()
+        )  # We can't determine this petition type without the date of birth
 
     if jurisdiction:
         qs = qs.filter(offense__ciprs_record__jurisdiction=jurisdiction)

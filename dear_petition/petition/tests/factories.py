@@ -2,18 +2,37 @@ import io
 import random
 
 import factory
-from dear_petition.petition.models import (Batch, BatchFile, CIPRSRecord,
-                                           Contact, Agency, Client, GeneratedPetition, Offense,
-                                           OffenseRecord, Petition,
-                                           PetitionDocument,
-                                           PetitionOffenseRecord)
+from dear_petition.petition.models import (
+    Batch,
+    BatchFile,
+    CIPRSRecord,
+    Contact,
+    Agency,
+    Client,
+    GeneratedPetition,
+    Offense,
+    OffenseRecord,
+    Petition,
+    PetitionDocument,
+    PetitionOffenseRecord,
+)
 from dear_petition.users.tests.factories import UserFactory
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from pytz import timezone
 
-from ..constants import (CHARGED, CONVICTED, DISMISSED, DISTRICT_COURT,
-                         DISTRICT_COURT_WITHOUT_DA_LEAVE, DURHAM_COUNTY,
-                         FEMALE, MALE, NOT_AVAILABLE, SUPERIOR_COURT, UNKNOWN)
+from ..constants import (
+    CHARGED,
+    CONVICTED,
+    DISMISSED,
+    DISTRICT_COURT,
+    DISTRICT_COURT_WITHOUT_DA_LEAVE,
+    DURHAM_COUNTY,
+    FEMALE,
+    MALE,
+    NOT_AVAILABLE,
+    SUPERIOR_COURT,
+    UNKNOWN,
+)
 
 
 class ContactFactory(factory.django.DjangoModelFactory):

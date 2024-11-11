@@ -57,15 +57,22 @@ class CIPRSRecord(PrintableModelMixin, models.Model):
     file_no = models.CharField(max_length=256, blank=True, verbose_name="File Number")
     county = models.CharField(max_length=256, blank=True, verbose_name="County")
     dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
-    sex = models.CharField(max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, verbose_name="Sex")
+    sex = models.CharField(
+        max_length=6, choices=SEX_CHOICES, default=NOT_AVAILABLE, verbose_name="Sex"
+    )
     race = models.CharField(max_length=256, blank=True, verbose_name="Race")
     case_status = models.CharField(max_length=256, blank=True, verbose_name="Case Status")
     offense_date = models.DateTimeField(null=True, blank=True, verbose_name="Offense Date")
     arrest_date = models.DateField(null=True, blank=True, verbose_name="Arrest Date")
     jurisdiction = models.CharField(
-        max_length=16, choices=JURISDICTION_CHOICES, default=NOT_AVAILABLE, verbose_name="Jurisdiction"
+        max_length=16,
+        choices=JURISDICTION_CHOICES,
+        default=NOT_AVAILABLE,
+        verbose_name="Jurisdiction",
     )
-    has_additional_offenses = models.BooleanField(default=False, verbose_name="Has Additional Offenses")
+    has_additional_offenses = models.BooleanField(
+        default=False, verbose_name="Has Additional Offenses"
+    )
 
     def __str__(self):
         return f"{self.label} {self.file_no} ({self.pk})"
@@ -106,7 +113,10 @@ class Offense(PrintableModelMixin, models.Model):
         "CIPRSRecord", related_name="offenses", on_delete=models.CASCADE
     )
     jurisdiction = models.CharField(
-        choices=JURISDICTION_CHOICES, max_length=255, default=pc.DISTRICT_COURT, verbose_name="Jurisdiction"
+        choices=JURISDICTION_CHOICES,
+        max_length=255,
+        default=pc.DISTRICT_COURT,
+        verbose_name="Jurisdiction",
     )
     disposed_on = models.DateField(blank=True, null=True, verbose_name="Disposed On Date")
     disposition_method = models.CharField(max_length=256, verbose_name="Disposition Method")
@@ -162,16 +172,16 @@ class Offense(PrintableModelMixin, models.Model):
 
 
 class OffenseRecord(PrintableModelMixin, models.Model):
-    offense = models.ForeignKey(
-        "Offense", related_name="offense_records", on_delete=models.CASCADE
-    )
+    offense = models.ForeignKey("Offense", related_name="offense_records", on_delete=models.CASCADE)
     count = models.IntegerField(blank=True, null=True, verbose_name="Count")
     law = models.CharField(max_length=256, blank=True, verbose_name="Law")
     code = models.IntegerField(blank=True, null=True, verbose_name="Code")
     action = models.CharField(max_length=256, null=True, verbose_name="Action")
     severity = models.CharField(max_length=256, verbose_name="Severity")
     description = models.CharField(max_length=256, verbose_name="Description")
-    agency = models.ForeignKey("Contact", related_name="+", null=True, blank=True, on_delete=models.SET_NULL)
+    agency = models.ForeignKey(
+        "Contact", related_name="+", null=True, blank=True, on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         ciprs_record = self.offense.ciprs_record
@@ -264,39 +274,45 @@ class AgencyWithSherriffOfficeManager(models.Manager):
         return (
             super(AgencyWithSherriffOfficeManager, self)
             .get_queryset()
-            .annotate(is_sheriff_office=Case(
-                When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
-                When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
-                default=Value(False),
-                output_field=models.BooleanField(),
-            ))
+            .annotate(
+                is_sheriff_office=Case(
+                    When(name__iregex=AGENCY_SHERRIFF_OFFICE_PATTERN, then=Value(True)),
+                    When(name__iregex=AGENCY_SHERRIFF_DEPARTMENT_PATTERN, then=Value(True)),
+                    default=Value(False),
+                    output_field=models.BooleanField(),
+                )
+            )
         )
-    
+
+
 class AgencyWithCleanNameManager(models.Manager):
     def get_queryset(self):
         """Annotation version of is_sheriff_office to be used from database"""
         return (
             super(AgencyWithCleanNameManager, self)
             .get_queryset()
-            .annotate(clean_name=models.Func(
-                models.F('name'),
-                Value(r'[\'\-\"\(\)&:\/\.]'), # special characters to remove
-                Value(r''),
-                Value('g'), # regex flag
-                function='REGEXP_REPLACE',
-                output_field=models.TextField(),
-            ))
+            .annotate(
+                clean_name=models.Func(
+                    models.F("name"),
+                    Value(r"[\'\-\"\(\)&:\/\.]"),  # special characters to remove
+                    Value(r""),
+                    Value("g"),  # regex flag
+                    function="REGEXP_REPLACE",
+                    output_field=models.TextField(),
+                )
+            )
         )
-
 
 
 class Contact(PrintableModelMixin, models.Model):
     name = models.CharField(max_length=512, verbose_name="Name")
     category = models.CharField(max_length=16, choices=CONTACT_CATEGORIES)
     address1 = models.CharField("Address (Line 1)", max_length=512, blank=True)
-    address2 = models.CharField("Address (Line 2)", max_length=512, default='', blank=True)
+    address2 = models.CharField("Address (Line 2)", max_length=512, default="", blank=True)
     city = models.CharField(max_length=64, blank=True, verbose_name="City")
-    state = models.CharField(choices=us_states.US_STATES, max_length=64, blank=True, verbose_name="State")
+    state = models.CharField(
+        choices=us_states.US_STATES, max_length=64, blank=True, verbose_name="State"
+    )
     zipcode = models.CharField("ZIP Code", max_length=16, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True, verbose_name="Phone Number")
     email = models.EmailField(max_length=254, null=True, blank=True, verbose_name="Email Address")
@@ -305,8 +321,8 @@ class Contact(PrintableModelMixin, models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return self.name if self.name else ''
-    
+        return self.name if self.name else ""
+
 
 class Client(Contact):
     dob = models.DateField(null=True, blank=True, verbose_name="Date of Birth")
@@ -355,7 +371,6 @@ class Agency(Contact):
 
         super().save(*args, **kwargs)
 
-
     @classmethod
     def get_sherriff_office_by_county(cls, county: str):
         qs = cls.agencies_with_sherriff_office.filter(county__iexact=county, is_sheriff_office=True)
@@ -365,8 +380,6 @@ class Agency(Contact):
             )
         return qs.first() if qs.exists() else None
 
-
-class Batch(PrintableModelMixin, models.Model):
 
 class Batch(PrintableModelMixin, models.Model):
     label = models.CharField(max_length=2048, blank=True)
@@ -436,12 +449,13 @@ class Batch(PrintableModelMixin, models.Model):
 
     def adult_misdemeanor_records(self, jurisdiction=""):
         return self.petition_offense_records(pc.ADULT_MISDEMEANORS, jurisdiction)
-    
+
     def adjust_for_new_client_dob(self):
         """
         Called when a new date of birth is added to a batch's client to adjust the petitions accordingly.
         """
         from dear_petition.petition.etl.load import create_petitions_from_records
+
         Petition.objects.filter(batch=self, form_type=pc.UNDERAGED_CONVICTIONS).delete()
         create_petitions_from_records(self, pc.UNDERAGED_CONVICTIONS)
 

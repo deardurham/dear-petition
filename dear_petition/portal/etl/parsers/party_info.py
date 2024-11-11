@@ -40,8 +40,8 @@ def parse_defendant_race(soup):
         <div ng-if="::party.Race" class="ng-binding ng-scope">
             White
         </div>
-    """ # noqa
-    race_div = soup.find('div', {'ng-if': '::party.Race'})
+    """  # noqa
+    race_div = soup.find("div", {"ng-if": "::party.Race"})
     if not race_div:
         return ""
 
@@ -57,8 +57,8 @@ def parse_defendant_sex(soup):
         <div ng-if="::party.Gender" class="ng-binding ng-scope">
             Female
         </div>
-    """ # noqa
-    sex_div = soup.find('div', {'ng-if': '::party.Gender'})
+    """  # noqa
+    sex_div = soup.find("div", {"ng-if": "::party.Gender"})
     if not sex_div:
         return ""
 
