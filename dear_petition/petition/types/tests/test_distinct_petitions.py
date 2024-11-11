@@ -24,7 +24,7 @@ def test_distinct_petition(batch, dismissed_offense):
 
 def test_distinct_petition__many(batch):
     """Identified petitions should include unique pairing of jurisdiction and county."""
-    method = constants.DISMISSED_DISPOSITION_METHODS[0]
+    method = constants.CIPRS_DISPOSITION_METHODS_DISMISSED[0]
     for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
         for county in ["DURHAM", "WAKE"]:
             record = CIPRSRecordFactory(jurisdiction=jurisdiction, county=county, batch=batch)
@@ -48,7 +48,7 @@ def test_distinct_petition__distinct_ciprs_records(batch):
     OffenseRecordFactory(
         action="CHARGED",
         offense=OffenseFactory(
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposition_method=dismissed.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
             ciprs_record=record1,
         ),
     )
@@ -61,7 +61,7 @@ def test_distinct_petition__distinct_ciprs_records(batch):
     OffenseRecordFactory(
         action="CHARGED",
         offense=OffenseFactory(
-            disposition_method=dismissed.DISMISSED_DISPOSITION_METHODS[0],
+            disposition_method=dismissed.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
             ciprs_record=record2,
         ),
     )

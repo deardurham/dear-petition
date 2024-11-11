@@ -11,7 +11,7 @@
         "editor.defaultFormatter": "ms-python.python"
       },
       "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
       },
       "[html]": {
         "editor.defaultFormatter": "vscode.html-language-features"

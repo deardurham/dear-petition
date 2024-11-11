@@ -12,8 +12,11 @@ import {
   PageContentWrapper,
 } from './PageBase.styled';
 import dearLogo from '../../assets/img/DEAR_logo.png';
+import lancLogoHoriz from '../../assets/img/LANC_logo_horiz.png';
+import ezExpungeWithoutTextHoriz from '../../assets/img/ez_expunge_without_lanc_text.png';
 import codeWithDurhamHorizontalLogo from '../../assets/img/CWD_horizontal_logo.png';
 import { smallerThanTabletLandscape } from '../../styles/media';
+import { Tooltip } from '../elements/Tooltip/Tooltip';
 
 import useAuth from '../../hooks/useAuth';
 import { useLogoutMutation } from '../../service/api';
@@ -21,7 +24,11 @@ import { loggedOut } from '../../slices/auth';
 import { DropdownMenu } from '../elements/DropdownMenu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
-import { generateBookmarklet } from '../../bookmarklet/bookmarklet';
+
+import { generateBookmarklet } from '@code-with-durham/bookmarklet';
+import bookmarkletMetadata from '@code-with-durham/bookmarklet/package.json';
+
+const bookmarkletVersion = `v${bookmarkletMetadata.version}`;
 
 const HeaderLogoLink = styled(LinkWrapper)`
   border: none;
@@ -61,11 +68,8 @@ function PageBase({ children, className, ...props }) {
   const [bookmarklet, setBookmarklet] = useState();
 
   useEffect(() => {
-    const generate = async () => {
-      const bookmarkletCode = await generateBookmarklet(user.username);
-      setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
-    };
-    generate();
+    const bookmarkletCode = generateBookmarklet(user.username);
+    setBookmarklet(`javascript:(function(){${bookmarkletCode}})()`);
   }, [user.username]);
 
   return (
@@ -74,7 +78,7 @@ function PageBase({ children, className, ...props }) {
         <PageHeader>
           <HeaderLogoLink>
             <Link to="/">
-              <Logo src={dearLogo} alt="DEAR logo" />
+              <Logo src={ezExpungeWithoutTextHoriz} alt="DEAR logo" />
             </Link>
           </HeaderLogoLink>
           <LinksGroup>
@@ -83,13 +87,23 @@ function PageBase({ children, className, ...props }) {
                 <Link to="/">Dashboard</Link>
               </LinkWrapper>
             )}
+            <Tooltip
+              offset={[0, 5]}
+              placement="bottom"
+              tooltipContent="To install, please click and drag this button to your bookmarks bar"
+            >
+              <a
+                href={bookmarklet}
+                className="cursor-grab"
+                onClick={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <LinkWrapper>Portal Importer ({bookmarkletVersion})</LinkWrapper>
+              </a>
+            </Tooltip>
             <LinkWrapper>
               <Link to="/help">Help</Link>
-            </LinkWrapper>
-            <LinkWrapper>
-              <a href={bookmarklet} title="Drag to your bookmarks bar">
-                Portal Importer ({import.meta.env.MODE})
-              </a>
             </LinkWrapper>
             {user?.is_admin ? (
               <DropdownMenu
@@ -134,9 +148,19 @@ function PageBase({ children, className, ...props }) {
         <PageContentWrapper className={className}>{children}</PageContentWrapper>
         <PageFooter>
           <FooterLogoLink>
+            <a href="https://www.deardurham.org/" target="_blank" rel="noopener noreferrer">
+              <Logo src={dearLogo} alt="DEAR logo" />
+            </a>
+          </FooterLogoLink>
+          <FooterLogoLink>
             <p className="m-0 relative top-14 text-[1.25rem] text-center">developed by</p>
             <a href="https://www.codefordurham.com/" target="_blank" rel="noopener noreferrer">
               <Logo src={codeWithDurhamHorizontalLogo} alt="Code with Durham logo" />
+            </a>
+          </FooterLogoLink>
+          <FooterLogoLink>
+            <a href="https://legalaidnc.org/" target="_blank" rel="noopener noreferrer">
+              <Logo src={lancLogoHoriz} alt="Legal Aid of NC logo" />
             </a>
           </FooterLogoLink>
         </PageFooter>

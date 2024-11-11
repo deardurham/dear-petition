@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useCreateContactMutation } from '../service/api';
+import { useCreateAgencyMutation } from '../service/api';
 import US_STATES from '../constants/US_STATES';
 import FormInput from '../components/elements/Input/FormInput';
 import FormSelect from '../components/elements/Input/FormSelect';
@@ -30,6 +30,7 @@ const CATEGORY_TO_TITLE = {
   attorney: 'Attorney',
 };
 
+// TODO: SPlit out client/agency/attorney
 export const CreateContact = ({
   onClose,
   category,
@@ -37,7 +38,7 @@ export const CreateContact = ({
   submitAndKeepOpenTitle = '',
   submitAndCloseTitle = 'Submit',
 }) => {
-  const [triggerCreate] = useCreateContactMutation();
+  const [triggerCreate] = useCreateAgencyMutation();
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       name: '',
@@ -45,6 +46,8 @@ export const CreateContact = ({
       city: '',
       zipcode: '',
       state: { label: 'NC', value: 'NC' },
+      county: '',
+      is_sheriff: false,
     },
     reValidateMode: 'onSubmit',
   });
@@ -61,7 +64,7 @@ export const CreateContact = ({
         submitData[field] = formData[field];
       }
     });
-    const data = await triggerCreate({ data: { ...submitData, category } }).unwrap();
+    const data = await triggerCreate({ data: { ...submitData } }).unwrap();
     reset();
     onSubmitSuccess?.(data);
   };
@@ -118,6 +121,29 @@ export const CreateContact = ({
               required: true,
               minLength: 5,
               validate: (value) => !Number.isNaN(+value),
+            },
+          }}
+        />
+        <FormInput
+          label="County"
+          className="w-[200px]"
+          inputProps={{
+            control,
+            name: 'county',
+            rules: {
+              required: true,
+            },
+          }}
+        />
+        <FormInput
+          type="checkbox"
+          label="Is Sheriff?"
+          className="w-[200px] flex flex-col gap-2 [&>input]:w-[20px]"
+          inputProps={{
+            control,
+            name: 'is_sheriff',
+            rules: {
+              required: true,
             },
           }}
         />

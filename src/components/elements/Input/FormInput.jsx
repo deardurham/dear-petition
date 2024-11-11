@@ -12,7 +12,7 @@ const InputRestyled = styled(InputStyled)`
   width: 100%;
 `;
 
-const FormInput = ({ className, label, errors, inputProps, ...restProps }) => {
+const FormInput = ({ className, label, errors, inputProps, type = 'input', ...restProps }) => {
   const { field, fieldState } = useController(inputProps);
   const { error: inputError } = fieldState;
   const error = inputError ? (
@@ -24,7 +24,12 @@ const FormInput = ({ className, label, errors, inputProps, ...restProps }) => {
   return (
     <InputWrapper className={className}>
       <InputRestyled>{label}</InputRestyled>
-      <ActualInputRestyled type="input" {...field} {...restProps} />
+      <ActualInputRestyled
+        type={type}
+        checked={type === 'checkbox' ? field.value : undefined}
+        {...field}
+        {...restProps}
+      />
       {error && (
         <AnimatePresence>
           <InputErrors

@@ -72,18 +72,26 @@ def create_petitions_from_records(batch, form_type):
     logger.info(f"Searching for {form_type} records (batch {batch})")
     record_set = petition_offense_records(batch, form_type)
     petition_types = identify_distinct_petitions(record_set)
+
     for petition_type in petition_types:
         petition = batch.petitions.create(
             form_type=form_type,
             jurisdiction=petition_type["jurisdiction"],
             county=petition_type["county"],
         )
-        sheriff_agency = pm.Contact.get_sherriff_office_by_county(petition_type["county"])
+        sheriff_agency = pm.Agency.get_sherriff_office_by_county(
+            petition_type["county"]
+        )
+        
+        # petition arresting agencies - add agencies parsed from portal and assign sheriff's office for county
         if sheriff_agency is not None:
             logger.info(
                 f"Detected {sheriff_agency.name} as {petition_type['county']} county's sherrif's office. Adding as default agency."
             )
             petition.agencies.add(sheriff_agency)
+        offense_record_agencies = pm.Agency.objects.filter(pk__in=record_set.exclude(agency__isnull=True).values_list('agency'))
+        petition.agencies.add(*offense_record_agencies)
+
         link_offense_records(petition)
         logger.info(
             f"Creating documents for {petition_type['county']} ({petition_type['jurisdiction']}) records"
@@ -96,7 +104,7 @@ def create_petitions_from_records(batch, form_type):
             pm.PetitionOffenseRecord.objects.filter(petition_id=petition.id).update(active=False)
 
 
-def link_offense_records(petition, filter_active=True):
+def link_offense_records(petition):
     """Divide offense records across petition and any needed attachment forms."""
 
     offense_records = petition.get_all_offense_records()

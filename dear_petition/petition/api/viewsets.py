@@ -3,6 +3,7 @@ from import_export.results import RowResult
 import logging
 import tablib
 import tempfile
+import os
 
 from django.db import transaction
 from django.db.models import Count
@@ -17,6 +18,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from openpyxl import load_workbook
 
 from dear_petition.petition import constants
 from dear_petition.petition import models as pm
@@ -27,6 +29,7 @@ from dear_petition.petition.api.authentication import JWTHttpOnlyCookieAuthentic
 from dear_petition.petition.etl import (
     import_ciprs_records,
     recalculate_petitions,
+    combine_batches,
     assign_agencies_to_documents,
 )
 from dear_petition.petition.export import (
@@ -180,6 +183,27 @@ class ContactViewSet(viewsets.ModelViewSet):
         )
         return Response(field_options)
 
+
+class AgencyViewSet(ContactViewSet):
+    queryset = pm.Agency.objects.all()
+    serializer_class = serializers.AgencySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend, ContactSearchFilter]
+    filterset_fields = {
+        "category": ["exact"],
+        "city": ["exact", "in"],
+        "zipcode": ["exact", "in"],
+    }
+    search_fields = ["name"]
+    ordering_fields = ["name", "address1", "address2", "city", "zipcode", "county"]
+    ordering = ["name"]
+
+    def get_serializer_class(self):
+        return serializers.AgencySerializer
+
+    def get_queryset(self):
+        return pm.Agency.objects.all()
+
     @action(detail=False, methods=["put"])
     def preview_import_agencies(self, request):
         file_data = request.data.get("file")
@@ -200,17 +224,18 @@ class ContactViewSet(viewsets.ModelViewSet):
                 else row_result.instance.address1
             )
             row_diff = {
-                "name": row_result.instance.name,
-                "address": address,
-                "city": row_result.instance.city,
-                "state": row_result.instance.state,
-                "zipcode": row_result.instance.zipcode,
-                "county": row_result.instance.county,
+                'name': row_result.instance.name,
+                'address': address,
+                'city': row_result.instance.city,
+                'state': row_result.instance.state,
+                'zipcode': row_result.instance.zipcode,
+                'county': row_result.instance.county,
+                'is_sheriff': row_result.instance.is_sheriff,
             }
             if row_result.import_type == RowResult.IMPORT_TYPE_SKIP:
                 continue
             elif row_result.import_type == RowResult.IMPORT_TYPE_NEW:
-                row_diff["new_fields"] = ["name", "address", "city", "state", "zipcode", "county"]
+                row_diff['new_fields'] = ['name', 'address', 'city', 'state', 'zipcode', 'county', 'is_sheriff']
             else:
                 original_address = (
                     f"{row_result.original.address1}, {row_result.original.address2}"
@@ -222,7 +247,7 @@ class ContactViewSet(viewsets.ModelViewSet):
                 if original_address != address:
                     row_diff["new_fields"].append("address")
 
-                for field in ["name", "city", "state", "zipcode", "county"]:
+                for field in ['name', 'city', 'state', 'zipcode', 'county', 'is_sheriff']:                    
                     if getattr(row_result.original, field) != getattr(row_result.instance, field):
                         row_diff["new_fields"].append(field)
 
@@ -243,6 +268,17 @@ class ContactViewSet(viewsets.ModelViewSet):
         dataset = tablib.Dataset().load(file_data)
         resources.AgencyResource().import_data(dataset, raise_errors=True)
         return Response({})
+
+
+class ClientViewSet(ContactViewSet):
+    queryset = pm.Client.objects.all()
+    serializer_class = serializers.ClientSerializer
+
+    def get_serializer_class(self):
+        return serializers.ClientSerializer
+
+    def get_queryset(self):
+        return pm.Client.objects.filter(user=self.request.user)
 
 
 class BatchViewSet(viewsets.ModelViewSet):
@@ -334,6 +370,90 @@ class BatchViewSet(viewsets.ModelViewSet):
             ] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             resp["Content-Disposition"] = 'attachment; filename="Records Summary.docx"'
             return resp
+        
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def generate_spreadsheet(self, request, pk):
+        batch = self.get_object()
+        resource = resources.RecordSummaryResource()
+        dataset = resource.export(batch)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            filepath = tmpdir + f"/{batch.label}.xlsx"
+            dataset.save(filepath)
+            resp = FileResponse(open(filepath, "rb"))
+            resp[
+                "Content-Type"
+            ] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            return resp
+
+    @action(
+        detail=False,
+        methods=[
+            "post",
+        ],
+    )
+    def combine_batches(self, request):
+        batch_ids = request.data['batchIds']
+        label = request.data['label']
+        user_id = request.user.id
+
+        if not batch_ids:
+            return Response(
+                "No client uploads have been uploaded.", status=status.HTTP_400_BAD_REQUEST
+            )
+        if not label:
+            return Response(
+                "A new label needs to be included for the client.", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_batch = combine_batches(batch_ids, label, user_id)
+        return Response(self.get_serializer(new_batch).data)
+    
+    @action(
+        detail=True,
+        methods=[
+            "post",
+        ],
+    )
+    def assign_client_to_batch(self, request, pk):
+        client_id = request.data['client_id']
+
+        try:
+            client = pm.Client.objects.get(pk=client_id)
+        except pm.Client.DoesNotExist:
+            return Response(
+                "Unknown client.", status=status.HTTP_400_BAD_REQUEST
+            )
+        batch = self.get_object()
+        batch.client = client
+        batch.save()
+        batch.adjust_for_new_client_dob()
+        return Response({"batch_id": batch.pk})
+    
+    @action(
+        detail=False,
+        methods=[
+            "post",
+        ],
+    )
+    def import_spreadsheet(self, request):
+        files = request.data.getlist("files")
+        user = request.user
+        resource = resources.RecordSummaryResource()
+        for file in files:
+            label = os.path.basename(file.name)
+            batch = pm.Batch.objects.create(label=label, user=user)
+            batch.files.create(file=file) 
+            file.seek(0)
+            workbook = load_workbook(filename=file)
+            resource.import_data(workbook, batch)
+
+        return Response({"batch_id": batch.pk})
 
 
 class MyInboxView(generics.ListAPIView):

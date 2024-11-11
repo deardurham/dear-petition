@@ -37,6 +37,13 @@ CONVICTED = "CONVICTED"
 ARRAIGNED = "ARRAIGNED"
 GUILTY = "GUILTY"
 
+ACTIONS = Choices(
+    (CHARGED, CHARGED),
+    (CONVICTED, CONVICTED),
+    (ARRAIGNED, ARRAIGNED),
+    (GUILTY, GUILTY),
+)
+
 COMMENT_MAX_LENGTH = 8192
 
 NEW_COMMENT_EMAIL_SUBJECT = "New comment available for batch #{batch}"
@@ -73,6 +80,13 @@ INACTIVE_BY_DEFAULT_FORM_TYPES = (
     ADULT_FELONIES,
     ADULT_MISDEMEANORS,
 )
+STATUTES = {
+    DISMISSED: "146(a)",
+    NOT_GUILTY: "146(a2)",
+    UNDERAGED_CONVICTIONS: "145.8A",
+    ADULT_FELONIES: "145.5F",
+    ADULT_MISDEMEANORS: "145.5M",
+}
 
 SEVERITIES = Choices(
     ("TRAFFIC", "Traffic"),
@@ -86,7 +100,7 @@ DURHAM_COUNTY = "DURHAM"
 
 DISTRICT_COURT_WITHOUT_DA_LEAVE = "Dismissal without Leave by DA"
 
-DISMISSED_DISPOSITION_METHODS = (
+CIPRS_DISPOSITION_METHODS_DISMISSED = (
     DISTRICT_COURT_WITHOUT_DA_LEAVE,
     "Dismissed by Court",
     "Deferred Prosecution Dismissal",
@@ -95,9 +109,45 @@ DISMISSED_DISPOSITION_METHODS = (
     "No Probable Cause",
     "Never To Be Served",
     "Deferred Proceeding or Deferred Prosecution Dismissal",
-    # Portal:
+)
+
+PORTAL_DISPOSITION_METHODS_DISMISSED = (
+    "District Dismissed by the Court - No Plea Agreement",
+    "District Dismissed by the Court - Plea Agreement",
+    "Superior Dismissed by the Court - No Plea Agreement",
+    "Superior Dismissed by the Court - Plea Agreement",
+    "District Dismissed by Court - Speedy Trial",
+    "Superior Dismissed by Court - Speedy Trial",
     "VD-District Dismissals w/o Leave by DA - No Plea Agreement",
+    "VD-District Dismissals w/o Leave by DA - Per Plea Agreement",
     "VD-Superior Dismissals w/o Leave by DA - No Plea Agreement",
+    "VD-Superior Dismissals w/o Leave by DA - Per Plea Agreement",
+    "District Not Guilty - Judge",
+    "Not Guilty - Jury",
+    "Not Guilty - Magistrate",
+    "Superior Not Guilty - Judge",
+    "District Not Responsible - Judge",
+    "Not Responsible - Jury",
+    "Superior Not Responsible - Judge",
+    "District Dismissed Incapacity without Leave - No Plea Agreement",
+    "District Dismissed Incapacity without Leave - Plea Agreement",
+    "Superior Dismissed Incapacity without Leave - No Plea Agreement",
+    "Superior Dismissed Incapacity without Leave - Plea Agreement",
+    "No Probable Cause Found",
+    "Superior Deferred Proceeding/Prosecution Dismissal",
+    "District Never to Be Served",
+)
+
+PORTAL_DISPOSITION_METHODS_NOT_GUILTY = (
+    "District Not Guilty - Judge",
+    "Superior Not Guilty - Judge",
+    "Not Guilty - Jury",
+)
+
+PORTAL_DISPOSITION_METHODS_CONVICTED = (
+    "District Guilty - Judge",
+    "Superior Guilty - Judge",
+    "Guilty - Jury",
 )
 
 DISP_METHOD_SUPERSEDING_INDICTMENT = "SUPERSEDING INDICTMENT OR PROCESS"
@@ -171,5 +221,5 @@ GENERATED_PETITION_ADMIN_FIELDS = (
 
 SEVERITY_FELONY = "FELONY"
 SEVERITY_MISDEMEANOR = "MISDEMEANOR"
-CHARGED_DEGREE_FELONY = ("FH", "FNC")
-CHARGED_DEGREE_MISDEMEANOR = ("MNC",)
+CHARGED_DEGREE_FELONY = ("FA", "FB", "FC", "FD", "FE", "FF", "FG", "FH", "FI", "FNC")
+CHARGED_DEGREE_MISDEMEANOR = ("MA1", "M1", "M2", "M3", "MNC")

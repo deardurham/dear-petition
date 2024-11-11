@@ -42,6 +42,13 @@ class TestCaseInfoFullRecord:
         assert case_info.parse_charge_filed_date(tr) == "01/09/2001"
 
 
+    def test_parse_charge_agency(self, soup):
+        tr = soup.select_one(case_info.SELECT_OFFENSES)
+        agency_tr = tr.findNext('tr')
+        assert agency_tr is not None
+        assert case_info.parse_charge_agency(agency_tr) == "Creedmoor Police Department"
+
+
 @pytest.mark.parametrize(
     "parser",
     [
@@ -54,6 +61,7 @@ class TestCaseInfoFullRecord:
         case_info.parse_charge_degree,
         case_info.parse_charge_offense_date,
         case_info.parse_charge_filed_date,
+        case_info.parse_charge_agency,
     ],
 )
 def test_catch_parse_error(caplog, parser):

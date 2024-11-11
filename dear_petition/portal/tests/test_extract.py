@@ -26,6 +26,8 @@ def test_extract(sample_record):
                     degree="FNC",
                     offense_date=dt.date(2001, 1, 1),
                     filed_date=dt.date(2001, 1, 9),
+                    arrest_date=dt.date(2001, 1, 3),
+                    agency="Creedmoor Police Department",
                 )
             ],
         ),

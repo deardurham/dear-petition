@@ -28,6 +28,6 @@ def parse_party_information(soup):
     """Party Information section"""
     return PartyInfo(
         defendant_name=party_info.parse_defendant_name(soup),
-        defendant_race=party_info.parse_defendant_race(soup),
-        defendant_sex=party_info.parse_defendant_sex(soup),
+        defendant_race=party_info.parse_defendant_race(soup) or "",
+        defendant_sex=party_info.parse_defendant_sex(soup) or ""
     )

@@ -65,7 +65,8 @@ export const PageContentWrapper = styled.section`
 
 export const PageFooter = styled.footer`
   margin-top: 2rem;
+  padding: 0 4rem;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 `;

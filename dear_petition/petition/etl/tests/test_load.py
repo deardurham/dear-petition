@@ -1,5 +1,4 @@
 import pytest
-import logging
 
 from dear_petition.petition import constants
 from dear_petition.petition.models import Batch
@@ -11,6 +10,7 @@ from dear_petition.petition.etl.load import (
 )
 from dear_petition.petition.tests.factories import (
     ContactFactory,
+    AgencyFactory,
     CIPRSRecordFactory,
     OffenseFactory,
     DismissedOffenseRecordFactory,
@@ -18,7 +18,6 @@ from dear_petition.petition.tests.factories import (
 )
 
 
-logger = logging.getLogger(__name__)
 pytestmark = pytest.mark.django_db
 
 
@@ -88,10 +87,10 @@ def test_save_pdf__duplicate(fake_pdf, fake_pdf2, user, mock_transform_ciprs_doc
 
 
 def test_assign_agencies_to_documents(petition, petition_document):
-    contact1 = ContactFactory()
-    contact2 = ContactFactory()
-    contact3 = ContactFactory()
-    contact4 = ContactFactory()
+    contact1 = AgencyFactory()
+    contact2 = AgencyFactory()
+    contact3 = AgencyFactory()
+    contact4 = AgencyFactory()
 
     petition.agencies.set([contact1, contact2, contact3])
     petition = assign_agencies_to_documents(petition)
@@ -106,10 +105,10 @@ def test_assign_agencies_to_documents(petition, petition_document):
 def test_removing_agency_does_not_delete_attachment_with_offense_records(
     petition, petition_document
 ):
-    contact1 = ContactFactory()
-    contact2 = ContactFactory()
-    contact3 = ContactFactory()
-    contact4 = ContactFactory()
+    contact1 = AgencyFactory()
+    contact2 = AgencyFactory()
+    contact3 = AgencyFactory()
+    contact4 = AgencyFactory()
 
     petition.agencies.set([contact1, contact2, contact3, contact4])
     ciprs_record = CIPRSRecordFactory(
