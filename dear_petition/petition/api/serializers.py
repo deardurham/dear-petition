@@ -2,6 +2,7 @@ import logging
 from django.urls import reverse
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from dateutil.relativedelta import relativedelta
 
 from dear_petition.users.models import User
 from dear_petition.petition.models import (
@@ -15,7 +16,14 @@ from dear_petition.petition.models import (
     Petition,
     PetitionDocument,
 )
-from dear_petition.petition.constants import ATTACHMENT, DISMISSED, UNDERAGED_CONVICTIONS
+from dear_petition.petition.constants import (
+    ATTACHMENT,
+    DISMISSED,
+    UNDERAGED_CONVICTIONS,
+    NOT_GUILTY,
+    ADULT_FELONIES,
+    ADULT_MISDEMEANORS,
+)
 
 from .fields import ValidationField
 
@@ -90,6 +98,91 @@ class OffenseRecordSerializer(serializers.ModelSerializer):
             "disposition_method",
             "file_no",
         ]
+
+
+class DismissedOffenseRecordSerializer(OffenseRecordSerializer):
+    warnings = serializers.SerializerMethodField()
+
+    def get_warnings(self, offense_record):
+        warnings = []
+        dob = self.get_dob(offense_record)
+        if dob:
+            eighteenth_birthday = dob + relativedelta(years=18)
+            if offense_record.offense.ciprs_record.offense_date.date() < eighteenth_birthday:
+                warnings.append("This offense may be a candidate for the AOC-CR-293 petition form")
+        return warnings
+
+    class Meta:
+        model = OffenseRecord
+        fields = OffenseRecordSerializer.Meta.fields + ["warnings"]
+
+
+class NotGuiltyOffenseRecordSerializer(OffenseRecordSerializer):
+    warnings = serializers.SerializerMethodField()
+
+    def get_warnings(self, offense_record):
+        warnings = []
+        dob = self.get_dob(offense_record)
+        if dob:
+            eighteenth_birthday = dob + relativedelta(years=18)
+            if offense_record.offense.ciprs_record.offense_date.date() < eighteenth_birthday:
+                warnings.append("This offense may be a candidate for the AOC-CR-293 petition form")
+        return warnings
+
+    class Meta:
+        model = OffenseRecord
+        fields = OffenseRecordSerializer.Meta.fields + ["warnings"]
+
+
+class UnderagedConvictionOffenseRecordSerializer(OffenseRecordSerializer):
+    warnings = serializers.SerializerMethodField()
+
+    def get_warnings(self, offense_record):
+        warnings = []
+        if "assault" in offense_record.description.lower():
+            warnings.append("This is an assault conviction")
+        return warnings
+
+    class Meta:
+        model = OffenseRecord
+        fields = OffenseRecordSerializer.Meta.fields + ["warnings"]
+
+
+class AdultFelonyOffenseRecordSerializer(OffenseRecordSerializer):
+    warnings = serializers.SerializerMethodField()
+
+    def get_warnings(self, offense_record):
+        warnings = []
+        if "assault" in offense_record.description.lower():
+            warnings.append("This is an assault conviction")
+        return warnings
+
+    class Meta:
+        model = OffenseRecord
+        fields = OffenseRecordSerializer.Meta.fields + ["warnings"]
+
+
+class AdultMisdemeanorOffenseRecordSerializer(OffenseRecordSerializer):
+    warnings = serializers.SerializerMethodField()
+
+    def get_warnings(self, offense_record):
+        warnings = []
+        if "assault" in offense_record.description.lower():
+            warnings.append("This is an assault conviction")
+        return warnings
+
+    class Meta:
+        model = OffenseRecord
+        fields = OffenseRecordSerializer.Meta.fields + ["warnings"]
+
+
+offense_record_serializer_map = {
+    DISMISSED: DismissedOffenseRecordSerializer,
+    NOT_GUILTY: NotGuiltyOffenseRecordSerializer,
+    UNDERAGED_CONVICTIONS: UnderagedConvictionOffenseRecordSerializer,
+    ADULT_FELONIES: AdultFelonyOffenseRecordSerializer,
+    ADULT_MISDEMEANORS: AdultMisdemeanorOffenseRecordSerializer,
+}
 
 
 class OffenseSerializer(serializers.ModelSerializer):
@@ -297,7 +390,8 @@ class ParentPetitionSerializer(PetitionSerializer):
 
     def get_offense_records(self, petition):
         offense_records = petition.offense_records.all()
-        return OffenseRecordSerializer(offense_records, many=True).data
+        Serializer = offense_record_serializer_map.get(petition.form_type, OffenseRecordSerializer)
+        return Serializer(offense_records, many=True).data
 
     def get_active_records(self, petition):
         return petition.offense_records.filter(petitionoffenserecord__active=True).values_list(
