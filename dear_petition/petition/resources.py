@@ -299,7 +299,7 @@ class RecordResource(MultiModelResource):
         sex = getattr(record, "sex")
         try:
             sex_value = constants.SEX_CHOICES[sex]
-        except:
+        except KeyError:
             sex_value = constants.NOT_AVAILABLE
         return sex_value
 
