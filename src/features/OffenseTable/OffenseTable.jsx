@@ -23,7 +23,6 @@ const toNormalCase = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1).toLo
 
 function OffenseRow({ offenseRecord, selected, onSelect, dob, warnings }) {
   const [showDetails, setShowDetails] = useState(false);
-  let warnings2 = [...warnings, 'warning 1', 'warning 2'];
   return (
     <TableRow key={offenseRecord.pk}>
       <TableCell>
@@ -36,7 +35,7 @@ function OffenseRow({ offenseRecord, selected, onSelect, dob, warnings }) {
       <TableCell>
         {warnings.length > 0 && (
           <Tooltip
-            tooltipContent={warnings2.map((warning, index) => (
+            tooltipContent={warnings.map((warning, index) => (
               <div key={index}>{warning}</div>
             ))}
             offset={[0, 10]}
