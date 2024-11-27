@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faChevronDown, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { formatDistance, isBefore, isValid } from 'date-fns';
+import { formatDistance, isValid } from 'date-fns';
 import { TableBody, TableCell, TableHeader, TableRow, TableStyle } from '../../components/elements/Table';
 import { Tooltip } from '../../components/elements/Tooltip/Tooltip';
 
@@ -21,11 +21,8 @@ const toNormalCaseEachWord = (str) =>
     .reduce((acc, s) => `${acc} ${s}`);
 const toNormalCase = (str) => `${str.charAt(0).toUpperCase()}${str.slice(1).toLowerCase()}`;
 
-function OffenseRow({ offenseRecord, selected, onSelect, dob }) {
+function OffenseRow({ offenseRecord, selected, onSelect, dob, warnings }) {
   const [showDetails, setShowDetails] = useState(false);
-
-  const dateAt18YearsOld = isValid(dob) && new Date(dob.getFullYear() + 18, dob.getMonth() + dob.getDay());
-
   return (
     <TableRow key={offenseRecord.pk}>
       <TableCell>
@@ -36,8 +33,14 @@ function OffenseRow({ offenseRecord, selected, onSelect, dob }) {
       <TableCell tooltip={offenseRecord.action}>{toNormalCaseEachWord(offenseRecord.action)}</TableCell>
       <TableCell tooltip={offenseRecord.severity}>{toNormalCaseEachWord(offenseRecord.severity)}</TableCell>
       <TableCell>
-        {isValid(dob) && isBefore(new Date(offenseRecord.offense_date), dateAt18YearsOld) && (
-          <Tooltip tooltipContent="This offense may be a candidate for the AOC-CR-293 petition form" offset={[0, 10]}>
+        {warnings.length > 0 && (
+          <Tooltip
+            tooltipContent={warnings.map((warning, index) => (
+              <div key={index}>{warning}</div>
+            ))}
+            offset={[0, 10]}
+            flexDirection="column"
+          >
             <FontAwesomeIcon className="text-xl text-red-600" icon={faExclamationTriangle} />
           </Tooltip>
         )}
@@ -95,6 +98,7 @@ function OffenseTable({ offenseRecords, selectedRows, onSelect, dob }) {
             offenseRecord={offenseRecord}
             onSelect={() => onSelect(offenseRecord.pk)}
             dob={dob}
+            warnings={offenseRecord.warnings}
           />
         ))}
       </TableBody>

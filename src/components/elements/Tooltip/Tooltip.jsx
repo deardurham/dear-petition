@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 const TooltipContentWrapper = styled.div`
   display: flex;
+  flex-direction: ${(props) => props.flexDirection};
   align-items: center;
   background: rgb(255 255 255);
   z-index: 10;
@@ -14,7 +15,14 @@ const TooltipContentWrapper = styled.div`
   padding: 1rem 0.5rem;
 `;
 
-export const Tooltip = ({ children, tooltipContent, placement, hideTooltip = false, offset = [0, 0] }) => {
+export const Tooltip = ({
+  children,
+  tooltipContent,
+  placement,
+  hideTooltip = false,
+  offset = [0, 0],
+  flexDirection = 'row',
+}) => {
   const hoverDiv = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
   const [popperElement, setPopperElement] = useState();
@@ -43,7 +51,7 @@ export const Tooltip = ({ children, tooltipContent, placement, hideTooltip = fal
       </div>
       {isHovering && (
         <Popover.Panel static ref={setPopperElement} style={styles.popper} {...attributes.popper}>
-          <TooltipContentWrapper>{tooltipContent}</TooltipContentWrapper>
+          <TooltipContentWrapper flexDirection={flexDirection}>{tooltipContent}</TooltipContentWrapper>
         </Popover.Panel>
       )}
     </Popover>

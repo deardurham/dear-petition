@@ -14,6 +14,7 @@
     
 6. In dear_petition/petition/etl/load.py, add to create_batch_petitions function
 7. Add to PETITION_FORM_NAMES constant in src/contstants/petitionConstants.js
+8. Create a new offense record serializer for your new petition type in serializers.py and add it to the offense_record_serializer_map.
 
 
 
