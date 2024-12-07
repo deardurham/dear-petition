@@ -283,25 +283,29 @@ class RecordResource(MultiModelResource):
 
     def dehydrate_jurisdiction(self, record):
         jurisdiction = getattr(record, "jurisdiction")
-        return constants.JURISDICTION_MAP[jurisdiction]
+        return constants.JURISDICTION_MAP.get(jurisdiction, constants.NOT_AVAILABLE)
 
     def hydrate_jurisdiction(self, field, data):
         attribute = field.attribute
+        hydrated_value = constants.NOT_AVAILABLE
         for k, v in constants.JURISDICTION_MAP.items():
             if v == data[attribute]:
-                data[attribute] = k
+                hydrated_value = k
                 break
-
+        data[attribute] = hydrated_value
         return data
 
     def dehydrate_sex(self, record):
         sex = getattr(record, "sex")
-        return constants.SEX_CHOICES[sex]
+        try:
+            sex_value = constants.SEX_CHOICES[sex]
+        except KeyError:
+            sex_value = constants.NOT_AVAILABLE
+        return sex_value
 
     def hydrate_sex(self, field, data):
         attribute = field.attribute
-        data[attribute] = constants.SEX_MAP[data[attribute]]
-
+        data[attribute] = constants.SEX_MAP.get(data[attribute], constants.NOT_AVAILABLE)
         return data
 
     def get_export_fields(self):
