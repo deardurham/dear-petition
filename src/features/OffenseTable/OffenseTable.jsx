@@ -30,8 +30,12 @@ function OffenseRow({ offenseRecord, selected, onSelect, dob, warnings }) {
       </TableCell>
       <TableCell tooltip={offenseRecord.offense_date}>{offenseRecord.offense_date}</TableCell>
       <TableCell tooltip={offenseRecord.description}>{offenseRecord.description}</TableCell>
-      <TableCell tooltip={offenseRecord.action}>{toNormalCaseEachWord(offenseRecord.action)}</TableCell>
-      <TableCell tooltip={offenseRecord.severity}>{toNormalCaseEachWord(offenseRecord.severity)}</TableCell>
+      <TableCell tooltip={offenseRecord.action}>
+        {offenseRecord.action ? toNormalCaseEachWord(offenseRecord.action) : ''}
+      </TableCell>
+      <TableCell tooltip={offenseRecord.severity}>
+        {offenseRecord.severity ? toNormalCaseEachWord(offenseRecord.severity) : ''}
+      </TableCell>
       <TableCell>
         {warnings.length > 0 && (
           <Tooltip
