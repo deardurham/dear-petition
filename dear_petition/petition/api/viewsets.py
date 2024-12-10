@@ -439,6 +439,9 @@ class BatchViewSet(viewsets.ModelViewSet):
         batch = self.get_object()
         batch.client = client
         batch.save()
+        if not client.dob and batch.dob:
+            client.dob = batch.dob
+            client.save()
         batch.adjust_for_new_client_dob()
         return Response({"batch_id": batch.pk})
 
