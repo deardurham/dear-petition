@@ -31,7 +31,7 @@ def generate_summary(batch):
 
 
 def generate_context(batch, attorney, client):
-    dob = batch.dob
+    dob = client.dob if client.dob else batch.dob
     birthday_18th = "None"
     birthday_22nd = "None"
 
