@@ -13,6 +13,7 @@ from dear_petition.petition.tests.factories import (
     OffenseFactory,
     ClientFactory,
     OffenseRecordFactory,
+    UserFactory,
 )
 
 pytestmark = pytest.mark.django_db
@@ -77,3 +78,29 @@ def test_adjust_for_new_client_dob():
     batch.save()
     batch.adjust_for_new_client_dob()
     assert offense_record not in batch.underaged_conviction_records()
+
+
+def test_populate_client_dob_from_batch_dob(api_client):
+    """
+    Tests that when client dob is left empty, it is populated from the batch dob when
+    batch has an available dob value.
+    """
+    # set up a user that will have access to the batch/client data
+    user = UserFactory()
+    api_client.force_authenticate(user=user)
+
+    # set dob to use for the batch record and create batch/record
+    dob = datetime.date(1992, 1, 28)
+    batch = BatchFactory(user=user, client=None)
+    CIPRSRecordFactory(batch=batch, dob=dob)  # add record with DOB to batch
+
+    client = ClientFactory(user=user, dob=None)  # add client with no DOB
+    assert client.dob == None
+
+    # use API to assign the client to the batch
+    data = {"client_id": client.pk}
+    api_client.post(reverse("api:batch-assign-client-to-batch", args=[batch.pk]), data=data)
+
+    # check that client dob updated appropriately during assignment
+    client.refresh_from_db()
+    assert client.dob == dob
