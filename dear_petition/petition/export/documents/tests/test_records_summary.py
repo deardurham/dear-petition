@@ -419,6 +419,68 @@ def test_records_summary_context__birthdays(
     assert context["birthday_22nd"] == formatted_22nd_bday
 
 
+@pytest.mark.parametrize(
+    "dob, formatted_dob, formatted_18th_bday, formatted_22nd_bday",
+    [
+        (date(1986, 6, 15), "06/15/1986", "06/15/2004", "06/15/2008"),
+        # born in leap year
+        (date(1996, 2, 29), "02/29/1996", "03/01/2014", "03/01/2018"),
+    ],
+)
+def test_records_summary_context_no_batch_birthday(
+    batch, dob, formatted_dob, formatted_18th_bday, formatted_22nd_bday
+):
+    """
+    Test generate_context method for a batch that has no date of birth, but client info has
+    date of birth, (e.g. for portal imported batches)
+    """
+
+    PETITIONER_INFO_WITH_DOB = {"name": "Pete Petitioner", "dob": dob}
+
+    offense = create_offense(
+        batch, "DURHAM", DISTRICT_COURT, "10CR000001", None, "NOT GUILTY", "JURY TRIAL", False
+    )
+    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    attorney = AttorneyFactory(name="E. Toruney")
+    client = ClientFactory(**PETITIONER_INFO_WITH_DOB)
+    context = generate_context(batch, attorney, client)
+
+    assert context["dob"] == formatted_dob
+    assert context["birthday_18th"] == formatted_18th_bday
+    assert context["birthday_22nd"] == formatted_22nd_bday
+
+
+def test_records_summary_context_birthdays_discrepancy(batch):
+    """
+    Test generate_context method where client date of birth does not match batch date of birth.
+    Client date of birth should be used in this case.
+    """
+
+    client_dob, formatted_dob, formatted_18th_bday, formatted_22nd_bday = (
+        date(1986, 6, 15),
+        "06/15/1986",
+        "06/15/2004",
+        "06/15/2008",
+    )
+    batch_dob = date(1993, 5, 22)
+
+    PETITIONER_INFO_WITH_DOB = {"name": "Pete Petitioner", "dob": client_dob}
+
+    offense = create_offense(
+        batch, "DURHAM", DISTRICT_COURT, "10CR000001", batch_dob, "NOT GUILTY", "JURY TRIAL", False
+    )
+    create_offense_record(offense, CHARGED, "SIMPLE ASSAULT", "MISDEMEANOR")
+
+    attorney = AttorneyFactory(name="E. Toruney")
+    client = ClientFactory(**PETITIONER_INFO_WITH_DOB)
+    context = generate_context(batch, attorney, client)
+
+    assert context["dob"] == formatted_dob
+    assert context["birthday_18th"] == formatted_18th_bday
+    assert context["birthday_22nd"] == formatted_22nd_bday
+
+
 def test_records_summary_context__additional_offenses(batch):
     """
     Test generate_context method with many offense records in a table. Check that addl_offense_file_nos in the table has
