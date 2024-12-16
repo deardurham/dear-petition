@@ -278,12 +278,12 @@ CELERYD_SOFT_TIME_LIMIT = 60
 
 CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-CELERYBEAT_SCHEDULE = {
-    "clean_stale_data": {
-        "task": "dear_petition.petition.tasks.clean_stale_data.clean_stale_data_task",
-        "schedule": crontab(minute=0),  # Every hour
-    }
-}
+# CELERYBEAT_SCHEDULE = {
+#     "clean_stale_data": {
+#         "task": "dear_petition.petition.tasks.clean_stale_data.clean_stale_data_task",
+#         "schedule": crontab(minute=0),  # Every hour
+#     }
+# }
 
 # django-allauth
 # ------------------------------------------------------------------------------
