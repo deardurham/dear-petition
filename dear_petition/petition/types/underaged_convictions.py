@@ -28,7 +28,7 @@ def get_offense_records(batch, jurisdiction=""):
         )  # We can't determine this petition type without the date of birth
 
     if jurisdiction:
-        qs = qs.filter(offense__ciprs_record__jurisdiction=jurisdiction)
+        qs = qs.filter(offense__jurisdiction=jurisdiction)
 
     query = build_query(dob)
     qs = qs.filter(query).exclude(severity="INFRACTION")
