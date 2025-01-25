@@ -14,6 +14,7 @@ export const CreateClient = ({
   onSubmitSuccess,
   submitAndKeepOpenTitle = '',
   submitAndCloseTitle = 'Submit',
+  handleWarnings,
 }) => {
   const [triggerCreate] = useCreateClientMutation();
   const { control, handleSubmit, reset } = useForm({
@@ -46,6 +47,7 @@ export const CreateClient = ({
   };
   const onSubmitAndClose = async (data) => {
     await onSubmit(data);
+    handleWarnings(data);
     onClose();
   };
   return (

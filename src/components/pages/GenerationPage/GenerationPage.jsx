@@ -84,7 +84,7 @@ function GenerationPage() {
     );
   }
 
-  const { attorney, client, label } = data;
+  const { attorney, client, dob, label } = data;
 
   const validateInput = () => {
     let hasErrors = false;
@@ -173,7 +173,7 @@ function GenerationPage() {
           />
         </InputSection>
         <InputSection label="Petitioner Information">
-          <PetitionerInput petitioner={client} errors={formErrors} onClearError={clearError} />
+          <PetitionerInput petitioner={client} batchDob={dob} errors={formErrors} onClearError={clearError} />
         </InputSection>
         <InputSection label="Documents">
           <div className="flex gap-4">
