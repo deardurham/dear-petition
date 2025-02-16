@@ -42,7 +42,7 @@ function OffenseRow({ offenseRecord, selected, onSelect, dob, warnings }) {
             tooltipContent={warnings.map((warning, index) => (
               <div key={index}>{warning}</div>
             ))}
-            offset={[0, 10]}
+            offset={10}
             flexDirection="column"
           >
             <FontAwesomeIcon className="text-xl text-red-600" icon={faExclamationTriangle} />

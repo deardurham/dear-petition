@@ -24,7 +24,7 @@ function ActionButton({
   title = '',
   isDisabled = false,
   tooltipMessage = '',
-  tooltipOffset = [0, 10],
+  tooltipOffset = 10,
 }) {
   const windowSize = useWindowSize();
   const isCollapsed = windowSize.width <= TABLET_LANDSCAPE_SIZE;
@@ -37,7 +37,7 @@ function ActionButton({
   );
 }
 
-const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = [0, 10] }) => (
+const TooltipWrapper = ({ children, tooltipMessage = '', tooltipOffset = 10 }) => (
   <Tooltip tooltipContent={tooltipMessage} hideTooltip={!tooltipMessage} offset={tooltipOffset}>
     {children}
   </Tooltip>
@@ -163,7 +163,7 @@ function PetitionRow({ petition, validateInput, backgroundColor, setFormErrors }
         </TableCell>
         <TableCell>
           <div className="flex justify-end items-center h-full gap-4 ">
-            <Tooltip tooltipContent={disabledTooltipContent} hideTooltip={!isDisabled && !error}>
+            <Tooltip tooltipContent={disabledTooltipContent} hideTooltip={!isDisabled && !error} offset={5}>
               <FontAwesomeIcon
                 className={cx('text-[24px] text-red', { invisible: !isDisabled && !error })}
                 icon={faExclamationTriangle}
