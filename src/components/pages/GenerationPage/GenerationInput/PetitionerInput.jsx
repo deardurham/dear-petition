@@ -14,8 +14,6 @@ import {
 import Button, { ModalButton } from '../../../elements/Button';
 import { useModalContext } from '../../../elements/Button/ModalButton';
 import { CreateClient } from '../../../../features/CreateClient';
-import { colorWarningOnWhiteBackground } from '../../../../styles/colors';
-import { smallerThanTabletLandscape } from '../../../../styles/media';
 
 const TextInput = styled(Input)`
   input {
@@ -25,18 +23,6 @@ const TextInput = styled(Input)`
   }
   &:not(:last-child) {
     margin-bottom: 1rem;
-  }
-`;
-
-const WarningMessage = styled.div`
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-  p {
-    color: ${colorWarningOnWhiteBackground};
-    @media (${smallerThanTabletLandscape}) {
-      font-size: 1.4rem;
-    }
-    white-space: normal;
   }
 `;
 
@@ -103,7 +89,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const handleDobWarning = (inputDob) => {
     // this function is split off from handleWarnings so it can also be used
     // when editing existing client dob
-    if (inputDob !== batchDob) {
+    if (batchDob && inputDob !== batchDob) {
       addWarning('dob', dobWarningMsg);
     } else {
       clearWarning('dob');
@@ -163,6 +149,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
         className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
         onClick={async () => {
           clearAllErrors();
+          handleWarnings(petitionerData);
           try {
             await triggerClientUpdate({
               id: petitioner.pk,
@@ -190,6 +177,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
           setIsEditing(false);
           clearAllErrors();
           setPetitionerData(getPetitionerData(petitioner));
+          handleWarnings(getPetitionerData(petitioner));
         }}
       >
         <span>
@@ -258,15 +246,11 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
               handleDobWarning(e.target.value);
             }}
             errors={isEditing && editErrors.dob}
+            warnings={isEditing && editWarnings.dob}
             onClearError={onClearError}
             disabled={!isEditing}
             type="date"
           />
-          {editWarnings.dob && (
-            <WarningMessage>
-              <p>{editWarnings.dob}</p>
-            </WarningMessage>
-          )}
           <AddressInput
             address={address}
             setAddress={setPetitionerData}
