@@ -1,6 +1,6 @@
 import useWindowSize from '../../hooks/useWindowSize';
 import { vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 
 describe('useWindowSize', () => {
   beforeEach(() => {
@@ -23,9 +23,11 @@ describe('useWindowSize', () => {
     expect(result.current.width).toBe(1920);
     expect(result.current.height).toBe(1080);
 
-    window.innerWidth = 1280;
-    window.innerHeight = 720;
-    window.dispatchEvent(new Event('resize'));
+    act(() => {
+      window.innerWidth = 1280;
+      window.innerHeight = 720;
+      window.dispatchEvent(new Event('resize'));
+    });
 
     expect(result.current.width).toBe(1280);
     expect(result.current.height).toBe(720);
