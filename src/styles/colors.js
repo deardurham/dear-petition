@@ -8,6 +8,7 @@ export const colorGreen = '#89af5b';
 export const colorRed = '#b04846';
 export const colorBlue = '#4082c3';
 export const colorYellow = '#d1d156';
+export const colorOrange = '#fc9a23';
 
 /* COLORS */
 export const colorPrimary = '#3d8f9d';
@@ -18,6 +19,7 @@ export const colorFontPrimary = colorBlack;
 export const colorSuccess = colorBlue;
 export const colorCaution = colorRed;
 export const colorWarning = colorYellow;
+export const colorWarningOnWhiteBackground = colorOrange;
 
 /**
  * greyScale

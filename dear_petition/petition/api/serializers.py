@@ -473,6 +473,7 @@ class BatchDetailSerializer(serializers.ModelSerializer):
             "pk",
             "label",
             "date_uploaded",
+            "dob",
             "user",
             "records",
             "petitions",

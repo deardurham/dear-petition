@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { useCreateClientMutation } from '../service/api';
 import US_STATES from '../constants/US_STATES';
@@ -14,6 +14,9 @@ export const CreateClient = ({
   onSubmitSuccess,
   submitAndKeepOpenTitle = '',
   submitAndCloseTitle = 'Submit',
+  handleWarnings,
+  handleDobWarning,
+  warnings,
 }) => {
   const [triggerCreate] = useCreateClientMutation();
   const { control, handleSubmit, reset } = useForm({
@@ -46,8 +49,10 @@ export const CreateClient = ({
   };
   const onSubmitAndClose = async (data) => {
     await onSubmit(data);
+    handleWarnings(data);
     onClose();
   };
+  const dobFieldValue = useWatch({ control, name: 'dob' });
   return (
     <div className="flex flex-col gap-8">
       <h3>{'Add New Client'}</h3>
@@ -67,6 +72,10 @@ export const CreateClient = ({
             name: 'dob',
             rules: { required: false },
           }}
+          onBlur={() => {
+            handleDobWarning(dobFieldValue);
+          }}
+          warnings={warnings.dob}
         />
         <FormTextArea
           label="Address"
