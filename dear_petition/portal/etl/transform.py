@@ -48,7 +48,7 @@ def transform_offenses(portal_record: PortalRecord):
                 {
                     "Law": charge.statute if charge else "",
                     "Count": disposition.charge_number,
-                    "Severity": charge.transform_severity(),
+                    "Severity": charge.transform_severity() if charge else "",
                     "Description": disposition.charge_offense,
                     "Agency": charge.agency if charge else None,
                 }
