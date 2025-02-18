@@ -74,7 +74,7 @@ export const Dashboard = () => {
               </Tab>
             </div>
           </Tab.List>
-          <Tab.Panels as="div">
+          <Tab.Panels className="pt-5">
             <Tab.Panel>
               <NewPetition />
             </Tab.Panel>

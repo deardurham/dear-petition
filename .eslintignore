@@ -5,3 +5,4 @@ tailwind.config.js
 staticfiles/
 htmlcov/
 index.html
+dist/

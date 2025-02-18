@@ -88,7 +88,7 @@ function PageBase({ children, className, ...props }) {
               </LinkWrapper>
             )}
             <Tooltip
-              offset={[0, 5]}
+              offset={5}
               placement="bottom"
               tooltipContent="To install, please click and drag this button to your bookmarks bar"
             >

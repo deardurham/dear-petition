@@ -204,11 +204,13 @@ export const ExistingPetitions = () => {
 
   return (
     <div className="flex flex-col">
-      <ModalButton title="Combine Petitions" colorClass={POSITIVE} className="w-[150px] h-[32px] mb-5">
+      <ModalButton title="Combine Petitions" colorClass={POSITIVE} className="w-[150px] h-[32px]">
         <CombineBatchModal rowData={data?.results} />
       </ModalButton>
-      <h3 className="mb-2">Recent Petitions</h3>
-      <p>Petitions you have recently worked on will show up here </p>
+      <div className="flex flex-col gap-2 mt-5">
+        <h3>Recent Petitions</h3>
+        <p>Petitions you have recently worked on will show up here </p>
+      </div>
       <div className="w-full">
         <div className="tw-flex items-end justify-end pb-2">
           <LegacyPageSelection
@@ -230,7 +232,7 @@ export const ExistingPetitions = () => {
                       Note: Records are available for 48 hours before they need to be uploaded again
                     </p>
                   }
-                  offset={[-10, 15]}
+                  offset={15}
                 >
                   <FontAwesomeIcon icon={faQuestionCircle} />
                 </Tooltip>

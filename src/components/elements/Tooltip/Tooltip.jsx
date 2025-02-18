@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
-import { Popover } from '@headlessui/react';
-import { usePopper } from 'react-popper';
+import { useState } from 'react';
 import styled from 'styled-components';
+import { offset as floatingOffset, useFloating, useFocus, useHover, useInteractions } from '@floating-ui/react';
+import { Popover } from '@headlessui/react';
 
 const TooltipContentWrapper = styled.div`
   display: flex;
@@ -20,37 +20,29 @@ export const Tooltip = ({
   tooltipContent,
   placement,
   hideTooltip = false,
-  offset = [0, 0],
+  offset = 0,
   flexDirection = 'row',
 }) => {
-  const hoverDiv = useRef(null);
-  const [isHovering, setIsHovering] = useState(false);
-  const [popperElement, setPopperElement] = useState();
-  const { styles, attributes } = usePopper(hoverDiv.current, popperElement, {
+  const [isOpen, setIsOpen] = useState(false);
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
     placement,
-    modifiers: {
-      name: 'offset',
-      options: {
-        offset,
-      },
-    },
+    middleware: [floatingOffset(offset)],
   });
+  const hover = useHover(context);
+  const focus = useFocus(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, focus]);
   if (hideTooltip) {
     return children;
   }
   return (
     <Popover>
-      <div
-        ref={hoverDiv}
-        onMouseEnter={() => {
-          setIsHovering(true);
-        }}
-        onMouseLeave={() => setIsHovering(false)}
-      >
+      <div ref={refs.setReference} {...getReferenceProps()}>
         {children}
       </div>
-      {isHovering && (
-        <Popover.Panel static ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+      {isOpen && (
+        <Popover.Panel static ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
           <TooltipContentWrapper flexDirection={flexDirection}>{tooltipContent}</TooltipContentWrapper>
         </Popover.Panel>
       )}
