@@ -68,6 +68,7 @@ def test_offense_records_by_jurisdiction(batch, jurisdiction):
     offense = OffenseFactory(
         disposition_method=constants.CIPRS_DISPOSITION_METHODS_DISMISSED[0],
         ciprs_record=ciprs_record,
+        jurisdiction=jurisdiction,
     )
     offense_record = OffenseRecordFactory(action="CHARGED", offense=offense)
     records = batch.dismissed_offense_records(jurisdiction=jurisdiction)

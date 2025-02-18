@@ -28,7 +28,11 @@ def test_distinct_petition__many(batch):
     for jurisdiction in [constants.DISTRICT_COURT, constants.SUPERIOR_COURT]:
         for county in ["DURHAM", "WAKE"]:
             record = CIPRSRecordFactory(jurisdiction=jurisdiction, county=county, batch=batch)
-            offense = OffenseFactory(disposition_method=method, ciprs_record=record)
+            offense = OffenseFactory(
+                disposition_method=method,
+                ciprs_record=record,
+                jurisdiction=jurisdiction,
+            )
             OffenseRecordFactory(action="CHARGED", offense=offense)
     petition_types = identify_distinct_petitions(batch.dismissed_offense_records())
     assert petition_types.count() == 4
