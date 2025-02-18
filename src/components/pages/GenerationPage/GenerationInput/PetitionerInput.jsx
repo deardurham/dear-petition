@@ -29,7 +29,7 @@ const TextInput = styled(Input)`
 const dobWarningMsg = `Warning: Date of birth entered does not match CIPRS form pdf.
   Petitioner Information date of birth will be used.`;
 
-export const CreateClientModal = ({ onCreate, handleWarnings }) => {
+export const CreateClientModal = ({ onCreate, handleWarnings, handleDobWarning, warnings }) => {
   const modalElement = useRef();
   const { closeModal } = useModalContext();
   return (
@@ -39,6 +39,8 @@ export const CreateClientModal = ({ onCreate, handleWarnings }) => {
         category="client"
         onSubmitSuccess={(submitData) => onCreate(submitData)}
         handleWarnings={handleWarnings}
+        handleDobWarning={handleDobWarning}
+        warnings={warnings}
       />
     </div>
   );
@@ -89,7 +91,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const handleDobWarning = (inputDob) => {
     // this function is split off from handleWarnings so it can also be used
     // when editing existing client dob
-    if (batchDob && inputDob !== batchDob) {
+    if (batchDob && inputDob && inputDob !== batchDob) {
       addWarning('dob', dobWarningMsg);
     } else {
       clearWarning('dob');
@@ -127,13 +129,18 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
             }
           }}
           handleWarnings={handleWarnings}
+          handleDobWarning={handleDobWarning}
+          warnings={editWarnings}
         />
       </ModalButton>
       {petitioner && (
         <Button
           colorClass="neutral"
           className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
-          onClick={() => setIsEditing(true)}
+          onClick={() => {
+            setIsEditing(true);
+            handleWarnings(petitionerData);
+          }}
         >
           <span>
             <FontAwesomeIcon icon={faPencilAlt} /> Edit
