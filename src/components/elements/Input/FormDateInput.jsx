@@ -1,8 +1,8 @@
 import { useController } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
-import { InputWrapper, InputStyled, ActualInputStyled, InputErrors } from './Input.styled';
+import { InputWrapper, InputStyled, ActualInputStyled, InputErrors, InputWarnings } from './Input.styled';
 
-const FormDateInput = ({ className, label, errors, inputProps, ...restProps }) => {
+const FormDateInput = ({ className, label, errors, warnings, inputProps, ...restProps }) => {
   const { field, fieldState } = useController(inputProps);
   const { error: inputError } = fieldState;
   const error = inputError ? (
@@ -15,8 +15,8 @@ const FormDateInput = ({ className, label, errors, inputProps, ...restProps }) =
     <InputWrapper className={className}>
       <InputStyled>{label}</InputStyled>
       <ActualInputStyled type="date" {...field} {...restProps} />
-      {error && (
-        <AnimatePresence>
+      <AnimatePresence>
+        {error && (
           <InputErrors
             initial={{ opacity: 0, y: -25 }}
             animate={{ opacity: 1, y: 0 }}
@@ -25,8 +25,20 @@ const FormDateInput = ({ className, label, errors, inputProps, ...restProps }) =
           >
             {error}
           </InputErrors>
-        </AnimatePresence>
-      )}
+        )}
+        {warnings && (
+          <InputWarnings
+            initial={{ opacity: 0, y: -25 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '50' }}
+            positionTransition
+          >
+            {warnings.map((warningMsg) => (
+              <p key={warningMsg}>{warningMsg}</p>
+            ))}
+          </InputWarnings>
+        )}
+      </AnimatePresence>
     </InputWrapper>
   );
 };
