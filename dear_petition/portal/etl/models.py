@@ -41,6 +41,8 @@ class Charge(BaseModel):
             severity = constants.SEVERITY_FELONY
         elif self.degree in constants.CHARGED_DEGREE_MISDEMEANOR:
             severity = constants.SEVERITY_MISDEMEANOR
+        elif self.degree in constants.CHARGED_DEGREE_INFRACTION:
+            severity = constants.SEVERITIES.INFRACTION
         return severity
 
 
