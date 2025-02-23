@@ -29,6 +29,7 @@ from . import constants as pc
 
 from .constants import (
     JURISDICTION_CHOICES,
+    SEVERITIES,
     NOT_AVAILABLE,
     SEX_CHOICES,
     CONTACT_CATEGORIES,
@@ -177,7 +178,7 @@ class OffenseRecord(PrintableModelMixin, models.Model):
     law = models.CharField(max_length=256, blank=True, verbose_name="Law")
     code = models.IntegerField(blank=True, null=True, verbose_name="Code")
     action = models.CharField(max_length=256, null=True, verbose_name="Action")
-    severity = models.CharField(max_length=256, verbose_name="Severity")
+    severity = models.CharField(max_length=256, choices=SEVERITIES, verbose_name="Severity")
     description = models.CharField(max_length=256, verbose_name="Description")
     agency = models.ForeignKey(
         "Contact", related_name="+", null=True, blank=True, on_delete=models.SET_NULL

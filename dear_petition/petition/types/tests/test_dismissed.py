@@ -7,7 +7,12 @@ from dear_petition.petition.tests.factories import (
     OffenseRecordFactory,
     PetitionFactory,
 )
-from dear_petition.petition.constants import CONVICTED, CHARGED
+from dear_petition.petition.constants import (
+    CONVICTED,
+    CHARGED,
+    CIPRS_DISPOSITION_METHODS_DISMISSED,
+    SEVERITIES,
+)
 from dear_petition.petition.models import Offense, OffenseRecord
 
 pytestmark = pytest.mark.django_db
@@ -49,16 +54,35 @@ def test_dismissed(action, disposition_method, should_be_included, batch, record
         assert offense_record not in batch.dismissed_offense_records()
 
 
-def test_infraction_severity_offense_record(batch, dismissed_offense):
-    """Offense records with severity INFRACTION should be excluded."""
+@pytest.mark.parametrize("file_no_type,should_be_included", [["CR", True], ["IF", False]])
+def test_infraction_severity_offense_record(batch, file_no_type, should_be_included):
+    """Offense records with severity INFRACTION in the file number should be excluded if "IF" is in file no and included if "CR" is in file no."""
+    record = CIPRSRecordFactory(batch=batch, file_no=f"99{file_no_type}BBBBBBBBBBBB")
+    dismissed_offense = OffenseFactory(
+        ciprs_record=record, disposition_method=CIPRS_DISPOSITION_METHODS_DISMISSED[0]
+    )
     infraction_record = OffenseRecordFactory(
         action="CHARGED", offense=dismissed_offense, severity="INFRACTION"
     )
     traffic_record = OffenseRecordFactory(
         action="CHARGED", offense=dismissed_offense, severity="TRAFFIC"
     )
-    assert infraction_record not in batch.dismissed_offense_records()
+
+    infraction_is_included = infraction_record in batch.dismissed_offense_records()
+    assert infraction_is_included is should_be_included
     assert traffic_record in batch.dismissed_offense_records()
+
+
+def test_non_dismissed_infraction_not_included(batch, record1):
+    offense = Offense.objects.create(
+        ciprs_record=record1,
+        disposition_method="Not a valid dismissed disposition method",
+    )
+    offense_record = OffenseRecord.objects.create(
+        offense=offense, action=CONVICTED, severity=SEVERITIES.INFRACTION
+    )
+
+    assert offense_record not in batch.dismissed_offense_records()
 
 
 @pytest.mark.parametrize("jurisdiction", [constants.DISTRICT_COURT, constants.SUPERIOR_COURT])
