@@ -78,6 +78,15 @@ def test_map_petitioner__dob(form, record2, client, offense_record1):
     assert form.data["DOB"] == utils.format_petition_date(client.dob)
 
 
+def test_map_petitioner__dob_client_dob_missing(form, record2, client, offense_record1):
+    ## if client.dob is missing then dob should come from record instead
+    client.dob = None
+    record2.dob = dt.date(2000, 1, 1)
+    record2.save()
+    form.map_petitioner()
+    assert form.data["DOB"] == utils.format_petition_date(record2.dob)
+
+
 def test_map_petitioner__address(form):
     client = ClientFactory(address1="123 Test St", address2="Apt 404")
     form.extra["client"] = client
