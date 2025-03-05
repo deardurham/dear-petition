@@ -69,7 +69,18 @@ def test_map_petitioner__sex(form, record2, offense_record1):
     assert form.data["Sex"] == record2.sex
 
 
-def test_map_petitioner__dob(form, record2, offense_record1):
+def test_map_petitioner__dob(form, record2, client, offense_record1):
+    record2.dob = dt.date(2000, 1, 1)
+    record2.save()
+    form.map_petitioner()
+    ## updated this to check that form.data["DOB"] comes from client.dob
+    ## since user input dob should override record.dob
+    assert form.data["DOB"] == utils.format_petition_date(client.dob)
+
+
+def test_map_petitioner__dob_client_dob_missing(form, record2, client, offense_record1):
+    ## if client.dob is missing then dob should come from record instead
+    client.dob = None
     record2.dob = dt.date(2000, 1, 1)
     record2.save()
     form.map_petitioner()

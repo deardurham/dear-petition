@@ -91,7 +91,9 @@ class AOCFormCR287(PetitionForm):
             self.data["NamePetitioner"] = record.label
             self.data["Race"] = record.race
             self.data["Sex"] = record.sex
-            self.data["DOB"] = self.format_date(record.dob)
+            ## updated so user input client.dob overrides record.dob
+            dob = client.dob if client.dob else record.dob
+            self.data["DOB"] = self.format_date(dob)
 
     def map_attorney(self):
         attorney = self.extra["attorney"]
@@ -274,7 +276,9 @@ class AOCFormCR297(AOCFormCR287):
             record = offense_record.offense.ciprs_record
             self.data["Race"] = record.race
             self.data["Sex"] = record.sex
-            self.data["DOB"] = self.format_date(record.dob)
+            ## updated so user input client.dob overrides record.dob
+            dob = client.dob if client.dob else record.dob
+            self.data["DOB"] = self.format_date(dob)
 
     def map_additional_forms(self):
         if self.petition.offense_records.filter(petitionoffenserecord__active=True).count() > 1:
