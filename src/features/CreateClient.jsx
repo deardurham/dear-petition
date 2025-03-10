@@ -1,4 +1,5 @@
 import { useForm, useWatch } from 'react-hook-form';
+import { useState } from 'react';
 
 import { useCreateClientMutation } from '../service/api';
 import US_STATES from '../constants/US_STATES';
@@ -53,6 +54,9 @@ export const CreateClient = ({
     onClose();
   };
   const dobFieldValue = useWatch({ control, name: 'dob' });
+  // hide dobWarning initially, then later display after dob field is edited
+  // this is because dob warning state is shared with PetitionerInput page, so may have a value initially
+  const [hideDobWarning, setHideDobWarning] = useState(true);
   return (
     <div className="flex flex-col gap-8">
       <h3>{'Add New Client'}</h3>
@@ -74,8 +78,10 @@ export const CreateClient = ({
           }}
           onBlur={() => {
             handleDobWarning(dobFieldValue);
+            setHideDobWarning(false);
           }}
           warnings={warnings.dob}
+          hideWarnings={hideDobWarning}
         />
         <FormTextArea
           label="Address"
