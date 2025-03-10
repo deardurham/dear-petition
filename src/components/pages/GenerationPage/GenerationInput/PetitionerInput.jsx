@@ -26,7 +26,7 @@ const TextInput = styled(Input)`
   }
 `;
 
-const dobWarningMsg = `Warning: Date of birth entered does not match CIPRS form pdf.
+const dobWarningMsg = `Warning: Date of birth entered does not match CIPRS record pdf.
   Petitioner Information date of birth will be used.`;
 
 export const CreateClientModal = ({ onCreate, handleWarnings, handleDobWarning, warnings }) => {
@@ -78,6 +78,8 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const clearError = (key) => setEditErrors((prev) => ({ ...prev, [key]: [] }));
   const clearAllErrors = () => setEditErrors({});
 
+  // Note that this currently only supports 1 warning message per key. If more than one warning per key is needed,
+  // change to something like ({ ...prev, [key]: prev[key] ? [...(prev[key]), warningMsg] : [warningMsg] }))
   const addWarning = (key, warningMsg) => setEditWarnings((prev) => ({ ...prev, [key]: [warningMsg] }));
   const clearWarning = (key) => setEditWarnings((prev) => ({ ...prev, [key]: [] }));
 
