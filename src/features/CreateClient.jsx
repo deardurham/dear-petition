@@ -7,6 +7,7 @@ import FormSelect from '../components/elements/Input/FormSelect';
 import FormDateInput from '../components/elements/Input/FormDateInput';
 import FormTextArea from '../components/elements/Input/FormTextArea';
 import { Button } from '../components/elements/Button';
+import useFormWarnings from '../hooks/useFormWarnings';
 
 export const CreateClient = ({
   onClose,
@@ -14,9 +15,7 @@ export const CreateClient = ({
   onSubmitSuccess,
   submitAndKeepOpenTitle = '',
   submitAndCloseTitle = 'Submit',
-  handleWarnings,
-  handleDobWarning,
-  warnings,
+  expectedValues,
 }) => {
   const [triggerCreate] = useCreateClientMutation();
   const { control, handleSubmit, reset } = useForm({
@@ -49,10 +48,19 @@ export const CreateClient = ({
   };
   const onSubmitAndClose = async (data) => {
     await onSubmit(data);
-    handleWarnings(data);
     onClose();
   };
   const dobFieldValue = useWatch({ control, name: 'dob' });
+  const { warnings, handleWarning } = useFormWarnings(
+    { dob: [(dob) => expectedValues.dob && dob != expectedValues.dob] },
+    {
+      dob: [
+        `Warning: Date of birth entered does not match CIPRS form pdf.
+              Petitioner Information date of birth will be used.`,
+      ],
+    },
+  );
+
   return (
     <div className="flex flex-col gap-8">
       <h3>{'Add New Client'}</h3>
@@ -73,7 +81,7 @@ export const CreateClient = ({
             rules: { required: false },
           }}
           onBlur={() => {
-            handleDobWarning(dobFieldValue);
+            handleWarning('dob', dobFieldValue);
           }}
           warnings={warnings.dob}
         />
