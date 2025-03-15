@@ -75,14 +75,12 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const clearAllErrors = () => setEditErrors({});
 
   const expectedValues = { dob: batchDob };
-  const { warnings, handleWarning, handleAllWarnings } = useFormWarnings(
-    { dob: [(dob) => expectedValues.dob && dob != expectedValues.dob] },
-    {
-      dob: [
-        `Warning: Date of birth entered does not match CIPRS form pdf.
-                Petitioner Information date of birth will be used.`,
-      ],
-    },
+  const { warnings, handleWarning, handleAllWarnings, addWarningType } = useFormWarnings();
+  addWarningType(
+    'dob',
+    (dob) => expectedValues.dob && dob != expectedValues.dob,
+    `Warning: Date of birth entered does not match CIPRS form pdf.
+                 Petitioner Information date of birth will be used.`,
   );
 
   const clientErrors = (errors?.client ?? editErrors?.client)?.map((errMsg) => (

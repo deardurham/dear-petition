@@ -51,14 +51,12 @@ export const CreateClient = ({
     onClose();
   };
   const dobFieldValue = useWatch({ control, name: 'dob' });
-  const { warnings, handleWarning } = useFormWarnings(
-    { dob: [(dob) => expectedValues.dob && dob != expectedValues.dob] },
-    {
-      dob: [
-        `Warning: Date of birth entered does not match CIPRS form pdf.
-              Petitioner Information date of birth will be used.`,
-      ],
-    },
+  const { warnings, handleWarning, addWarningType } = useFormWarnings();
+  addWarningType(
+    'dob',
+    (dob) => expectedValues.dob && dob != expectedValues.dob,
+    `Warning: Date of birth entered does not match CIPRS form pdf.
+               Petitioner Information date of birth will be used.`,
   );
 
   return (
