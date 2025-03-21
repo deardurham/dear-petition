@@ -93,7 +93,8 @@ function PageBase({ children, className, ...props }) {
               tooltipContent="To install, please click and drag this button to your bookmarks bar"
             >
               <a
-                href={bookmarklet}
+                ref={(node) => node && node.setAttribute('href', bookmarklet)}
+                href
                 className="cursor-grab"
                 onClick={(e) => {
                   e.preventDefault();
