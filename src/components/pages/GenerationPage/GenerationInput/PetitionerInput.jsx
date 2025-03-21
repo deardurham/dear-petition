@@ -4,6 +4,7 @@ import { faPencilAlt, faPlus, faSave, faTimes } from '@fortawesome/free-solid-sv
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Input from '../../../elements/Input/Input';
+import DobWarning from '../../../elements/Warning/DobWarning';
 import AddressInput from './AddressInput';
 import AutocompleteInput from '../../../elements/Input/AutocompleteInput';
 import {
@@ -26,10 +27,7 @@ const TextInput = styled(Input)`
   }
 `;
 
-const dobWarningMsg = `Warning: Date of birth entered does not match CIPRS form pdf.
-  Petitioner Information date of birth will be used.`;
-
-export const CreateClientModal = ({ onCreate, handleWarnings, handleDobWarning, warnings }) => {
+export const CreateClientModal = ({ onCreate, expectedDob }) => {
   const modalElement = useRef();
   const { closeModal } = useModalContext();
   return (
@@ -38,9 +36,7 @@ export const CreateClientModal = ({ onCreate, handleWarnings, handleDobWarning, 
         onClose={closeModal}
         category="client"
         onSubmitSuccess={(submitData) => onCreate(submitData)}
-        handleWarnings={handleWarnings}
-        handleDobWarning={handleDobWarning}
-        warnings={warnings}
+        expectedDob={expectedDob}
       />
     </div>
   );
@@ -69,7 +65,6 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const [triggerClientUpdate] = useUpdateClientMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [editErrors, setEditErrors] = useState({});
-  const [editWarnings, setEditWarnings] = useState({});
 
   const [petitionerData, setPetitionerData] = useState(getPetitionerData(petitioner));
   const { name, dob, ...address } = petitionerData;
@@ -77,26 +72,6 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const addError = (key, error) => setEditErrors((prev) => ({ ...prev, [key]: [error] }));
   const clearError = (key) => setEditErrors((prev) => ({ ...prev, [key]: [] }));
   const clearAllErrors = () => setEditErrors({});
-
-  const addWarning = (key, warningMsg) => setEditWarnings((prev) => ({ ...prev, [key]: [warningMsg] }));
-  const clearWarning = (key) => setEditWarnings((prev) => ({ ...prev, [key]: [] }));
-
-  const handleWarnings = (data) => {
-    // this function is used to check warnings for all fields on create client save
-    // (note only dob field has a warning as of now)
-    const inputDob = data.dob;
-    handleDobWarning(inputDob);
-  };
-
-  const handleDobWarning = (inputDob) => {
-    // this function is split off from handleWarnings so it can also be used
-    // when editing existing client dob
-    if (batchDob && inputDob && inputDob !== batchDob) {
-      addWarning('dob', dobWarningMsg);
-    } else {
-      clearWarning('dob');
-    }
-  };
 
   const clientErrors = (errors?.client ?? editErrors?.client)?.map((errMsg) => (
     <p key={errMsg} className="text-red">
@@ -128,9 +103,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
               addError('client', 'Unable to select new client. Please try searching and selecting the new client.');
             }
           }}
-          handleWarnings={handleWarnings}
-          handleDobWarning={handleDobWarning}
-          warnings={editWarnings}
+          expectedDob={batchDob}
         />
       </ModalButton>
       {petitioner && (
@@ -139,7 +112,6 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
           className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
           onClick={() => {
             setIsEditing(true);
-            handleWarnings(petitionerData);
           }}
         >
           <span>
@@ -156,7 +128,6 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
         className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
         onClick={async () => {
           clearAllErrors();
-          handleWarnings(petitionerData);
           try {
             await triggerClientUpdate({
               id: petitioner.pk,
@@ -184,7 +155,6 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
           setIsEditing(false);
           clearAllErrors();
           setPetitionerData(getPetitionerData(petitioner));
-          handleWarnings(getPetitionerData(petitioner));
         }}
       >
         <span>
@@ -250,14 +220,13 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
             value={dob}
             onChange={(e) => {
               setPetitionerData((prev) => ({ ...prev, dob: e.target.value }));
-              handleDobWarning(e.target.value);
             }}
             errors={isEditing && editErrors.dob}
-            warnings={isEditing && editWarnings.dob}
             onClearError={onClearError}
             disabled={!isEditing}
             type="date"
           />
+          <DobWarning enabled={batchDob && dob !== batchDob} expectedValue={batchDob} />
           <AddressInput
             address={address}
             setAddress={setPetitionerData}
