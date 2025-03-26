@@ -3,7 +3,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 export const DobWarning = ({ enabled, expectedValue }) => {
   // parsing date as UTC here to prevent unexpected changes of date value from using locale time
   const dob = new Date(expectedValue + 'Z');
-  const expectedDobString = `${dob.getUTCMonth() + 1}/${dob.getUTCDate()}/${dob.getUTCFullYear()}`;
+  const expectedDobString = dob.toLocaleDateString('en-US', {
+    timeZone: 'UTC',
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+  });
 
   return (
     <>
