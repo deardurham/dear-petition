@@ -7,6 +7,7 @@ import FormSelect from '../components/elements/Input/FormSelect';
 import FormDateInput from '../components/elements/Input/FormDateInput';
 import FormTextArea from '../components/elements/Input/FormTextArea';
 import { Button } from '../components/elements/Button';
+import DobWarning from '../components/elements/Warning/DobWarning';
 
 export const CreateClient = ({
   onClose,
@@ -14,9 +15,7 @@ export const CreateClient = ({
   onSubmitSuccess,
   submitAndKeepOpenTitle = '',
   submitAndCloseTitle = 'Submit',
-  handleWarnings,
-  handleDobWarning,
-  warnings,
+  expectedDob,
 }) => {
   const [triggerCreate] = useCreateClientMutation();
   const { control, handleSubmit, reset } = useForm({
@@ -49,7 +48,6 @@ export const CreateClient = ({
   };
   const onSubmitAndClose = async (data) => {
     await onSubmit(data);
-    handleWarnings(data);
     onClose();
   };
   const dobFieldValue = useWatch({ control, name: 'dob' });
@@ -72,10 +70,10 @@ export const CreateClient = ({
             name: 'dob',
             rules: { required: false },
           }}
-          onBlur={() => {
-            handleDobWarning(dobFieldValue);
-          }}
-          warnings={warnings.dob}
+        />
+        <DobWarning
+          enabled={expectedDob && dobFieldValue && dobFieldValue !== expectedDob}
+          expectedValue={expectedDob}
         />
         <FormTextArea
           label="Address"
