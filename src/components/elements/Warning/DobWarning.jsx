@@ -22,8 +22,7 @@ export const DobWarning = ({ enabled, expectedValue }) => {
             key="DobWarning"
           >
             <p className="text-amber-700 text-sm lg:text-base whitespace-normal">
-              Note: Date of birth entered does not match date found in CIPRS form pdf: {expectedDobString}. Petitioner
-              Information date of birth will be used.
+              Note: Date of birth entered does not match date found in CIPRS form pdf: {expectedDobString}.
             </p>
           </motion.div>
         )}
