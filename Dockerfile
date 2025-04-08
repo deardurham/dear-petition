@@ -138,6 +138,10 @@ ENV UWSGI_STATIC_MAP="/static/=/code/staticfiles/" UWSGI_STATIC_EXPIRES_URI="/st
 # Change to a non-root user
 USER ${APP_USER}:${APP_USER}
 
+# Enable heroku exec https://devcenter.heroku.com/articles/exec#using-with-docker
+RUN echo '[ -z "$SSH_CLIENT" ] && source <(curl --fail --retry 3 -sSL "$HEROKU_EXEC_URL")' > /app/.profile.d
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
 # Uncomment after creating your docker-entrypoint.sh
 ENTRYPOINT ["/code/docker-entrypoint.sh"]
 
