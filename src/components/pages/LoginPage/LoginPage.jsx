@@ -10,19 +10,17 @@ import ezExpungeLogoWithLancText from '../../../assets/img/ez_expunge_logo_with_
 // Routing
 import { useHistory } from 'react-router-dom';
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
-// import styled from 'styled-components';
-import { motion } from 'framer-motion';
 
 const FormErrors = motion.div;
 
 const LoginButton = ({ children }) => {
   return (
     <>
-      <Button className="pt-[1rem] pr-[3rem] text-[1.7rem] w-full" type="submit">
+      <Button className="py-[1rem] px-[3rem] text-[1.7rem] w-full" type="submit">
         {children}
       </Button>
     </>

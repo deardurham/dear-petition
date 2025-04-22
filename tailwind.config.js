@@ -40,9 +40,6 @@ module.exports = {
           DEFAULT: '#ffffff',
         },
       },
-      fontSize: {
-        inherit: 'inherit',
-      },
     },
   },
   plugins: [],
