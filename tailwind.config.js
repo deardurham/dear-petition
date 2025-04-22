@@ -27,6 +27,7 @@ module.exports = {
         },
         gray: {
           DEFAULT: '#82908d',
+          disabled: '#b8b8b8',
         },
         black: {
           DEFAULT: '#262626',
@@ -38,6 +39,9 @@ module.exports = {
         white: {
           DEFAULT: '#ffffff',
         },
+      },
+      fontSize: {
+        inherit: 'inherit',
       },
     },
   },

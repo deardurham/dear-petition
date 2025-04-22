@@ -1,24 +1,27 @@
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import keyAndAmbientShadows from '../../../styles/shadows';
-import { colorPrimary, colorWhite, colorCaution, greyScale } from '../../../styles/colors';
 import { fontPrimary } from '../../../styles/fonts';
 
-export const Button = styled.button`
-  cursor: pointer;
-  ${({ colorClass }) => mapTypeToStartingState(colorClass)}
-  ${({ disabled }) => disabled && mapTypeToStartingState(DISABLED)}
-  border-radius: 3px;
-  padding: 0.5rem;
-  outline: none;
+export const Button = ({ className, children, colorClass, ref, onClick, disabled }) => {
+  const buttonColor = !disabled ? mapTypeToStartingState(colorClass) : mapTypeToStartingState(DISABLED);
+  // renaming className for clarity
+  const parentStyles = className;
 
-  font-size: inherit;
-  font-family: ${fontPrimary};
-
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
-`;
+  return (
+    <button
+      ref={ref}
+      onClick={onClick}
+      disabled={disabled}
+      className={`cursor-pointer rounded-[3px] p-[0.5rem] outline-none
+              text-[length:inherit] font-[${fontPrimary}]
+              shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1),0_2px_4px_-2px_rgb(0_0_0/0.1)]
+              ${parentStyles} ${buttonColor}`}
+    >
+      {children}
+    </button>
+  );
+};
 
 export const CloseButton = styled(Button)`
   padding: 0 0.25rem;
@@ -58,27 +61,21 @@ function mapTypeToStartingState(colorClass) {
   }
 }
 
-const disabled = css`
-  background: ${greyScale(7.25)};
-  border: 1px solid ${greyScale(7.25)};
-  color: ${colorWhite};
-`;
-const positive = css`
-  background: ${colorPrimary};
-  border: 1px solid ${colorPrimary};
-  color: ${colorWhite};
-`;
-const caution = css`
-  background: ${colorCaution};
-  border: 1px solid ${colorCaution};
-  color: ${colorWhite};
-`;
+// const disabled = css`
+//   background: ${greyScale(7.25)};
+//   border: 1px solid ${greyScale(7.25)};
+//   color: ${colorWhite};
+// `;
 
-const neutral = css`
-  background: ${colorWhite};
-  border: 1px solid ${colorPrimary};
-  color: ${colorPrimary};
-`;
+// note: had trouble finding a way to get tailwind to accept the hsl color we had been using,
+// so added an equivalent color in tailwind config as gray-disabled
+const disabled = `bg-gray-disabled border-[1px] border-solid border-gray-disabled text-white`;
+
+const positive = 'bg-primary border-[1px] border-solid border-primary text-white';
+
+const caution = 'bg-red border-[1px] border-solid border-red text-white';
+
+const neutral = 'bg-white border-[1px] border-solid border-primary text-primary';
 
 Button.propTypes = {
   /** Reflects the state of the button */

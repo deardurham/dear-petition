@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { SplashLogo, FormErrors, InputStyled, PasswordInputStyled } from './LoginPage.styled';
+import { InputStyled, PasswordInputStyled } from './LoginPage.styled';
 import { Button } from '../../elements/Button';
 
 // Assets
@@ -14,13 +14,26 @@ import { AnimatePresence } from 'framer-motion';
 import useAuth from '../../../hooks/useAuth';
 import { loggedIn } from '../../../slices/auth';
 import { useLoginMutation } from '../../../service/api';
-import styled from 'styled-components';
+// import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
-const LoginButton = styled(Button)`
-  padding: 1rem 3rem;
-  font-size: 1.7rem;
-  width: 100%;
-`;
+const FormErrors = motion.div;
+
+const LoginButton = ({ children }) => {
+  return (
+    <>
+      <Button className="pt-[1rem] pr-[3rem] text-[1.7rem] w-full" type="submit">
+        {children}
+      </Button>
+    </>
+  );
+};
+
+// const LoginButton = styled(Button)`
+//   padding: 1rem 3rem;
+//   font-size: 1.7rem;
+//   width: 100%;
+// `;
 
 function Login() {
   const { user: authenticatedUser } = useAuth();
@@ -64,7 +77,7 @@ function Login() {
   return (
     <main className="flex-1 flex flex-col gap-12 items-center w-100 h-100 mt-20">
       <div className="w-[600px] px-2 py-12 flex flex-col items-center">
-        <SplashLogo src={ezExpungeLogoWithLancText} alt="EZ Expunge logo" />
+        <img className="w-full h-auto" src={ezExpungeLogoWithLancText} alt="EZ Expunge logo" />
       </div>
       <form className="flex flex-col items-center gap-4 w-[190px]" onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
@@ -91,7 +104,7 @@ function Login() {
               exit={{ opacity: 0, y: '-50' }}
               positionTransition
             >
-              <p>{errors.detail}</p>
+              <p className="text-red">{errors.detail}</p>
             </FormErrors>
           )}
         </AnimatePresence>

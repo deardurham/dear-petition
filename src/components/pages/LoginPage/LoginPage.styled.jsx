@@ -1,19 +1,14 @@
 import styled from 'styled-components';
 import FormInput from '../../elements/Input/FormInput';
-import { colorRed } from '../../../styles/colors';
-import { motion } from 'framer-motion';
+// import { colorRed } from '../../../styles/colors';
+// import { motion } from 'framer-motion';
 
-export const SplashLogo = styled.img`
-  width: 100%;
-  height: auto;
-`;
-
-export const FormErrors = styled(motion.div)`
-  p {
-    color: ${colorRed};
-  }
-  margin-bottom: 1.5rem;
-`;
+// export const FormErrors = styled(motion.div)`
+//   p {
+//     color: ${colorRed};
+//   }
+//   margin-bottom: 1.5rem;
+// `;
 
 export const InputStyled = styled(FormInput)`
   margin: 2rem 0;
