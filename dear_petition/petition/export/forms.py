@@ -88,7 +88,6 @@ class AOCFormCR287(PetitionForm):
         offense_record = self.get_most_recent_record()
         if offense_record:
             record = offense_record.offense.ciprs_record
-            self.data["NamePetitioner"] = record.label
             self.data["Race"] = record.race
             self.data["Sex"] = record.sex
             ## updated so user input client.dob overrides record.dob
