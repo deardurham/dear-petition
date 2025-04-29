@@ -1,6 +1,6 @@
 module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  important: true,
+  important: false,
   theme: {
     fontSize: {
       '2xs': '1rem',
@@ -12,6 +12,10 @@ module.exports = {
       '2xl': '2rem',
       '3xl': '3rem',
       '4xl': '4rem',
+    },
+    fontFamily: {
+      primary: ['"Arial"', 'Helvetica', 'sans-serif'],
+      error: ['"Arial"', 'Helvetica', 'sans-serif'],
     },
     extend: {
       colors: {

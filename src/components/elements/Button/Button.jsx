@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import keyAndAmbientShadows from '../../../styles/shadows';
-import { fontPrimary } from '../../../styles/fonts';
+// import { fontPrimary } from '../../../styles/fonts';
 
-export const Button = ({ className, children, colorClass, ref, onClick, disabled }) => {
+export const Button = ({ className, children, colorClass, ref, onClick, disabled, type, title }) => {
   const buttonColor = !disabled ? mapTypeToStartingState(colorClass) : mapTypeToStartingState(DISABLED);
   // renaming className for clarity
   const parentStyles = className;
@@ -14,13 +14,17 @@ export const Button = ({ className, children, colorClass, ref, onClick, disabled
       onClick={onClick}
       disabled={disabled}
       className={`cursor-pointer rounded-[3px] p-[0.5rem] outline-none
-              text-[length:inherit] font-[${fontPrimary}]
+              text-[length:inherit] font-primary
               shadow-[0_4px_6px_-1px_rgb(0_0_0/0.1),0_2px_4px_-2px_rgb(0_0_0/0.1)]
               ${parentStyles} ${buttonColor}`}
+      type={type}
+      title={title}
     >
       {children}
     </button>
   );
+
+  // font-[${fontPrimary}]
 };
 
 export const CloseButton = styled(Button)`

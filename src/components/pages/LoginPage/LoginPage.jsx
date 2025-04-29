@@ -20,7 +20,7 @@ const FormErrors = motion.div;
 const LoginButton = ({ children }) => {
   return (
     <>
-      <Button className="py-[1rem] px-[3rem] text-[1.7rem] w-full" type="submit">
+      <Button className="!py-[1rem] !px-[3rem] !text-[1.7rem] w-full" type="submit">
         {children}
       </Button>
     </>
@@ -79,7 +79,7 @@ function Login() {
       </div>
       <form className="flex flex-col items-center gap-4 w-[190px]" onSubmit={handleSubmit(handleLogin)}>
         <InputStyled
-          className="m-0"
+          className="!m-0"
           label="username"
           inputProps={{ name: 'username', control }}
           errors={errors.username}

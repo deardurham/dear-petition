@@ -68,7 +68,7 @@ const AgenciesPage = () => {
         <h2>Arresting Agencies</h2>
         <div className="flex gap-6 mb-1">
           <ModalButton
-            className="flex gap-2 font-semibold px-2 py-1"
+            className="flex gap-2 font-semibold !px-2 !py-1"
             title={
               <span>
                 <FontAwesomeIcon icon={faPlus} /> New Agency
@@ -78,7 +78,7 @@ const AgenciesPage = () => {
             <CreateAgencyModal />
           </ModalButton>
           <ModalButton
-            className="flex gap-2 font-semibold px-2 py-1"
+            className="flex gap-2 font-semibold !px-2 !py-1"
             title={
               <span>
                 <FontAwesomeIcon icon={faCog} /> Display Settings
@@ -95,7 +95,7 @@ const AgenciesPage = () => {
             </DisplaySettingsModal>
           </ModalButton>
           <ModalButton
-            className="flex gap-2 font-semibold px-2 py-1"
+            className="flex gap-2 font-semibold !px-2 !py-1"
             title={
               <span>
                 <FontAwesomeIcon icon={faList} /> Filters
@@ -105,7 +105,7 @@ const AgenciesPage = () => {
             <AgencyFiltersModal onFilter={onFilter} filterSelections={filterSelections} />
           </ModalButton>
           <ModalButton
-            className="flex gap-2 font-semibold px-2 py-1"
+            className="flex gap-2 font-semibold !px-2 !py-1"
             title={
               <span>
                 <FontAwesomeIcon icon={faUpload} /> Import

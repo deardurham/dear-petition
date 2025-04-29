@@ -82,7 +82,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const addOrEditClient = (
     <>
       <ModalButton
-        className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
+        className="h-full border !border-gray-700 !rounded-md !shadow-md font-semibold"
         title={
           <span>
             <FontAwesomeIcon icon={faPlus} /> New Client
@@ -109,7 +109,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
       {petitioner && (
         <Button
           colorClass="neutral"
-          className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
+          className="h-full border !border-gray-700 !rounded-md !shadow-md font-semibold"
           onClick={() => {
             setIsEditing(true);
           }}
@@ -125,7 +125,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
   const saveOrCancelChanges = (
     <>
       <Button
-        className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
+        className="h-full border !border-gray-700 !rounded-md !shadow-md font-semibold"
         onClick={async () => {
           clearAllErrors();
           try {
@@ -150,7 +150,7 @@ export default function PetitionerInput({ petitioner, batchDob, errors, onClearE
       </Button>
       <Button
         colorClass="neutral"
-        className="h-full border border-gray-700 rounded-md shadow-md font-semibold"
+        className="h-full border !border-gray-700 !rounded-md !shadow-md font-semibold"
         onClick={() => {
           setIsEditing(false);
           clearAllErrors();
