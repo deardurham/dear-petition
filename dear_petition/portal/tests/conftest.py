@@ -1,4 +1,5 @@
 import pathlib
+import json
 
 from bs4 import BeautifulSoup
 import pytest
@@ -13,3 +14,9 @@ def sample_record():
 @pytest.fixture(scope="module")
 def soup(sample_record):
     return BeautifulSoup(sample_record, features="html.parser")
+
+
+@pytest.fixture(scope="module")
+def dispositions():
+    path = pathlib.Path(__file__).parent / "data" / "dispositions.json"
+    return json.loads(path.read_text())

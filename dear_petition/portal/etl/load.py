@@ -10,10 +10,10 @@ __all__ = ("import_portal_record",)
 logger = logging.getLogger(__name__)
 
 
-def import_portal_record(user, source: str, location: str):
+def import_portal_record(user, source: str, location: str, url: str):
     """Import eCourts Portal records into models."""
     logger.info("Importing Portal record")
-    data = transform_portal_record(source, location)
+    data = transform_portal_record(source, location, url)
     batch, _ = Batch.objects.get_or_create(user=user, label=data["Defendant"]["Name"])
     record = CIPRSRecord(batch=batch, data=data)
     record.refresh_record_from_data()
