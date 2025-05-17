@@ -1,7 +1,10 @@
+from unittest.mock import patch
 from dear_petition.portal.etl.transform import transform_portal_record
 
 
-def test_transform_full_record(sample_record):
+@patch("dear_petition.portal.etl.parsers.dispositions.requests")
+def test_transform_full_record(mock_requests, sample_record, dispositions):
+    mock_requests.get.return_value.json.return_value = dispositions
     expected = {
         "Case Information": {
             "Case Status": "Disposed",
@@ -31,6 +34,7 @@ def test_transform_full_record(sample_record):
         "General": {"County": "Wake", "District": "Yes", "File No": "01CR012345-678"},
         "Superior Court Offense Information": [],
     }
-    transformed_record = transform_portal_record(sample_record)
+    transformed_record = transform_portal_record(sample_record, url="/#/123")
     transformed_record.pop("_meta")
+
     assert transformed_record == expected

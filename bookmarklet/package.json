@@ -1,6 +1,6 @@
 {
   "name": "@code-with-durham/bookmarklet",
-  "version": "0.1.0",
+  "version": "0.2.3",
   "description": "Bookmark that forwards Portal case info for parsing",
   "main": "index.js",
   "scripts": {
