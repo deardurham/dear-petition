@@ -34,7 +34,7 @@ def test_transform_full_record(mock_requests, sample_record, dispositions):
         "General": {"County": "Wake", "District": "Yes", "File No": "01CR012345-678"},
         "Superior Court Offense Information": [],
     }
-    transformed_record = transform_portal_record(sample_record, url="/#/123")
+    transformed_record = transform_portal_record(sample_record, location="#/123")
     transformed_record.pop("_meta")
 
     assert transformed_record == expected

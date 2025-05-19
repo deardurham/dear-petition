@@ -43,14 +43,9 @@ export function generateBookmarklet(username) {
   location_input.name = 'location';
   location_input.value = window.location;
 
-  var url_input = document.createElement('input');
-  url_input.name = 'url';
-  url_input.value = window.location.href;
-
   form.appendChild(username_input);
   form.appendChild(location_input);
   form.appendChild(textarea);
-  form.appendChild(url_input);
   iframe.appendChild(form);
   
   document.body.appendChild(iframe);

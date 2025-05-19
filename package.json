@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@code-with-durham/bookmarklet": "0.2.3",
+    "@code-with-durham/bookmarklet": "0.1.0",
     "@floating-ui/react": "^0.27.4",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",

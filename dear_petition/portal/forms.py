@@ -13,7 +13,6 @@ class BookmarkletDataForm(forms.Form):
     user = forms.CharField()
     location = forms.CharField()
     source = forms.CharField()
-    url = forms.CharField()
 
     def clean_user(self):
         try:
