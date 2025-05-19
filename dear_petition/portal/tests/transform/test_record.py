@@ -36,5 +36,4 @@ def test_transform_full_record(mock_requests, sample_record, dispositions):
     }
     transformed_record = transform_portal_record(sample_record, location="#/123")
     transformed_record.pop("_meta")
-
     assert transformed_record == expected
