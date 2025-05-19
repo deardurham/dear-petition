@@ -55,6 +55,7 @@ def parse_dispositions_by_html(soup):
         )
     return dispositions
 
+
 @catch_parse_error
 def parse_event_date(div):
     """
