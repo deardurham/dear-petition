@@ -39,6 +39,22 @@ def parse_dispositions(record_id):
     return dispositions
 
 
+def parse_dispositions_by_html(soup):
+    """Case Information section"""
+    divs = soup.select(SELECT_DISPOSITIONS)
+    dispositions = []
+    for div in divs:
+        dispositions.append(
+            Disposition(
+                event_date=parse_event_date(div),
+                event=parse_event(div),
+                charge_number=parse_charge_number(div),
+                charge_offense=parse_charge_offense(div),
+                criminal_disposition=parse_criminal_disposition(div),
+            )
+        )
+    return dispositions
+
 @catch_parse_error
 def parse_event_date(div):
     """
