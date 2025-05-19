@@ -1,3 +1,6 @@
+import requests
+from datetime import datetime
+
 from dear_petition.portal.etl.models import Disposition
 
 from .utils import catch_parse_error
@@ -6,7 +9,37 @@ from .utils import catch_parse_error
 SELECT_DISPOSITIONS = "div[ng-if*=data\\.roaSections\\.dispositionEvents] div.roa-event-info-criminal-disposition-event"
 
 
-def parse_dispositions(soup):
+def parse_dispositions(record_id):
+    """Case Information section"""
+    disposition_request = requests.get(
+        f"https://portal-nc.tylertech.cloud/app/RegisterOfActionsService/DispositionEvents('{record_id}')?mode=portalembed&$top=50&$skip=0"
+    )
+    disposition_request.raise_for_status()
+    disposition_data = disposition_request.json()
+    dispositions = []
+    for event in disposition_data["Events"]:
+        disposition_label = event["CriminalDispositionLabel"]
+        event = event["Event"]
+        date = event["Date"]
+        criminal_dispositions = event["CriminalDispositions"]
+        for criminal_disposition in criminal_dispositions:
+            criminal_disposition_type = criminal_disposition["CriminalDispositionTypeId"]
+            charge = criminal_disposition["Charge"]
+            charge_offense = charge["ChargeOffense"]
+            dispositions.append(
+                Disposition(
+                    event_date=datetime.strptime(date, "%m/%d/%Y").date(),
+                    event=disposition_label,
+                    charge_number=charge_offense["ChargeNumber"],
+                    charge_offense=charge_offense["ChargeOffenseDescription"],
+                    criminal_disposition=criminal_disposition_type["Description"],
+                )
+            )
+
+    return dispositions
+
+
+def parse_dispositions_by_html(soup):
     """Case Information section"""
     divs = soup.select(SELECT_DISPOSITIONS)
     dispositions = []
