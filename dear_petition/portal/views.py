@@ -18,7 +18,7 @@ def bookmarklet_handler(request):
     if not form.is_valid():
         logger.warning(f"Bookmarklet validation failed: {form.errors.as_json()}")
         return HttpResponse(status=400)
-    breakpoint()
+
     import_portal_record(
         user=form.cleaned_data["user"],
         location=form.cleaned_data["location"],

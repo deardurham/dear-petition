@@ -4,7 +4,7 @@ from .models import CaseSummary, PartyInfo, PortalRecord
 from .parsers import case_summary, dispositions, case_info, party_info
 
 
-def extract_portal_record(source, record_id: str):
+def extract_portal_record(source, record_id: str | None = None):
     """Parse HTML source to extract eCourts Portal record"""
     soup = BeautifulSoup(source, features="html.parser")
     return PortalRecord(
