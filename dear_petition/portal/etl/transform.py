@@ -5,9 +5,9 @@ from .models import PortalRecord
 from ...petition import constants as pc
 
 
-def transform_portal_record(source, url, location=""):
+def transform_portal_record(source, url: str | None, location=""):
     """Transform eCourts Portal record to CIPRS-looking record."""
-    record_id = re.search(r"#/([A-Za-z0-9]+)", url).group(1)
+    record_id = re.search(r"#/([A-Za-z0-9]+)", url).group(1) if url else None
     portal_record = extract_portal_record(source, record_id)
     court = portal_record.case_summary.court
     sex = portal_record.party_info.defendant_sex

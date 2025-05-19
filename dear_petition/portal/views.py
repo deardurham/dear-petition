@@ -23,6 +23,6 @@ def bookmarklet_handler(request):
         user=form.cleaned_data["user"],
         location=form.cleaned_data["location"],
         source=form.cleaned_data["source"],
-        url=form.cleaned_data["url"],
+        url=form.cleaned_data.get("url"),
     )
     return HttpResponse(status=201)

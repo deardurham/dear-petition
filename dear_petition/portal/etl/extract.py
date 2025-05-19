@@ -7,11 +7,15 @@ from .parsers import case_summary, dispositions, case_info, party_info
 def extract_portal_record(source, record_id: str | None = None):
     """Parse HTML source to extract eCourts Portal record"""
     soup = BeautifulSoup(source, features="html.parser")
+    if record_id:
+        dispositions = dispositions.parse_dispositions(record_id)
+    else:
+        dispositions = 
     return PortalRecord(
         case_summary=parse_case_summary(soup),
         case_info=case_info.parse_case_information(soup),
         party_info=parse_party_information(soup),
-        dispositions=dispositions.parse_dispositions(record_id),
+        dispositions=dispositions,
     )
 
 

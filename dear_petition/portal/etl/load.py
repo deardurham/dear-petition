@@ -10,7 +10,7 @@ __all__ = ("import_portal_record",)
 logger = logging.getLogger(__name__)
 
 
-def import_portal_record(user, source: str, location: str, url: str):
+def import_portal_record(user, source: str, location: str, url: str | None):
     """Import eCourts Portal records into models."""
     logger.info("Importing Portal record")
     data = transform_portal_record(source, location, url)
