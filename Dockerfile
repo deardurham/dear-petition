@@ -1,4 +1,4 @@
-FROM node:18-slim as dear_frontend
+FROM node:22-slim as dear_frontend
 
 WORKDIR /code
 ENV PATH /code/node_modules/.bin:$PATH
@@ -23,12 +23,12 @@ FROM python:3.12-slim-bookworm as base
 #   libfontconfig -- required by pdftotext
 # We need to recreate the /usr/share/man/man{1..8} directories first because
 # they were clobbered by a parent image.
+
 RUN set -ex \
     && RUN_DEPS=" \
     libpcre3 \
     libfontconfig \
     mime-support \
-    postgresql-client \
     build-essential \
     xz-utils  \
     zlib1g-dev \
@@ -44,6 +44,14 @@ RUN set -ex \
     && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y wget gnupg lsb-release \
+ && echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+    > /etc/apt/sources.list.d/pgdg.list \
+ && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+ && apt-get update \
+ && apt-get install -y postgresql-client-17 \
+ && apt-get clean
 
 # Install poppler pdftotext, based on xpdf3 (for parser mode V1)
 RUN set -ex \
