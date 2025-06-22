@@ -31,6 +31,8 @@ CONTACT_CATEGORIES = Choices(("agency", "Agency"), ("attorney", "Attorney"), ("c
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%m/%d/%Y"
+PETITION_FILENAME_FORMAT = "%Y-%m-%d"  # YYYY-MM-DD
+OLD_PETITION_FILENAME_FORMAT = "%m-%d-%Y"  # MM-DD-YYYY
 
 CHARGED = "CHARGED"
 CONVICTED = "CONVICTED"
