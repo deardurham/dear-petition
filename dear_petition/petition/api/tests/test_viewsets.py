@@ -125,7 +125,7 @@ class TestBatchViewSet(APITestCase):
             response = self.client.delete(
                 self.detail_url, headers={"authorization": f"Bearer {self.access}"}
             )
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_unauthorized(self):
         """Unauthorized users may not use the API.
