@@ -323,7 +323,7 @@ class BatchViewSet(viewsets.ModelViewSet):
         batch = self.queryset.get(pk=pk)
         if batch and batch.user == user:
             batch.delete()
-            return Response({}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({}, status=status.HTTP_403_FORBIDDEN)
 
