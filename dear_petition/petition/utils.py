@@ -94,7 +94,7 @@ def remove_prefix(text, prefix):
 def get_petition_filename(petitioner_name, petition, extension, addendum_document=None):
     date_generated = format_petition_filename_date(petition.created)
     statute = STATUTES.get(petition.form_type)
-    return f"{date_generated} {petition.county} {petition.jurisdiction}C {statute} {petitioner_name}.{extension}"
+    return f"{date_generated} {petition.county} {petition.jurisdiction}C {statute} DRAFT {petitioner_name}.{extension}"
 
 
 def split_first_and_last_name(name):
