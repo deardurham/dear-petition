@@ -6,7 +6,7 @@ from django.utils.timezone import make_aware
 from django.utils import timezone
 from django.db.models import IntegerField, Case, When, Value
 from django.db.models.functions import Cast, Substr, Concat
-from .constants import DATE_FORMAT, STATUTES
+from .constants import DATE_FORMAT, PETITION_FILENAME_FORMAT, STATUTES
 
 from PIL import ImageFont
 import dateutil.parser
@@ -76,6 +76,14 @@ def format_petition_date(date):
     return date.strftime(DATE_FORMAT) if date else ""
 
 
+def format_petition_filename_date(datetime: datetime) -> str:
+    """
+    Requested petition filename date format by Emily.
+    Note: We may need to have different formatting for different users/groups.
+    """
+    return datetime.date().strftime(PETITION_FILENAME_FORMAT)
+
+
 # https://stackoverflow.com/questions/16891340/remove-a-prefix-from-a-string
 def remove_prefix(text, prefix):
     if text.startswith(prefix):
@@ -84,9 +92,9 @@ def remove_prefix(text, prefix):
 
 
 def get_petition_filename(petitioner_name, petition, extension, addendum_document=None):
-    date_generated = petition.created.date().strftime("%m-%d-%Y")
+    date_generated = format_petition_filename_date(petition.created)
     statute = STATUTES.get(petition.form_type)
-    return f"{date_generated} {petition.county} {petition.jurisdiction}C {statute} {petitioner_name}.{extension}"
+    return f"{date_generated} {petition.county} {petition.jurisdiction}C {statute} DRAFT {petitioner_name}.{extension}"
 
 
 def split_first_and_last_name(name):
