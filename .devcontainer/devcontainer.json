@@ -7,7 +7,7 @@
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/heroku-cli:1": {},
+		// "ghcr.io/devcontainers-contrib/features/heroku-cli:1": {},
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "lts"
 		}
