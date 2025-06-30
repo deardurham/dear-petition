@@ -5,7 +5,13 @@ from datetime import datetime, date
 
 from dear_petition.petition import utils as pu
 
-from ..constants import DATETIME_FORMAT
+from ..constants import (
+    ADULT_FELONIES,
+    ADULT_MISDEMEANORS,
+    DISMISSED,
+    NOT_GUILTY,
+    UNDERAGED_CONVICTIONS,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -113,11 +119,22 @@ def test_get_truncation_point_of_short_text_by_pixel_size():
     assert truncation_point == len(text)
 
 
-def test_get_petition_filename(petition):
+@pytest.mark.parametrize(
+    "form_type,expected_statute",
+    [
+        [DISMISSED, "146"],
+        [NOT_GUILTY, "146NG"],
+        [UNDERAGED_CONVICTIONS, "145.8A"],
+        [ADULT_FELONIES, "145.5F"],
+        [ADULT_MISDEMEANORS, "145.5M"],
+    ],
+)
+def test_get_petition_filename(petition, form_type, expected_statute):
     petition.created = datetime(2024, 7, 28, 0, 0)
+    petition.form_type = form_type
     petition.save()
-    petitioner_name = "Test"
+    petitioner_name = "Test Client"
     assert (
         pu.get_petition_filename(petitioner_name, petition, "pdf")
-        == "07-28-2024 DURHAM DC 146(a) Test.pdf"
+        == f"2024-07-28 DURHAM DC {expected_statute} DRAFT Test Client.pdf"
     )

@@ -323,7 +323,9 @@ class BatchViewSet(viewsets.ModelViewSet):
         batch = self.queryset.get(pk=pk)
         if batch and batch.user == user:
             batch.delete()
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
 
     def perform_create(self, serializer):
         files = self.request.data.getlist("files")
