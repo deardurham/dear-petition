@@ -18,7 +18,8 @@ def parse_dispositions(record_id):
     disposition_data = disposition_request.json()
     dispositions = []
     for event in disposition_data["Events"]:
-        disposition_label = event["CriminalDispositionLabel"]
+        if event["Type"] != "CriminalDispositionEvent":
+            continue
         event = event["Event"]
         date = event["Date"]
         criminal_dispositions = event["CriminalDispositions"]
@@ -29,7 +30,6 @@ def parse_dispositions(record_id):
             dispositions.append(
                 Disposition(
                     event_date=datetime.strptime(date, "%m/%d/%Y").date(),
-                    event=disposition_label,
                     charge_number=charge_offense["ChargeNumber"],
                     charge_offense=charge_offense["ChargeOffenseDescription"],
                     criminal_disposition=criminal_disposition_type["Description"],

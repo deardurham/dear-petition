@@ -66,7 +66,6 @@ class PartyInfo(BaseModel):
 
 class Disposition(BaseModel):
     event_date: Union[dt.date, None]
-    event: str
     charge_number: int
     charge_offense: str
     criminal_disposition: str
