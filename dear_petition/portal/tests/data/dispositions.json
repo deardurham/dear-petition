@@ -162,8 +162,10 @@
         "AmendReasons": [],
         "Documents": []
       }
-    }
+    },
+    {"Type": "SentenceEvent"},
+    {"Type": "PleaEvent"}
   ],
-  "Count": 1,
+  "Count": 3,
   "Skipped": 0
 }
