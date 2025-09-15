@@ -156,6 +156,12 @@ export const api = createApi({
     logout: builder.mutation({
       query: () => ({ url: 'token/', method: 'delete' }),
     }),
+    obtainAuthToken: builder.query({
+      query: () => ({ url: 'authtoken/', method: 'get' }),
+    }),
+    createAuthToken: builder.query({
+      query: () => ({ url: 'authtoken/', method: 'post' }),
+    }),
     users: builder.query({
       query: ({ queryString, id }) => {
         let url = 'users/';
@@ -254,5 +260,7 @@ export const {
   useCreateUserMutation,
   useModifyUserMutation,
   useUsersQuery,
+  useObtainAuthTokenQuery,
+  useCreateAuthTokenQuery,
   useAssignClientToBatchMutation,
 } = api;
