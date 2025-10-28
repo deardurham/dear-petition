@@ -7,9 +7,13 @@ const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || 'https://examplePublicKey@
 Sentry.init({
   dsn: SENTRY_DSN,
 
+  // defaultIntegrations and sampleRate are set to prevent error reporting for front-end,
+  // since we are only using sentry for feedback widget; change these values if error reporting is desired
+  defaultIntegrations: false,
+  sampleRate: 0,
+
   integrations: [
     Sentry.feedbackIntegration({
-      // Additional SDK configuration goes in here, for example:
       colorScheme: 'light',
     }),
   ],
