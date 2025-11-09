@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/react';
 
-// get sentry dsn from vite env variables, otherwise just use example dsn (e.g. for local development)
-// TODO: look into using a different fallback dsn for testing purposes
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || 'https://examplePublicKey@o0.ingest.sentry.io/0';
+const SENTRY_DSN = 'https://8b15bbb6bc864b3ebdc0369ffbdd02c0@o262794.ingest.us.sentry.io/1462682';
 
 Sentry.init({
   dsn: SENTRY_DSN,
