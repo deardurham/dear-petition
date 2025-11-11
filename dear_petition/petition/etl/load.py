@@ -158,7 +158,9 @@ def assign_agencies_to_documents(petition):
                 current_document = current_document.following_document
             except pm.PetitionDocument.DoesNotExist:  # Have to create new attachment
                 current_document = pm.PetitionDocument.objects.create(
-                    petition=petition, previous_document=current_document
+                    petition=petition,
+                    previous_document=current_document,
+                    form_type=ATTACHMENT,
                 )
 
         current_document.agencies.clear()

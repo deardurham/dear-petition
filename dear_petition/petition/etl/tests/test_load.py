@@ -99,6 +99,8 @@ def test_assign_agencies_to_documents(petition, petition_document):
     # 4th contact should attachment
     petition.agencies.add(contact4)
     petition = assign_agencies_to_documents(petition)
+    form_types = [document.form_type for document in petition.documents.all()]
+    assert set(form_types) == set(("AOC-CR-287", "AOC-CR-285"))
     assert petition.documents.count() == 2
 
 
