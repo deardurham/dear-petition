@@ -143,7 +143,7 @@ export const CreateContact = ({
             control,
             name: 'is_sheriff',
             rules: {
-              required: true,
+              required: false,
             },
           }}
         />
