@@ -142,9 +142,6 @@ export const CreateContact = ({
           inputProps={{
             control,
             name: 'is_sheriff',
-            rules: {
-              required: false,
-            },
           }}
         />
       </form>
