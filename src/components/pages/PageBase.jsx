@@ -106,6 +106,9 @@ function PageBase({ children, className, ...props }) {
             <LinkWrapper>
               <Link to="/help">Help</Link>
             </LinkWrapper>
+            <LinkWrapper>
+              <Link to="/token">Token</Link>
+            </LinkWrapper>
             {user?.is_admin ? (
               <DropdownMenu
                 items={[

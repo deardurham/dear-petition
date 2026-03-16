@@ -11,6 +11,7 @@ import { Button } from './elements/Button';
 import Modal from './elements/Modal/Modal';
 import GenerationPage from './pages/GenerationPage/GenerationPage';
 import FAQPage from './pages/HelpPage/HelpPage';
+import TokenPage from './pages/TokenPage/TokenPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import { CSRF_TOKEN_LS_KEY, USER } from '../constants/authConstants';
 import useBrowserWarning from '../hooks/useBrowserWarning';
@@ -86,6 +87,9 @@ function App() {
             </ProtectedRoute>
             <ProtectedRoute exact path="/help">
               <FAQPage />
+            </ProtectedRoute>
+            <ProtectedRoute exact path="/token">
+              <TokenPage />
             </ProtectedRoute>
           </Switch>
         </AppStyled>

@@ -18,6 +18,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt import exceptions
 from rest_framework_simplejwt import views as simplejwt_views
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 from openpyxl import load_workbook
 
 from dear_petition.petition import constants
@@ -779,3 +781,26 @@ class TokenRefreshCookieView(simplejwt_views.TokenRefreshView):
         )
 
         return response
+
+
+class AuthToken(APIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            token = Token.objects.get(user=user)
+            return Response({"token": token.key, "user_id": user.pk, "email": user.email})
+        except Token.DoesNotExist:
+            return Response(
+                "No token found. Please generate one", status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        with transaction.atomic():
+            Token.objects.filter(user=user).delete()
+            token = Token.objects.create(user=user)
+        return Response({"token": token.key, "user_id": user.pk, "email": user.email})

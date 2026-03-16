@@ -35,4 +35,5 @@ urlpatterns = [
         ensure_csrf_cookie(viewsets.TokenRefreshCookieView.as_view()),
         name="token_refresh",
     ),
+    path("authtoken/", viewsets.AuthToken.as_view(), name="auth_token"),
 ]

@@ -4,6 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.authtoken.models import Token
 
 from dear_petition.petition.tests.factories import (
     BatchFactory,
@@ -198,3 +199,82 @@ class TestMyInbox:
         assert data["total_emails"] == 1
         assert data["total_files"] == 0
         assert data["total_petitions"] == 0
+
+
+@pytest.mark.django_db
+class TestAuthTokenViewSet(APITestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.other_user = UserFactory()
+        self.url = reverse("api:auth_token")
+        self.tokens = get_tokens_for_user(self.user)
+        self.access = self.tokens["access"]
+        self.other_user_tokens = get_tokens_for_user(self.other_user)
+        self.other_user_access = self.other_user_tokens["access"]
+
+    def test_get_existing_token(self):
+        """Test GET request returns existing token for authenticated user"""
+
+        existing_token = Token.objects.create(user=self.user)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["token"], existing_token.key)
+        self.assertEqual(response.data["user_id"], self.user.pk)
+        self.assertEqual(response.data["email"], self.user.email)
+
+    def test_get_no_existing_token(self):
+        """Test GET request returns 400 when no token exists for user"""
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, "No token found. Please generate one")
+
+    def test_post_create_new_token(self):
+        """Test POST request creates new token for authenticated user"""
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("token", response.data)
+
+        token = Token.objects.get(user=self.user)
+        self.assertEqual(response.data["token"], token.key)
+
+    def test_post_regenerate_existing_token(self):
+        """Test POST request regenerates existing token for authenticated user"""
+
+        old_token = Token.objects.create(user=self.user)
+        old_key = old_token.key
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("token", response.data)
+        self.assertEqual(response.data["user_id"], self.user.pk)
+        self.assertEqual(response.data["email"], self.user.email)
+
+        # Verify new token is different from old token
+        new_token = Token.objects.get(user=self.user)
+        self.assertEqual(response.data["token"], new_token.key)
+        self.assertNotEqual(old_key, new_token.key)
+
+        # Verify only one token exists for the user
+        self.assertEqual(Token.objects.filter(user=self.user).count(), 1)
+
+    def test_unauthorized_access(self):
+        """Test unauthorized users cannot access token endpoints"""
+
+        with self.subTest("GET without auth"):
+            response = self.client.get(self.url)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        with self.subTest("POST without auth"):
+            response = self.client.post(self.url)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
